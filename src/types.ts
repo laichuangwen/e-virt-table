@@ -1,0 +1,166 @@
+import type Cell from "./Cell";
+import type CellHeader from "./CellHeader";
+import type { RuleItem } from "async-validator";
+import config from "./config";
+export type EVirtTableOptions = {
+  data: any[];
+  footerData: any[];
+  columns: Column[];
+  config?: ConfigType;
+};
+export type EventCallback = (...args: any[]) => void;
+export type ChangeItem = {
+  value: any;
+  key: string;
+  rowKey: string;
+  row: any;
+};
+export type OverflowTooltipPlacement =
+  | "top"
+  | "top-start"
+  | "top-end"
+  | "right"
+  | "right-start"
+  | "right-end"
+  | "left"
+  | "left-start"
+  | "left-end"
+  | "bottom"
+  | "bottom-start"
+  | "bottom-end";
+
+export type VerticalAlign = "top" | "middle" | "bottom";
+export type Align = "left" | "center" | "right";
+export type Fixed = "left" | "right" ;
+export type Type = "index" | "selection" | "index-selection" | "tree";
+export type TypeCheckbox =
+  | "checkbox-uncheck"
+  | "checkbox-check"
+  | "checkbox-check-disabled"
+  | "checkbox-disabled"
+  | "checkbox-hover"
+  | "checkbox-indeterminate";
+export type CellType = "body" | "footer";
+export type RowType = CellType;
+export type MenuItem = {
+  label: string;
+  value: string | "copy" | "paste" | "cut" | "clearSelected";
+  children?: MenuItem[];
+  event?: Function;
+};
+export type OverlayerView = {
+  key: "left" | "center" | "right";
+  style: any;
+  cells: Cell[] | CellHeader[];
+};
+export type OverlayerWrapper = {
+  type: "body" | "footer" | "header";
+  class: string;
+  style: any;
+  views: OverlayerView[];
+};
+export type OverlayerContainer = {
+  style: any;
+  views: OverlayerWrapper[];
+};
+export type ContextmenuItem = {
+  label: string;
+  value: string | number;
+  render: Function;
+};
+export type Render = Function | string | undefined;
+export interface KRuleItem extends RuleItem {
+  column?: Column;
+  row?: any; // 这里可以定义更具体的类型，根据你的需求
+  rowIndex?: number;
+  colIndex?: number;
+}
+export type Rule = KRuleItem | KRuleItem[];
+export type Rules = {
+  [x: string]: Rule;
+};
+export type Position = {
+  height: number;
+  top: number;
+  bottom: number;
+};
+export interface Column {
+  type: Type;
+  editorType: string;
+  title: string;
+  width: number;
+  align: Align;
+  verticalAlign: VerticalAlign;
+  fixed: Fixed;
+  level: number;
+  text: string;
+  colspan: number;
+  rowspan: number;
+  key: string;
+  render: Function;
+  renderFooter: Function;
+  renderHeader: Function;
+  formatter: formatterMethod;
+  required: boolean;
+  readonly: boolean;
+  children: Column[];
+  column: Column;
+  overflowTooltipShow: boolean;
+  overflowTooltipWidth: number;
+  overflowTooltipPlacement: OverflowTooltipPlacement;
+  rules: Rules;
+  options: any[];
+}
+export type OverlayerTooltip = {
+  style: any;
+  text: string;
+  show: boolean;
+};
+export type OverlayerContextmenu = {
+  style: any;
+  list: any[];
+  show: boolean;
+};
+export type CellStyleOptions = {
+  color?: string;
+  backgroundColor?: string;
+};
+export type CellParams = {
+  row: any;
+  rowIndex: number;
+  colIndex: number;
+  column: Column;
+  value: any;
+};
+export type SpanType = {
+  rowspan: number;
+  colspan: number;
+};
+export type SpanParams = {
+  row: any;
+  rowIndex: number;
+  colIndex: number;
+  column: Column;
+  visibleLeafColumns: Column[];
+  value: any;
+  headIndex: number;
+  headPosition: Position;
+  visibleRows: any[];
+  rows: any[];
+};
+export type SelectableParams = {
+  row: any;
+  rowIndex: number;
+};
+export type ConfigType = Partial<typeof config>;
+export type FilterMethod = (rows: any[]) => any[];
+export type formatterMethod = (params: CellParams) => string | void;
+export type CellStyleMethod = (params: CellParams) => CellStyleOptions | void;
+export type CellReadonlyMethod = (params: CellParams) => boolean | void;
+export type CellRulesMethod = (params: CellParams) => Rules | void;
+export type CellTypeMethod = (params: CellParams) => Type | void;
+export type CellEditorTypeMethod = (params: CellParams) => string | void;
+export type CellRenderMethod = (params: CellParams) => string | void;
+export type SpanMethod = (params: SpanParams) => SpanType | void;
+export type SelectableMethod = (params: SelectableParams) => boolean | void;
+export type ExpandLazyMethod = (params: CellParams) => Promise<any[]>;
