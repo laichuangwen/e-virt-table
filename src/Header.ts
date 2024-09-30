@@ -70,76 +70,8 @@ export default class Header {
       (sum, _item) => sum + _item.width,
       SCROLLER_TRACK_SIZE
     );
-  }
-  private setMouseDown() {
-    if (this.resizeTarget) {
-      this.isResizing = true;
-    } else {
-      this.isResizing = false;
-    }
-    this.isMouseDown = true;
-  }
-  private setMouseUp() {
-    this.isMouseDown = false;
-    // 清空
-    // this.ctx?.selector.setFocusCellHeader(undefined);
-    if (this.resizeDiff !== 0 && this.resizeTarget) {
-      // 调整宽度
-      this.resizeColumn(this.resizeTarget, this.resizeDiff);
-    }
-    this.ctx.target.style.cursor = "default";
-    this.resizeTarget = null;
-    this.isResizing = false;
-  }
-  private setMouseMove(e: MouseEvent) {
-    const {
-      target,
-      config: { RESIZE_COLUMN_MIN_WIDTH = 0 },
-    } = this.ctx;
-    // 鼠标移动
-    if (this.isResizing && this.resizeTarget) {
-      const resizeTargetWidth = this.resizeTarget.width;
-      let diff = e.offsetX - this.offsetX;
-      if (diff + resizeTargetWidth < RESIZE_COLUMN_MIN_WIDTH) {
-        diff = -(resizeTargetWidth - RESIZE_COLUMN_MIN_WIDTH);
-      }
-      this.resizeDiff = diff;
-      this.ctx.emit("draw");
-    } else {
-      this.resizeTarget = null;
-      // 按下时不改变样式，有可能是多选表头
-      if (this.isMouseDown) {
-        return;
-      }
-      // 恢复默认样式
-      if (this.ctx.target.style.cursor === "col-resize") {
-        this.ctx.target.style.cursor = "default";
-      }
-      // 渲染的表头
-      const renderAllCellHeaders = [
-        ...this.renderFixedCellHeaders,
-        ...this.renderCenterCellHeaders,
-      ];
-      for (const col of renderAllCellHeaders) {
-        const x = e.layerX;
-        const drawX = col.getDrawX();
-        if (
-          x > drawX + col.width - 5 &&
-          x < drawX + col.width + 4 &&
-          x < target.offsetWidth - 4 && // 视窗中最后一列不允许调整宽
-          col.colspan <= 1 // 父级表头不触发
-        ) {
-          // 在表头内
-          if (
-            (e.target as HTMLElement).tagName.toLowerCase() === "canvas" &&
-            e.layerY <= this.height
-          ) {
-            this.ctx.target.style.cursor = "col-resize";
-            this.resizeTarget = col;
-          }
-        }
-      }
-    }
+    // 更新最大列索引
+    this.ctx.maxRowIndex = this.leafCellHeaders.length - 1;
   }
   // 调整表头的宽度
   initResizeColumn() {
@@ -150,15 +82,79 @@ export default class Header {
       return;
     }
     this.ctx.on("mousedown", (e) => {
+      if (!this.ctx.isTarget(e.target)) {
+        return;
+      }
       this.offsetX = e.offsetX;
-      this.setMouseDown();
+      if (this.resizeTarget) {
+        this.isResizing = true;
+      } else {
+        this.isResizing = false;
+      }
+      this.isMouseDown = true;
     });
     this.ctx.on("mouseup", () => {
-      this.setMouseUp();
+      this.isMouseDown = false;
+      // 清空
+      if (this.resizeDiff !== 0 && this.resizeTarget) {
+        // 调整宽度
+        this.resizeColumn(this.resizeTarget, this.resizeDiff);
+      }
+      this.ctx.target.style.cursor = "default";
+      this.resizeTarget = null;
+      this.isResizing = false;
       this.offsetX = 0;
     });
     this.ctx.on("mousemove", (e) => {
-      this.setMouseMove(e);
+      const {
+        target,
+        config: { RESIZE_COLUMN_MIN_WIDTH = 0 },
+      } = this.ctx;
+      // 鼠标移动
+      if (this.isResizing && this.resizeTarget) {
+        const resizeTargetWidth = this.resizeTarget.width;
+        let diff = e.offsetX - this.offsetX;
+        if (diff + resizeTargetWidth < RESIZE_COLUMN_MIN_WIDTH) {
+          diff = -(resizeTargetWidth - RESIZE_COLUMN_MIN_WIDTH);
+        }
+        this.resizeDiff = diff;
+        this.ctx.emit("draw");
+      } else {
+        this.resizeTarget = null;
+        // 按下时不改变样式，有可能是多选表头
+        if (this.isMouseDown) {
+          return;
+        }
+        // 恢复默认样式
+        if (this.ctx.target.style.cursor === "col-resize") {
+          this.ctx.target.style.cursor = "default";
+        }
+        // 渲染的表头
+        const renderAllCellHeaders = [
+          ...this.renderFixedCellHeaders,
+          ...this.renderCenterCellHeaders,
+        ];
+        for (const col of renderAllCellHeaders) {
+          const x = e.layerX;
+          const drawX = col.getDrawX();
+          if (
+            x > drawX + col.width - 5 &&
+            x < drawX + col.width + 4 &&
+            x < target.offsetWidth - 4 && // 视窗中最后一列不允许调整宽
+            col.colspan <= 1 // 父级表头不触发
+          ) {
+            // 在表头内
+            if (
+              e.target instanceof HTMLCanvasElement &&
+              this.ctx.isTarget(e.target) &&
+              e.layerY <= this.height
+            ) {
+              this.ctx.target.style.cursor = "col-resize";
+              this.resizeTarget = col;
+            }
+          }
+        }
+      }
     });
   }
   resizeColumn(cell: CellHeader, diff: number) {

@@ -8,6 +8,7 @@ import { Column, EVirtTableOptions } from "./types";
 import Icons from "./Icons";
 import CellHeader from "./CellHeader";
 import Row from "./Row";
+import { generateShortUUID } from "./util";
 export type ConfigType = Partial<typeof config>;
 export type HeaderOptions = {
   x: number;
@@ -29,11 +30,13 @@ export type BodyOptions = {
   visibleWidth: number;
   headIndex: number;
   tailIndex: number;
-  visibleRows: Row[];
+  visibleRows: any[];
+  renderRows: Row[];
 };
 export default class Context {
   private eventBus: EventBus;
   private eventBrowser: EventBrowser;
+  private uuid = generateShortUUID();
   target: HTMLCanvasElement;
   paint: Paint;
   icons: Icons;
@@ -42,7 +45,8 @@ export default class Context {
   scrollX = 0;
   fixedLeftWidth = 0;
   fixedRightWidth = 0;
-
+  maxColIndex = 0;
+  maxRowIndex = 0;
   body: BodyOptions = {
     x: 0,
     y: 0,
@@ -53,6 +57,7 @@ export default class Context {
     headIndex: 0,
     tailIndex: 0,
     visibleRows: [],
+    renderRows: [],
   };
   header: HeaderOptions = {
     x: 0,
@@ -71,6 +76,7 @@ export default class Context {
 
   constructor(target: HTMLCanvasElement, options: EVirtTableOptions) {
     this.target = target;
+    this.target.setAttribute("uuid", this.uuid);
     this.config = { ...config, ...options.config };
     this.eventBus = new EventBus();
     this.eventBrowser = new EventBrowser(this);
@@ -78,6 +84,11 @@ export default class Context {
     this.database = new Database(this, options);
     this.history = new History(this);
     this.icons = new Icons(this);
+  }
+  isTarget(target: HTMLCanvasElement): boolean {
+    if(target === null) return false;
+    const uuid = target.getAttribute("uuid");
+    return this.uuid === uuid;
   }
   hasEvent(event: string): boolean {
     return this.eventBus.has(event);

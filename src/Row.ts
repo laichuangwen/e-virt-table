@@ -33,9 +33,9 @@ export default class Row {
     this.rowKey = ctx.database.getRowKeyForRowIndex(rowIndex);
     this.rowType = rowType;
     this.data = data;
-    this.updated();
+    this.update();
   }
-  updated() {
+  update() {
     const { header } = this.ctx;
     const cells: Cell[] = [];
     const fixedCells: Cell[] = [];

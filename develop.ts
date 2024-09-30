@@ -380,8 +380,8 @@ const eVirtTable = new EVirtTable(canvas, {
   footerData: [],
   config: {
     WIDTH: 0,
-    HEIGHT: 500,
-    ENABLE_OFFSET_HEIGHT: false,
+    HEIGHT: 0,
+    ENABLE_OFFSET_HEIGHT: true,
     OFFSET_HEIGHT: 16,
   },
 });

@@ -45,6 +45,10 @@ export default class Cell extends BaseCell {
   message: string = "";
   text: string = "";
   displayText: string = "";
+  visibleWidth = 0;
+  visibleHeight = 0;
+  drawX = 0;
+  drawY = 0;
   constructor(
     ctx: Context,
     rowIndex: number,
@@ -82,7 +86,6 @@ export default class Cell extends BaseCell {
     this.renderFooter = column.renderFooter;
     this.formatter = column.formatter;
     this.update();
-    this.getValidationMessage();
   }
   getValidationMessage() {
     const errors = this.ctx.database.getValidationError(this.rowKey, this.key);
@@ -95,11 +98,14 @@ export default class Cell extends BaseCell {
   update() {
     // this.updateSpan();
     // this.updateStyle();
-    // this.updateType();
-    // this.updateEditorType();
-    // this.updateRender();
+    this.updateType();
+    this.updateEditorType();
+    this.updateRender();
+    this.getValidationMessage();
     this.text = this.getText();
     this.displayText = this.getDisplayText();
+    this.drawX = this.getDrawX();
+    this.drawY = this.getDrawY();
   }
   // updateSpan() {
   //   // 合计不合并
@@ -336,10 +342,6 @@ export default class Cell extends BaseCell {
     // };
   }
   draw() {
-    this.update();
-    const drawX = this.getDrawX();
-    const drawY = this.getDrawY();
-    // const displayText = this.getText();
     const {
       paint,
       config: {
@@ -351,11 +353,14 @@ export default class Cell extends BaseCell {
         HEAD_FONT_STYLE,
       },
     } = this.ctx;
+    const { drawX, drawY } = this;
+    // 绘制单元格
     paint.drawRect(drawX, drawY, this.width, this.height, {
       borderColor: BORDER_COLOR,
       fillColor: BODY_BG_COLOR,
     });
     const font = `${HEAD_FONT_SIZE}px ${HEAD_FONT_STYLE} ${HEAD_FONTFAMILY}`;
+    // 绘制文本
     paint.drawText(this.displayText, drawX, drawY, this.width, this.height, {
       font,
       padding: CELL_PADDING,

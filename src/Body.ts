@@ -6,7 +6,6 @@ export default class Body {
   private isMouseDown = false; // 是否按下
   private resizeDiff = 0; // 是否移动中
   private offsetY = 0; // 鼠标按下时的y轴位置
-  isResizing = false; //是否正在调整大小
   private ctx: Context;
   private x = 0;
   private y = 0;
@@ -14,142 +13,25 @@ export default class Body {
   private height = 0;
   private headIndex = 0;
   private tailIndex = 0;
+  isResizing = false; //是否正在调整大小
   renderRows: Row[] = [];
   visibleRows: any[] = [];
   visibleHeight = 0;
   visibleWidth = 0;
   data: any[] = [];
-  range = {
-    minX: 0,
-    maxX: 0,
-    minY: 0,
-    maxY: 0,
-  };
   constructor(ctx: Context) {
     this.ctx = ctx;
     this.init();
     this.initResizeRow();
   }
-  init() {
+  private init() {
     const { database, header } = this.ctx;
     const { data, sumHeight } = database.getData();
     this.height = sumHeight;
     this.data = data;
-    this.range.maxX = header.leafCellHeaders.length - 1;
-    this.range.maxY = this.data.length - 1;
     this.updateWidthHeight();
   }
-  setMouseDown() {
-    if (this.resizeTarget) {
-      this.isResizing = true;
-    } else {
-      this.isResizing = false;
-    }
-    this.isMouseDown = true;
-  }
-  setMouseUp() {
-    this.isMouseDown = false;
-    if (this.resizeDiff !== 0 && this.resizeTarget) {
-      // 调整宽度
-      this.resizeRow(this.resizeTarget, this.resizeDiff);
-    }
-    this.ctx.target.style.cursor = "default";
-    this.resizeTarget = null;
-    this.resizeDiff = 0;
-    this.isResizing = false;
-  }
-  // 调整行的高度
-  initResizeRow() {
-    const {
-      config: { ENABLE_RESIZE_ROW },
-    } = this.ctx;
-    if (!ENABLE_RESIZE_ROW) {
-      return;
-    }
-    // 鼠标移动
-    this.ctx.on("mouseup", () => {
-      this.setMouseUp();
-      this.offsetY = 0;
-    });
-    this.ctx.on("mousedown", (e) => {
-      this.offsetY = e.offsetY;
-      this.setMouseDown();
-    });
-    this.ctx.on("mousemove", (e) => {
-      const y = e.layerY;
-      const x = e.layerX;
-      const {
-        target,
-        scrollY,
-        scrollX,
-        config: { RESIZE_ROW_MIN_HEIGHT = 0 },
-      } = this.ctx;
-      if (this.isResizing && this.resizeTarget) {
-        const resizeTargetHeight = this.resizeTarget.height;
-        let diff = e.offsetY - this.offsetY;
-        if (diff + resizeTargetHeight < RESIZE_ROW_MIN_HEIGHT) {
-          diff = -(resizeTargetHeight - RESIZE_ROW_MIN_HEIGHT);
-        }
-        this.resizeDiff = diff;
-        this.ctx.emit("draw");
-      } else {
-        this.resizeTarget = null;
-        // 按下时不改变样式，有可能是多选表头
-        if (this.isMouseDown) {
-          return;
-        }
-        // 恢复默认样式
-        if (this.ctx.target.style.cursor === "row-resize") {
-          this.ctx.target.style.cursor = "default";
-        }
-        for (let i = 0; i < this.renderRows.length; i++) {
-          const row = this.renderRows[i];
-          const isYRange =
-            y > row.y - scrollY + row.height - 1.2 &&
-            y < row.y - scrollY + row.height + 1.2 &&
-            y < target.offsetHeight - 4;
-          const isXRange =
-            x >= row.x - scrollX + 10 && x <= row.x - scrollX + row.width - 10;
-          if (isYRange && isXRange) {
-            for (let j = 0; j < row.cells.length; j++) {
-              const cell = row.cells[j];
-              // 对应格子l
-              const cellClientX = cell.getDrawX();
-              if (
-                x > cellClientX &&
-                x < cellClientX + cell.width + 4 &&
-                cell.rowspan === 1 //没有被合并的单元格
-              ) {
-                this.ctx.target.style.cursor = "row-resize";
-                this.resizeTarget = row;
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-  resizeRow(row: Row, diff: number) {
-    const { rowIndex, height, rowKey, data } = row;
-    this.ctx.database.setRowHeight(rowIndex, height + diff);
-    // 清除显示缓存
-    this.ctx.database.clearBufferData();
-    this.init();
-    // 清除选择器
-    // this.ctx.selector.setFocusCell(undefined);
-    // this.ctx.selector.clearSelector();
-    // this.ctx.autofill.clearAutofill();
-    this.ctx.emit("draw");
-    this.ctx.emit("resizeRowChange", {
-      rowIndex,
-      oldHeight: height,
-      height: height + diff,
-      rowKey,
-      row: data,
-      data: this.data,
-    });
-  }
-  updateWidthHeight() {
+  private updateWidthHeight() {
     const {
       target,
       header,
@@ -247,58 +129,112 @@ export default class Body {
       this.visibleHeight = _visibleHeight;
     }
   }
-  update() {
-    this.updateWidthHeight();
-    const { header, database, scrollY } = this.ctx;
-    const offset = scrollY;
-    const { data, positions } = database.getData();
-    const _headIndex = this.binarySearch(positions, offset);
-    let _tailIndex = this.binarySearch(positions, offset + this.visibleHeight);
-    // 找不到就为data.length
-    if (_tailIndex === -1) {
-      _tailIndex = data.length;
+  // 调整行的高度
+  private initResizeRow() {
+    const {
+      config: { ENABLE_RESIZE_ROW },
+    } = this.ctx;
+    if (!ENABLE_RESIZE_ROW) {
+      return;
     }
-    this.headIndex = Math.max(0, _headIndex);
-    this.tailIndex = Math.min(data.length, _tailIndex + 1);
-    this.visibleRows = data.slice(this.headIndex, this.tailIndex);
-    this.ctx.setBody({
-      x: this.x,
-      y: this.y,
-      width: this.width,
-      height: this.height,
-      visibleWidth: this.visibleWidth,
-      visibleHeight: this.visibleHeight,
-      headIndex: this.headIndex,
-      tailIndex: this.tailIndex,
-      visibleRows: this.visibleRows,
+    // 鼠标移动
+    this.ctx.on("mouseup", () => {
+      this.isMouseDown = false;
+      if (this.resizeDiff !== 0 && this.resizeTarget) {
+        // 调整宽度
+        this.resizeRow(this.resizeTarget, this.resizeDiff);
+      }
+      this.ctx.target.style.cursor = "default";
+      this.resizeTarget = null;
+      this.resizeDiff = 0;
+      this.isResizing = false;
+      this.offsetY = 0;
     });
-    const rows: Row[] = [];
-    for (let i = 0; i <= this.visibleRows.length; i++) {
-      const index = this.headIndex + i;
-      const data = this.visibleRows[i];
-      const { height, top } = this.ctx.database.getPositionForRowIndex(index);
-      const row = new Row(
-        this.ctx,
-        index,
-        0,
-        top + this.y,
-        header.width,
-        height,
-        data
-      );
-      rows.push(row);
-    }
-    this.renderRows = rows;
+    this.ctx.on("mousedown", (e) => {
+      if (!this.ctx.isTarget(e.target)) {
+        return;
+      }
+      this.offsetY = e.offsetY;
+      if (this.resizeTarget) {
+        this.isResizing = true;
+      } else {
+        this.isResizing = false;
+      }
+      this.isMouseDown = true;
+    });
+    this.ctx.on("mousemove", (e) => {
+      const y = e.layerY;
+      const x = e.layerX;
+      const {
+        target,
+        scrollY,
+        scrollX,
+        config: { RESIZE_ROW_MIN_HEIGHT = 0 },
+      } = this.ctx;
+      if (this.isResizing && this.resizeTarget) {
+        const resizeTargetHeight = this.resizeTarget.height;
+        let diff = e.offsetY - this.offsetY;
+        if (diff + resizeTargetHeight < RESIZE_ROW_MIN_HEIGHT) {
+          diff = -(resizeTargetHeight - RESIZE_ROW_MIN_HEIGHT);
+        }
+        this.resizeDiff = diff;
+        this.ctx.emit("draw");
+      } else {
+        this.resizeTarget = null;
+        // 按下时不改变样式，有可能是多选表头
+        if (this.isMouseDown) {
+          return;
+        }
+        // 恢复默认样式
+        if (this.ctx.target.style.cursor === "row-resize") {
+          this.ctx.target.style.cursor = "default";
+        }
+        for (let i = 0; i < this.renderRows.length; i++) {
+          const row = this.renderRows[i];
+          const isYRange =
+            y > row.y - scrollY + row.height - 1.2 &&
+            y < row.y - scrollY + row.height + 1.2 &&
+            y < target.offsetHeight - 4;
+          const isXRange =
+            x >= row.x - scrollX + 10 && x <= row.x - scrollX + row.width - 10;
+          if (isYRange && isXRange) {
+            for (let j = 0; j < row.cells.length; j++) {
+              const cell = row.cells[j];
+              // 对应格子l
+              const cellClientX = cell.getDrawX();
+              if (
+                x > cellClientX &&
+                x < cellClientX + cell.width + 4 &&
+                cell.rowspan === 1 //没有被合并的单元格
+              ) {
+                this.ctx.target.style.cursor = "row-resize";
+                this.resizeTarget = row;
+              }
+            }
+          }
+        }
+      }
+    });
   }
-  draw() {
-    this.renderRows.forEach((row) => {
-      row.drawCenter();
+  private resizeRow(row: Row, diff: number) {
+    const { rowIndex, height, rowKey, data } = row;
+    this.ctx.database.setRowHeight(rowIndex, height + diff);
+    // 清除显示缓存
+    this.ctx.database.clearBufferData();
+    this.init();
+    // 清除选择器
+    // this.ctx.selector.setFocusCell(undefined);
+    // this.ctx.selector.clearSelector();
+    // this.ctx.autofill.clearAutofill();
+    this.ctx.emit("draw");
+    this.ctx.emit("resizeRowChange", {
+      rowIndex,
+      oldHeight: height,
+      height: height + diff,
+      rowKey,
+      row: data,
+      data: this.data,
     });
-    this.drawFiexShadow();
-    this.renderRows.forEach((row) => {
-      row.drawFixed();
-    });
-    this.drawTipLine();
   }
   private drawTipLine() {
     if (this.isResizing && this.resizeTarget) {
@@ -372,5 +308,61 @@ export default class Body {
       }
     }
     return tempIndex;
+  }
+  update() {
+    this.updateWidthHeight();
+    const { header, database, scrollY } = this.ctx;
+    const offset = scrollY;
+    const { data, positions } = database.getData();
+    // 更新最大行数
+    this.ctx.maxColIndex = data.length - 1;
+    const _headIndex = this.binarySearch(positions, offset);
+    let _tailIndex = this.binarySearch(positions, offset + this.visibleHeight);
+    // 找不到就为data.length
+    if (_tailIndex === -1) {
+      _tailIndex = data.length;
+    }
+    this.headIndex = Math.max(0, _headIndex);
+    this.tailIndex = Math.min(data.length, _tailIndex + 1);
+    this.visibleRows = data.slice(this.headIndex, this.tailIndex);
+    const rows: Row[] = [];
+    for (let i = 0; i <= this.visibleRows.length; i++) {
+      const index = this.headIndex + i;
+      const data = this.visibleRows[i];
+      const { height, top } = this.ctx.database.getPositionForRowIndex(index);
+      const row = new Row(
+        this.ctx,
+        index,
+        0,
+        top + this.y,
+        header.width,
+        height,
+        data
+      );
+      rows.push(row);
+    }
+    this.renderRows = rows;
+    this.ctx.setBody({
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height,
+      visibleWidth: this.visibleWidth,
+      visibleHeight: this.visibleHeight,
+      headIndex: this.headIndex,
+      tailIndex: this.tailIndex,
+      visibleRows: this.visibleRows,
+      renderRows: this.renderRows,
+    });
+  }
+  draw() {
+    this.renderRows.forEach((row) => {
+      row.drawCenter();
+    });
+    this.drawFiexShadow();
+    this.renderRows.forEach((row) => {
+      row.drawFixed();
+    });
+    this.drawTipLine();
   }
 }

@@ -194,6 +194,8 @@ class Scrollbar {
       this.barY =
         headerHeight +
         (this.scroll / this.distance) * (this.visibleDistance - this.barHeight);
+      // 范围限制
+      this.scroll = Math.max(0, Math.min(this.scroll, this.distance));
     } else {
       this.visibleDistance = visibleWidth - SCROLLER_TRACK_SIZE;
       this.distance = headerWidth - this.visibleDistance;
@@ -217,6 +219,8 @@ class Scrollbar {
       this.barHeight = SCROLLER_SIZE;
       this.barX =
         (this.scroll / this.distance) * (this.visibleDistance - this.barWidth);
+      // 范围限制
+      this.scroll = Math.max(0, Math.min(this.scroll, this.distance));
     }
   }
   draw() {
@@ -287,6 +291,10 @@ export default class Scroller {
   }
 
   onMouseDown(e: MouseEvent) {
+    // 鼠标样式不是默认的时候不触发，说明可能是拖动调整行高或者列宽
+    if (this.ctx.target.style.cursor !== "default") {
+      return;
+    }
     this.verticalScrollbar.onMouseDown(e);
     this.horizontalScrollbar.onMouseDown(e);
     this.draw();

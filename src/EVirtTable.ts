@@ -3,18 +3,21 @@ import Context from "./Context";
 import Scroller from "./Scroller";
 import Header from "./Header";
 import Body from "./Body";
+import Selector from "./Selector";
 export default class VirtTable {
   target: HTMLCanvasElement;
   ctx: Context;
   scroller: Scroller;
   private header: Header;
   private body: Body;
+  private selector: Selector;
   constructor(target: HTMLCanvasElement, options: EVirtTableOptions) {
     this.target = target;
     this.ctx = new Context(target, options);
     this.header = new Header(this.ctx);
     this.body = new Body(this.ctx);
     this.scroller = new Scroller(this.ctx);
+    this.selector = new Selector(this.ctx);
     console.log(this.ctx);
     // 外层容器样式
     const {

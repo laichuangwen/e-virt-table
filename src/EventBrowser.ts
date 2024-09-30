@@ -1,5 +1,4 @@
 import Context from "./Context";
-import { throttle } from "./util";
 
 type EventTask = Map<string, EventListenerOrEventListenerObject>;
 
@@ -12,7 +11,7 @@ export default class EventBrowser {
   }
 
   init() {
-    this.bind(window, "resize", throttle(this.handleResize.bind(this), 100));
+    this.bind(window, "resize", this.handleResize.bind(this));
     this.bind(window, "mousedown", this.handleMouseDown.bind(this));
     this.bind(window, "mouseup", this.handleMouseUp.bind(this));
     this.bind(window, "mousemove", this.handleMousemove.bind(this));
