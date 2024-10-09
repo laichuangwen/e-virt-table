@@ -209,7 +209,7 @@ const columns: any[] = [
     title: "性别",
     key: "sex",
     // readonly: false,
-    // fixed: "right",
+    fixed: "right",
     // render: "sex",
     rules: {
       required: true,
@@ -366,14 +366,14 @@ for (let i = 1; i < 10000; i += 1) {
     children: [],
   });
 }
-for (let i = 0; i < 500; i += 1) {
-  columns.push({
-    title: `表头${i}`,
-    key: `sc_name${i}`,
-    readonly: true,
-    align: "right",
-  });
-}
+// for (let i = 0; i < 500; i += 1) {
+//   columns.push({
+//     title: `表头${i}`,
+//     key: `sc_name${i}`,
+//     readonly: true,
+//     align: "right",
+//   });
+// }
 const eVirtTable = new EVirtTable(canvas, {
   columns,
   data,

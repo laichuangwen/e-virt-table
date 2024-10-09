@@ -367,5 +367,116 @@ export default class Cell extends BaseCell {
       align: this.align,
       verticalAlign: this.verticalAlign,
     });
+    this.drawSelector();
+  }
+  private drawSelector() {
+    const { drawX, drawY, width, rowIndex, colIndex } = this;
+    const x = drawX + 0.5;
+    let y = drawY + 0.5;
+    let height = this.height;
+    // 第一行减去1，不然会被表头覆盖
+    if (rowIndex === 0) {
+      y = this.y + 1;
+      height = height - 1;
+    }
+    const { xArr, yArr, xArrCopy, yArrCopy } = this.ctx.selector;
+    // 复制线
+    this.drawBorder({
+      xArr: xArrCopy,
+      yArr: yArrCopy,
+      borderColor: this.ctx.config.SELECT_BORDER_COLOR || "rgb(82,146,247)",
+      fillColor: this.ctx.config.SELECT_AREA_COLOR || "rgba(82,146,247,0.1)",
+      borderWidth: 1,
+      lineDash: [4, 4],
+    });
+    // 选择线
+    this.drawBorder({
+      xArr,
+      yArr,
+      borderColor: this.ctx.config.SELECT_BORDER_COLOR || "rgb(82,146,247)",
+      fillColor: this.ctx.config.SELECT_AREA_COLOR || "rgba(82,146,247,0.1)",
+      borderWidth: 1,
+    });
+  }
+  private drawBorder(options: {
+    xArr: number[];
+    yArr: number[];
+    borderColor: string;
+    fillColor: string;
+    borderWidth: number;
+    lineDash?: number[];
+  }) {
+    const { drawX, drawY, width, rowIndex, colIndex } = this;
+    const x = drawX + 0.5;
+    let y = drawY + 0.5;
+    let height = this.height;
+    // 第一行减去1，不然会被表头覆盖
+    if (rowIndex === 0) {
+      y = this.y + 1;
+      height = height - 1;
+    }
+    const {
+      xArr,
+      yArr,
+      lineDash = [],
+      borderWidth = 1,
+      borderColor,
+      fillColor,
+    } = options;
+
+    const minX = xArr[0];
+    const maxX = xArr[1];
+    const minY = yArr[0];
+    const maxY = yArr[1];
+    // 选择
+    if (colIndex >= minX && colIndex <= maxX && rowIndex === minY) {
+      this.ctx.paint.drawLine([x, y, x + width - 2, y], {
+        borderColor,
+        fillColor,
+        borderWidth,
+        lineCap: "round",
+        lineJoin: "round",
+        lineDash,
+      });
+    }
+    // bottom border
+    if (colIndex >= minX && colIndex <= maxX && rowIndex === maxY) {
+      this.ctx.paint.drawLine(
+        [x, y + height - 1.5, x + width, y + height - 1.5],
+        {
+          borderColor,
+          fillColor,
+          borderWidth,
+          lineCap: "round",
+          lineJoin: "round",
+          lineDash,
+        }
+      );
+    }
+    // left border
+    if (colIndex === minX && rowIndex >= minY && rowIndex <= maxY) {
+      this.ctx.paint.drawLine([x, y, x, y + height - 1], {
+        borderColor,
+        fillColor,
+        borderWidth,
+        lineCap: "round",
+        lineJoin: "round",
+        lineDash,
+      });
+    }
+    // right border
+    if (colIndex === maxX && rowIndex >= minY && rowIndex <= maxY) {
+      this.ctx.paint.drawLine(
+        [x + width - 1, y, x + width - 1, y + height - 1],
+        {
+          borderColor,
+          fillColor,
+          borderWidth,
+          lineCap: "round",
+          lineJoin: "round",
+          lineDash,
+        }
+      );
+    }
   }
 }

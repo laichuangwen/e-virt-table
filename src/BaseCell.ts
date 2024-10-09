@@ -46,12 +46,8 @@ export default class BaseCell {
       return this.x;
     }
     if (this.fixed === "right") {
-      // 距离左边的距离+(可见宽度-总固定宽度)
-      const x =
-        this.ctx.header.width -
-        (this.x + this.width) +
-        this.ctx.target.offsetWidth -
-        this.ctx.fixedRightWidth;
+      // 可见区域宽度 -到右边界的距离即(表头宽度 - x坐标)
+      const x = this.ctx.header.visibleWidth - (this.ctx.header.width - this.x);
       return x;
     }
     return this.x - this.ctx.scrollX;

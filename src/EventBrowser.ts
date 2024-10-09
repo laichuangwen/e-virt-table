@@ -13,9 +13,11 @@ export default class EventBrowser {
   init() {
     this.bind(window, "resize", this.handleResize.bind(this));
     this.bind(window, "mousedown", this.handleMouseDown.bind(this));
+    this.bind(window, "mousedown", this.handleMouseDown.bind(this));
     this.bind(window, "mouseup", this.handleMouseUp.bind(this));
     this.bind(window, "mousemove", this.handleMousemove.bind(this));
     this.bind(this.ctx.target, "click", this.handleClick.bind(this));
+    this.bind(this.ctx.target, "keydown", this.handleKeydown.bind(this));
     this.bind(this.ctx.target, "wheel", this.handleWheel.bind(this));
   }
   destroy() {
@@ -42,6 +44,13 @@ export default class EventBrowser {
   private handleClick(e: Event) {
     this.ctx.emit("click", e);
   }
+  private handleKeydown(e: Event) {
+    console.log("handleKeydown");
+
+    const { ENABLE_KEYBOARD } = this.ctx.config;
+    if (!ENABLE_KEYBOARD) return;
+    this.ctx.emit("keydown", e);
+  }
   private handleWheel(e: Event) {
     this.ctx.emit("wheel", e);
   }
@@ -50,6 +59,10 @@ export default class EventBrowser {
     name: string,
     fn: EventListenerOrEventListenerObject
   ): void {
+    // canvas元素默认不支持键盘事件，需要设置tabIndex
+    if (target instanceof HTMLCanvasElement && name === "keydown") {
+      target.tabIndex = 0;
+    }
     target.addEventListener(name, fn);
     this.eventTasks.set(name, fn);
   }

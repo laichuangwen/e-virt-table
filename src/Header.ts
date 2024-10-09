@@ -88,6 +88,7 @@ export default class Header {
       this.offsetX = e.offsetX;
       if (this.resizeTarget) {
         this.isResizing = true;
+        this.ctx.columnResizing = true;
       } else {
         this.isResizing = false;
       }
@@ -103,6 +104,7 @@ export default class Header {
       this.ctx.target.style.cursor = "default";
       this.resizeTarget = null;
       this.isResizing = false;
+      this.ctx.columnResizing = false;
       this.offsetX = 0;
     });
     this.ctx.on("mousemove", (e) => {

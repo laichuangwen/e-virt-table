@@ -4,7 +4,7 @@ export type LineOptions = {
   lineCap?: CanvasLineCap;
   lineDash?: number[];
   lineJoin?: CanvasLineJoin;
-  borderWidth?: 1;
+  borderWidth?: number;
   borderColor?: string | CanvasGradient | CanvasPattern;
   fillColor?: string | CanvasGradient | CanvasPattern;
 };

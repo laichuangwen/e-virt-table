@@ -43,6 +43,7 @@ class Scrollbar {
       this.offsetX = offsetX;
       this.offsetY = offsetY;
       this.isDragging = true;
+      this.ctx.scrollerMove = true; // 滚动条移动
       this.isFocus = true;
       this.dragStart = this.scroll;
     } else if (this.isOnTrack(offsetX, offsetY)) {
@@ -277,11 +278,23 @@ export default class Scroller {
     this.ctx = ctx;
     this.verticalScrollbar = new Scrollbar(ctx, "vertical");
     this.horizontalScrollbar = new Scrollbar(ctx, "horizontal");
-
     this.ctx.on("wheel", (e) => this.onWheel(e));
     this.ctx.on("mousedown", (e) => this.onMouseDown(e));
     this.ctx.on("mousemove", (e) => this.onMouseMove(e));
     this.ctx.on("mouseup", () => this.onMouseUp());
+    this.ctx.on("setScroll", (scrollX: number, scrollY: number) => {
+      this.horizontalScrollbar.scroll = scrollX;
+      this.verticalScrollbar.scroll = scrollY;
+      this.ctx.emit("draw");
+    });
+    this.ctx.on("setScrollX", (scrollX: number) => {
+      this.horizontalScrollbar.scroll = scrollX;
+      this.ctx.emit("draw");
+    });
+    this.ctx.on("setScrollY", (scrollY: number) => {
+      this.verticalScrollbar.scroll = scrollY;
+      this.ctx.emit("draw");
+    });
   }
 
   onWheel(e: WheelEvent) {
@@ -309,6 +322,7 @@ export default class Scroller {
   onMouseUp() {
     this.verticalScrollbar.onMouseUp();
     this.horizontalScrollbar.onMouseUp();
+    this.ctx.scrollerMove = false;
   }
 
   draw() {

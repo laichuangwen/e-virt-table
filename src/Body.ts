@@ -148,6 +148,7 @@ export default class Body {
       this.resizeTarget = null;
       this.resizeDiff = 0;
       this.isResizing = false;
+       this.ctx.rowResizing = false;
       this.offsetY = 0;
     });
     this.ctx.on("mousedown", (e) => {
@@ -157,6 +158,8 @@ export default class Body {
       this.offsetY = e.offsetY;
       if (this.resizeTarget) {
         this.isResizing = true;
+        // 传递给上下文，防止其他事件触发，行调整大小时，不触发选择器
+        this.ctx.rowResizing = true;
       } else {
         this.isResizing = false;
       }
