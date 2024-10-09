@@ -10,10 +10,18 @@ export default class Selector {
   }
   init() {
     this.ctx.on("cellHoverChange", () => {
+      // 如果是自动填充移动就不处理
+      if (this.ctx.autofillMove) {
+        return;
+      }
       this.mouseenter();
     });
     this.ctx.on("cellMousedown", (_cell, e) => {
       if (!this.ctx.isTarget(e.target)) {
+        return;
+      }
+      // 如果是自动填充就不处理
+      if (this.ctx.target.style.cursor === "crosshair") {
         return;
       }
       this.click(e.shiftKey);
@@ -151,18 +159,17 @@ export default class Selector {
   }
   selectAll() {
     // 只有两个全选启用了才能全选
-    // const { ENABLE_SELECTOR_ALL_ROWS, ENABLE_SELECTOR_ALL_COLS } =
-    //   this.ctx.config;
-    // if (ENABLE_SELECTOR_ALL_ROWS && ENABLE_SELECTOR_ALL_COLS) {
-    //   const minX = 0;
-    //   const maxX = this.ctx.maxColIndex;
-    //   const minY = 0;
-    //   const maxY = this.ctx.maxRowIndex;
-    //   const xArr = [minX + 1, maxX];
-    //   const yArr = [minY, maxY];
-    //   this.focusCell = undefined; // 清除focusCell
-    //   this.setSelector(xArr, yArr);
-    // }
+    const { ENABLE_SELECTOR_ALL_ROWS, ENABLE_SELECTOR_ALL_COLS } =
+      this.ctx.config;
+    if (ENABLE_SELECTOR_ALL_ROWS && ENABLE_SELECTOR_ALL_COLS) {
+      const minX = 0;
+      const maxX = this.ctx.maxColIndex;
+      const minY = 0;
+      const maxY = this.ctx.maxRowIndex;
+      const xArr = [minX + 1, maxX];
+      const yArr = [minY, maxY];
+      this.setSelector(xArr, yArr);
+    }
   }
   selectRows(cell: Cell, isSetFocus = true) {
     // 启用单选就不能批量选中
@@ -269,39 +276,6 @@ export default class Selector {
     return cell;
   }
   /**
-   * 获取选中的数据
-   * @returns
-   */
-  getSelectedData() {
-    const rowsData = [];
-    const yArr = this.ctx.selector.yArr;
-    const xArr = this.ctx.selector.xArr;
-    let text = "";
-    for (let ri = 0; ri <= yArr[1] - yArr[0]; ri++) {
-      const cellsData = [];
-      for (let ci = 0; ci <= xArr[1] - xArr[0]; ci++) {
-        const rowIndex = ri + yArr[0];
-        const colIndex = ci + xArr[0];
-        const item = this.ctx.database.getItemValueForRowIndexAndColIndex(
-          rowIndex,
-          colIndex
-        );
-        if (item) {
-          cellsData.push(item.value);
-        }
-      }
-      text += `${cellsData.join("\t")}\r`;
-      rowsData.push(cellsData);
-    }
-    text = text ? text.replace(/\r$/, "") : " "; // 去掉最后一个\n，否则会导致复制到excel里多一行空白
-    return {
-      xArr,
-      yArr,
-      text,
-      value: rowsData,
-    };
-  }
-  /**
    * 复制
    * @returns
    */
@@ -309,7 +283,7 @@ export default class Selector {
     if (!this.ctx.config.ENABLE_COPY) {
       return;
     }
-    const { text } = this.getSelectedData();
+    const { text } = this.ctx.getSelectedData();
     if (navigator.clipboard) {
       navigator.clipboard
         .writeText(text)

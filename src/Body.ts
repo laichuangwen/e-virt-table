@@ -148,7 +148,7 @@ export default class Body {
       this.resizeTarget = null;
       this.resizeDiff = 0;
       this.isResizing = false;
-       this.ctx.rowResizing = false;
+      this.ctx.rowResizing = false;
       this.offsetY = 0;
     });
     this.ctx.on("mousedown", (e) => {
@@ -188,8 +188,12 @@ export default class Body {
         if (this.isMouseDown) {
           return;
         }
-        // 恢复默认样式
+        // 如果是拖动选择
+        if (this.ctx.target.style.cursor === "crosshair") {
+          return;
+        }
         if (this.ctx.target.style.cursor === "row-resize") {
+          // 恢复默认样式
           this.ctx.target.style.cursor = "default";
         }
         for (let i = 0; i < this.renderRows.length; i++) {
@@ -318,7 +322,7 @@ export default class Body {
     const offset = scrollY;
     const { data, positions } = database.getData();
     // 更新最大行数
-    this.ctx.maxColIndex = data.length - 1;
+    this.ctx.maxRowIndex = data.length - 1;
     const _headIndex = this.binarySearch(positions, offset);
     let _tailIndex = this.binarySearch(positions, offset + this.visibleHeight);
     // 找不到就为data.length

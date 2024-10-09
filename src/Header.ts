@@ -71,7 +71,7 @@ export default class Header {
       SCROLLER_TRACK_SIZE
     );
     // 更新最大列索引
-    this.ctx.maxRowIndex = this.leafCellHeaders.length - 1;
+    this.ctx.maxColIndex = this.leafCellHeaders.length - 1;
   }
   // 调整表头的宽度
   initResizeColumn() {

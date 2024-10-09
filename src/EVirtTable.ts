@@ -4,6 +4,7 @@ import Scroller from "./Scroller";
 import Header from "./Header";
 import Body from "./Body";
 import Selector from "./Selector";
+import Autofill from "./Autofill";
 export default class VirtTable {
   target: HTMLCanvasElement;
   ctx: Context;
@@ -11,6 +12,7 @@ export default class VirtTable {
   private header: Header;
   private body: Body;
   private selector: Selector;
+  private autofill: Autofill;
   constructor(target: HTMLCanvasElement, options: EVirtTableOptions) {
     this.target = target;
     this.ctx = new Context(target, options);
@@ -18,6 +20,7 @@ export default class VirtTable {
     this.body = new Body(this.ctx);
     this.scroller = new Scroller(this.ctx);
     this.selector = new Selector(this.ctx);
+    this.autofill = new Autofill(this.ctx);
     console.log(this.ctx);
     // 外层容器样式
     const {

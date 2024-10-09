@@ -368,22 +368,50 @@ export default class Cell extends BaseCell {
       verticalAlign: this.verticalAlign,
     });
     this.drawSelector();
+    this.drawAutofillPiont();
+  }
+  private drawAutofillPiont() {
+    if (this.cellType === "footer") {
+      return;
+    }
+    const show = true;
+    const { xArr, yArr } = this.ctx.selector;
+    const maxX = xArr[1];
+    const maxY = yArr[1];
+    const { colIndex, rowIndex, drawX, drawY } = this;
+    // 绘制自动填充点
+    if (show && colIndex === maxX && rowIndex === maxY) {
+      const { SELECT_BORDER_COLOR } = this.ctx.config;
+      this.ctx.paint.drawRect(
+        drawX + this.width - 6,
+        drawY + this.height - 6,
+        6,
+        6,
+        {
+          borderColor: "#fff",
+          fillColor: SELECT_BORDER_COLOR,
+        }
+      );
+    }
   }
   private drawSelector() {
-    const { drawX, drawY, width, rowIndex, colIndex } = this;
-    const x = drawX + 0.5;
-    let y = drawY + 0.5;
-    let height = this.height;
-    // 第一行减去1，不然会被表头覆盖
-    if (rowIndex === 0) {
-      y = this.y + 1;
-      height = height - 1;
+    if (this.cellType === "footer") {
+      return;
     }
     const { xArr, yArr, xArrCopy, yArrCopy } = this.ctx.selector;
     // 复制线
     this.drawBorder({
       xArr: xArrCopy,
       yArr: yArrCopy,
+      borderColor: this.ctx.config.SELECT_BORDER_COLOR || "rgb(82,146,247)",
+      fillColor: this.ctx.config.SELECT_AREA_COLOR || "rgba(82,146,247,0.1)",
+      borderWidth: 1,
+      lineDash: [4, 4],
+    });
+    // 填充线
+    this.drawBorder({
+      xArr: this.ctx.autofill.xArr,
+      yArr: this.ctx.autofill.yArr,
       borderColor: this.ctx.config.SELECT_BORDER_COLOR || "rgb(82,146,247)",
       fillColor: this.ctx.config.SELECT_AREA_COLOR || "rgba(82,146,247,0.1)",
       borderWidth: 1,

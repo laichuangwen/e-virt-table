@@ -49,6 +49,11 @@ export type SelectorOptions = {
   xArrCopy: number[];
   yArrCopy: number[];
 };
+export type AutofillOptions = {
+  enable: boolean;
+  xArr: number[];
+  yArr: number[];
+};
 export default class Context {
   private eventBus: EventBus;
   private eventBrowser: EventBrowser;
@@ -60,6 +65,7 @@ export default class Context {
   rowResizing = false; // 行调整大小中
   columnResizing = false; // 列调整大小中
   scrollerMove = false; // 滚动条移动中
+  autofillMove = false; // 自动填充移动中
   scrollY = 0;
   scrollX = 0;
   fixedLeftWidth = 0;
@@ -106,6 +112,11 @@ export default class Context {
     yArr: [-1, -1],
     xArrCopy: [-1, -1],
     yArrCopy: [-1, -1],
+  };
+  autofill: AutofillOptions = {
+    enable: false,
+    xArr: [-1, -1],
+    yArr: [-1, -1],
   };
   database: Database;
   history: History;
@@ -271,6 +282,7 @@ export default class Context {
             y < layerY + cell.height
           ) {
             this.setHoverCell(cell);
+            this.emit("cellMousemove", cell, e);
             return; // 找到后直接返回
           }
         }
@@ -316,6 +328,39 @@ export default class Context {
       (cell: { colIndex: number }) => cell.colIndex === colIndex
     );
     return cell;
+  }
+  /**
+   * 获取选中的数据
+   * @returns
+   */
+  getSelectedData() {
+    const rowsData = [];
+    const yArr = this.selector.yArr;
+    const xArr = this.selector.xArr;
+    let text = "";
+    for (let ri = 0; ri <= yArr[1] - yArr[0]; ri++) {
+      const cellsData = [];
+      for (let ci = 0; ci <= xArr[1] - xArr[0]; ci++) {
+        const rowIndex = ri + yArr[0];
+        const colIndex = ci + xArr[0];
+        const item = this.database.getItemValueForRowIndexAndColIndex(
+          rowIndex,
+          colIndex
+        );
+        if (item) {
+          cellsData.push(item.value);
+        }
+      }
+      text += `${cellsData.join("\t")}\r`;
+      rowsData.push(cellsData);
+    }
+    text = text ? text.replace(/\r$/, "") : " "; // 去掉最后一个\n，否则会导致复制到excel里多一行空白
+    return {
+      xArr,
+      yArr,
+      text,
+      value: rowsData,
+    };
   }
   setScroll(x: number, y: number): void {
     let scrollX = Math.floor(x);
