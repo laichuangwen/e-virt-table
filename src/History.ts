@@ -18,6 +18,34 @@ export default class History {
   historyIndex = -1;
   constructor(ctx: Context) {
     this.ctx = ctx;
+    this.init();
+  }
+  init() {
+    this.ctx.on("keydown", (e) => {
+      // 撤销
+      if (
+        (e.ctrlKey && !e.shiftKey && e.code === "KeyZ") ||
+        (e.metaKey && !e.shiftKey && e.code === "KeyZ")
+      ) {
+        e.preventDefault();
+        this.ctx.clearSelector();
+        this.ctx.clearAutofill();
+        this.backState();
+        return;
+      }
+      // 恢复
+      if (
+        (e.ctrlKey && e.code === "KeyY") ||
+        (e.ctrlKey && e.shiftKey && e.code === "KeyZ") ||
+        (e.metaKey && e.shiftKey && e.code === "KeyZ")
+      ) {
+        e.preventDefault();
+        this.ctx.clearSelector();
+        this.ctx.clearAutofill();
+        this.forwardState();
+        return;
+      }
+    });
   }
   pushState(changeList: HistoryItem) {
     const { HISTORY_NUM = 0, ENABLE_HISTORY } = this.ctx.config;
@@ -48,7 +76,7 @@ export default class History {
       // 不需要添加历史记录
       this.ctx.database.batchSetItemValue(data, false);
       this.historyIndex -= 1;
-      // this.ctx?.rendererView?.reDraw();
+      this.ctx.emit("draw");
     }
   }
   // 前进
@@ -68,7 +96,7 @@ export default class History {
       );
       // 不需要添加历史记录
       this.ctx.database.batchSetItemValue(data, false);
-      // this.ctx?.rendererView?.reDraw();
+      this.ctx.emit("draw");
     }
   }
   // 清空历史

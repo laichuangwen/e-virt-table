@@ -25,7 +25,7 @@ export default class Body {
     this.initResizeRow();
   }
   private init() {
-    const { database, header } = this.ctx;
+    const { database } = this.ctx;
     const { data, sumHeight } = database.getData();
     this.height = sumHeight;
     this.data = data;
@@ -166,17 +166,16 @@ export default class Body {
       this.isMouseDown = true;
     });
     this.ctx.on("mousemove", (e) => {
-      const y = e.layerY;
-      const x = e.layerX;
+      const y = e.offsetY;
+      const x = e.offsetX;
       const {
         target,
         scrollY,
-        scrollX,
         config: { RESIZE_ROW_MIN_HEIGHT = 0 },
       } = this.ctx;
       if (this.isResizing && this.resizeTarget) {
         const resizeTargetHeight = this.resizeTarget.height;
-        let diff = e.offsetY - this.offsetY;
+        let diff = y - this.offsetY;
         if (diff + resizeTargetHeight < RESIZE_ROW_MIN_HEIGHT) {
           diff = -(resizeTargetHeight - RESIZE_ROW_MIN_HEIGHT);
         }
@@ -199,19 +198,15 @@ export default class Body {
         for (let i = 0; i < this.renderRows.length; i++) {
           const row = this.renderRows[i];
           const isYRange =
-            y > row.y - scrollY + row.height - 1.2 &&
-            y < row.y - scrollY + row.height + 1.2 &&
+            y > row.y - scrollY + row.height - 1.5 &&
+            y < row.y - scrollY + row.height + 1.5 &&
             y < target.offsetHeight - 4;
-          const isXRange =
-            x >= row.x - scrollX + 10 && x <= row.x - scrollX + row.width - 10;
-          if (isYRange && isXRange) {
+          if (isYRange) {
             for (let j = 0; j < row.cells.length; j++) {
               const cell = row.cells[j];
-              // 对应格子l
-              const cellClientX = cell.getDrawX();
               if (
-                x > cellClientX &&
-                x < cellClientX + cell.width + 4 &&
+                x > cell.drawX + 10 &&
+                x < cell.drawX + cell.width - 10 &&
                 cell.rowspan === 1 //没有被合并的单元格
               ) {
                 this.ctx.target.style.cursor = "row-resize";
@@ -229,10 +224,6 @@ export default class Body {
     // 清除显示缓存
     this.ctx.database.clearBufferData();
     this.init();
-    // 清除选择器
-    // this.ctx.selector.setFocusCell(undefined);
-    // this.ctx.selector.clearSelector();
-    // this.ctx.autofill.clearAutofill();
     this.ctx.emit("draw");
     this.ctx.emit("resizeRowChange", {
       rowIndex,

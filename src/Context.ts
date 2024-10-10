@@ -290,10 +290,6 @@ export default class Context {
     });
   }
   private setHoverCell(cell: Cell) {
-    // 如果在body行调整大小，就不显示
-    // if (this.ctx.body.isResizing) {
-    //   return;
-    // }
     if (this.hoverCell === cell) return;
     if (this.hoverCell?.rowKey !== cell.rowKey) {
       this.hoverCell = cell;
@@ -328,6 +324,22 @@ export default class Context {
       (cell: { colIndex: number }) => cell.colIndex === colIndex
     );
     return cell;
+  }
+  clearSelector() {
+    this.selector = {
+      enable: false,
+      xArr: [-1, -1],
+      yArr: [-1, -1],
+      xArrCopy: [-1, -1],
+      yArrCopy: [-1, -1],
+    };
+  }
+  clearAutofill() {
+    this.autofill = {
+      enable: false,
+      xArr: [-1, -1],
+      yArr: [-1, -1],
+    };
   }
   /**
    * 获取选中的数据
