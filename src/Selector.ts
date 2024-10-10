@@ -234,16 +234,9 @@ export default class Selector {
     if (this.ctx.config.ENABLE_SELECTOR_SINGLE) {
       return;
     }
-    // 设置autofill的mouseenter
-    // this.ctx.autofill.mouseenter(cell);
     const { mousedown, focusCell, hoverCell } = this.ctx;
     if (mousedown && focusCell && hoverCell) {
-      const { rowIndex, colIndex, type } = focusCell;
-
-      // 选中行处理
-      // if (["index-selection", "selection", "index"].includes(type)) {
-      //   return;
-      // }
+      const { rowIndex, colIndex } = focusCell;
       const minX = Math.min(hoverCell.colIndex, colIndex);
       const maxX = Math.max(hoverCell.colIndex, colIndex);
       const minY = Math.min(hoverCell.rowIndex, rowIndex);
@@ -549,4 +542,5 @@ export default class Selector {
       this.ctx.setScrollY(scrollY + diffBottom);
     }
   }
+  destroy() {}
 }

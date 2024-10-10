@@ -13,7 +13,6 @@ import type {
   CellRenderMethod,
   // SpanMethod,
   CellEditorTypeMethod,
-  SpanMethod,
 } from "./types";
 import Context from "./Context";
 import BaseCell from "./BaseCell";

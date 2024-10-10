@@ -54,6 +54,8 @@ export default class VirtTable {
    * 销毁
    */
   destroy() {
+    this.selector.destroy();
+    this.autofill.destroy();
     this.ctx.destroy();
     this.target.remove();
     console.log("销毁");

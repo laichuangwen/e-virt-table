@@ -186,4 +186,6 @@ export default class Autofill {
       this.setAutofill(xArr, yArr);
     }
   }
+  destroy() { 
+  };
 }
