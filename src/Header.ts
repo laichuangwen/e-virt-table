@@ -292,6 +292,7 @@ export default class Header {
       leafCellHeaders: this.leafCellHeaders,
       visibleLeafColumns: this.visibleLeafColumns,
       renderLeafCellHeaders: this.renderLeafCellHeaders,
+      renderCellHeaders: this.renderFixedCellHeaders.concat(this.renderCenterCellHeaders),
     });
   }
   drawTipLine() {

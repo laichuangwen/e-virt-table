@@ -3,23 +3,24 @@ import EVirtTable from "./src/EVirtTable";
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const columns: any[] = [
   // {
-  //   title: '序号',
-  //   key: 'index',
-  //   type: 'index',
-  //   width: 50,
-  // },
-  // {
-  //   key: "selection",
-  //   type: "selection",
+  //   title: "序号",
+  //   key: "index",
+  //   type: "index",
   //   fixed: "left",
   //   width: 50,
   // },
   {
     key: "selection",
-    type: "index-selection",
-    width: 100,
+    type: "selection",
     fixed: "left",
+    width: 50,
   },
+  // {
+  //   key: "selection",
+  //   type: "index-selection",
+  //   width: 100,
+  //   fixed: "left",
+  // },
   {
     title: "工号",
     key: "emp_no",

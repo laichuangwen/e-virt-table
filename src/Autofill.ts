@@ -1,15 +1,13 @@
 import type Context from "./Context";
 import type Cell from "./Cell";
 export default class Autofill {
-  // private enable = false;
-  // private mousedown = false;
   ctx: Context;
   constructor(ctx: Context) {
     this.ctx = ctx;
     this.init();
   }
   init() {
-    this.ctx.on("cellMousemove", (cell, e) => {
+    this.ctx.on("cellMouseenter", (cell, e) => {
       this.ctx.target.style.cursor = "default";
       const { xArr, yArr } = this.ctx.selector;
       const maxX = xArr[1];
@@ -185,14 +183,7 @@ export default class Autofill {
       } else if (rowIndex < selector.yArr[0]) {
         yArr.splice(0, 1, rowIndex);
       }
-      console.log("setAutofill", xArr, yArr);
-
       this.setAutofill(xArr, yArr);
     }
-  }
-  clearAutofill() {
-    const xArr = [-1, -1];
-    const yArr = [-1, -1];
-    this.setAutofill(xArr, yArr);
   }
 }

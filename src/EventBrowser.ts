@@ -13,7 +13,6 @@ export default class EventBrowser {
   init() {
     this.bind(window, "resize", this.handleResize.bind(this));
     this.bind(window, "mousedown", this.handleMouseDown.bind(this));
-    this.bind(window, "mousedown", this.handleMouseDown.bind(this));
     this.bind(window, "mouseup", this.handleMouseUp.bind(this));
     this.bind(window, "mousemove", this.handleMousemove.bind(this));
     this.bind(this.ctx.target, "click", this.handleClick.bind(this));
@@ -31,14 +30,20 @@ export default class EventBrowser {
     this.ctx.emit("draw");
   }
   private handleMouseDown(e: Event) {
-    this.ctx.mousedown = true;
+    const _e = e as MouseEvent;
+    if (_e.button === 0) {
+      this.ctx.mousedown = true;
+    }
     this.ctx.emit("mousedown", e);
   }
   private handleMousemove(e: Event) {
     this.ctx.emit("mousemove", e);
   }
   private handleMouseUp(e: Event) {
-    this.ctx.mousedown = false;
+    const _e = e as MouseEvent;
+    if (_e.button === 0) {
+      this.ctx.mousedown = false;
+    }
     this.ctx.emit("mouseup", e);
   }
   private handleClick(e: Event) {

@@ -1,30 +1,55 @@
 import type Context from "./Context";
 import type Cell from "./Cell";
 import type CellHeader from "./CellHeader";
+import { ChangeItem } from "./types";
 export default class Selector {
   private isCut = false;
+  private isMultipleRow = false;
   ctx: Context;
   constructor(ctx: Context) {
     this.ctx = ctx;
     this.init();
   }
   init() {
-    this.ctx.on("cellHoverChange", () => {
+    this.ctx.on("cellHoverChange", (cell) => {
       // 如果是自动填充移动就不处理
       if (this.ctx.autofillMove) {
         return;
       }
+      if (["index-selection", "selection", "index"].includes(cell.type)) {
+        this.selectRows(cell, false);
+        // 如果是自动填充就不处理
+        return;
+      }
+      // 多选行
+      if (this.isMultipleRow) {
+        return;
+      }
       this.mouseenter();
     });
-    this.ctx.on("cellMousedown", (_cell, e) => {
+    this.ctx.on("cellMousedown", (cell, e) => {
       if (!this.ctx.isTarget(e.target)) {
         return;
       }
-      // 如果是自动填充就不处理
+      // 如果是填充返回
       if (this.ctx.target.style.cursor === "crosshair") {
         return;
       }
+      if (["index-selection", "selection", "index"].includes(cell.type)) {
+        this.isMultipleRow = true;
+        this.selectRows(cell);
+        return;
+      }
+      this.isMultipleRow = false;
       this.click(e.shiftKey);
+    });
+    this.ctx.on("cellHeaderHoverChange", (cell) => {
+      if (this.ctx.mousedown) {
+        this.selectCols(cell);
+      }
+    });
+    this.ctx.on("cellHeaderMousedown", (cell) => {
+      this.selectCols(cell);
     });
     this.ctx.on("keydown", (e) => {
       // CTRL+C／Command+C
@@ -125,6 +150,10 @@ export default class Selector {
   }
 
   selectCols(cell: CellHeader) {
+    // 如果是拖拽改变列宽就不处理
+    if (this.ctx.columnResizing) {
+      return;
+    }
     // 启用单选就不能批量选中
     if (this.ctx.config.ENABLE_SELECTOR_SINGLE) {
       return;
@@ -139,23 +168,23 @@ export default class Selector {
     }
     const minY = 0;
     const maxY = this.ctx.maxRowIndex;
-    // if (this.focusCellHeader) {
-    //   const { colIndex } = this.focusCellHeader;
-    //   if (cell.colIndex >= colIndex) {
-    //     const xArr = [colIndex, cell.colIndex + cell.colspan - 1];
-    //     const yArr = [minY, maxY];
-    //     this.setSelector(xArr, yArr);
-    //   } else {
-    //     const xArr = [cell.colIndex, colIndex];
-    //     const yArr = [minY, maxY];
-    //     this.setSelector(xArr, yArr);
-    //   }
-    // } else {
-    //   this.setFocusCellHeader(cell);
-    //   const xArr = [cell.colIndex, cell.colIndex + cell.colspan - 1];
-    //   const yArr = [minY, maxY];
-    //   this.setSelector(xArr, yArr);
-    // }
+    if (this.ctx.mousedown && this.ctx.focusCellHeader) {
+      const { colIndex } = this.ctx.focusCellHeader;
+      if (cell.colIndex >= colIndex) {
+        const xArr = [colIndex, cell.colIndex + cell.colspan - 1];
+        const yArr = [minY, maxY];
+        this.setSelector(xArr, yArr);
+      } else {
+        const xArr = [cell.colIndex, colIndex];
+        const yArr = [minY, maxY];
+        this.setSelector(xArr, yArr);
+      }
+    } else {
+      // this.setFocusCellHeader(cell);
+      const xArr = [cell.colIndex, cell.colIndex + cell.colspan - 1];
+      const yArr = [minY, maxY];
+      this.setSelector(xArr, yArr);
+    }
   }
   selectAll() {
     // 只有两个全选启用了才能全选
@@ -179,29 +208,26 @@ export default class Selector {
     if (!this.ctx.config.ENABLE_SELECTOR_ALL_COLS) {
       return;
     }
-    // index, index-selection, selection不可选列
-    // if (["index", "index-selection", "selection"].includes(cell.type)) {
-    //   const maxX = this.ctx.maxColIndex;
-    //   const minX = cell.colIndex + 1;
-    //   if (isSetFocus) {
-    //     this.setFocusCell(cell);
-    //     const xArr = [minX, maxX];
-    //     const yArr = [cell.rowIndex, cell.rowIndex];
-    //     this.setSelector(xArr, yArr);
-    //   }
-    //   if (this.focusCell && this.mousedown) {
-    //     const { rowIndex } = this.focusCell;
-    //     if (cell.rowIndex >= rowIndex) {
-    //       const xArr = [minX, maxX];
-    //       const yArr = [rowIndex, cell.rowIndex];
-    //       this.setSelector(xArr, yArr);
-    //     } else {
-    //       const xArr = [minX, maxX];
-    //       const yArr = [cell.rowIndex, rowIndex];
-    //       this.setSelector(xArr, yArr);
-    //     }
-    //   }
-    // }
+    const maxX = this.ctx.maxColIndex;
+    const minX = cell.colIndex + 1;
+    if (isSetFocus) {
+      this.ctx.setFocusCell(cell);
+      const xArr = [minX, maxX];
+      const yArr = [cell.rowIndex, cell.rowIndex];
+      this.setSelector(xArr, yArr);
+    }
+    if (this.ctx.focusCell && this.ctx.mousedown) {
+      const { rowIndex } = this.ctx.focusCell;
+      if (cell.rowIndex >= rowIndex) {
+        const xArr = [minX, maxX];
+        const yArr = [rowIndex, cell.rowIndex];
+        this.setSelector(xArr, yArr);
+      } else {
+        const xArr = [minX, maxX];
+        const yArr = [cell.rowIndex, rowIndex];
+        this.setSelector(xArr, yArr);
+      }
+    }
   }
 
   mouseenter() {
@@ -213,6 +239,7 @@ export default class Selector {
     const { mousedown, focusCell, hoverCell } = this.ctx;
     if (mousedown && focusCell && hoverCell) {
       const { rowIndex, colIndex, type } = focusCell;
+
       // 选中行处理
       // if (["index-selection", "selection", "index"].includes(type)) {
       //   return;
@@ -231,6 +258,7 @@ export default class Selector {
     if (!focusCell) {
       return;
     }
+    this.ctx.selector.enable = true;
     if (clickCell && shiftKey) {
       // shiftKey快捷选中
       const { colIndex, rowIndex } = clickCell;
@@ -299,8 +327,8 @@ export default class Selector {
       console.error("当前浏览器不支持Clipboard API");
     }
   }
-  clearSelectedData(xArr: number[], yArr: number[]) {
-    let changeList = [];
+  clearSelectedData(xArr: number[], yArr: number[], ignoreSet = false) {
+    let changeList: ChangeItem[] = [];
     const rowKeyList: Set<string> = new Set();
     for (let ri = 0; ri <= yArr[1] - yArr[0]; ri++) {
       for (let ci = 0; ci <= xArr[1] - xArr[0]; ci++) {
@@ -327,7 +355,11 @@ export default class Selector {
     }
     // 没有变化就返回
     if (!changeList.length) {
-      return;
+      return [];
+    }
+    // 忽略设置，只返回数据，用于cut
+    if (ignoreSet) {
+      return changeList;
     }
     // 批量设置数据，并记录历史
     this.ctx.database.batchSetItemValue(changeList, true);
@@ -336,6 +368,7 @@ export default class Selector {
       rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
     });
     this.ctx.emit("clearSelectedDataChange", changeList, rows);
+    return changeList;
   }
   paste() {
     if (!navigator.clipboard) {
@@ -358,7 +391,7 @@ export default class Selector {
           } else {
             textArr = arr.map((item) => item.split("\t"));
           }
-          let changeList = [];
+          let changeList: ChangeItem[] = [];
           for (let ri = 0; ri <= textArr.length - 1; ri++) {
             const len = textArr[ri].length;
             for (let ci = 0; ci <= len - 1; ci++) {
@@ -385,6 +418,25 @@ export default class Selector {
               }
             }
           }
+          // 剪切时清除选中数据
+          if (this.isCut) {
+            const cutList = this.clearSelectedData(
+              this.ctx.selector.xArrCopy,
+              this.ctx.selector.yArrCopy,
+              true // 忽略设置，只返回数据，用于cut，实现历史回退需要返回两次问题
+            );
+            const changeListRowkeys = changeList.map(
+              (item) => `${item.rowKey}-${item.key}`
+            );
+            // 剔除剪切的数据
+            cutList.forEach((item) => {
+              if (!changeListRowkeys.includes(`${item.rowKey}-${item.key}`)) {
+                // 剪切的数据放在最前面
+                changeList.unshift(item);
+              }
+            });
+            this.isCut = false;
+          }
           // 没有变化就返回
           if (!changeList.length) {
             return;
@@ -396,15 +448,6 @@ export default class Selector {
             rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
           });
           this.ctx.emit("pasteChange", changeList, rows);
-          // 剪切时清除选中数据
-          console.log("qingxhu", this.isCut);
-          if (this.isCut) {
-            this.clearSelectedData(
-              this.ctx.selector.xArrCopy,
-              this.ctx.selector.yArrCopy
-            );
-            this.isCut = false;
-          }
           // 清除复制线
           this.clearCopyLine();
           this.ctx.emit("draw");

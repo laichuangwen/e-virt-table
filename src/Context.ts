@@ -21,6 +21,7 @@ export type HeaderOptions = {
   visibleLeafColumns: Column[];
   leafCellHeaders: CellHeader[];
   renderLeafCellHeaders: CellHeader[];
+  renderCellHeaders: CellHeader[];
 };
 export type BodyOptions = {
   x: number;
@@ -75,6 +76,9 @@ export default class Context {
   clickCell?: Cell;
   focusCell?: Cell;
   hoverCell?: Cell;
+  clickCellHeader?: CellHeader;
+  focusCellHeader?: CellHeader;
+  hoverCellHeader?: CellHeader;
   body: BodyOptions = {
     x: 0,
     y: 0,
@@ -105,6 +109,7 @@ export default class Context {
     visibleLeafColumns: [],
     leafCellHeaders: [],
     renderLeafCellHeaders: [],
+    renderCellHeaders: [],
   };
   selector: SelectorOptions = {
     enable: false,
@@ -139,10 +144,17 @@ export default class Context {
       if (!this.isTarget(e.target)) {
         return;
       }
+      // 左边点击
+      if (e.button !== 0) {
+        return;
+      }
       const y = e.layerY;
       const x = e.layerX;
       // 列行调整大小中不处理
       if (this.target.style.cursor === "row-resize") {
+        return;
+      }
+      if (this.target.style.cursor === "col-resize") {
         return;
       }
       // 列调整大小中不处理
@@ -166,6 +178,23 @@ export default class Context {
       if (x > this.target.offsetWidth - SCROLLER_TRACK_SIZE) {
         return;
       }
+      // header
+      const renderCellHeaders = this.header.renderCellHeaders;
+      for (const cell of renderCellHeaders) {
+        const layerX = cell.getDrawX();
+        const layerY = cell.getDrawY();
+        if (
+          x > layerX &&
+          x < layerX + cell.width &&
+          y > layerY &&
+          y < layerY + cell.height
+        ) {
+          this.focusCellHeader = cell;
+          this.emit("cellHeaderMousedown", cell, e);
+          return; // 找到后直接返回
+        }
+      }
+      // body
       const renderRows = this.body.renderRows;
       for (const row of renderRows) {
         // 优先处理固定列
@@ -190,6 +219,10 @@ export default class Context {
       if (!this.isTarget(e.target)) {
         return;
       }
+      // 左边点击
+      if (e.button !== 0) {
+        return;
+      }
       const y = e.layerY;
       const x = e.layerX;
       const { SCROLLER_TRACK_SIZE = 0 } = this.config;
@@ -217,6 +250,23 @@ export default class Context {
       if (x > this.target.offsetWidth - SCROLLER_TRACK_SIZE) {
         return;
       }
+      // header
+      const renderCellHeaders = this.header.renderCellHeaders;
+      for (const cell of renderCellHeaders) {
+        const layerX = cell.getDrawX();
+        const layerY = cell.getDrawY();
+        if (
+          x > layerX &&
+          x < layerX + cell.width &&
+          y > layerY &&
+          y < layerY + cell.height
+        ) {
+          this.clickCellHeader = cell;
+          this.emit("cellHeaderClick", cell, e);
+          return; // 找到后直接返回
+        }
+      }
+      // body
       const renderRows = this.body.renderRows;
       for (const row of renderRows) {
         // 优先处理固定列
@@ -268,6 +318,31 @@ export default class Context {
       if (x > this.target.offsetWidth - SCROLLER_TRACK_SIZE) {
         return;
       }
+      // header
+      const renderCellHeaders = this.header.renderCellHeaders;
+      for (const cell of renderCellHeaders) {
+        const layerX = cell.getDrawX();
+        const layerY = cell.getDrawY();
+        if (
+          x > layerX &&
+          x < layerX + cell.width &&
+          y > layerY &&
+          y < layerY + cell.height
+        ) {
+          this.emit("cellHeaderMouseenter", cell, e);
+          // 移出事件
+          if (this.hoverCellHeader && this.hoverCellHeader !== cell) {
+            this.emit("cellHeaderMouseleave", this.hoverCellHeader, e);
+          }
+          if (this.hoverCellHeader === cell) {
+            return;
+          }
+          this.hoverCellHeader = cell;
+          this.emit("cellHeaderHoverChange", cell);
+          return; // 找到后直接返回
+        }
+      }
+      // body
       const renderRows = this.body.renderRows;
       for (const row of renderRows) {
         // 优先处理固定列
@@ -281,22 +356,23 @@ export default class Context {
             y > layerY &&
             y < layerY + cell.height
           ) {
-            this.setHoverCell(cell);
-            this.emit("cellMousemove", cell, e);
+            this.emit("cellMouseenter", cell, e);
+            // 移出事件
+            if (this.hoverCell && this.hoverCell !== cell) {
+              this.emit("cellMouseleave", this.hoverCell, e);
+            }
+            if (this.hoverCell === cell) return;
+            if (this.hoverCell?.rowKey !== cell.rowKey) {
+              this.hoverCell = cell;
+              this.emit("rowHoverChange", cell);
+            }
+            this.hoverCell = cell;
+            this.emit("cellHoverChange", cell);
             return; // 找到后直接返回
           }
         }
       }
     });
-  }
-  private setHoverCell(cell: Cell) {
-    if (this.hoverCell === cell) return;
-    if (this.hoverCell?.rowKey !== cell.rowKey) {
-      this.hoverCell = cell;
-      this.emit("rowHoverChange", cell);
-    }
-    this.hoverCell = cell;
-    this.emit("cellHoverChange", cell);
   }
   setFocusCell(cell: Cell) {
     if (this.focusCell === cell) return;
@@ -307,23 +383,6 @@ export default class Context {
     }
     this.focusCell = cell;
     this.emit("cellFocusChange", cell);
-  }
-  /**
-   * 获取渲染单元格
-   * @param rowIndex
-   * @param colIndex
-   * @returns
-   */
-  getRenderCell(rowIndex: number, colIndex: number) {
-    // 设置选中FocusCell
-    const row = this.body.renderRows.find((row) => row.rowIndex === rowIndex);
-    if (!row) {
-      return null;
-    }
-    const cell = row.cells.find(
-      (cell: { colIndex: number }) => cell.colIndex === colIndex
-    );
-    return cell;
   }
   clearSelector() {
     this.selector = {
