@@ -304,10 +304,6 @@ export default class Scroller {
   }
 
   onMouseDown(e: MouseEvent) {
-    // 鼠标样式不是默认的时候不触发，说明可能是拖动调整行高或者列宽
-    if (this.ctx.target.style.cursor !== "default") {
-      return;
-    }
     this.verticalScrollbar.onMouseDown(e);
     this.horizontalScrollbar.onMouseDown(e);
     this.draw();

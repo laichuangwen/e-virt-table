@@ -144,7 +144,6 @@ export default class Body {
         // 调整宽度
         this.resizeRow(this.resizeTarget, this.resizeDiff);
       }
-      this.ctx.target.style.cursor = "default";
       this.resizeTarget = null;
       this.resizeDiff = 0;
       this.isResizing = false;
@@ -321,7 +320,7 @@ export default class Body {
       _tailIndex = data.length;
     }
     this.headIndex = Math.max(0, _headIndex);
-    this.tailIndex = Math.min(data.length, _tailIndex + 1);
+    this.tailIndex = Math.min(this.ctx.maxRowIndex, _tailIndex + 1);
     this.visibleRows = data.slice(this.headIndex, this.tailIndex);
     const rows: Row[] = [];
     for (let i = 0; i <= this.visibleRows.length; i++) {
@@ -351,6 +350,7 @@ export default class Body {
       tailIndex: this.tailIndex,
       visibleRows: this.visibleRows,
       renderRows: this.renderRows,
+      data: this.data,
     });
   }
   draw() {

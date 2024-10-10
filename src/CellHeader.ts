@@ -32,6 +32,9 @@ export default class CellHeader extends BaseCell {
   hasChildren: boolean;
   render: Render;
   style: Partial<CSSStyleDeclaration> = {};
+  drawX = 0;
+  drawY = 0;
+  checkboxName = "";
   constructor(
     ctx: Context,
     colIndex: number,
@@ -92,13 +95,11 @@ export default class CellHeader extends BaseCell {
 
   update() {
     this.updateStyle();
+    this.displayText = this.getText();
+    this.drawX = this.getDrawX();
+    this.drawY = this.getDrawY();
   }
   draw() {
-    // this.x = this.getDisplayX();
-    // console.log(this.x);
-    const drawX = this.getDrawX();
-    const drawY = this.getDrawY();
-    const displayText = this.getText();
     const {
       paint,
       config: {
@@ -110,6 +111,7 @@ export default class CellHeader extends BaseCell {
         HEAD_FONT_STYLE,
       },
     } = this.ctx;
+    const { drawX, drawY, displayText } = this;
     paint.drawRect(drawX, drawY, this.width, this.height, {
       borderColor: BORDER_COLOR,
       fillColor: HEADER_BG_COLOR,
@@ -121,6 +123,47 @@ export default class CellHeader extends BaseCell {
       align: this.align,
       verticalAlign: this.verticalAlign,
     });
+    this.drawSelection();
+  }
+  private drawSelection() {
+    const { width, height, type } = this;
+    // 选中框类型
+    if (["index-selection", "selection"].includes(type)) {
+      const { indeterminate, check, selectable } =
+        this.ctx.database.getCheckedState();
+      const { CHECKBOX_SIZE = 0 } = this.ctx.config;
+      const _x = this.drawX + (width - CHECKBOX_SIZE) / 2;
+      const _y = this.drawY + (height - CHECKBOX_SIZE) / 2;
+      let checkboxImage: HTMLImageElement | undefined =
+        this.ctx.icons.get("checkbox-uncheck");
+      let checkboxName = "checkbox-uncheck";
+      if (indeterminate) {
+        checkboxImage = this.ctx.icons.get("checkbox-indeterminate");
+        checkboxName = "checkbox-indeterminate";
+      } else if (check && selectable) {
+        checkboxImage = this.ctx.icons.get("checkbox-check");
+        checkboxName = "checkbox-check";
+      } else if (check && selectable) {
+        checkboxImage = this.ctx.icons.get("checkbox-check-disabled");
+        checkboxName = "checkbox-check-disabled";
+      } else if (!check && selectable) {
+        checkboxImage = this.ctx.icons.get("checkbox-uncheck");
+        checkboxName = "checkbox-uncheck";
+      } else {
+        checkboxImage = this.ctx.icons.get("checkbox-disabled");
+        checkboxName = "checkbox-disabled";
+      }
+      if (checkboxImage) {
+        this.checkboxName = checkboxName;
+        this.ctx.paint.drawImage(
+          checkboxImage,
+          _x,
+          _y,
+          CHECKBOX_SIZE,
+          CHECKBOX_SIZE
+        );
+      }
+    }
   }
   getText() {
     if (this.render) {

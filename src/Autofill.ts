@@ -8,7 +8,9 @@ export default class Autofill {
   }
   init() {
     this.ctx.on("cellMouseenter", (cell, e) => {
-      this.ctx.target.style.cursor = "default";
+      if (this.ctx.target.style.cursor === "crosshair") {
+        this.ctx.target.style.cursor = "default";
+      }
       const { xArr, yArr } = this.ctx.selector;
       const maxX = xArr[1];
       const maxY = yArr[1];
@@ -186,6 +188,5 @@ export default class Autofill {
       this.setAutofill(xArr, yArr);
     }
   }
-  destroy() { 
-  };
+  destroy() {}
 }

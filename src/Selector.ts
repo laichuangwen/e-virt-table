@@ -31,6 +31,13 @@ export default class Selector {
       if (!this.ctx.isTarget(e.target)) {
         return;
       }
+      // 如果是选中就不处理，比如chexkbox
+      if (this.ctx.target.style.cursor === "pointer") {
+        return;
+      }
+      if (this.ctx.isPointer) {
+        return;
+      }
       // 如果是填充返回
       if (this.ctx.target.style.cursor === "crosshair") {
         return;
@@ -48,7 +55,14 @@ export default class Selector {
         this.selectCols(cell);
       }
     });
-    this.ctx.on("cellHeaderMousedown", (cell) => {
+    this.ctx.on("cellHeaderMousedown", (cell, e) => {
+      // 如果是选中就不处理，比如chexkbox
+      if (this.ctx.target.style.cursor === "pointer") {
+        return;
+      }
+      if (this.ctx.isPointer) {
+        return;
+      }
       this.selectCols(cell);
     });
     this.ctx.on("keydown", (e) => {

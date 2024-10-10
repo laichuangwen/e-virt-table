@@ -34,6 +34,7 @@ export type BodyOptions = {
   tailIndex: number;
   visibleRows: any[];
   renderRows: Row[];
+  data: any[];
 };
 export type FooterOptions = {
   x: number;
@@ -56,6 +57,7 @@ export type AutofillOptions = {
   yArr: number[];
 };
 export default class Context {
+  private resizeObserver!: ResizeObserver;
   private eventBus: EventBus;
   private eventBrowser: EventBrowser;
   private uuid = generateShortUUID();
@@ -63,6 +65,7 @@ export default class Context {
   paint: Paint;
   icons: Icons;
   mousedown = false;
+  isPointer = false;
   rowResizing = false; // 行调整大小中
   columnResizing = false; // 列调整大小中
   scrollerMove = false; // 滚动条移动中
@@ -73,6 +76,7 @@ export default class Context {
   fixedRightWidth = 0;
   maxColIndex = 0;
   maxRowIndex = 0;
+  hoverRow?: Row;
   clickCell?: Cell;
   focusCell?: Cell;
   hoverCell?: Cell;
@@ -90,6 +94,7 @@ export default class Context {
     tailIndex: 0,
     visibleRows: [],
     renderRows: [],
+    data: [],
   };
   footer: FooterOptions = {
     x: 0,
@@ -140,6 +145,14 @@ export default class Context {
     this.initListener();
   }
   initListener(): void {
+    // 监听窗口大小变化
+    this.resizeObserver = new ResizeObserver(() => {
+      this.emit("resizeObserver");
+      this.emit("draw");
+    });
+    if (this.target.parentElement) {
+      this.resizeObserver.observe(this.target);
+    }
     this.on("mousedown", (e) => {
       if (!this.isTarget(e.target)) {
         return;
@@ -263,6 +276,21 @@ export default class Context {
         ) {
           this.clickCellHeader = cell;
           this.emit("cellHeaderClick", cell, e);
+          // selection事件
+          if (
+            ["selection", "index-selection"].includes(cell.type) &&
+            this.isPointer
+          ) {
+            if (
+              cell.checkboxName === "checkbox-uncheck" ||
+              cell.checkboxName === "checkbox-indeterminate"
+            ) {
+              this.database.toggleAllSelection();
+            } else if (cell.checkboxName === "checkbox-check") {
+              this.database.clearSelection();
+            }
+            this.emit("draw");
+          }
           return; // 找到后直接返回
         }
       }
@@ -282,6 +310,17 @@ export default class Context {
           ) {
             this.clickCell = cell;
             this.emit("cellClick", cell, e);
+            // selection事件
+            if (
+              ["selection", "index-selection"].includes(cell.type) &&
+              this.isPointer
+            ) {
+              const selectable = this.database.getRowSelectable(cell.rowKey);
+              if (!selectable) {
+                return;
+              }
+              this.database.toggleRowSelection(cell.rowKey);
+            }
             return; // 找到后直接返回
           }
         }
@@ -334,6 +373,25 @@ export default class Context {
           if (this.hoverCellHeader && this.hoverCellHeader !== cell) {
             this.emit("cellHeaderMouseleave", this.hoverCellHeader, e);
           }
+          // selection事件
+          if (["selection", "index-selection"].includes(cell.type)) {
+            const { CHECKBOX_SIZE = 0 } = this.config;
+            const _x = cell.drawX + (cell.width - CHECKBOX_SIZE) / 2;
+            const _y = cell.drawY + (cell.height - CHECKBOX_SIZE) / 2;
+            if (
+              x > _x &&
+              x < _x + CHECKBOX_SIZE &&
+              y > _y &&
+              y < _y + CHECKBOX_SIZE
+            ) {
+              this.target.style.cursor = "pointer";
+              this.isPointer = true;
+              this.emit("cellHeaderSelectionMouseenter", cell, e);
+            } else {
+              this.isPointer = false;
+              this.target.style.cursor = "default";
+            }
+          }
           if (this.hoverCellHeader === cell) {
             return;
           }
@@ -361,10 +419,36 @@ export default class Context {
             if (this.hoverCell && this.hoverCell !== cell) {
               this.emit("cellMouseleave", this.hoverCell, e);
             }
+            // selection事件
+            if (["selection", "index-selection"].includes(cell.type)) {
+              const { CHECKBOX_SIZE = 0 } = this.config;
+              const _x = cell.drawX + (cell.width - CHECKBOX_SIZE) / 2;
+              const _y = cell.drawY + (cell.height - CHECKBOX_SIZE) / 2;
+              if (
+                x > _x &&
+                x < _x + CHECKBOX_SIZE &&
+                y > _y &&
+                y < _y + CHECKBOX_SIZE
+              ) {
+                const selectable = this.database.getRowSelectable(cell.rowKey);
+                if (!selectable) {
+                  this.target.style.cursor = "not-allowed";
+                } else {
+                  this.target.style.cursor = "pointer";
+                }
+                this.isPointer = true;
+                this.emit("cellSelectionMouseenter", cell, e);
+              } else {
+                this.isPointer = false;
+                this.target.style.cursor = "default";
+              }
+            }
             if (this.hoverCell === cell) return;
             if (this.hoverCell?.rowKey !== cell.rowKey) {
               this.hoverCell = cell;
-              this.emit("rowHoverChange", cell);
+              this.hoverRow = this.body.renderRows[cell.rowIndex];
+              this.emit("rowHoverChange", this.hoverRow, cell);
+              this.emit("draw");
             }
             this.hoverCell = cell;
             this.emit("cellHoverChange", cell);
@@ -503,6 +587,7 @@ export default class Context {
     this.body = bodyOptions;
   }
   destroy(): void {
+    this.resizeObserver.unobserve(this.target);
     this.eventBrowser.destroy();
     this.eventBus.destroy();
   }

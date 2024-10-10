@@ -9,18 +9,18 @@ const columns: any[] = [
   //   fixed: "left",
   //   width: 50,
   // },
-  {
-    key: "selection",
-    type: "selection",
-    fixed: "left",
-    width: 50,
-  },
   // {
   //   key: "selection",
-  //   type: "index-selection",
-  //   width: 100,
+  //   type: "selection",
   //   fixed: "left",
+  //   width: 50,
   // },
+  {
+    key: "selection",
+    type: "index-selection",
+    width: 100,
+    fixed: "left",
+  },
   {
     title: "工号",
     key: "emp_no",
@@ -316,7 +316,7 @@ const columns: any[] = [
   // },
 ];
 let data: any[] = [];
-for (let i = 1; i < 10000; i += 1) {
+for (let i = 0; i < 10000; i += 1) {
   data.push({
     _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
     id: i,

@@ -516,7 +516,8 @@ export default class Database {
     this.setRowSelectionByCheckboxKey(rowKey, row.check);
     this.ctx.emit("toggleRowSelection");
     const rows = this.getSelectionRows();
-    this.ctx.emit("toggleRowSelection", rows);
+    this.ctx.emit("selectionChange", rows);
+    this.ctx.emit("draw");
   }
   /**
    * 根据rowKey 设置选中状态
@@ -526,9 +527,9 @@ export default class Database {
     const row = this.rowKeyMap.get(rowKey);
     row.check = check;
     this.setRowSelectionByCheckboxKey(rowKey, row.check);
-    this.ctx.emit("setRowSelection");
     const rows = this.getSelectionRows();
     this.ctx.emit("setRowSelection", rows);
+    this.ctx.emit("draw");
   }
   getSelectionRows() {
     let rows: any[] = [];
@@ -585,6 +586,7 @@ export default class Database {
     this.ctx.emit("toggleAllSelection");
     const rows = this.getSelectionRows();
     this.ctx.emit("selectionChange", rows);
+    this.ctx.emit("draw");
   }
   /**
    * 清除选中
@@ -610,6 +612,7 @@ export default class Database {
     this.ctx.emit("clearSelection");
     const rows = this.getSelectionRows();
     this.ctx.emit("selectionChange", rows);
+    this.ctx.emit("draw");
   }
   /**
    * 获取选中状态，表头用

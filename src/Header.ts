@@ -101,7 +101,6 @@ export default class Header {
         // 调整宽度
         this.resizeColumn(this.resizeTarget, this.resizeDiff);
       }
-      this.ctx.target.style.cursor = "default";
       this.resizeTarget = null;
       this.isResizing = false;
       this.ctx.columnResizing = false;
@@ -292,7 +291,9 @@ export default class Header {
       leafCellHeaders: this.leafCellHeaders,
       visibleLeafColumns: this.visibleLeafColumns,
       renderLeafCellHeaders: this.renderLeafCellHeaders,
-      renderCellHeaders: this.renderFixedCellHeaders.concat(this.renderCenterCellHeaders),
+      renderCellHeaders: this.renderFixedCellHeaders.concat(
+        this.renderCenterCellHeaders
+      ),
     });
   }
   drawTipLine() {
@@ -351,10 +352,12 @@ export default class Header {
   }
   draw() {
     this.renderCenterCellHeaders.forEach((item) => {
+      item.update();
       item.draw();
     });
     this.drawFiexShadow();
     this.renderFixedCellHeaders.forEach((item) => {
+      item.update();
       item.draw();
     });
     this.drawTipLine();
