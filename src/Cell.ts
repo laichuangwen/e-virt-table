@@ -49,8 +49,17 @@ export default class Cell extends BaseCell {
   visibleHeight = 0;
   drawX = 0;
   drawY = 0;
-  checkboxName = "";
-  checkboxImage: HTMLImageElement | undefined;
+  drawTextX = 0;
+  drawTextY = 0;
+  drawImageX = 0;
+  drawImageY = 0;
+  drawImageWidth = 0;
+  drawImageHeight = 0;
+  drawImageName = "";
+  drawImageSource: HTMLImageElement | undefined;
+  ellipsis = false;
+  textColor = "";
+
   constructor(
     ctx: Context,
     rowIndex: number,
@@ -98,16 +107,20 @@ export default class Cell extends BaseCell {
     return this.message;
   }
   update() {
-    this.updateSpan();
-    // this.updateStyle();
-    this.updateType();
-    this.updateEditorType();
-    this.updateRender();
-    this.getValidationMessage();
     this.text = this.getText();
     this.displayText = this.getDisplayText();
     this.drawX = this.getDrawX();
     this.drawY = this.getDrawY();
+    this.drawTextX = this.drawX;
+    this.drawTextY = this.drawY;
+    this.updateSpan();
+    // this.updateStyle();
+    this.updateType();
+    this.updateSelection();
+    this.updateTree();
+    this.updateEditorType();
+    this.updateRender();
+    this.getValidationMessage();
   }
   updateSpan() {
     // 合计不合并
@@ -223,6 +236,117 @@ export default class Cell extends BaseCell {
   updateStyle() {
     this.style = this.getOverlayerViewsStyle();
   }
+  private updateTree() {
+    const { CELL_PADDING = 0 } = this.ctx.config;
+    const { rowKey, cellType } = this;
+    let icon = undefined;
+    let iconOffsetX = 0;
+    let iconName = "";
+    if (this.type === "tree" && cellType === "body") {
+      const row = this.ctx.database.getRowForRowKey(rowKey);
+      const {
+        expand = false,
+        hasChildren = false,
+        expandLoading = false,
+        level = 0,
+      } = row || {};
+      if (expandLoading) {
+        const loadingIcon = this.ctx.icons.get("loading");
+        iconName = "loading";
+        icon = loadingIcon;
+        iconOffsetX = level * 8;
+      } else if (hasChildren) {
+        const expandIcon = this.ctx.icons.get("expand");
+        const shrinkIcon = this.ctx.icons.get("shrink");
+        icon = !expand ? expandIcon : shrinkIcon;
+        iconName = !expand ? "expand" : "shrink";
+        iconOffsetX = level * 8;
+      } else {
+        iconOffsetX = level * 8;
+      }
+      if (icon) {
+        let iconWidth = 20;
+        let iconHeight = 20;
+        let iconX = this.drawX + iconOffsetX + CELL_PADDING;
+        let iconY = this.drawY + (this.visibleHeight - iconHeight) / 2 + 2;
+        this.ctx.paint.drawImage(icon, iconX, iconY, iconWidth, iconHeight);
+        this.drawImageX = iconX;
+        this.drawImageY = iconY;
+        this.drawImageWidth = iconWidth;
+        this.drawImageHeight = iconHeight;
+        this.drawImageName = iconName;
+        this.drawImageSource = icon;
+        // 更改文本距离
+        this.align = "left";
+        this.drawTextX = iconOffsetX + this.drawX + iconWidth + 0.5;
+      }
+    }
+  }
+  private updateSelection() {
+    const {
+      visibleWidth,
+      visibleHeight,
+      rowspan,
+      colspan,
+      cellType,
+      type,
+      rowIndex,
+      rowKey,
+    } = this;
+    //合并的选框不显示
+    if (rowspan === 0 || colspan === 0) {
+      return;
+    }
+    // 合计不显示
+    if (cellType === "footer") {
+      return;
+    }
+    // 选中框类型
+    if (["index-selection", "selection"].includes(type)) {
+      const check = this.ctx.database.getRowSelection(rowKey);
+      const selectable = this.ctx.database.getRowSelectable(rowKey);
+      const { CHECKBOX_SIZE = 0 } = this.ctx.config;
+      const _x = this.drawX + (visibleWidth - CHECKBOX_SIZE) / 2;
+      const _y = this.drawY + (visibleHeight - CHECKBOX_SIZE) / 2;
+      let checkboxImage: HTMLImageElement | undefined =
+        this.ctx.icons.get("checkbox-uncheck");
+      let checkboxName = "checkbox-uncheck";
+      if (check && selectable) {
+        checkboxImage = this.ctx.icons.get("checkbox-check");
+        checkboxName = "checkbox-check";
+      } else if (check && selectable) {
+        checkboxImage = this.ctx.icons.get("checkbox-check-disabled");
+        checkboxName = "checkbox-check-disabled";
+      } else if (!check && selectable) {
+        checkboxImage = this.ctx.icons.get("checkbox-uncheck");
+        checkboxName = "checkbox-uncheck";
+      } else {
+        checkboxImage = this.ctx.icons.get("checkbox-disabled");
+        checkboxName = "checkbox-disabled";
+      }
+      if (checkboxImage && type == "index-selection") {
+        if (
+          (this.ctx.hoverCell && this.ctx.hoverCell.rowIndex === rowIndex) ||
+          ["checkbox-disabled", "checkbox-check"].includes(checkboxName)
+        ) {
+          this.displayText = "";
+          this.drawImageX = _x;
+          this.drawImageY = _y;
+          this.drawImageWidth = CHECKBOX_SIZE;
+          this.drawImageHeight = CHECKBOX_SIZE;
+          this.drawImageName = checkboxName;
+          this.drawImageSource = checkboxImage;
+        }
+      } else if (checkboxImage && "selection" === type) {
+        this.drawImageX = _x;
+        this.drawImageY = _y;
+        this.drawImageWidth = CHECKBOX_SIZE;
+        this.drawImageHeight = CHECKBOX_SIZE;
+        this.drawImageName = checkboxName;
+        this.drawImageSource = checkboxImage;
+      }
+    }
+  }
 
   /**
    * 获取显示文本
@@ -278,41 +402,6 @@ export default class Cell extends BaseCell {
     return this.ctx.database.getItemValue(this.rowKey, this.key);
   }
   /**
-   * 文本是否溢出
-   * @returns
-   */
-  isTextOverflowing() {
-    // 创建一个虚拟文本节点来测量实际文本宽度
-    // const {
-    //   CELL_PADDING,
-    //   READONLY_TEXT_COLOR,
-    //   BODY_FONTFAMILY,
-    //   BODY_FONT_SIZE,
-    //   BODY_LINE_HEIGHT,
-    //   BODY_FONT_STYLE,
-    // } = this.ctx.config;
-    // const virtualText = new Konva.Text({
-    //   name: "virtual-text-node",
-    //   text: this.getDisplayText(),
-    //   width: this.visibleWidth,
-    //   fontFamily: BODY_FONTFAMILY,
-    //   lineHeight: BODY_LINE_HEIGHT,
-    //   fontSize: BODY_FONT_SIZE,
-    //   fontStyle: BODY_FONT_STYLE,
-    //   padding: CELL_PADDING,
-    //   align: this.align,
-    //   ellipsis: false,
-    //   verticalAlign: this.verticalAlign,
-    //   fill: READONLY_TEXT_COLOR,
-    //   visible: false, // 不显示虚拟文本节点
-    // });
-    // // 添加虚拟文本节点到层并绘制一次以计算宽度
-    // this.ctx.layer.add(virtualText);
-    // const isTextOverflowing = virtualText.height() > this.height;
-    // virtualText.destroy(); // 移除虚拟文本节点
-    // return isTextOverflowing;
-  }
-  /**
    * 获取样式
    */
   getOverlayerViewsStyle() {
@@ -350,26 +439,33 @@ export default class Cell extends BaseCell {
         BORDER_COLOR,
         BODY_BG_COLOR,
         CELL_PADDING,
-        HEAD_FONTFAMILY,
-        HEAD_FONT_SIZE,
-        HEAD_FONT_STYLE,
+        BODY_FONTFAMILY,
+        BODY_FONT_SIZE,
+        BODY_FONT_STYLE,
+        HIGHLIGHT_SELECTED_ROW,
+        HIGHLIGHT_SELECTED_ROW_COLOR,
+        HIGHLIGHT_HOVER_ROW,
+        HIGHLIGHT_HOVER_ROW_COLOR,
       },
     } = this.ctx;
     const { drawX, drawY } = this;
+    let fillColor = BODY_BG_COLOR;
+    const focusCell = this.ctx.focusCell;
+    const hoverCell = this.ctx.hoverCell;
+    if (HIGHLIGHT_HOVER_ROW && hoverCell?.rowKey === this.rowKey) {
+      fillColor = HIGHLIGHT_HOVER_ROW_COLOR;
+    }
+    if (HIGHLIGHT_SELECTED_ROW && focusCell?.rowKey === this.rowKey) {
+      fillColor = HIGHLIGHT_SELECTED_ROW_COLOR;
+    }
     // 绘制单元格
     paint.drawRect(drawX, drawY, this.width, this.height, {
       borderColor: BORDER_COLOR,
-      fillColor: BODY_BG_COLOR,
+      fillColor,
     });
-    this.drawSelection();
-    const font = `${HEAD_FONT_SIZE}px ${HEAD_FONT_STYLE} ${HEAD_FONTFAMILY}`;
-    // 绘制文本
-    paint.drawText(this.displayText, drawX, drawY, this.width, this.height, {
-      font,
-      padding: CELL_PADDING,
-      align: this.align,
-      verticalAlign: this.verticalAlign,
-    });
+    // 画选中框
+    this.ellipsis = this.drawText();
+    this.drawImage();
     this.drawSelector();
     this.drawAutofillPiont();
   }
@@ -389,74 +485,41 @@ export default class Cell extends BaseCell {
     }
     return width;
   }
-  private drawSelection() {
+  private drawText() {
     const {
-      visibleWidth,
-      visibleHeight,
-      rowspan,
-      colspan,
-      cellType,
-      type,
-      rowIndex,
-      rowKey,
-    } = this;
-    //合并的选框不显示
-    if (rowspan === 0 || colspan === 0) {
+      CELL_PADDING = 0,
+      READONLY_TEXT_COLOR,
+      BODY_FONTFAMILY,
+      BODY_FONT_SIZE,
+      BODY_FONT_STYLE,
+    } = this.ctx.config;
+    const font = `${BODY_FONT_SIZE}px ${BODY_FONT_STYLE} ${BODY_FONTFAMILY}`;
+    return this.ctx.paint.drawText(
+      this.displayText,
+      this.drawTextX,
+      this.drawTextY,
+      this.visibleWidth,
+      this.visibleHeight,
+      {
+        font,
+        padding: CELL_PADDING,
+        align: this.align,
+        verticalAlign: this.verticalAlign,
+        color: this.textColor || READONLY_TEXT_COLOR,
+      }
+    );
+  }
+  private drawImage() {
+    if (!this.drawImageSource) {
       return;
     }
-    // 合计不显示
-    if (cellType === "footer") {
-      return;
-    }
-    // 选中框类型
-    if (["index-selection", "selection"].includes(type)) {
-      const check = this.ctx.database.getRowSelection(rowKey);
-      const selectable = this.ctx.database.getRowSelectable(rowKey);
-      const { CHECKBOX_SIZE = 0 } = this.ctx.config;
-      const _x = this.drawX + (visibleWidth - CHECKBOX_SIZE) / 2;
-      const _y = this.drawY + (visibleHeight - CHECKBOX_SIZE) / 2;
-      let checkboxImage: HTMLImageElement | undefined =
-        this.ctx.icons.get("checkbox-uncheck");
-      let checkboxName = "checkbox-uncheck";
-      if (check && selectable) {
-        checkboxImage = this.ctx.icons.get("checkbox-check");
-        checkboxName = "checkbox-check";
-      } else if (check && selectable) {
-        checkboxImage = this.ctx.icons.get("checkbox-check-disabled");
-        checkboxName = "checkbox-check-disabled";
-      } else if (!check && selectable) {
-        checkboxImage = this.ctx.icons.get("checkbox-uncheck");
-        checkboxName = "checkbox-uncheck";
-      } else {
-        checkboxImage = this.ctx.icons.get("checkbox-disabled");
-        checkboxName = "checkbox-disabled";
-      }
-      if (checkboxImage && type == "index-selection") {
-        if (
-          (this.ctx.hoverCell && this.ctx.hoverCell.rowIndex === rowIndex) ||
-          ["checkbox-disabled", "checkbox-check"].includes(checkboxName)
-        ) {
-          this.displayText = "";
-          this.checkboxName = checkboxName;
-          this.ctx.paint.drawImage(
-            checkboxImage,
-            _x,
-            _y,
-            CHECKBOX_SIZE,
-            CHECKBOX_SIZE
-          );
-        }
-      } else if (checkboxImage && "selection" === type) {
-        this.checkboxName = checkboxName;
-        this.ctx.paint.drawImage(
-          checkboxImage,
-          _x,
-          _y,
-          CHECKBOX_SIZE,
-          CHECKBOX_SIZE
-        );
-      }
-    }
+    this.ctx.paint.drawImage(
+      this.drawImageSource,
+      this.drawImageX,
+      this.drawImageY,
+      this.drawImageWidth,
+      this.drawImageHeight
+    );
   }
   private drawAutofillPiont() {
     if (this.cellType === "footer") {

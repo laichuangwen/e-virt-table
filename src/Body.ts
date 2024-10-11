@@ -25,16 +25,10 @@ export default class Body {
     this.initResizeRow();
   }
   private init() {
-    const { database } = this.ctx;
-    const { data, sumHeight } = database.getData();
-    this.height = sumHeight;
-    this.data = data;
-    this.updateWidthHeight();
-  }
-  private updateWidthHeight() {
     const {
       target,
       header,
+      database,
       config: {
         FOOTER_FIXED,
         CELL_FOOTER_HEIGHT = 0,
@@ -54,6 +48,11 @@ export default class Body {
     }
     this.x = 0;
     this.y = header.height; //更新body的y轴位置
+    const { data, sumHeight } = database.getData();
+    // 更新高度
+    this.height = sumHeight;
+    // 更新数据
+    this.data = data;
     const { left, top } = target.getBoundingClientRect();
     // 更新宽度
     this.width = header.width;
@@ -220,8 +219,6 @@ export default class Body {
   private resizeRow(row: Row, diff: number) {
     const { rowIndex, height, rowKey, data } = row;
     this.ctx.database.setRowHeight(rowIndex, height + diff);
-    // 清除显示缓存
-    this.ctx.database.clearBufferData();
     this.init();
     this.ctx.emit("draw");
     this.ctx.emit("resizeRowChange", {
@@ -307,7 +304,7 @@ export default class Body {
     return tempIndex;
   }
   update() {
-    this.updateWidthHeight();
+    this.init();
     const { header, database, scrollY } = this.ctx;
     const offset = scrollY;
     const { data, positions } = database.getData();
@@ -321,9 +318,9 @@ export default class Body {
     }
     this.headIndex = Math.max(0, _headIndex);
     this.tailIndex = Math.min(this.ctx.maxRowIndex, _tailIndex + 1);
-    this.visibleRows = data.slice(this.headIndex, this.tailIndex);
+    this.visibleRows = data.slice(this.headIndex, this.tailIndex + 1);
     const rows: Row[] = [];
-    for (let i = 0; i <= this.visibleRows.length; i++) {
+    for (let i = 0; i < this.visibleRows.length; i++) {
       const index = this.headIndex + i;
       const data = this.visibleRows[i];
       const { height, top } = this.ctx.database.getPositionForRowIndex(index);

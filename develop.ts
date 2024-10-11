@@ -35,6 +35,7 @@ const columns: any[] = [
     type: "contenteditable",
     width: 100,
     fixed: "left",
+    align: "left",
     verticalAlign: "middle",
     // render: "emp_name",
   },
@@ -382,8 +383,36 @@ const eVirtTable = new EVirtTable(canvas, {
   config: {
     WIDTH: 0,
     HEIGHT: 0,
+    // CELL_HEIGHT: 28,
     ENABLE_OFFSET_HEIGHT: true,
+    HIGHLIGHT_SELECTED_ROW: true,
+    HIGHLIGHT_HOVER_ROW: true,
     OFFSET_HEIGHT: 16,
+    EXPAND_LAZY_METHOD : (params: any) => {
+      const i = params.row.id;
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const list = [
+            {
+              id: 1,
+              emp_no: `${i}-1-1`,
+              emp_name: `张三${i}-层级1-1`,
+              children: [],
+              emp_img:
+                "https://img.alicdn.com/bao/uploaded/i1/3035493001/O1CN01ueaQmD1Y2VJOV3Ujo_!!3035493001.jpg",
+            },
+            {
+              id: 2,
+              emp_no: `${i}-1-2`,
+              emp_name: `张三${i}-层级1-1`,
+              emp_img:
+                "https://img.alicdn.com/bao/uploaded/i1/3035493001/O1CN01ueaQmD1Y2VJOV3Ujo_!!3035493001.jpg",
+            },
+          ];
+          resolve(list);
+        }, 1000);
+      });
+    },
   },
 });
 // 销毁

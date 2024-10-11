@@ -1,7 +1,7 @@
 import type Cell from "./Cell";
 import type CellHeader from "./CellHeader";
 import type { RuleItem } from "async-validator";
-import config from "./config";
+import Config from "./Config";
 export type EVirtTableOptions = {
   data: any[];
   footerData: any[];
@@ -152,7 +152,7 @@ export type SelectableParams = {
   row: any;
   rowIndex: number;
 };
-export type ConfigType = Partial<typeof config>;
+export type ConfigType = Partial<Config>;
 export type FilterMethod = (rows: any[]) => any[];
 export type formatterMethod = (params: CellParams) => string | void;
 export type CellStyleMethod = (params: CellParams) => CellStyleOptions | void;

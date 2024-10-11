@@ -34,7 +34,12 @@ export default class CellHeader extends BaseCell {
   style: Partial<CSSStyleDeclaration> = {};
   drawX = 0;
   drawY = 0;
-  checkboxName = "";
+  drawImageX = 0;
+  drawImageY = 0;
+  drawImageWidth = 0;
+  drawImageHeight = 0;
+  drawImageName = "";
+  drawImageSource: HTMLImageElement | undefined;
   constructor(
     ctx: Context,
     colIndex: number,
@@ -154,13 +159,18 @@ export default class CellHeader extends BaseCell {
         checkboxName = "checkbox-disabled";
       }
       if (checkboxImage) {
-        this.checkboxName = checkboxName;
+        this.drawImageX = _x;
+        this.drawImageY = _y;
+        this.drawImageWidth = CHECKBOX_SIZE;
+        this.drawImageHeight = CHECKBOX_SIZE;
+        this.drawImageName = checkboxName;
+        this.drawImageSource = checkboxImage;
         this.ctx.paint.drawImage(
-          checkboxImage,
-          _x,
-          _y,
-          CHECKBOX_SIZE,
-          CHECKBOX_SIZE
+          this.drawImageSource,
+          this.drawImageX,
+          this.drawImageY,
+          this.drawImageWidth,
+          this.drawImageHeight
         );
       }
     }

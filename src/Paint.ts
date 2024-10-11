@@ -160,9 +160,11 @@ export class Paint {
     x: number,
     y: number,
     width: number,
-    height: number
+    height: number,
   ) {
+    this.ctx.save();
     this.ctx.drawImage(img, x, y, width, height);
+    this.ctx.restore();
   }
 
   drawRect(
@@ -170,12 +172,7 @@ export class Paint {
     y: number,
     width: number,
     height: number,
-    {
-      borderWidth = 1,
-      borderColor,
-      fillColor,
-      radius = 0,
-    }: RectOptions = {}
+    { borderWidth = 1, borderColor, fillColor, radius = 0 }: RectOptions = {}
   ) {
     this.ctx.save();
     this.ctx.beginPath();
@@ -233,6 +230,7 @@ export class Paint {
     height: number,
     options: DrawTextOptions = {}
   ): boolean {
+    this.ctx.save();
     const {
       font = "12px Arial",
       align = "center",

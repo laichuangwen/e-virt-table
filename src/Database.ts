@@ -70,7 +70,7 @@ export default class Database {
    * @param dataList
    * @param level
    */
-  private initData(dataList: any[], level: number = 1) {
+  private initData(dataList: any[], level: number = 0) {
     dataList.forEach((item, index) => {
       let hasChildren = false;
       if (Array.isArray(item.children)) {
@@ -134,6 +134,7 @@ export default class Database {
     const row = this.rowKeyMap.get(rowKey);
     row.height = height;
     row.item._height = height;
+    this.clearBufferData(); // 清除缓存数据
   }
   /**
    *
@@ -157,7 +158,7 @@ export default class Database {
   }
   setColumns(columns: Column[]) {
     this.columns = columns;
-    this.init();
+    this.clearBufferData();
   }
   setData(data: any[]) {
     this.data = data;
@@ -240,15 +241,21 @@ export default class Database {
   expandItem(rowKey: string, expand = false) {
     const row = this.rowKeyMap.get(rowKey);
     row.expand = expand;
+    this.clearBufferData(); // 清除缓存数据
+    this.ctx.emit("draw");
   }
   expandAll(expand: boolean) {
     this.rowKeyMap.forEach((row: any) => {
       row.expand = expand;
     });
+    this.clearBufferData(); // 清除缓存数据
+    this.ctx.emit("draw");
   }
   expandLoading(rowKey: string, loading = false) {
     const row = this.rowKeyMap.get(rowKey);
     row.expandLoading = loading;
+    this.clearBufferData(); // 清除缓存数据
+    this.ctx.emit("draw");
   }
   setExpandChildren(rowKey: string, children: any[]) {
     const row = this.rowKeyMap.get(rowKey);
@@ -256,6 +263,7 @@ export default class Database {
     row.expandLazy = true;
     row.item.children = children;
     this.initData(row.item.children, row.level + 1);
+    this.clearBufferData(); // 清除缓存数据
   }
   getIsExpandLoading(rowKey: string) {
     const row = this.rowKeyMap.get(rowKey);
