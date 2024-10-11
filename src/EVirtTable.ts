@@ -33,7 +33,6 @@ export default class VirtTable {
       `outline: none; position: relative; border-radius: ${BORDER_RADIUS}px; border: 1px solid ${BORDER_COLOR};`
     );
     this.ctx.on("draw", this.draw.bind(this));
-    // console.log(this.ctx);
     this.draw();
   }
   draw() {
@@ -47,8 +46,6 @@ export default class VirtTable {
       this.scroller.draw();
       console.timeEnd("draw");
     });
-
-    // console.log("draw", this.ctx.scrollX, this.ctx.scrollY);
   }
   /**
    * 销毁

@@ -55,7 +55,7 @@ export default class Selector {
         this.selectCols(cell);
       }
     });
-    this.ctx.on("cellHeaderMousedown", (cell, e) => {
+    this.ctx.on("cellHeaderMousedown", (cell) => {
       // 如果是选中就不处理，比如chexkbox
       if (this.ctx.target.style.cursor === "pointer") {
         return;

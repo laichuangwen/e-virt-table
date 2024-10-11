@@ -438,10 +438,6 @@ export default class Cell extends BaseCell {
       config: {
         BORDER_COLOR,
         BODY_BG_COLOR,
-        CELL_PADDING,
-        BODY_FONTFAMILY,
-        BODY_FONT_SIZE,
-        BODY_FONT_STYLE,
         HIGHLIGHT_SELECTED_ROW,
         HIGHLIGHT_SELECTED_ROW_COLOR,
         HIGHLIGHT_HOVER_ROW,
