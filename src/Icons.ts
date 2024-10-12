@@ -4,14 +4,15 @@ type ConfigColorNameType =
   | "EXPAND_ICON_COLOR"
   | "SHRINK_ICON_COLOR"
   | "CHECKBOX_COLOR";
-type SvgIcon = {
-  [x: string]: any;
-  name: string;
-  configName: string;
+interface SvgIcon extends IconType {
+  configName?: string;
   configColorName?: ConfigColorNameType;
+}
+export interface IconType {
+  name: string;
   svg: string;
   color: string;
-};
+}
 export default class Icons {
   private ctx: Context;
   private list: SvgIcon[] = [
@@ -93,6 +94,16 @@ export default class Icons {
           color = configColor;
         }
       }
+      // 将异步操作推入 promises 数组
+      const promise = this.createImageFromSVG(item.svg, color).then((icon) => {
+        this.icons.set(item.name, icon);
+      });
+      promises.push(promise);
+    }
+    // 额外的图标
+    for (let i = 0; i < this.ctx.config.ICONS.length; i++) {
+      const item = this.ctx.config.ICONS[i];
+      let color = item.color;
       // 将异步操作推入 promises 数组
       const promise = this.createImageFromSVG(item.svg, color).then((icon) => {
         this.icons.set(item.name, icon);

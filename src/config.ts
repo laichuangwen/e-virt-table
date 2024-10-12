@@ -1,5 +1,7 @@
+import { IconType } from "./Icons";
 import {
   CellEditorTypeMethod,
+  CellHoverIconMethod,
   CellReadonlyMethod,
   CellRenderMethod,
   CellRulesMethod,
@@ -14,6 +16,7 @@ import {
 export default class Config {
   PROCESSOR_NUM: number = 50;
   CSS_PREFIX: string = "evirt-table";
+  ICONS: IconType[] = [];
   ROW_KEY: string = "";
   HEAD_FONTFAMILY: string = "Arial";
   HEAD_LINE_HEIGHT: number = 1.2;
@@ -48,6 +51,7 @@ export default class Config {
   CELL_WIDTH: number = 100;
   CELL_HEIGHT: number = 36;
   CELL_PADDING: number = 8;
+  CELL_HOVER_ICON_SIZE: number = 20;
   SCROLLER_TRACK_SIZE: number = 14;
   SCROLLER_SIZE: number = 8;
   SCROLLER_COLOR: string = "#dee0e3";
@@ -109,6 +113,7 @@ export default class Config {
   CELL_TYPE_METHOD?: CellTypeMethod;
   CELL_EDITOR_TYPE_METHOD?: CellEditorTypeMethod;
   CELL_RENDER_METHOD?: CellRenderMethod;
+  CELL_HOVER_ICON_METHOD?: CellHoverIconMethod;
   SPAN_METHOD?: SpanMethod;
   SELECTABLE_METHOD?: SelectableMethod;
   EXPAND_LAZY_METHOD?: ExpandLazyMethod;

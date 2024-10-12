@@ -87,6 +87,7 @@ export type Position = {
 export interface Column {
   type: Type;
   editorType: string;
+  hoverIconName: string;
   title: string;
   width: number;
   align: Align;
@@ -105,9 +106,6 @@ export interface Column {
   readonly: boolean;
   children: Column[];
   column: Column;
-  overflowTooltipShow: boolean;
-  overflowTooltipWidth: number;
-  overflowTooltipPlacement: OverflowTooltipPlacement;
   rules: Rules;
   options: any[];
 }
@@ -161,6 +159,7 @@ export type CellRulesMethod = (params: CellParams) => Rules | void;
 export type CellTypeMethod = (params: CellParams) => Type | void;
 export type CellEditorTypeMethod = (params: CellParams) => string | void;
 export type CellRenderMethod = (params: CellParams) => string | void;
+export type CellHoverIconMethod = (params: CellParams) => string | void;
 export type SpanMethod = (params: SpanParams) => SpanType | void;
 export type SelectableMethod = (params: SelectableParams) => boolean | void;
 export type ExpandLazyMethod = (params: CellParams) => Promise<any[]>;

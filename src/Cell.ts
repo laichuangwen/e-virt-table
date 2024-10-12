@@ -1,7 +1,6 @@
 import type { Rule } from "async-validator";
 import type {
   Column,
-  OverflowTooltipPlacement,
   Fixed,
   Type,
   Align,
@@ -14,14 +13,16 @@ import type {
   // SpanMethod,
   CellEditorTypeMethod,
   SpanMethod,
+  CellHoverIconMethod,
 } from "./types";
 import Context from "./Context";
 import BaseCell from "./BaseCell";
 export default class Cell extends BaseCell {
-  formatter: formatterMethod | undefined;
+  formatter?: formatterMethod;
+  hoverIconName: string = "";
   align: Align;
   verticalAlign: VerticalAlign;
-  fixed: Fixed | undefined;
+  fixed?: Fixed;
   type: Type;
   editorType: string;
   cellType: CellType;
@@ -29,9 +30,6 @@ export default class Cell extends BaseCell {
   colspan = 1;
   rowspan = 1;
   key: string;
-  overflowTooltipShow = false;
-  overflowTooltipWidth = 0;
-  overflowTooltipPlacement: OverflowTooltipPlacement;
   column: Column;
   rowIndex: number;
   colIndex: number;
@@ -56,7 +54,7 @@ export default class Cell extends BaseCell {
   drawImageWidth = 0;
   drawImageHeight = 0;
   drawImageName = "";
-  drawImageSource: HTMLImageElement | undefined;
+  drawImageSource?: HTMLImageElement;
   ellipsis = false;
   textColor = "";
 
@@ -81,9 +79,6 @@ export default class Cell extends BaseCell {
     this.type = column.type || "text";
     this.editorType = column.editorType || "text";
     this.cellType = cellType;
-    this.overflowTooltipShow = column.overflowTooltipShow || false;
-    this.overflowTooltipWidth = column.overflowTooltipWidth || 0;
-    this.overflowTooltipPlacement = column.overflowTooltipPlacement || "top";
     this.align = column.align || "center";
     this.verticalAlign = column.verticalAlign || "middle";
     this.fixed = column.fixed;
@@ -95,6 +90,7 @@ export default class Cell extends BaseCell {
     this.value = this.getValue();
     this.render = column.render;
     this.renderFooter = column.renderFooter;
+    this.hoverIconName = column.hoverIconName;
     this.formatter = column.formatter;
     this.update();
   }
@@ -116,6 +112,7 @@ export default class Cell extends BaseCell {
     this.updateSpan();
     // this.updateStyle();
     this.updateType();
+    this.updateHoverIcon();
     this.updateSelection();
     this.updateTree();
     this.updateEditorType();
@@ -344,6 +341,38 @@ export default class Cell extends BaseCell {
         this.drawImageHeight = CHECKBOX_SIZE;
         this.drawImageName = checkboxName;
         this.drawImageSource = checkboxImage;
+      }
+    }
+  }
+  private updateHoverIcon() {
+    const { CELL_HOVER_ICON_METHOD, CELL_HOVER_ICON_SIZE, CELL_PADDING } =
+      this.ctx.config;
+    if (typeof CELL_HOVER_ICON_METHOD === "function") {
+      const hoverIconMethod: CellHoverIconMethod = CELL_HOVER_ICON_METHOD;
+      const hoverIconName = hoverIconMethod({
+        row: this.row,
+        rowIndex: this.rowIndex,
+        colIndex: this.colIndex,
+        column: this.column,
+        value: this.getValue(),
+      });
+      // 可以动态改变hoverIconName
+      if (hoverIconName !== undefined) {
+        this.hoverIconName = hoverIconName;
+      }
+    }
+    // 永远放在右边
+    const _x = this.drawX + this.width - CELL_HOVER_ICON_SIZE - CELL_PADDING;
+    const _y = this.drawY + (this.height - CELL_HOVER_ICON_SIZE) / 2;
+    if (this.hoverIconName) {
+      if (this.ctx.hoverCell && this.ctx.hoverCell.rowIndex === this.rowIndex) {
+        const drawImageSource = this.ctx.icons.get(this.hoverIconName);
+        this.drawImageX = _x;
+        this.drawImageY = _y;
+        this.drawImageWidth = CELL_HOVER_ICON_SIZE;
+        this.drawImageHeight = CELL_HOVER_ICON_SIZE;
+        this.drawImageName = this.hoverIconName;
+        this.drawImageSource = drawImageSource;
       }
     }
   }

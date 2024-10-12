@@ -7,7 +7,7 @@ export default class BaseCell {
   y = 0;
   width = 0;
   height = 0;
-  fixed: Fixed | undefined;
+  fixed?: Fixed;
   constructor(
     ctx: Context,
     x: number,

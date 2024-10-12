@@ -5,14 +5,16 @@ import Header from "./Header";
 import Body from "./Body";
 import Selector from "./Selector";
 import Autofill from "./Autofill";
+import Tooltip from "./Tooltip";
 export default class VirtTable {
-  target: HTMLCanvasElement;
-  ctx: Context;
-  scroller: Scroller;
+  private target: HTMLCanvasElement;
+  private scroller: Scroller;
   private header: Header;
   private body: Body;
   private selector: Selector;
   private autofill: Autofill;
+  private tooltip: Tooltip;
+  ctx: Context;
   constructor(target: HTMLCanvasElement, options: EVirtTableOptions) {
     this.target = target;
     this.ctx = new Context(target, options);
@@ -21,6 +23,7 @@ export default class VirtTable {
     this.scroller = new Scroller(this.ctx);
     this.selector = new Selector(this.ctx);
     this.autofill = new Autofill(this.ctx);
+    this.tooltip = new Tooltip(this.ctx);
     console.log(this.ctx);
     // 外层容器样式
     const {
@@ -51,6 +54,7 @@ export default class VirtTable {
    * 销毁
    */
   destroy() {
+    this.tooltip.destroy();
     this.selector.destroy();
     this.autofill.destroy();
     this.ctx.destroy();
