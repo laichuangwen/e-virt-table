@@ -74,13 +74,13 @@ export default class Config {
   FOOTER_BG_COLOR: string = "#fafafa";
   FOOTER_FIXED: boolean = false;
   CELL_FOOTER_HEIGHT: number = 36;
-  ENABLE_SELECTOR: boolean = true;
+  ENABLE_SELECTOR: boolean = false;
   ENABLE_SELECTOR_SINGLE: boolean = false;
   ENABLE_SELECTOR_SPAN_COL: boolean = true;
   ENABLE_SELECTOR_SPAN_ROW: boolean = true;
   ENABLE_SELECTOR_ALL_ROWS: boolean = true;
   ENABLE_SELECTOR_ALL_COLS: boolean = true;
-  ENABLE_AUTOFILL: boolean = true;
+  ENABLE_AUTOFILL: boolean = false;
   ENABLE_CONTEXTMENU: boolean = true;
   ENABLE_COPY: boolean = true;
   ENABLE_PASTER: boolean = true;
@@ -90,8 +90,8 @@ export default class Config {
   RESIZE_COLUMN_LINE_COLOR: string = "#e1e6eb";
   RESIZE_ROW_MIN_HEIGHT: number = 36;
   RESIZE_COLUMN_MIN_WIDTH: number = 50;
-  ENABLE_KEYBOARD: boolean = true;
-  ENABLE_HISTORY: boolean = true;
+  ENABLE_KEYBOARD: boolean = false;
+  ENABLE_HISTORY: boolean = false;
   ENABLE_VALIDATOR_IMMEDIATE: boolean = true;
   HISTORY_NUM: number = 50;
   HIGHLIGHT_HOVER_ROW: boolean = false;

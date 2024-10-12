@@ -70,6 +70,7 @@ export default class Context {
   rowResizing = false; // 行调整大小中
   columnResizing = false; // 列调整大小中
   scrollerMove = false; // 滚动条移动中
+  scrollerFocus = false; // 滚动条focus中
   autofillMove = false; // 自动填充移动中
   scrollY = 0;
   scrollX = 0;
@@ -266,9 +267,6 @@ export default class Context {
   }
   emit(event: string, ...args: any[]): void {
     this.eventBus.emit(event, ...args);
-  }
-  setHeader(headerOptions: HeaderOptions): void {
-    this.header = headerOptions;
   }
   destroy(): void {
     this.eventTable.destroy();

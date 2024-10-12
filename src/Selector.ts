@@ -133,13 +133,9 @@ export default class Selector {
 
   setSelector(xArr: number[], yArr: number[]) {
     const {
-      ENABLE_SELECTOR,
       ENABLE_SELECTOR_SPAN_COL,
       ENABLE_SELECTOR_SPAN_ROW,
     } = this.ctx.config;
-    if (!ENABLE_SELECTOR) {
-      return;
-    }
     let _xArr = xArr;
     let _yArr = yArr;
     if (!ENABLE_SELECTOR_SPAN_ROW) {

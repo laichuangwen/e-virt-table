@@ -1,0 +1,11 @@
+/* .vitepress/theme/custom.css */
+:root {
+  --vp-sidebar-width: 200px;
+  /* --vp-layout-max-width: 1440px; */
+}
+.VPDoc.has-aside .content-container {
+  max-width: 1200px !important;
+}
+.VPContent.has-sidebar {
+  padding-right: 0 !important;
+}

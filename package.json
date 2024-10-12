@@ -1,9 +1,8 @@
 {
   "name": "evirt-table",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "index.ts",
-  "module": "index.ts",
   "types": "index.ts",
   "scripts": {
     "dev": "vite",
@@ -11,6 +10,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "rollup-plugin-copy": "^3.5.0",
     "typescript": "^5.5.3",
     "vite": "^5.4.1"
   },

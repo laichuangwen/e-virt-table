@@ -14,6 +14,7 @@ import type {
   CellEditorTypeMethod,
   SpanMethod,
   CellHoverIconMethod,
+  CellStyleMethod,
 } from "./types";
 import Context from "./Context";
 import BaseCell from "./BaseCell";
@@ -47,6 +48,9 @@ export default class Cell extends BaseCell {
   visibleHeight = 0;
   drawX = 0;
   drawY = 0;
+  drawCellBgColor = "";
+  drawCellSkyBgColor = "";
+  drawTextColor = "";
   drawTextX = 0;
   drawTextY = 0;
   drawImageX = 0;
@@ -56,7 +60,6 @@ export default class Cell extends BaseCell {
   drawImageName = "";
   drawImageSource?: HTMLImageElement;
   ellipsis = false;
-  textColor = "";
 
   constructor(
     ctx: Context,
@@ -116,6 +119,7 @@ export default class Cell extends BaseCell {
     this.updateEditorType();
     this.updateRender();
     this.getValidationMessage();
+    this.updateContainer();
     this.text = this.getText();
     this.displayText = this.getDisplayText();
   }
@@ -278,6 +282,70 @@ export default class Cell extends BaseCell {
         this.drawTextX = iconOffsetX + this.drawX + iconWidth + 0.5;
       }
     }
+  }
+  private updateContainer() {
+    const {
+      BODY_BG_COLOR,
+      EDIT_BG_COLOR,
+      BODY_CELL_STYLE_METHOD,
+      READONLY_TEXT_COLOR,
+      FOOTER_BG_COLOR,
+      HIGHLIGHT_SELECTED_ROW,
+      HIGHLIGHT_SELECTED_ROW_COLOR,
+      HIGHLIGHT_HOVER_ROW,
+      HIGHLIGHT_HOVER_ROW_COLOR,
+    } = this.ctx.config;
+    const cell = this;
+    const { rowKey, key, type } = this;
+    // 恢复默认背景色
+    let bgColor = BODY_BG_COLOR;
+    let textColor = READONLY_TEXT_COLOR;
+    // 赋值编辑色
+    if (!this.ctx.database.getReadonly(rowKey, key)) {
+      if (!["index", "index-selection", "selection"].includes(type)) {
+        bgColor = EDIT_BG_COLOR;
+      }
+    }
+    // 定义格子样式方法
+    if (typeof BODY_CELL_STYLE_METHOD === "function") {
+      const cellStyleMethod: CellStyleMethod = BODY_CELL_STYLE_METHOD;
+      const { backgroundColor, color } =
+        cellStyleMethod({
+          row: cell.row,
+          rowIndex: cell.rowIndex,
+          colIndex: cell.colIndex,
+          column: cell.column,
+          value: cell.getValue(),
+        }) || {};
+      if (backgroundColor) {
+        bgColor = backgroundColor;
+      }
+      // 文字颜色
+      if (color) {
+        textColor = color;
+      }
+    }
+    // 合计底部背景色
+    if (cell.cellType === "footer") {
+      bgColor = FOOTER_BG_COLOR;
+    }
+    // 高亮行,在背景色上加一层颜色
+    let drawCellSkyBgColor = "transparent";
+    const focusCell = this.ctx.focusCell;
+    const hoverCell = this.ctx.hoverCell;
+    if (HIGHLIGHT_HOVER_ROW && hoverCell?.rowKey === this.rowKey) {
+      drawCellSkyBgColor = HIGHLIGHT_HOVER_ROW_COLOR;
+    }
+    if (HIGHLIGHT_SELECTED_ROW && focusCell?.rowKey === this.rowKey) {
+      drawCellSkyBgColor = HIGHLIGHT_SELECTED_ROW_COLOR;
+    }
+    this.drawCellSkyBgColor = drawCellSkyBgColor;
+    this.drawCellBgColor = bgColor;
+    this.drawTextColor = textColor;
+    // const change = this.grid.database.isHasChangedData(cell.rowKey, cell.key);
+    // if (change) {
+    //   this.setBackgroundColor("red");
+    // }
   }
   private updateSelection() {
     const {
@@ -472,29 +540,18 @@ export default class Cell extends BaseCell {
   draw() {
     const {
       paint,
-      config: {
-        BORDER_COLOR,
-        BODY_BG_COLOR,
-        HIGHLIGHT_SELECTED_ROW,
-        HIGHLIGHT_SELECTED_ROW_COLOR,
-        HIGHLIGHT_HOVER_ROW,
-        HIGHLIGHT_HOVER_ROW_COLOR,
-      },
+      config: { BORDER_COLOR },
     } = this.ctx;
     const { drawX, drawY } = this;
-    let fillColor = BODY_BG_COLOR;
-    const focusCell = this.ctx.focusCell;
-    const hoverCell = this.ctx.hoverCell;
-    if (HIGHLIGHT_HOVER_ROW && hoverCell?.rowKey === this.rowKey) {
-      fillColor = HIGHLIGHT_HOVER_ROW_COLOR;
-    }
-    if (HIGHLIGHT_SELECTED_ROW && focusCell?.rowKey === this.rowKey) {
-      fillColor = HIGHLIGHT_SELECTED_ROW_COLOR;
-    }
     // 绘制单元格
     paint.drawRect(drawX, drawY, this.visibleWidth, this.visibleHeight, {
       borderColor: BORDER_COLOR,
-      fillColor,
+      fillColor: this.drawCellBgColor,
+    });
+    paint.drawRect(drawX, drawY, this.width, this.height, {
+      borderColor: "transparent",
+      borderWidth: 1,
+      fillColor: this.drawCellSkyBgColor,
     });
     // 画选中框
     this.ellipsis = this.drawText();
@@ -521,7 +578,6 @@ export default class Cell extends BaseCell {
   private drawText() {
     const {
       CELL_PADDING = 0,
-      READONLY_TEXT_COLOR,
       BODY_FONTFAMILY,
       BODY_FONT_SIZE,
       BODY_FONT_STYLE,
@@ -538,7 +594,7 @@ export default class Cell extends BaseCell {
         padding: CELL_PADDING,
         align: this.align,
         verticalAlign: this.verticalAlign,
-        color: this.textColor || READONLY_TEXT_COLOR,
+        color: this.drawTextColor,
       }
     );
   }
@@ -558,6 +614,14 @@ export default class Cell extends BaseCell {
     if (this.cellType === "footer") {
       return;
     }
+    const { SELECT_BORDER_COLOR, ENABLE_AUTOFILL, ENABLE_SELECTOR } =
+      this.ctx.config;
+    if (!ENABLE_SELECTOR) {
+      return;
+    }
+    if (!ENABLE_AUTOFILL) {
+      return;
+    }
     const show = true;
     const { xArr, yArr } = this.ctx.selector;
     const maxX = xArr[1];
@@ -565,7 +629,6 @@ export default class Cell extends BaseCell {
     const { colIndex, rowIndex, drawX, drawY } = this;
     // 绘制自动填充点
     if (show && colIndex === maxX && rowIndex === maxY) {
-      const { SELECT_BORDER_COLOR } = this.ctx.config;
       this.ctx.paint.drawRect(
         drawX + this.width - 6,
         drawY + this.height - 6,
@@ -580,6 +643,10 @@ export default class Cell extends BaseCell {
   }
   private drawSelector() {
     if (this.cellType === "footer") {
+      return;
+    }
+    const { ENABLE_SELECTOR } = this.ctx.config;
+    if (!ENABLE_SELECTOR) {
       return;
     }
     const { xArr, yArr, xArrCopy, yArrCopy } = this.ctx.selector;

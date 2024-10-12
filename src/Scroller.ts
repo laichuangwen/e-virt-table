@@ -188,10 +188,15 @@ class Scrollbar {
       // 滚动条的X位置=轨道的X位置+（轨道的宽度-滚动条的宽度）/2
       this.barX = this.trackX + (SCROLLER_TRACK_SIZE - SCROLLER_SIZE) / 2;
       this.barWidth = SCROLLER_SIZE;
-      this.barHeight = Math.max(
-        SCROLLER_TRACK_SIZE,
-        (this.visibleDistance / this.distance) * this.visibleDistance
-      );
+      const ratio = this.distance ? this.visibleDistance / bodyHeight : 0;
+      let _barHeight = Math.floor(ratio * this.visibleDistance);
+      // 最小30,超出可见区域则隐藏
+      if (_barHeight < 30) {
+        _barHeight = 30;
+      } else if (_barHeight > this.visibleDistance) {
+        _barHeight = 0;
+      }
+      this.barHeight = _barHeight;
       this.barY =
         headerHeight +
         (this.scroll / this.distance) * (this.visibleDistance - this.barHeight);
@@ -211,12 +216,17 @@ class Scrollbar {
       this.trackY = visibleHeight - SCROLLER_TRACK_SIZE;
       this.trackWidth = visibleWidth;
       this.trackHeight = SCROLLER_TRACK_SIZE;
-      this.barWidth = SCROLLER_SIZE;
+
+      const ratio = this.distance ? this.visibleDistance / headerWidth : 0;
+      let _barWidth = Math.floor(ratio * this.visibleDistance);
       this.barY = this.trackY + (SCROLLER_TRACK_SIZE - SCROLLER_SIZE) / 2;
-      this.barWidth = Math.max(
-        SCROLLER_TRACK_SIZE,
-        (this.visibleDistance / this.distance) * this.visibleDistance
-      );
+      // 最小30,超出可见区域则隐藏
+      if (_barWidth < 30) {
+        _barWidth = 30;
+      } else if (_barWidth > this.visibleDistance) {
+        _barWidth = 0;
+      }
+      this.barWidth = _barWidth;
       this.barHeight = SCROLLER_SIZE;
       this.barX =
         (this.scroll / this.distance) * (this.visibleDistance - this.barWidth);
@@ -266,6 +276,8 @@ class Scrollbar {
         borderWidth: 1,
       });
     }
+    // 悬浮状态
+    this.ctx.scrollerFocus = this.isFocus;
   }
 }
 
@@ -283,17 +295,13 @@ export default class Scroller {
     this.ctx.on("mousemove", (e) => this.onMouseMove(e));
     this.ctx.on("mouseup", () => this.onMouseUp());
     this.ctx.on("setScroll", (scrollX: number, scrollY: number) => {
-      this.horizontalScrollbar.scroll = scrollX;
-      this.verticalScrollbar.scroll = scrollY;
-      this.ctx.emit("draw");
+      this.setScroll(scrollX, scrollY);
     });
     this.ctx.on("setScrollX", (scrollX: number) => {
-      this.horizontalScrollbar.scroll = scrollX;
-      this.ctx.emit("draw");
+      this.setScrollX(scrollX);
     });
     this.ctx.on("setScrollY", (scrollY: number) => {
-      this.verticalScrollbar.scroll = scrollY;
-      this.ctx.emit("draw");
+      this.setScrollY(scrollY);
     });
   }
 
@@ -339,5 +347,51 @@ export default class Scroller {
         this.ctx.emit("onScrollY", scrollY);
       }
     }
+  }
+  setScroll(x: number, y: number) {
+    this.horizontalScrollbar.scroll = x;
+    this.verticalScrollbar.scroll = y;
+    this.ctx.emit("draw");
+  }
+  setScrollX(scrollX: number) {
+    this.horizontalScrollbar.scroll = scrollX;
+    this.ctx.emit("draw");
+  }
+  setScrollY(scrollY: number) {
+    this.verticalScrollbar.scroll = scrollY;
+    this.ctx.emit("draw");
+  }
+  scrollToColkey(key: string) {
+    const { header } = this.ctx;
+    const cell = header.leafCellHeaders.find((cell) => cell.key === key);
+    if (cell) {
+      // 移动到窗口中间/2
+      this.setScrollX(cell.x + header.visibleWidth / 2);
+    }
+  }
+  scrollToColIndex(colIndex: number) {
+    const { header } = this.ctx;
+    const cell = header.leafCellHeaders.find(
+      (cell) => cell.colIndex === colIndex
+    );
+    if (cell) {
+      // 移动到窗口中间/2
+      if (cell.x > header.visibleWidth / 2) {
+        this.setScrollX(cell.x + header.visibleWidth / 2);
+      }
+    }
+  }
+  scrollToRowIndex(rowIndex: number) {
+    const { body, database } = this.ctx;
+    const { top } = database.getPositionForRowIndex(rowIndex);
+    if (top > body.visibleHeight) {
+      this.setScrollY(top + body.visibleHeight / 2);
+    }
+  }
+  scrollToRowKey(rowKey: string) {
+    const { body, database } = this.ctx;
+    const rowIndex = database.getRowIndexForRowKey(rowKey);
+    const { top } = database.getPositionForRowIndex(rowIndex);
+    this.setScrollY(-top + body.visibleHeight / 2);
   }
 }

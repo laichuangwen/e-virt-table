@@ -50,8 +50,6 @@ export default class EventBrowser {
     this.ctx.emit("click", e);
   }
   private handleKeydown(e: Event) {
-    console.log("handleKeydown");
-
     const { ENABLE_KEYBOARD } = this.ctx.config;
     if (!ENABLE_KEYBOARD) return;
     this.ctx.emit("keydown", e);

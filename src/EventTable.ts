@@ -10,7 +10,7 @@ export default class EventTable {
     this.ctx = ctx;
     this.init();
   }
-  init(): void {
+  private init(): void {
     // 监听窗口大小变化
     this.resizeObserver = new ResizeObserver(() => {
       this.ctx.emit("resizeObserver");
@@ -307,13 +307,12 @@ export default class EventTable {
   private isBusy(e: MouseEvent) {
     const y = e.offsetY;
     const x = e.offsetX;
-    if (e.target instanceof HTMLCanvasElement && !this.ctx.isTarget(e.target)) {
+    if (!(e.target instanceof HTMLCanvasElement)) {
       return true;
     }
-    // 行调整大小中不处理
-    // if (this.ctx.target.style.cursor === "crosshair") {
-    //   return true;
-    // }
+    if (!this.ctx.isTarget(e.target)) {
+      return true;
+    }
     // 行调整大小中不处理
     if (this.ctx.target.style.cursor === "row-resize") {
       return true;
@@ -335,9 +334,13 @@ export default class EventTable {
     if (this.ctx.scrollerMove) {
       return true;
     }
+    // 滚动条悬浮不处理
+    if (this.ctx.scrollerFocus) {
+      return true;
+    }
     // 点击滚动条不处理
     if (y > this.ctx.target.offsetHeight - SCROLLER_TRACK_SIZE) {
-      return;
+      return true;
     }
     // 点击滚动条不处理
     if (x > this.ctx.target.offsetWidth - SCROLLER_TRACK_SIZE) {

@@ -317,7 +317,7 @@ const columns: any[] = [
   // },
 ];
 let data: any[] = [];
-for (let i = 0; i < 10000; i += 1) {
+for (let i = 0; i < 5000; i += 1) {
   data.push({
     _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
     id: i,
@@ -368,14 +368,14 @@ for (let i = 0; i < 10000; i += 1) {
     children: [],
   });
 }
-// for (let i = 0; i < 500; i += 1) {
-//   columns.push({
-//     title: `表头${i}`,
-//     key: `sc_name${i}`,
-//     readonly: true,
-//     align: "right",
-//   });
-// }
+for (let i = 0; i < 0; i += 1) {
+  columns.push({
+    title: `表头${i}`,
+    key: `sc_name${i}`,
+    readonly: true,
+    align: "right",
+  });
+}
 // 获取合并单元格的spanArr,针对行数据相同key合并
 const getSpanArrByRow = (list: any, key: string) => {
   let contactDot = 0;
@@ -450,6 +450,10 @@ const eVirtTable = new EVirtTable(canvas, {
     HEIGHT: 0,
     CHECKBOX_KEY: "emp_name",
     // CELL_HEIGHT: 28,
+    ENABLE_AUTOFILL: true,
+    ENABLE_SELECTOR: true,
+    ENABLE_KEYBOARD: true,
+    ENABLE_HISTORY: true,
     ENABLE_OFFSET_HEIGHT: true,
     HIGHLIGHT_SELECTED_ROW: true,
     HIGHLIGHT_HOVER_ROW: true,
@@ -478,6 +482,21 @@ const eVirtTable = new EVirtTable(canvas, {
           resolve(list);
         }, 1000);
       });
+    },
+    BODY_CELL_STYLE_METHOD: (cell: any) => {
+      const { rowIndex, column } = cell;
+      if (rowIndex == 5 && column.key === "phone")
+        return {
+          color: "blue",
+          backgroundColor: "red",
+        };
+      return {};
+    },
+    CELL_READONLY_METHOD: (params: any) => {
+      const { rowIndex, column } = params;
+      if (rowIndex == 15 && ["emp_name221", "emp_name2"].includes(column.key)) {
+        return true;
+      }
     },
     SPAN_METHOD: (params) => {
       const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;

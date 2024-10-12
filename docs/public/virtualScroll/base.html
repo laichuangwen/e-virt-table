@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>evirt-table</title>
+  </head>
+  <script src="../index.umd.js"></script>
+  <style>
+    .view:fullscreen {
+      background-color: white;
+    }
+    .content {
+      position: relative;
+    }
+    .jn-data-grid-editor {
+      position: absolute;
+      top: -10000px;
+      left: -10000px;
+      text-align: left;
+      line-height: 0;
+      z-index: 100;
+      overflow: hidden;
+      background-color: #fff;
+      border: 2px solid rgb(82, 146, 247);
+      box-sizing: border-box;
+      box-shadow: rgba(0, 0, 0, 0.2) 0px 6px 16px;
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+    }
+
+    .jn-data-grid-editor div[contenteditable="true"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
+      outline: none;
+      font-weight: 400;
+      font-size: 12px;
+      color: inherit;
+      white-space: normal;
+      word-wrap: break-word;
+      word-break: break-all;
+      line-height: 18px;
+      margin: 0;
+      background: #fff;
+      cursor: text;
+    }
+  </style>
+  <body style="margin: 0px">
+    <div id="jn-data-grid-view" class="view">
+      <div style="margin-bottom: 8px">
+        <button id="jn-data-grid-fullpage-btn">全屏</button>
+        <select id="options" name="options">
+          <option value="1">列1k行1K</option>
+          <option value="2">列100行20w</option>
+          <option value="3">列20W行100</option>
+        </select>
+      </div>
+      <div class="content">
+        <!-- <canvas id="jn-data-grid-table" class="jn-data-grid-table"></canvas> -->
+        <canvas id="jn-data-grid-table" class="jn-data-grid-table"></canvas>
+        <div id="jn-data-grid-editor" class="jn-data-grid-editor">
+          <div id="jn-data-grid-text" contenteditable="true"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    function gcData(c = 1000, r = 1000) {
+      let columns = [
+        {
+          type: "index",
+          key: "index",
+          width: 100,
+        },
+        {
+          title: "日期",
+          key: "date",
+        },
+        {
+          title: "姓名",
+          key: "name",
+        },
+        {
+          title: "省份",
+          key: "province",
+        },
+        {
+          title: "市区",
+          key: "city",
+        },
+        {
+          title: "地址",
+          key: "address",
+          width: 200,
+        },
+        {
+          title: "邮编",
+          key: "zip",
+        },
+      ];
+      let gcData = {};
+      for (let i = 0; i < c; i += 1) {
+        columns.push({
+          title: `表头${i}`,
+          key: `gc_${i}`,
+        });
+        gcData[`gc_${i}`] = `数据${i}`;
+      }
+      let data = [];
+      _gcData = {
+        date: "2016-05-02",
+        name: "王小虎",
+        province: "上海",
+        city: "普陀区",
+        address: "上海市普陀区金沙江路 1518 弄",
+        zip: 200333,
+        ...gcData,
+      };
+      for (let i = 0; i < r; i += 1) {
+        data.push(JSON.parse(JSON.stringify(_gcData)));
+      }
+      return {
+        columns,
+        data,
+      };
+    }
+    const { columns, data } = gcData(1000, 1000);
+    const fullpageBtn = document.getElementById("jn-data-grid-fullpage-btn");
+    fullpageBtn.addEventListener("click", () => {
+      const view = document.getElementById("jn-data-grid-view");
+      if (view.requestFullscreen) {
+        view.requestFullscreen();
+      } else if (view.mozRequestFullScreen) {
+        // Firefox
+        view.mozRequestFullScreen();
+      } else if (view.webkitRequestFullscreen) {
+        // Chrome, Safari, Opera
+        view.webkitRequestFullscreen();
+      } else if (view.msRequestFullscreen) {
+        // IE/Edge
+        view.msRequestFullscreen();
+      }
+    });
+    // 获取 select 元素
+    const selectElement = document.getElementById("options");
+
+    // 添加 change 事件监听器
+    selectElement.addEventListener("change", function () {
+      grid.setLoading(true);
+      // 获取选中的值
+      const selectedValue = selectElement.value;
+      if (selectedValue === "1") {
+        const { columns, data } = gcData(1000, 1000);
+        grid.loadColumns(columns);
+        grid.loadData(data);
+      } else if (selectedValue === "2") {
+        const { columns, data } = gcData(100, 200000);
+        grid.loadColumns(columns);
+        grid.loadData(data);
+      } else if (selectedValue === "3") {
+        const { columns, data } = gcData(200000, 100);
+        grid.loadColumns(columns);
+        grid.loadData(data);
+      }
+    });
+    const target = document.getElementById("jn-data-grid-table");
+    console.log(EVirtTable);
+    
+    const grid = new EVirtTable(target, {
+      data,
+      columns,
+      config: {
+        ENABLE_SELECTOR: true,
+        ENABLE_AUTOFILL: true,
+      },
+    });
+    grid.on("startEdit", (cell) => {
+      const {
+        clientX = 0,
+        clientY = 0,
+        width = 0,
+        height = 0,
+        padding = 0,
+      } = cell?.getClient() || {};
+      const value = cell.getValue();
+      const editor = document.getElementById("jn-data-grid-editor");
+      editor.style.left = `${clientX}px`;
+      editor.style.top = `${clientY}px`;
+      const text = document.getElementById("jn-data-grid-text");
+      text.style.minWidth = `${width}px`;
+      text.style.minHeight = `${height}px`;
+      text.style.padding = `${padding}px`;
+      if (value !== null) {
+        text.innerText = value;
+      }
+      text.focus();
+      const selection = window.getSelection(); // 创建selection
+      selection?.selectAllChildren(text); // 清除选区并选择指定节点的所有子节点
+      selection?.collapseToEnd(); // 光标移至最后
+    });
+    grid.on("doneEdit", (cell) => {
+      const text = document.getElementById("jn-data-grid-text");
+      const { rowKey, key } = cell;
+      const value = cell.getValue();
+      // !(text.textContent === '' && value === null)剔除点击编辑后未修改会把null变为''的情况
+      if (
+        text.textContent !== value &&
+        !(text.textContent === "" && value === null)
+      ) {
+        grid.setItemValue(rowKey, key, text.textContent, true, true, true);
+      }
+      text.textContent = null;
+      const editor = document.getElementById("jn-data-grid-editor");
+      if (editor) {
+        editor.style.left = `${-10000}px`;
+        editor.style.top = `${-10000}px`;
+      }
+    });
+  </script>
+</html>

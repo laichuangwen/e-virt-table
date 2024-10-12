@@ -264,7 +264,7 @@ export default class Body {
       config: { HEADER_BG_COLOR, SCROLLER_TRACK_SIZE },
     } = this.ctx;
 
-    if (scrollX > 0) {
+    if (scrollX > 0 && fixedLeftWidth !== 0) {
       this.ctx.paint.drawShadow(this.x, this.y, fixedLeftWidth, this.height, {
         fillColor: HEADER_BG_COLOR,
         side: "right",
