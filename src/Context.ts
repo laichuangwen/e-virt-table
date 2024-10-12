@@ -270,9 +270,6 @@ export default class Context {
   setHeader(headerOptions: HeaderOptions): void {
     this.header = headerOptions;
   }
-  setBody(bodyOptions: BodyOptions): void {
-    this.body = bodyOptions;
-  }
   destroy(): void {
     this.eventTable.destroy();
     this.eventBrowser.destroy();

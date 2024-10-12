@@ -103,8 +103,6 @@ export default class Cell extends BaseCell {
     return this.message;
   }
   update() {
-    this.text = this.getText();
-    this.displayText = this.getDisplayText();
     this.drawX = this.getDrawX();
     this.drawY = this.getDrawY();
     this.drawTextX = this.drawX;
@@ -118,6 +116,8 @@ export default class Cell extends BaseCell {
     this.updateEditorType();
     this.updateRender();
     this.getValidationMessage();
+    this.text = this.getText();
+    this.displayText = this.getDisplayText();
   }
   updateSpan() {
     // 合计不合并
@@ -326,7 +326,6 @@ export default class Cell extends BaseCell {
           (this.ctx.hoverCell && this.ctx.hoverCell.rowIndex === rowIndex) ||
           ["checkbox-disabled", "checkbox-check"].includes(checkboxName)
         ) {
-          this.displayText = "";
           this.drawImageX = _x;
           this.drawImageY = _y;
           this.drawImageWidth = CHECKBOX_SIZE;
@@ -400,6 +399,15 @@ export default class Cell extends BaseCell {
       }
       // 插槽不显示文本
       if (this.render) {
+        return "";
+      }
+      //
+      if (
+        this.type === "index-selection" &&
+        ((this.ctx.hoverCell &&
+          this.ctx.hoverCell.rowIndex === this.rowIndex) ||
+          ["checkbox-disabled", "checkbox-check"].includes(this.drawImageName))
+      ) {
         return "";
       }
       return this.text;
@@ -484,7 +492,7 @@ export default class Cell extends BaseCell {
       fillColor = HIGHLIGHT_SELECTED_ROW_COLOR;
     }
     // 绘制单元格
-    paint.drawRect(drawX, drawY, this.width, this.height, {
+    paint.drawRect(drawX, drawY, this.visibleWidth, this.visibleHeight, {
       borderColor: BORDER_COLOR,
       fillColor,
     });

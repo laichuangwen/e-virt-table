@@ -127,6 +127,13 @@ export default class Body {
     } else {
       this.visibleHeight = _visibleHeight;
     }
+    this.ctx.body.x = this.x;
+    this.ctx.body.y = this.y;
+    this.ctx.body.width = this.width;
+    this.ctx.body.height = this.height;
+    this.ctx.body.visibleWidth = this.visibleWidth;
+    this.ctx.body.visibleHeight = this.visibleHeight;
+    this.ctx.body.data = data;
   }
   // 调整行的高度
   private initResizeRow() {
@@ -319,6 +326,9 @@ export default class Body {
     this.headIndex = Math.max(0, _headIndex);
     this.tailIndex = Math.min(this.ctx.maxRowIndex, _tailIndex + 1);
     this.visibleRows = data.slice(this.headIndex, this.tailIndex + 1);
+    this.ctx.body.headIndex = this.headIndex;
+    this.ctx.body.tailIndex = this.tailIndex;
+    this.ctx.body.visibleRows = this.visibleRows;
     const rows: Row[] = [];
     for (let i = 0; i < this.visibleRows.length; i++) {
       const index = this.headIndex + i;
@@ -336,19 +346,7 @@ export default class Body {
       rows.push(row);
     }
     this.renderRows = rows;
-    this.ctx.setBody({
-      x: this.x,
-      y: this.y,
-      width: this.width,
-      height: this.height,
-      visibleWidth: this.visibleWidth,
-      visibleHeight: this.visibleHeight,
-      headIndex: this.headIndex,
-      tailIndex: this.tailIndex,
-      visibleRows: this.visibleRows,
-      renderRows: this.renderRows,
-      data: this.data,
-    });
+    this.ctx.body.renderRows = rows;
   }
   draw() {
     this.renderRows.forEach((row) => {

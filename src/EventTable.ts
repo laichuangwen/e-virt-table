@@ -163,6 +163,16 @@ export default class EventTable {
         for (const cell of cells) {
           const layerX = cell.getDrawX();
           const layerY = cell.getDrawY();
+          // 因为可能有合并单元格，所以这里要判断是可视区域
+          if (
+            x > layerX &&
+            x < layerX + cell.visibleWidth &&
+            y > layerY &&
+            y < layerY + cell.visibleHeight
+          ) {
+            // selection移入移除事件
+            this.imageEnterAndLeave(cell, e);
+          }
           if (
             x > layerX &&
             x < layerX + cell.width &&
@@ -174,8 +184,6 @@ export default class EventTable {
             if (this.ctx.hoverCell && this.ctx.hoverCell !== cell) {
               this.ctx.emit("cellMouseleave", this.ctx.hoverCell, e);
             }
-            // selection移入移除事件
-            this.imageEnterAndLeave(cell, e);
             if (this.ctx.hoverCell === cell) return;
             if (this.ctx.hoverCell?.rowKey !== cell.rowKey) {
               this.ctx.hoverCell = cell;
@@ -291,7 +299,7 @@ export default class EventTable {
       }
     } else {
       this.ctx.isPointer = false;
-      if (this.ctx.target.style.cursor === "pointer") { 
+      if (this.ctx.target.style.cursor === "pointer") {
         this.ctx.target.style.cursor = "default";
       }
     }

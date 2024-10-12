@@ -72,6 +72,11 @@ export default class Header {
     );
     // 更新最大列索引
     this.ctx.maxColIndex = this.leafCellHeaders.length - 1;
+    this.ctx.header.x = this.x;
+    this.ctx.header.y = this.y;
+    this.ctx.header.width = this.width;
+    this.ctx.header.height = this.height;
+    this.ctx.header.visibleHeight = this.visibleHeight;
   }
   // 调整表头的宽度
   initResizeColumn() {
@@ -281,20 +286,14 @@ export default class Header {
       target,
     } = this.ctx;
     this.visibleWidth = target.offsetWidth - SCROLLER_TRACK_SIZE;
-    this.ctx.setHeader({
-      x: this.x,
-      y: this.y,
-      width: this.width,
-      height: this.height,
-      visibleHeight: this.visibleHeight,
-      visibleWidth: this.visibleWidth,
-      leafCellHeaders: this.leafCellHeaders,
-      visibleLeafColumns: this.visibleLeafColumns,
-      renderLeafCellHeaders: this.renderLeafCellHeaders,
-      renderCellHeaders: this.renderFixedCellHeaders.concat(
-        this.renderCenterCellHeaders
-      ),
-    });
+    this.ctx.header.visibleLeafColumns = this.visibleLeafColumns;
+    this.ctx.header.visibleWidth = this.visibleWidth;
+    this.ctx.header.visibleHeight = this.visibleHeight;
+    this.ctx.header.leafCellHeaders = this.leafCellHeaders;
+    this.ctx.header.renderLeafCellHeaders = this.renderLeafCellHeaders;
+    this.ctx.header.renderCellHeaders = this.renderFixedCellHeaders.concat(
+      this.renderCenterCellHeaders
+    );
   }
   drawTipLine() {
     if (this.isResizing && this.resizeTarget) {

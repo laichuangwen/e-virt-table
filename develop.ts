@@ -9,18 +9,18 @@ const columns: any[] = [
   //   fixed: "left",
   //   width: 50,
   // },
-  // {
-  //   key: "selection",
-  //   type: "selection",
-  //   fixed: "left",
-  //   width: 50,
-  // },
   {
     key: "selection",
-    type: "index-selection",
-    width: 100,
+    type: "selection",
     fixed: "left",
+    width: 50,
   },
+  // {
+  //   key: "selection",
+  //   type: "index-selection",
+  //   width: 100,
+  //   fixed: "left",
+  // },
   {
     title: "工号",
     key: "emp_no",
@@ -37,7 +37,6 @@ const columns: any[] = [
     fixed: "left",
     align: "left",
     verticalAlign: "middle",
-    hoverIconName: "icon-edit",
     // render: "emp_name",
   },
   // {
@@ -233,7 +232,6 @@ const columns: any[] = [
     size: "small",
     key: "birthday",
     type: "date",
-    hoverIconName: "icon-edit",
   },
   {
     title: "家庭地址",
@@ -378,6 +376,64 @@ for (let i = 0; i < 10000; i += 1) {
 //     align: "right",
 //   });
 // }
+// 获取合并单元格的spanArr,针对行数据相同key合并
+const getSpanArrByRow = (list: any, key: string) => {
+  let contactDot = 0;
+  const spanArr: number[] = [];
+  list.forEach((item: any, index: number) => {
+    if (index === 0) {
+      spanArr.push(1);
+    } else {
+      if (item[key] === list[index - 1][key]) {
+        spanArr[contactDot] += 1;
+        spanArr.push(0);
+      } else {
+        spanArr.push(1);
+        contactDot = index;
+      }
+    }
+  });
+  return spanArr;
+};
+const getSpanObjByColumn = (row: any, columns: any) => {
+  let keyPre = "";
+  let keyDot = "";
+  const spanObj: any = {};
+  columns.forEach((item: any, index: number) => {
+    if (index === 0) {
+      keyPre = item.key;
+      keyDot = item.key;
+      spanObj[item.key] = 1;
+    } else {
+      // eslint-disable-next-line no-undef
+      if (row[item.key] === row[keyPre]) {
+        spanObj[item.key] = 0;
+        spanObj[keyDot] += 1;
+      } else {
+        spanObj[item.key] = 1;
+        keyPre = item.key;
+        keyDot = item.key;
+      }
+    }
+  });
+  return spanObj;
+};
+// 合并行单元格
+const mergeRowCell = (data: any, key: string) => {
+  // 合并单元格
+  const { visibleRows, rowIndex, headIndex } = data;
+  const spanArr = getSpanArrByRow(visibleRows, key);
+  if (spanArr[rowIndex - headIndex] === 0) {
+    return {
+      rowspan: 0,
+      colspan: 0,
+    };
+  }
+  return {
+    rowspan: spanArr[rowIndex - headIndex],
+    colspan: 1,
+  };
+};
 const eVirtTable = new EVirtTable(canvas, {
   columns,
   data,
@@ -392,6 +448,7 @@ const eVirtTable = new EVirtTable(canvas, {
     ],
     WIDTH: 0,
     HEIGHT: 0,
+    CHECKBOX_KEY: "emp_name",
     // CELL_HEIGHT: 28,
     ENABLE_OFFSET_HEIGHT: true,
     HIGHLIGHT_SELECTED_ROW: true,
@@ -421,6 +478,31 @@ const eVirtTable = new EVirtTable(canvas, {
           resolve(list);
         }, 1000);
       });
+    },
+    SPAN_METHOD: (params) => {
+      const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;
+      if (column.key === "emp_name") {
+        // 合并行单元格
+        return mergeRowCell(params, "emp_name");
+      }
+      if (column.key === "selection") {
+        // 合并行单元格
+        return mergeRowCell(params, "emp_name");
+      }
+      // // 合并动态列单元格
+      // if (colIndex > 4) {
+      //   const spanObj = getSpanObjByColumn(row, visibleLeafColumns);
+      //   if (spanObj[column.key] === 0) {
+      //     return {
+      //       rowspan: 0,
+      //       colspan: 0,
+      //     };
+      //   }
+      //   return {
+      //     rowspan: 1,
+      //     colspan: spanObj[column.key],
+      //   };
+      // }
     },
   },
 });
