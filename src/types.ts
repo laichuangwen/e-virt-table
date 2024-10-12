@@ -31,8 +31,9 @@ export type OverflowTooltipPlacement =
 
 export type VerticalAlign = "top" | "middle" | "bottom";
 export type Align = "left" | "center" | "right";
-export type Fixed = "left" | "right" ;
+export type Fixed = "left" | "right";
 export type Type = "index" | "selection" | "index-selection" | "tree";
+
 export type TypeCheckbox =
   | "checkbox-uncheck"
   | "checkbox-check"
@@ -40,7 +41,7 @@ export type TypeCheckbox =
   | "checkbox-disabled"
   | "checkbox-hover"
   | "checkbox-indeterminate";
-export type CellType = "body" | "footer";
+export type CellType = "header" | "body" | "footer";
 export type RowType = CellType;
 export type MenuItem = {
   label: string;

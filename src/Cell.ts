@@ -73,7 +73,7 @@ export default class Cell extends BaseCell {
     row: any,
     cellType: CellType = "body"
   ) {
-    super(ctx, x, y, width, height, column.fixed);
+    super(ctx, x, y, width, height, column.fixed, cellType);
     this.visibleWidth = this.width;
     this.visibleHeight = this.height;
     this.colIndex = colIndex;

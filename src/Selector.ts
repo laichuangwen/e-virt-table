@@ -5,12 +5,12 @@ import { ChangeItem } from "./types";
 export default class Selector {
   private isCut = false;
   private isMultipleRow = false;
-  ctx: Context;
+  private ctx: Context;
   constructor(ctx: Context) {
     this.ctx = ctx;
     this.init();
   }
-  init() {
+  private init() {
     this.ctx.on("cellHoverChange", (cell) => {
       // 如果是自动填充移动就不处理
       if (this.ctx.autofillMove) {
@@ -131,11 +131,9 @@ export default class Selector {
     });
   }
 
-  setSelector(xArr: number[], yArr: number[]) {
-    const {
-      ENABLE_SELECTOR_SPAN_COL,
-      ENABLE_SELECTOR_SPAN_ROW,
-    } = this.ctx.config;
+  private setSelector(xArr: number[], yArr: number[]) {
+    const { ENABLE_SELECTOR_SPAN_COL, ENABLE_SELECTOR_SPAN_ROW } =
+      this.ctx.config;
     let _xArr = xArr;
     let _yArr = yArr;
     if (!ENABLE_SELECTOR_SPAN_ROW) {
@@ -159,7 +157,7 @@ export default class Selector {
     }
   }
 
-  selectCols(cell: CellHeader) {
+  private selectCols(cell: CellHeader) {
     // 如果是拖拽改变列宽就不处理
     if (this.ctx.columnResizing) {
       return;
@@ -196,7 +194,7 @@ export default class Selector {
       this.setSelector(xArr, yArr);
     }
   }
-  selectAll() {
+  private selectAll() {
     // 只有两个全选启用了才能全选
     const { ENABLE_SELECTOR_ALL_ROWS, ENABLE_SELECTOR_ALL_COLS } =
       this.ctx.config;
@@ -210,7 +208,7 @@ export default class Selector {
       this.setSelector(xArr, yArr);
     }
   }
-  selectRows(cell: Cell, isSetFocus = true) {
+  private selectRows(cell: Cell, isSetFocus = true) {
     // 启用单选就不能批量选中
     if (this.ctx.config.ENABLE_SELECTOR_SINGLE) {
       return;
@@ -240,7 +238,7 @@ export default class Selector {
     }
   }
 
-  mouseenter() {
+  private mouseenter() {
     if (this.ctx.config.ENABLE_SELECTOR_SINGLE) {
       return;
     }
@@ -256,7 +254,7 @@ export default class Selector {
       this.setSelector(xArr, yArr);
     }
   }
-  click(shiftKey = false) {
+  private click(shiftKey = false) {
     const { focusCell, clickCell } = this.ctx;
     if (!focusCell) {
       return;
@@ -280,13 +278,8 @@ export default class Selector {
       this.adjustBoundaryPosition();
     }
   }
-  clearSelector() {
-    this.ctx.selector.enable = false;
-    this.ctx.selector.xArr = [-1, -1];
-    this.ctx.selector.yArr = [-1, -1];
-    this.clearCopyLine();
-  }
-  clearCopyLine() {
+  
+  private clearCopyLine() {
     this.ctx.selector.xArrCopy = [-1, -1];
     this.ctx.selector.yArrCopy = [-1, -1];
   }
@@ -296,7 +289,7 @@ export default class Selector {
    * @param colIndex
    * @returns
    */
-  getCell(rowIndex: number, colIndex: number) {
+  private getCell(rowIndex: number, colIndex: number) {
     // 设置选中FocusCell
     const row = this.ctx.body.renderRows.find(
       (row) => row.rowIndex === rowIndex
@@ -310,7 +303,7 @@ export default class Selector {
    * 复制
    * @returns
    */
-  copy() {
+  private copy() {
     if (!this.ctx.config.ENABLE_COPY) {
       return;
     }
@@ -330,7 +323,7 @@ export default class Selector {
       console.error("当前浏览器不支持Clipboard API");
     }
   }
-  clearSelectedData(xArr: number[], yArr: number[], ignoreSet = false) {
+  private clearSelectedData(xArr: number[], yArr: number[], ignoreSet = false) {
     let changeList: ChangeItem[] = [];
     const rowKeyList: Set<string> = new Set();
     for (let ri = 0; ri <= yArr[1] - yArr[0]; ri++) {
@@ -373,7 +366,7 @@ export default class Selector {
     this.ctx.emit("clearSelectedDataChange", changeList, rows);
     return changeList;
   }
-  paste() {
+  private paste() {
     if (!navigator.clipboard) {
       console.error("当前浏览器不支持Clipboard API");
       return;
@@ -463,7 +456,7 @@ export default class Selector {
   /**键盘上下左右切换
    * @param dir
    */
-  moveFocus(dir: "LEFT" | "TOP" | "RIGHT" | "BOTTOM") {
+  private moveFocus(dir: "LEFT" | "TOP" | "RIGHT" | "BOTTOM") {
     const { focusCell } = this.ctx;
     if (!focusCell) {
       return;
@@ -509,7 +502,7 @@ export default class Selector {
   /**
    * 调整滚动条位置，让焦点单元格始终出现在可视区域内
    */
-  adjustBoundaryPosition() {
+  private adjustBoundaryPosition() {
     const {
       target,
       focusCell,

@@ -171,9 +171,11 @@ class Scrollbar {
     const headerHeight = header.height;
     const headerWidth = header.width;
     const bodyHeight = body.height;
+    const footerHeight = this.ctx.footer.height;
     if (this.type === "vertical") {
-      this.visibleDistance = visibleHeight - SCROLLER_TRACK_SIZE - headerHeight;
-      this.distance = bodyHeight - this.visibleDistance;
+      this.visibleDistance =
+        visibleHeight - SCROLLER_TRACK_SIZE - headerHeight;
+      this.distance = bodyHeight - this.visibleDistance + footerHeight;
       this.trackX = visibleWidth - SCROLLER_TRACK_SIZE;
       this.trackY = 0;
       // 分割线

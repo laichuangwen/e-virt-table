@@ -49,7 +49,7 @@ export default class CellHeader extends BaseCell {
     height: number,
     column: Column
   ) {
-    super(ctx, x, y, width, height, column.fixed);
+    super(ctx, x, y, width, height, column.fixed, "header");
     this.ctx = ctx;
     this.x = x;
     this.y = y;
@@ -73,13 +73,6 @@ export default class CellHeader extends BaseCell {
     this.rowKey = generateShortUUID();
     this.hasChildren = (column.children && column.children.length > 0) || false; // 是否有子
     this.render = column.renderHeader;
-  }
-  /**
-   * 覆盖基类方法，获取绘制y坐标
-   * @returns
-   */
-  getDrawY() {
-    return this.y;
   }
   /**
    * 是否可见，覆盖基类方法，表头是跟y滚动条没有关系的所以不需要加滚动参数

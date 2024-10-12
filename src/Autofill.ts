@@ -1,12 +1,12 @@
 import type Context from "./Context";
 import type Cell from "./Cell";
 export default class Autofill {
-  ctx: Context;
+  private ctx: Context;
   constructor(ctx: Context) {
     this.ctx = ctx;
     this.init();
   }
-  init() {
+  private init() {
     this.ctx.on("cellMouseenter", (cell, e) => {
       if (this.ctx.target.style.cursor === "crosshair") {
         this.ctx.target.style.cursor = "default";
@@ -44,7 +44,7 @@ export default class Autofill {
    * 是否在填充
    * @returns
    */
-  isAutofillIng() {
+  private isAutofillIng() {
     const { xArr, yArr } = this.ctx.selector;
     // 两个相等
     if (
@@ -55,11 +55,11 @@ export default class Autofill {
     }
     return true;
   }
-  setMousedown() {
+  private setMousedown() {
     this.ctx.autofill.enable = true;
     this.ctx.autofillMove = true;
   }
-  setMouseUp() {
+  private setMouseUp() {
     if (!this.ctx.autofill.enable) {
       return;
     }
@@ -72,7 +72,7 @@ export default class Autofill {
     this.ctx.autofill.xArr = [-1, -1];
     this.ctx.autofill.yArr = [-1, -1];
   }
-  setAutofill(xArr: number[], yArr: number[]) {
+  private setAutofill(xArr: number[], yArr: number[]) {
     const {
       ENABLE_AUTOFILL,
       ENABLE_SELECTOR_SPAN_COL,
@@ -105,7 +105,7 @@ export default class Autofill {
   /**
    * 填充数据
    */
-  autofillData() {
+  private autofillData() {
     const rowKeyList: Set<string> = new Set();
     const selector = this.ctx.getSelectedData();
     // 存复制赋值的位置,用于剔除填充
@@ -165,7 +165,7 @@ export default class Autofill {
     this.ctx.selector.yArr = this.ctx.autofill.yArr;
     this.ctx.emit("draw");
   }
-  mouseenter(cell: Cell) {
+  private mouseenter(cell: Cell) {
     if (["index", "selection", "index-selection"].includes(cell.type)) {
       return;
     }

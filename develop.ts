@@ -317,7 +317,7 @@ const columns: any[] = [
   // },
 ];
 let data: any[] = [];
-for (let i = 0; i < 5000; i += 1) {
+for (let i = 0; i < 50; i += 1) {
   data.push({
     _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
     id: i,
@@ -525,6 +525,24 @@ const eVirtTable = new EVirtTable(canvas, {
     },
   },
 });
+setInterval(() => {
+  const num = Math.floor(Math.random() * 1000);
+  eVirtTable.loadFooterData([
+    {
+      emp_name: "合计",
+      emp_img: "122",
+      phone: "12222222",
+      sex: `${num}`,
+      dep_name: "3434bu",
+    },
+    {
+      emp_name: "合计34",
+      emp_img: "122",
+      phone: "12222223332",
+      sex: `${num}`,
+    },
+  ]);
+}, 5000);
 // 销毁
 function destroy() {
   eVirtTable.destroy();

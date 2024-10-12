@@ -11,6 +11,7 @@ import Context from "./Context";
 import Scroller from "./Scroller";
 import Header from "./Header";
 import Body from "./Body";
+import Footer from "./Footer";
 import Selector from "./Selector";
 import Autofill from "./Autofill";
 import Tooltip from "./Tooltip";
@@ -19,6 +20,7 @@ export default class VirtTable {
   private scroller: Scroller;
   private header: Header;
   private body: Body;
+  private footer: Footer;
   private selector: Selector;
   private autofill: Autofill;
   private tooltip: Tooltip;
@@ -28,6 +30,7 @@ export default class VirtTable {
     this.ctx = new Context(target, options);
     this.header = new Header(this.ctx);
     this.body = new Body(this.ctx);
+    this.footer = new Footer(this.ctx);
     this.scroller = new Scroller(this.ctx);
     this.selector = new Selector(this.ctx);
     this.autofill = new Autofill(this.ctx);
@@ -50,9 +53,11 @@ export default class VirtTable {
     requestAnimationFrame(() => {
       console.time("draw");
       this.header.update();
+      this.footer.update();
       this.body.update();
       this.ctx.paint.clear();
       this.body.draw();
+      this.footer.draw();
       this.header.draw();
       this.scroller.draw();
       console.timeEnd("draw");
@@ -165,7 +170,7 @@ export default class VirtTable {
   getValidations() {
     return new Promise(async (resolve, reject) => {
       const data = this.ctx.database.getAllRowsData();
-      const leafCellHeaders = this.header.leafCellHeaders;
+      const leafCellHeaders = this.ctx.header.leafCellHeaders;
       let errors: any[] = [];
       for (let i = 0; i < data.length; i++) {
         for (let y = 0; y < leafCellHeaders.length; y++) {

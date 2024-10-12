@@ -115,9 +115,6 @@ export default class Icons {
     // 加载完成后触发绘制
     this.ctx.emit("draw");
   }
-  get(name: string) {
-    return this.icons.get(name);
-  }
   private async createImageFromSVG(svgContent: string, fill?: string) {
     const parser = new DOMParser();
     const svgDoc = parser.parseFromString(svgContent, "image/svg+xml");
@@ -140,5 +137,8 @@ export default class Icons {
         resolve(img);
       };
     });
+  }
+  get(name: string) {
+    return this.icons.get(name);
   }
 }

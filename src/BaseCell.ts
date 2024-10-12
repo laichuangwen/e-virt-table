@@ -1,5 +1,5 @@
 import Context from "./Context";
-import { Fixed } from "./types";
+import { CellType, Fixed } from "./types";
 
 export default class BaseCell {
   ctx: Context;
@@ -8,13 +8,15 @@ export default class BaseCell {
   width = 0;
   height = 0;
   fixed?: Fixed;
+  cellType: CellType;
   constructor(
     ctx: Context,
     x: number,
     y: number,
     width: number,
     height: number,
-    fixed: Fixed
+    fixed: Fixed,
+    cellType: CellType
   ) {
     this.ctx = ctx;
     this.x = x;
@@ -22,6 +24,7 @@ export default class BaseCell {
     this.width = width;
     this.height = height;
     this.fixed = fixed;
+    this.cellType = cellType;
   }
   isHorizontalVisible() {
     if (this.fixed) {
@@ -53,6 +56,13 @@ export default class BaseCell {
     return this.x - this.ctx.scrollX;
   }
   getDrawY() {
+    if (this.cellType === "header") {
+      return this.y;
+    }
+    // footer固定时
+    if (this.cellType === "footer" && this.ctx.config.FOOTER_FIXED) {
+      return this.y;
+    }
     return this.y - this.ctx.scrollY;
   }
   getLeftFixedX() {

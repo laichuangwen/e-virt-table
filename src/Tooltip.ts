@@ -2,12 +2,12 @@ import Cell from "./Cell";
 import Context from "./Context";
 
 export default class Tooltip {
-  ctx: Context;
+  private ctx: Context;
   constructor(ctx: Context) {
     this.ctx = ctx;
     this.init();
   }
-  init() {
+  private init() {
     this.ctx.on("cellHoverChange", (cell) => {
       if (cell.ellipsis) {
         this.show(cell);
@@ -17,7 +17,7 @@ export default class Tooltip {
       this.hide();
     });
   }
-  show(cell: Cell) {
+  private show(cell: Cell) {
     let text = cell.getText();
     if (cell.message) {
       text = cell.message;
@@ -28,7 +28,7 @@ export default class Tooltip {
       show: true,
     });
   }
-  hide() {
+  private hide() {
     this.ctx.emit("overlayerTooltipChange", {
       cell: {},
       text: "",

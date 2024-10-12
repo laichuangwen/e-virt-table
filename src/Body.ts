@@ -13,12 +13,12 @@ export default class Body {
   private height = 0;
   private headIndex = 0;
   private tailIndex = 0;
-  isResizing = false; //是否正在调整大小
-  renderRows: Row[] = [];
-  visibleRows: any[] = [];
-  visibleHeight = 0;
-  visibleWidth = 0;
-  data: any[] = [];
+  private isResizing = false; //是否正在调整大小
+  private renderRows: Row[] = [];
+  private visibleRows: any[] = [];
+  private visibleHeight = 0;
+  private visibleWidth = 0;
+  private data: any[] = [];
   constructor(ctx: Context) {
     this.ctx = ctx;
     this.init();
@@ -31,7 +31,6 @@ export default class Body {
       database,
       config: {
         FOOTER_FIXED,
-        CELL_FOOTER_HEIGHT = 0,
         SCROLLER_TRACK_SIZE = 0,
         BORDER_COLOR,
         BORDER_RADIUS,
@@ -72,10 +71,7 @@ export default class Body {
     target.width = stageWidth;
     this.visibleWidth = target.width - SCROLLER_TRACK_SIZE;
     // 底部高度
-    const footerData = this.ctx.database.getFooterData();
-    const footerHeight = footerData.reduce((sum: number) => {
-      return sum + CELL_FOOTER_HEIGHT;
-    }, 0);
+    const footerHeight = this.ctx.footer.height;
     if (!this.data.length) {
       this.height = EMPTY_BODY_HEIGHT;
     }

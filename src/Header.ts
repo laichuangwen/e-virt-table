@@ -9,30 +9,30 @@ export default class Header {
   private width = 0; // 宽度
   private height = 0; // 高度
   private resizeTarget: CellHeader | null = null; //调整表头
-  isResizing = false; // 是否移动中
+  private isResizing = false; // 是否移动中
   private offsetX = 0; // 鼠标按下时的x轴位置
   private resizeDiff = 0; // 是否移动中
   private columnIndex = 0;
-  isMouseDown = false; // 是否按下
-  columns: any;
-  visibleLeafColumns: any[] = [];
-  visibleHeight = 0;
-  visibleWidth = 0;
-  allCellHeaders: CellHeader[] = [];
-  leafCellHeaders: CellHeader[] = [];
-  renderLeafCellHeaders: CellHeader[] = [];
-  fixedLeftCellHeaders: CellHeader[] = [];
-  centerCellHeaders: CellHeader[] = [];
-  fixedRightCellHeaders: CellHeader[] = [];
-  renderCenterCellHeaders: CellHeader[] = [];
-  renderFixedCellHeaders: CellHeader[] = [];
+  private isMouseDown = false; // 是否按下
+  private columns: any;
+  private visibleLeafColumns: any[] = [];
+  private visibleHeight = 0;
+  private visibleWidth = 0;
+  private allCellHeaders: CellHeader[] = [];
+  private leafCellHeaders: CellHeader[] = [];
+  private renderLeafCellHeaders: CellHeader[] = [];
+  private fixedLeftCellHeaders: CellHeader[] = [];
+  private centerCellHeaders: CellHeader[] = [];
+  private fixedRightCellHeaders: CellHeader[] = [];
+  private renderCenterCellHeaders: CellHeader[] = [];
+  private renderFixedCellHeaders: CellHeader[] = [];
   constructor(ctx: Context) {
     this.ctx = ctx;
     this.init();
     // 初始化调整列大小ENABLE_RESIZE_COLUMN
     this.initResizeColumn();
   }
-  init() {
+  private init() {
     const {
       config: { HEADER_HEIGHT = 0, SCROLLER_TRACK_SIZE = 0 },
     } = this.ctx;
@@ -79,7 +79,7 @@ export default class Header {
     this.ctx.header.visibleHeight = this.visibleHeight;
   }
   // 调整表头的宽度
-  initResizeColumn() {
+  private initResizeColumn() {
     const {
       config: { ENABLE_RESIZE_COLUMN },
     } = this.ctx;
@@ -163,7 +163,7 @@ export default class Header {
       }
     });
   }
-  resizeColumn(cell: CellHeader, diff: number) {
+  private resizeColumn(cell: CellHeader, diff: number) {
     const setWidth = (columns: any[]) => {
       columns.forEach((column: any) => {
         if (column.children && column.children.length > 0) {
@@ -189,25 +189,7 @@ export default class Header {
       columns: this.columns,
     });
   }
-  // moveToTop() {
-  //   this.container.moveToTop();
-  // }
-  /**
-   * 根据列的索引获取列的宽度
-   * @param {Number} colIndex
-   */
-  getWidthByColIndexColSpan(colIndex: number, colSpan: number) {
-    if (colSpan === 0) {
-      return 0;
-    }
-    let width = 0;
-    for (let i = colIndex; i < colIndex + colSpan; i++) {
-      const cellHeader = this.leafCellHeaders[i];
-      width += cellHeader.width;
-    }
-    return width;
-  }
-  render(arr: Column[], originX: number) {
+  private render(arr: Column[], originX: number) {
     const len = arr.length;
     let everyOffsetX = originX;
     const { HEADER_HEIGHT = 0 } = this.ctx.config;
@@ -246,6 +228,61 @@ export default class Header {
       !item.children && this.columnIndex++;
       item.children && this.render(item.children, everyOffsetX);
       everyOffsetX += width;
+    }
+  }
+
+  private drawTipLine() {
+    if (this.isResizing && this.resizeTarget) {
+      const {
+        target,
+        config: { RESIZE_COLUMN_LINE_COLOR },
+      } = this.ctx;
+      const resizeTargetDrawX = this.resizeTarget.getDrawX();
+      const resizeTargetWidth = this.resizeTarget.width;
+      const x = resizeTargetDrawX + resizeTargetWidth + this.resizeDiff - 0.5;
+      const poins = [x + 0.5, 0, x + 0.5, target.offsetHeight];
+      this.ctx.paint.drawLine(poins, {
+        borderColor: RESIZE_COLUMN_LINE_COLOR,
+        borderWidth: 1,
+      });
+    }
+  }
+  private drawFiexShadow() {
+    const {
+      fixedLeftWidth,
+      fixedRightWidth,
+      scrollX,
+      header,
+      target,
+      config: { HEADER_BG_COLOR, SCROLLER_TRACK_SIZE },
+    } = this.ctx;
+
+    if (scrollX > 0 && fixedLeftWidth !== 0) {
+      this.ctx.paint.drawShadow(this.x, this.y, fixedLeftWidth, this.height, {
+        fillColor: HEADER_BG_COLOR,
+        side: "right",
+        shadowWidth: 4,
+        colorStart: "rgba(0,0,0,0.1)",
+        colorEnd: "rgba(0,0,0,0)",
+      });
+    }
+    // 右边阴影
+    if (
+      scrollX < header.width - header.visibleWidth &&
+      fixedRightWidth !== SCROLLER_TRACK_SIZE
+    ) {
+      const x =
+        header.width -
+        (this.x + this.width) +
+        target.offsetWidth -
+        fixedRightWidth;
+      this.ctx.paint.drawShadow(x + 0.5, this.y, fixedRightWidth, this.height, {
+        fillColor: HEADER_BG_COLOR,
+        side: "left",
+        shadowWidth: 4,
+        colorStart: "rgba(0,0,0,0)",
+        colorEnd: "rgba(0,0,0,0.1)",
+      });
     }
   }
   update() {
@@ -294,60 +331,6 @@ export default class Header {
     this.ctx.header.renderCellHeaders = this.renderFixedCellHeaders.concat(
       this.renderCenterCellHeaders
     );
-  }
-  drawTipLine() {
-    if (this.isResizing && this.resizeTarget) {
-      const {
-        target,
-        config: { RESIZE_COLUMN_LINE_COLOR },
-      } = this.ctx;
-      const resizeTargetDrawX = this.resizeTarget.getDrawX();
-      const resizeTargetWidth = this.resizeTarget.width;
-      const x = resizeTargetDrawX + resizeTargetWidth + this.resizeDiff - 0.5;
-      const poins = [x + 0.5, 0, x + 0.5, target.offsetHeight];
-      this.ctx.paint.drawLine(poins, {
-        borderColor: RESIZE_COLUMN_LINE_COLOR,
-        borderWidth: 1,
-      });
-    }
-  }
-  drawFiexShadow() {
-    const {
-      fixedLeftWidth,
-      fixedRightWidth,
-      scrollX,
-      header,
-      target,
-      config: { HEADER_BG_COLOR, SCROLLER_TRACK_SIZE },
-    } = this.ctx;
-
-    if (scrollX > 0 && fixedLeftWidth !== 0) {
-      this.ctx.paint.drawShadow(this.x, this.y, fixedLeftWidth, this.height, {
-        fillColor: HEADER_BG_COLOR,
-        side: "right",
-        shadowWidth: 4,
-        colorStart: "rgba(0,0,0,0.1)",
-        colorEnd: "rgba(0,0,0,0)",
-      });
-    }
-    // 右边阴影
-    if (
-      scrollX < header.width - header.visibleWidth &&
-      fixedRightWidth !== SCROLLER_TRACK_SIZE
-    ) {
-      const x =
-        header.width -
-        (this.x + this.width) +
-        target.offsetWidth -
-        fixedRightWidth;
-      this.ctx.paint.drawShadow(x + 0.5, this.y, fixedRightWidth, this.height, {
-        fillColor: HEADER_BG_COLOR,
-        side: "left",
-        shadowWidth: 4,
-        colorStart: "rgba(0,0,0,0)",
-        colorEnd: "rgba(0,0,0,0.1)",
-      });
-    }
   }
   draw() {
     this.renderCenterCellHeaders.forEach((item) => {

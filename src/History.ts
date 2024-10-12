@@ -13,14 +13,14 @@ export type HistoryItem = {
  * 数据历史堆栈
  */
 export default class History {
-  ctx: Context;
-  history: HistoryItem[] = [];
-  historyIndex = -1;
+  private ctx: Context;
+  private history: HistoryItem[] = [];
+  private historyIndex = -1;
   constructor(ctx: Context) {
     this.ctx = ctx;
     this.init();
   }
-  init() {
+  private init() {
     this.ctx.on("keydown", (e) => {
       // 撤销
       if (
