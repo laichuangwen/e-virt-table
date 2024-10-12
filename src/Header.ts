@@ -289,7 +289,6 @@ export default class Header {
     const renderLeafCellHeaders: CellHeader[] = [];
     const renderCenterCellHeaders: CellHeader[] = [];
     const renderFixedCellHeaders: CellHeader[] = [];
-    this.ctx.database.clearRenderHeaderCell(); // 清除渲染的单元格
     this.centerCellHeaders.forEach((item) => {
       if (item.isHorizontalVisible() && item.isVerticalVisible()) {
         renderCenterCellHeaders.push(item);

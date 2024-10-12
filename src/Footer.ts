@@ -52,9 +52,15 @@ export default class Footer {
       target,
       config: { HEADER_BG_COLOR, SCROLLER_TRACK_SIZE },
     } = this.ctx;
-
+    let y = this.y;
+    // 不是footer固定时
+    if (!this.ctx.config.FOOTER_FIXED) {
+      y = this.y - this.ctx.scrollY;
+      console.log(y);
+      
+    }
     if (scrollX > 0 && fixedLeftWidth !== 0) {
-      this.ctx.paint.drawShadow(this.x, this.y, fixedLeftWidth, this.height, {
+      this.ctx.paint.drawShadow(this.x, y, fixedLeftWidth, this.height, {
         fillColor: HEADER_BG_COLOR,
         side: "right",
         shadowWidth: 4,
@@ -72,7 +78,7 @@ export default class Footer {
         (this.x + this.width) +
         target.offsetWidth -
         fixedRightWidth;
-      this.ctx.paint.drawShadow(x + 0.5, this.y, fixedRightWidth, this.height, {
+      this.ctx.paint.drawShadow(x + 0.5, y, fixedRightWidth, this.height, {
         fillColor: HEADER_BG_COLOR,
         side: "left",
         shadowWidth: 4,

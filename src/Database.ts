@@ -13,7 +13,6 @@ import type {
   EVirtTableOptions,
 } from "./types";
 import { generateShortUUID } from "./util";
-import Cell from "./Cell";
 import { HistoryItemData } from "./History";
 export default class Database {
   private loading = false;
@@ -34,9 +33,6 @@ export default class Database {
   private sumHeight = 0;
   private filterMethod: FilterMethod | undefined;
   private positions: Position[] = []; //虚拟滚动位置
-  private renderHeaderCells: CellHeader[] = []; //渲染Header的cell
-  private renderBodyCells: Cell[] = []; //渲染body的cell
-  private renderFooterCells: Cell[] = []; //渲染Footer的cell
   constructor(ctx: Context, options: EVirtTableOptions) {
     this.ctx = ctx;
     const { data = [], columns = [], footerData = [] } = options;
@@ -855,33 +851,6 @@ export default class Database {
   }
   getLoading() {
     return this.loading;
-  }
-  clearRenderHeaderCell() {
-    this.renderHeaderCells = [];
-  }
-  getRenderHeaderCells() {
-    return this.renderHeaderCells;
-  }
-  addRenderHeaderCell(cell: CellHeader) {
-    this.renderHeaderCells.push(cell);
-  }
-  clearRenderBodyCell() {
-    this.renderBodyCells = [];
-  }
-  addRenderBodyCell(cell: Cell) {
-    this.renderBodyCells.push(cell);
-  }
-  getRenderBodyCells() {
-    return this.renderBodyCells;
-  }
-  clearRenderFooterCell() {
-    this.renderFooterCells = [];
-  }
-  addRenderFooterCell(cell: Cell) {
-    this.renderFooterCells.push(cell);
-  }
-  getRenderFooterCells() {
-    return this.renderFooterCells;
   }
   setValidationError(rowKey: string, key: string, errors: any[]) {
     const _key = `${rowKey}_${key}`;
