@@ -103,6 +103,9 @@ export interface Column {
   renderFooter: Function;
   renderHeader: Function;
   formatter: formatterMethod;
+  overflowTooltipShow: boolean;
+  overflowTooltipWidth: number;
+  overflowTooltipPlacement: OverflowTooltipPlacement;
   required: boolean;
   readonly: boolean;
   children: Column[];

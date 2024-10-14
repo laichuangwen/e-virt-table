@@ -15,6 +15,7 @@ import type {
   SpanMethod,
   CellHoverIconMethod,
   CellStyleMethod,
+  OverflowTooltipPlacement,
 } from "./types";
 import Context from "./Context";
 import BaseCell from "./BaseCell";
@@ -60,6 +61,9 @@ export default class Cell extends BaseCell {
   drawImageName = "";
   drawImageSource?: HTMLImageElement;
   ellipsis = false;
+  overflowTooltipShow = true;
+  overflowTooltipWidth = 500;
+  overflowTooltipPlacement: OverflowTooltipPlacement = "top";
 
   constructor(
     ctx: Context,
@@ -92,6 +96,9 @@ export default class Cell extends BaseCell {
     this.rowKey = this.ctx.database.getRowKeyForRowIndex(rowIndex);
     this.value = this.getValue();
     this.render = column.render;
+    this.overflowTooltipShow = column.overflowTooltipShow || true;
+    this.overflowTooltipWidth = column.overflowTooltipWidth || 500;
+    this.overflowTooltipPlacement = column.overflowTooltipPlacement || 'top';
     this.renderFooter = column.renderFooter;
     this.hoverIconName = column.hoverIconName;
     this.formatter = column.formatter;
