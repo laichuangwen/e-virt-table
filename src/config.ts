@@ -98,9 +98,10 @@ export default class Config {
   HIGHLIGHT_HOVER_ROW_COLOR: string = "rgba(186,203,231,0.1)";
   HIGHLIGHT_SELECTED_ROW: boolean = false;
   HIGHLIGHT_SELECTED_ROW_COLOR: string = "rgba(82,146,247,0.1)";
-  TOOLTIP_BG_COLOR: string = "#000";
+  TOOLTIP_BG_COLOR: string = "#303133";
   TOOLTIP_TEXT_COLOR: string = "#fff";
-  TOOLTIP_CUSTOM: boolean = true;
+  TOOLTIP_ZINDEX: number = 3000;
+  TOOLTIP_CUSTOM_STYLE: Partial<CSSStyleDeclaration> = {};
   CONTEXT_MENU: MenuItem[] = [
     { label: "复制", value: "copy" },
     { label: "剪切", value: "cut" },

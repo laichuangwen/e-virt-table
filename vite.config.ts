@@ -4,7 +4,7 @@ import copy from "rollup-plugin-copy";
 export default defineConfig({
   build: {
     lib: {
-      entry: "index.ts", // 入口文件
+      entry: "src/index.ts", // 入口文件
       name: "EVirtTable",
       fileName: (format) => `index.${format}.js`,
       formats: ["es", "cjs", "umd"], // 生成 ES Module 和 CommonJS 格式

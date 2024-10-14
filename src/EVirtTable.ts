@@ -16,6 +16,7 @@ import Selector from "./Selector";
 import Autofill from "./Autofill";
 import Tooltip from "./Tooltip";
 export default class VirtTable {
+  private targetContainer: HTMLDivElement;
   private target: HTMLCanvasElement;
   private scroller: Scroller;
   private header: Header;
@@ -25,9 +26,12 @@ export default class VirtTable {
   private autofill: Autofill;
   private tooltip: Tooltip;
   ctx: Context;
-  constructor(target: HTMLCanvasElement, options: EVirtTableOptions) {
-    this.target = target;
-    this.ctx = new Context(target, options);
+  constructor(target: HTMLDivElement, options: EVirtTableOptions) {
+    this.target = document.createElement("canvas");
+    this.targetContainer = target;
+    this.targetContainer.style.position = "relative";
+    this.targetContainer.appendChild(this.target);
+    this.ctx = new Context(this.targetContainer, this.target, options);
     this.header = new Header(this.ctx);
     this.body = new Body(this.ctx);
     this.footer = new Footer(this.ctx);

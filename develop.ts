@@ -1,6 +1,6 @@
 import EVirtTable from "./src/EVirtTable";
 
-const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+const canvas = document.getElementById("canvas") as HTMLDivElement;
 const columns: any[] = [
   // {
   //   title: "序号",
@@ -211,7 +211,7 @@ const columns: any[] = [
     title: "性别",
     key: "sex",
     // readonly: false,
-    fixed: "right",
+    // fixed: "right",
     // render: "sex",
     rules: {
       required: true,
@@ -221,7 +221,7 @@ const columns: any[] = [
   {
     title: "计薪月份",
     size: "small",
-    fixed: "right",
+    // fixed: "right",
     key: "salary_month",
     type: "month",
     align: "right",
@@ -447,14 +447,14 @@ const eVirtTable = new EVirtTable(canvas, {
       },
     ],
     WIDTH: 0,
-    HEIGHT: 0,
+    HEIGHT: 500,
     CHECKBOX_KEY: "emp_name",
     // CELL_HEIGHT: 28,
     ENABLE_AUTOFILL: true,
     ENABLE_SELECTOR: true,
     ENABLE_KEYBOARD: true,
     ENABLE_HISTORY: true,
-    ENABLE_OFFSET_HEIGHT: true,
+    // ENABLE_OFFSET_HEIGHT: true,
     HIGHLIGHT_SELECTED_ROW: true,
     HIGHLIGHT_HOVER_ROW: true,
     OFFSET_HEIGHT: 16,

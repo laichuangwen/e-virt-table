@@ -3,10 +3,10 @@
   "private": true,
   "version": "0.0.1",
   "main": "index.ts",
-  "types": "index.ts",
+  "types": "types/index.d.ts",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build && tsc",
     "preview": "vite preview"
   },
   "devDependencies": {
@@ -15,6 +15,8 @@
     "vite": "^5.4.1"
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.6.11",
+    "@popperjs/core": "^2.11.8",
     "async-validator": "^4.2.5"
   }
 }

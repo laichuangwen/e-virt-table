@@ -62,6 +62,7 @@ export default class Context {
   private eventBrowser: EventBrowser;
   private eventTable: EventTable;
   private uuid = generateShortUUID();
+  targetContainer: HTMLElement;
   target: HTMLCanvasElement;
   paint: Paint;
   icons: Icons;
@@ -134,8 +135,13 @@ export default class Context {
   history: History;
   config: Config;
 
-  constructor(target: HTMLCanvasElement, options: EVirtTableOptions) {
+  constructor(
+    targetContainer: HTMLDivElement,
+    target: HTMLCanvasElement,
+    options: EVirtTableOptions
+  ) {
     this.target = target;
+    this.targetContainer = targetContainer;
     this.target.setAttribute("uuid", this.uuid);
     this.config = new Config(options.config || {});
     this.eventBus = new EventBus();

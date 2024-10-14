@@ -1,18 +1,18 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "useDefineForClassFields": true,
-    "module": "ESNext",
+    "useDefineForClassFields": true, // 使用定义字段初始化程序语法
+    "module": "ESNext", // 指定生成哪个模块系统代码
+    "outDir": "./dist/types", // 输出声明文件的目录
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "skipLibCheck": true,
-
+    "emitDeclarationOnly": true, // 只生成声明文件，而不编译 JavaScript 代码
+    "skipLibCheck": true, // 跳过声明文件检查
+    "declaration": true, // 生成声明文件
+    "sourceMap": true, // 成调试用的 source map 文件
+    "esModuleInterop": true, // ES模块和CommonJS互操作
     /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-
+    "moduleResolution": "node", // 指定模块解析策略
+    "isolatedModules": true, // 将每个文件做为单独的模块
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,

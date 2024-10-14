@@ -188,11 +188,11 @@ export default class EventTable {
             if (this.ctx.hoverCell?.rowKey !== cell.rowKey) {
               this.ctx.hoverCell = cell;
               this.ctx.hoverRow = this.ctx.body.renderRows[cell.rowIndex];
-              this.ctx.emit("rowHoverChange", this.ctx.hoverRow, cell);
+              this.ctx.emit("rowHoverChange", this.ctx.hoverRow, cell, e);
               this.ctx.emit("draw");
             }
             this.ctx.hoverCell = cell;
-            this.ctx.emit("cellHoverChange", cell);
+            this.ctx.emit("cellHoverChange", cell, e);
             return; // 找到后直接返回
           }
         }
