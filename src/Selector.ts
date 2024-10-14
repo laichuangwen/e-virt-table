@@ -278,7 +278,7 @@ export default class Selector {
       this.adjustBoundaryPosition();
     }
   }
-  
+
   private clearCopyLine() {
     this.ctx.selector.xArrCopy = [-1, -1];
     this.ctx.selector.yArrCopy = [-1, -1];
@@ -364,6 +364,7 @@ export default class Selector {
       rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
     });
     this.ctx.emit("clearSelectedDataChange", changeList, rows);
+    this.ctx.emit("draw");
     return changeList;
   }
   private paste() {

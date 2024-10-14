@@ -7,14 +7,14 @@
 
 - `type=selection`
 ::: demo
-<iframe src="/selection/base.html" style="min-height:210px"></iframe>
+<iframe src="/selection/base.html" style="min-height:220px"></iframe>
 :::
 
 ## 有下标的多选
 
 - `type=index-selection`
 ::: demo
-<iframe src="/selection/index.html" style="min-height:210px"></iframe>
+<iframe src="/selection/index.html" style="min-height:220px"></iframe>
 :::
 
 ## 通过rows设置选中/清空选中

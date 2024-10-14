@@ -8,7 +8,7 @@
 
 ::: demo
 
-<iframe src="/height/base.html" style="min-height:210px"></iframe>
+<iframe src="/height/base.html" style="min-height:220px"></iframe>
 :::
 
 ## 设置高度
@@ -18,5 +18,5 @@
 <!--
 ## 可调整宽度
 ::: demo
-<iframe src="/height/resize.html" style="min-height:210px"></iframe>
+<iframe src="/height/resize.html" style="min-height:220px"></iframe>
 ::: -->

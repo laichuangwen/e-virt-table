@@ -12,14 +12,14 @@
 
 - 选择器默认是禁用
 ::: demo
-<iframe src="/selector/disabled.html" style="min-height:210px"></iframe>
+<iframe src="/selector/disabled.html" style="min-height:220px"></iframe>
 :::
 
 ## 启用
 
 - 选择器默认是禁用，如果需要启用设置`config.ENABLE_SELECTOR`为`true`
 ::: demo
-<iframe src="/selector/enable.html" style="min-height:210px"></iframe>
+<iframe src="/selector/enable.html" style="min-height:220px"></iframe>
 :::
 
 ## 单选
@@ -28,7 +28,7 @@
 
 ::: demo
 
-<iframe src="/selector/single.html" style="min-height:210px"></iframe>
+<iframe src="/selector/single.html" style="min-height:220px"></iframe>
 :::
 
 ## 只选列
@@ -40,7 +40,7 @@
 - 设置`config.ENABLE_SELECTOR_ALL_COLS`为`false`
 ::: demo
 
-<iframe src="/selector/col.html" style="min-height:210px"></iframe>
+<iframe src="/selector/col.html" style="min-height:220px"></iframe>
 :::
 
 ## 只选行
@@ -53,7 +53,7 @@
 - 设置`config.ENABLE_SELECTOR_ALL_COLS`为`true`
 ::: demo
 
-<iframe src="/selector/row.html" style="min-height:210px"></iframe>
+<iframe src="/selector/row.html" style="min-height:220px"></iframe>
 :::
 
 ## 禁用批量
@@ -63,5 +63,5 @@
 - 设置`config.ENABLE_SELECTOR_ALL_COLS`为`false`
 ::: demo
 
-<iframe src="/selector/batch.html" style="min-height:210px"></iframe>
+<iframe src="/selector/batch.html" style="min-height:220px"></iframe>
 :::

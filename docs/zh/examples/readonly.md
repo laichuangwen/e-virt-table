@@ -9,26 +9,26 @@
 ## 列只读/编辑
 - 日期、姓名不可编辑，其他都可编辑
 ::: demo
-<iframe src="/readonly/column.html" style="min-height:210px"></iframe>
+<iframe src="/readonly/column.html" style="min-height:220px"></iframe>
 :::
 
 ## 行只读/编辑
 - 日期、姓名不可编辑，第一行不可编辑，其他都可编辑
 - column全部设置`readonly`为`false`然后需要编辑row数据添加`_readonly`为`true`就可以了
 ::: demo
-<iframe src="/readonly/row.html" style="min-height:210px"></iframe>
+<iframe src="/readonly/row.html" style="min-height:220px"></iframe>
 :::
 
 ## 方法控制只读/编辑
 - 日期、姓名不可编辑，第一行不可编辑，其他都可编辑
 - `config.CELL_READONLY_METHOD`方法控制只读
 ::: demo
-<iframe src="/readonly/method.html" style="min-height:210px"></iframe>
+<iframe src="/readonly/method.html" style="min-height:220px"></iframe>
 :::
 
 ## 拓展时间选择
 - 日期、姓名不可编辑，第一行不可编辑，其他都可编辑
 - `config.CELL_READONLY_METHOD`方法控制只读
 ::: demo
-<iframe src="/readonly/method.html" style="min-height:210px"></iframe>
+<iframe src="/readonly/method.html" style="min-height:220px"></iframe>
 :::

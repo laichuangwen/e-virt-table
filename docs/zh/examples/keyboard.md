@@ -1,6 +1,6 @@
 # 键盘事件
 
-- `config.ENABLE_KEYBOARD`为`true`即开启键盘事件，只支持全部启用或全部禁用，默认是开开启的
+- `config.ENABLE_KEYBOARD`为`true`即开启键盘事件，只支持全部启用或全部禁用，默认是禁用的
 
 | 操作                          | Windows 快捷键       | Mac 快捷键           |
 | ----------------------------- | -------------------- | -------------------- |
@@ -19,13 +19,13 @@
 
 - `config.ENABLE_KEYBOARD`为`true`默认是禁用的
 ::: demo
-<iframe src="/keyboard/enable.html" style="min-height:210px"></iframe>
+<iframe src="/keyboard/enable.html" style="min-height:220px"></iframe>
 :::
 
 ## 禁用
 
 - `config.ENABLE_KEYBOARD`为`false`
 ::: demo
-<iframe src="/keyboard/disabled.html" style="min-height:210px"></iframe>
+<iframe src="/keyboard/disabled.html" style="min-height:220px"></iframe>
 :::
 

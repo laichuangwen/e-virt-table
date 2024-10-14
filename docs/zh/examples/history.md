@@ -9,19 +9,19 @@
 
 - `config.ENABLE_HISTORY`为`true`,默认是开开启的
 ::: demo
-<iframe src="/history/enable.html" style="min-height:210px"></iframe>
+<iframe src="/history/enable.html" style="min-height:220px"></iframe>
 :::
 
 ## 禁用
 
 - `config.ENABLE_HISTORY`为`false`
 ::: demo
-<iframe src="/history/disabled.html" style="min-height:210px"></iframe>
+<iframe src="/history/disabled.html" style="min-height:220px"></iframe>
 :::
 
 ## 回退数量
 
 - `config.HISTORY_NUM`为`3`回退 3 次
 ::: demo
-<iframe src="/history/num.html" style="min-height:210px"></iframe>
+<iframe src="/history/num.html" style="min-height:220px"></iframe>
 :::

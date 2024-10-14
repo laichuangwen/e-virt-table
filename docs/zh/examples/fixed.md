@@ -21,5 +21,5 @@
 - fixed可为`"left","right"`
 
 ::: demo
-<iframe src="/fixed/left-right.html" style="min-height:210px"></iframe>
+<iframe src="/fixed/left-right.html" style="min-height:220px"></iframe>
 :::

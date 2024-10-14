@@ -7,7 +7,7 @@
 
 ::: demo
 
-<iframe src="/align/horizontal.html" style="min-height:210px"></iframe>
+<iframe src="/align/horizontal.html" style="min-height:220px"></iframe>
 :::
 
 ## 垂直对齐
