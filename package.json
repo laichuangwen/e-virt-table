@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "@floating-ui/dom": "^1.6.11",
-    "@popperjs/core": "^2.11.8",
     "async-validator": "^4.2.5"
   }
 }
