@@ -7,7 +7,7 @@
   </head>
   <script src="../index.umd.js"></script>
   <body>
-    <div id="jn-data-grid-table" class="jn-data-grid-table"></div>
+    <div id="evirt-table" ></div>
   </body>
   <script>
     let data = [
@@ -153,7 +153,7 @@
         readonly: true,
       },
     ];
-    const target = document.getElementById("jn-data-grid-table");
+    const target = document.getElementById("evirt-table");
     // 获取合并单元格的spanArr,针对行数据相同key合并
     const getSpanArrByRow = function (list, key) {
       let contactDot = 0;

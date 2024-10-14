@@ -42,7 +42,7 @@
     }
   </style>
   <body style="margin: 0px">
-    <div id="jn-data-grid-table" class="jn-data-grid-table"></div>
+    <div id="evirt-table" ></div>
     <div id="jn-data-grid-editor" class="jn-data-grid-editor">
       <div
         id="jn-data-grid-text"
@@ -115,7 +115,7 @@
         key: "zip",
       },
     ];
-    const target = document.getElementById("jn-data-grid-table");
+    const target = document.getElementById("evirt-table");
     const grid = new EVirtTable(target, {
       data,
       columns,

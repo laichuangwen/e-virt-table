@@ -72,6 +72,10 @@ export default class Tooltip {
     if (!cell.overflowTooltipShow) {
       return;
     }
+    // 如果是鼠标按下状态，则不显示
+    if (this.ctx.mousedown) { 
+      return;
+    }
     this.floatingEl.style.display = "block";
     let text = cell.getText();
     if (cell.message) {

@@ -98,7 +98,7 @@ export default class Cell extends BaseCell {
     this.render = column.render;
     this.overflowTooltipShow = column.overflowTooltipShow || true;
     this.overflowTooltipWidth = column.overflowTooltipWidth || 500;
-    this.overflowTooltipPlacement = column.overflowTooltipPlacement || 'top';
+    this.overflowTooltipPlacement = column.overflowTooltipPlacement || "top";
     this.renderFooter = column.renderFooter;
     this.hoverIconName = column.hoverIconName;
     this.formatter = column.formatter;
@@ -462,7 +462,7 @@ export default class Cell extends BaseCell {
         return "";
       }
       const text = this.row[this.key];
-      if ([null, undefined].includes(text)) {
+      if (this.text === null || this.text === undefined) {
         return "";
       }
       return text;
@@ -485,7 +485,10 @@ export default class Cell extends BaseCell {
       ) {
         return "";
       }
-      return this.text;
+      if (this.text === null || this.text === undefined) {
+        return "";
+      }
+      return `${this.text}`;
     }
   }
   /**
@@ -590,6 +593,7 @@ export default class Cell extends BaseCell {
       BODY_FONT_STYLE,
     } = this.ctx.config;
     const font = `${BODY_FONT_SIZE}px ${BODY_FONT_STYLE} ${BODY_FONTFAMILY}`;
+
     return this.ctx.paint.drawText(
       this.displayText,
       this.drawTextX,

@@ -7,13 +7,13 @@
   </head>
   <script src="../index.umd.js"></script>
   <body>
-    <div id="jn-data-grid-table" class="jn-data-grid-table"></div>
+    <div id="evirt-table"></div>
   </body>
   <script>
     let data = [
       {
         date: "2016-05-02",
-        name: "王小虎",
+        name: "王小虎111111111111",
         province: "上海",
         city: "普陀区",
         address: "上海市普陀区金沙江路 1518 弄",
@@ -54,6 +54,7 @@
         title: "姓名",
         key: "name",
         readonly: true,
+        overflowTooltipPlacement: "right",
       },
       {
         title: "省份",
@@ -71,22 +72,22 @@
         readonly: true,
         overflowTooltipShow: true,
         overflowTooltipWidth: 200,
-        overflowTooltipPlacement: 'top-start',
         width: 100,
       },
       {
         title: "邮编",
         key: "zip",
         readonly: true,
+        overflowTooltipPlacement: "bottom",
       },
     ];
-    const target = document.getElementById("jn-data-grid-table");
+    const target = document.getElementById("evirt-table");
     const grid = new EVirtTable(target, {
       data,
       columns,
-      config:{
+      config: {
         TOOLTIP_CUSTOM: false,
-      }
+      },
     });
   </script>
 </html>

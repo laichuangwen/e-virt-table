@@ -7,7 +7,7 @@
   </head>
   <script src="../index.umd.js"></script>
   <body>
-    <div id="jn-data-grid-table" class="jn-data-grid-table"></div>
+    <div id="evirt-table" ></div>
   </body>
   <script>
     let data = [
@@ -76,7 +76,7 @@
         readonly: true,
       },
     ];
-    const target = document.getElementById("jn-data-grid-table");
+    const target = document.getElementById("evirt-table");
     const grid = new EVirtTable(target, {
       data,
       columns,

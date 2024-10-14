@@ -58,8 +58,8 @@
         </select>
       </div>
       <div class="content">
-        <!-- <div id="jn-data-grid-table" class="jn-data-grid-table"></div> -->
-        <div id="jn-data-grid-table" class="jn-data-grid-table"></div>
+        <!-- <div id="evirt-table" ></div> -->
+        <div id="evirt-table" ></div>
         <div id="jn-data-grid-editor" class="jn-data-grid-editor">
           <div id="jn-data-grid-text" contenteditable="true"></div>
         </div>
@@ -165,7 +165,7 @@
         grid.loadData(data);
       }
     });
-    const target = document.getElementById("jn-data-grid-table");
+    const target = document.getElementById("evirt-table");
     console.log(EVirtTable);
     
     const grid = new EVirtTable(target, {
