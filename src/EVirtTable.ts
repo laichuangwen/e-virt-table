@@ -78,6 +78,7 @@ export default class VirtTable {
     //   this.editor.doneEdit();
     // }
     this.ctx.database.setColumns(columns);
+    this.header.init();
     this.ctx.emit("draw");
   }
   loadData(data: any[]) {

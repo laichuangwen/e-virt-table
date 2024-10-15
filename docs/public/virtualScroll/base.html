@@ -54,12 +54,12 @@
         <select id="options" name="options">
           <option value="1">列1k行1K</option>
           <option value="2">列100行20w</option>
-          <option value="3">列20W行100</option>
+          <option value="3">列1W行1000</option>
         </select>
       </div>
       <div class="content">
         <!-- <div id="evirt-table" ></div> -->
-        <div id="evirt-table" ></div>
+        <div id="evirt-table"></div>
         <div id="jn-data-grid-editor" class="jn-data-grid-editor">
           <div id="jn-data-grid-text" contenteditable="true"></div>
         </div>
@@ -160,20 +160,22 @@
         grid.loadColumns(columns);
         grid.loadData(data);
       } else if (selectedValue === "3") {
-        const { columns, data } = gcData(200000, 100);
+        const { columns, data } = gcData(10000, 1000);
         grid.loadColumns(columns);
         grid.loadData(data);
       }
     });
     const target = document.getElementById("evirt-table");
     console.log(EVirtTable);
-    
+
     const grid = new EVirtTable(target, {
       data,
       columns,
       config: {
         ENABLE_SELECTOR: true,
         ENABLE_AUTOFILL: true,
+        ENABLE_OFFSET_HEIGHT: true,
+        OFFSET_HEIGHT: 0,
       },
     });
     grid.on("startEdit", (cell) => {

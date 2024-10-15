@@ -32,7 +32,7 @@ export default class Header {
     // 初始化调整列大小ENABLE_RESIZE_COLUMN
     this.initResizeColumn();
   }
-  private init() {
+  init() {
     const {
       config: { HEADER_HEIGHT = 0, SCROLLER_TRACK_SIZE = 0 },
     } = this.ctx;
@@ -272,10 +272,7 @@ export default class Header {
       fixedRightWidth !== SCROLLER_TRACK_SIZE
     ) {
       const x =
-        header.width -
-        (this.x + this.width) +
-        target.width -
-        fixedRightWidth;
+        header.width - (this.x + this.width) + target.width - fixedRightWidth;
       this.ctx.paint.drawShadow(x + 0.5, this.y, fixedRightWidth, this.height, {
         fillColor: HEADER_BG_COLOR,
         side: "left",
