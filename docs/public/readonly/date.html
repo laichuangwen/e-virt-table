@@ -7,7 +7,7 @@
   </head>
   <script src="../index.umd.js"></script>
   <style>
-    .jn-data-grid-editor {
+    .evirt-table-editor {
       position: absolute;
       top: -10000px;
       left: -10000px;
@@ -24,7 +24,7 @@
       align-items: center;
     }
 
-    .jn-data-grid-editor div[contenteditable="true"] {
+    .evirt-table-editor div[contenteditable="true"] {
       width: 100%;
       box-sizing: border-box;
       padding: 8px;
@@ -43,13 +43,13 @@
   </style>
   <body style="margin: 0px">
     <div id="evirt-table" ></div>
-    <div id="jn-data-grid-editor" class="jn-data-grid-editor">
+    <div id="evirt-table-editor" class="evirt-table-editor">
       <div
-        id="jn-data-grid-text"
+        id="evirt-table-text"
         style="display: none"
         contenteditable="true"
       ></div>
-      <input id="jn-data-grid-date" style="display: none" type="date" />
+      <input id="evirt-table-date" style="display: none" type="date" />
     </div>
   </body>
   <script>
@@ -134,11 +134,11 @@
         padding = 0,
       } = cell?.getClient() || {};
       const value = cell.getValue();
-      const editor = document.getElementById("jn-data-grid-editor");
+      const editor = document.getElementById("evirt-table-editor");
       editor.style.left = `${clientX}px`;
       editor.style.top = `${clientY}px`;
       if (["date"].includes(dataType)) {
-        const el = document.getElementById("jn-data-grid-date");
+        const el = document.getElementById("evirt-table-date");
         el.focus();
         el.style.display = "block";
         el.style.minWidth = `${width}px`;
@@ -146,7 +146,7 @@
         el.style.border = 'none';
         el.value = value;
       } else {
-        const text = document.getElementById("jn-data-grid-text");
+        const text = document.getElementById("evirt-table-text");
         text.style.display = "block";
         text.style.minWidth = `${width}px`;
         text.style.minHeight = `${height}px`;
@@ -161,9 +161,9 @@
       }
     });
     grid.on("doneEdit", (cell) => {
-      const date = document.getElementById("jn-data-grid-date");
+      const date = document.getElementById("evirt-table-date");
       date.style.display = "none";
-      const text = document.getElementById("jn-data-grid-text");
+      const text = document.getElementById("evirt-table-text");
       text.style.display = "none";
       const { rowKey, key } = cell;
       const value = cell.getValue();
@@ -186,7 +186,7 @@
           text.textContent = null;
         }
       }
-      const editor = document.getElementById("jn-data-grid-editor");
+      const editor = document.getElementById("evirt-table-editor");
       if (editor) {
         editor.style.left = `${-10000}px`;
         editor.style.top = `${-10000}px`;

@@ -1,22 +1,22 @@
 <template>
-    <div class="jn-data-grid">
-        <div ref="canvasRef" class="jn-data-grid-table"></div>
-        <div ref="editor" class="jn-data-grid-editor">
+    <div class="evirt-table">
+        <div ref="canvasRef" class="evirt-table-table"></div>
+        <div ref="editor" class="evirt-table-editor">
             <el-date-picker v-if="editorType === 'month'" :style="popupSty" ref="month" v-model="value"
-                class="jn-data-grid-editor-popup" :editable="false" type="month" placeholder="月份" format="YYYY-MM"
+                class="evirt-table-editor-popup" :editable="false" type="month" placeholder="月份" format="YYYY-MM"
                 value-format="YYYY-MM" @change="doneEdit" />
             <el-date-picker v-else-if="editorType === 'date'" :style="popupSty" ref="date" v-model="value"
-                class="jn-data-grid-editor-popup" :editable="false" type="date" placeholder="日期" format="YYYY-MM-DD"
+                class="evirt-table-editor-popup" :editable="false" type="date" placeholder="日期" format="YYYY-MM-DD"
                 value-format="YYYY-MM-DD" @change="doneEdit" />
             <el-date-picker v-else-if="editorType === 'datetime'" :style="popupSty" ref="datetime" v-model="value"
-                class="jn-data-grid-editor-popup" :editable="false" type="datetime" placeholder="时间"
+                class="evirt-table-editor-popup" :editable="false" type="datetime" placeholder="时间"
                 format="YYYY-MM-DD HH:mm:ss" value-format="YYYY-MM-DD HH:mm:ss" @change="doneEdit" />
             <div ref="contenteditable" v-else-if="editorType === 'contenteditable'"
                 contenteditable="true" @keydown.tab.prevent @keydown.esc="doneEdit" />
             <div ref="text" v-else @keydown.enter="doneEdit" contenteditable="true" @keydown.tab.prevent
                 @keydown.esc="doneEdit" />
         </div>
-        <div class="jn-data-grid-overlayer" v-if="overlayerView" :style="overlayerView.style">
+        <div class="evirt-table-overlayer" v-if="overlayerView" :style="overlayerView.style">
             <div :class="wrapper.class" v-for="wrapper in overlayerView.views" :style="wrapper.style"
                 :key="wrapper.type">
                 <div :style="view.style" v-for="view in wrapper.views" :key="view.key">
@@ -30,7 +30,7 @@
                 </div>
             </div>
         </div>
-        <div v-if="empty === 'empty'" class="jn-data-grid-empty" :style="`top: ${emptyTop}px`">
+        <div v-if="empty === 'empty'" class="evirt-table-empty" :style="`top: ${emptyTop}px`">
             <p>暂无数据</p>
         </div>
 
@@ -54,8 +54,8 @@
 </template>
 
 <script lang="ts">
-import { DataGrid } from '@jn-data-grid/core';
-import type { EventCallback, OverlayerContainer, OverlayerTooltip, OverlayerContextmenu, FilterMethod } from '@jn-data-grid/core';
+import { DataGrid } from '@evirt-table/core';
+import type { EventCallback, OverlayerContainer, OverlayerTooltip, OverlayerContextmenu, FilterMethod } from '@evirt-table/core';
 export default {
     props: {
         columns: {
@@ -348,7 +348,7 @@ export default {
 </script>
 
 <style lang="css">
-.jn-data-grid {
+.evirt-table {
     --el-menu-item-height: 40px;
     --el-menu-active-color: '#303133';
     overflow: hidden;
@@ -356,12 +356,12 @@ export default {
     width: auto;
 }
 
-.jn-data-grid-table {
+.evirt-table-table {
     overflow: hidden;
     width: 100%;
 }
 
-.jn-data-grid-editor {
+.evirt-table-editor {
     position: absolute;
     top: -10000px;
     left: -10000px;
@@ -378,7 +378,7 @@ export default {
     align-items: center;
 }
 
-.jn-data-grid-editor div[contenteditable="true"] {
+.evirt-table-editor div[contenteditable="true"] {
     width: 100%;
     box-sizing: border-box;
     padding: 8px;
@@ -396,24 +396,24 @@ export default {
     cursor: text;
 }
 
-.jn-data-grid-editor-popup input[type="text"] {
+.evirt-table-editor-popup input[type="text"] {
     border: none;
     outline: none;
     border-radius: 0;
 }
 
-.jn-data-grid-editor-popup .el-input__wrapper {
+.evirt-table-editor-popup .el-input__wrapper {
     border: none !important;
     box-shadow: none !important;
 }
 
-.jn-data-grid-overlayer {
+.evirt-table-overlayer {
     position: absolute;
     top: 0px;
     left: 0px;
 }
 
-.jn-data-grid-empty {
+.evirt-table-empty {
     font-size: 14px;
     color: #666;
     position: absolute;

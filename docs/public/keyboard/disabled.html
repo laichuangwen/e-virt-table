@@ -7,7 +7,7 @@
   </head>
   <script src="../index.umd.js"></script>
   <style>
-    .jn-data-grid-editor {
+    .evirt-table-editor {
       position: absolute;
       top: -10000px;
       left: -10000px;
@@ -24,7 +24,7 @@
       align-items: center;
     }
 
-    .jn-data-grid-editor div[contenteditable="true"] {
+    .evirt-table-editor div[contenteditable="true"] {
       width: 100%;
       box-sizing: border-box;
       padding: 8px;
@@ -43,8 +43,8 @@
   </style>
   <body style="margin: 0px">
     <div id="evirt-table" ></div>
-    <div id="jn-data-grid-editor" class="jn-data-grid-editor">
-      <div id="jn-data-grid-text" contenteditable="true"></div>
+    <div id="evirt-table-editor" class="evirt-table-editor">
+      <div id="evirt-table-text" contenteditable="true"></div>
     </div>
   </body>
   <script>
@@ -133,10 +133,10 @@
         padding = 0,
       } = cell?.getClient() || {};
       const value = cell.getValue();
-      const editor = document.getElementById("jn-data-grid-editor");
+      const editor = document.getElementById("evirt-table-editor");
       editor.style.left = `${clientX}px`;
       editor.style.top = `${clientY}px`;
-      const text = document.getElementById("jn-data-grid-text");
+      const text = document.getElementById("evirt-table-text");
       text.style.minWidth = `${width}px`;
       text.style.minHeight = `${height}px`;
       text.style.padding = `${padding}px`;
@@ -149,7 +149,7 @@
       selection?.collapseToEnd(); // 光标移至最后
     });
     grid.on("doneEdit", (cell) => {
-      const text = document.getElementById("jn-data-grid-text");
+      const text = document.getElementById("evirt-table-text");
       const { rowKey, key } = cell;
       const value = cell.getValue();
       // !(text.textContent === '' && value === null)剔除点击编辑后未修改会把null变为''的情况
@@ -160,7 +160,7 @@
         grid.setItemValue(rowKey, key, text.textContent, true, true, true);
       }
       text.textContent = null;
-      const editor = document.getElementById("jn-data-grid-editor");
+      const editor = document.getElementById("evirt-table-editor");
       if (editor) {
         editor.style.left = `${-10000}px`;
         editor.style.top = `${-10000}px`;

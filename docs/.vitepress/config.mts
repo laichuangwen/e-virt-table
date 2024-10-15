@@ -4,7 +4,7 @@ import { markdownConfig } from "./plugins/markdown-plugin";
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   appearance: false,
-  title: "jn-data-grid",
+  title: "evirt-table",
   description: "一个canvas实现的数据表格",
   markdown: {
     config: markdownConfig,
@@ -86,7 +86,7 @@ export default defineConfig({
         socialLinks: [
           {
             icon: "github",
-            link: "https://github.com/laichuangwen/jn-data-grid",
+            link: "https://github.com/laichuangwen/evirt-table",
           },
         ],
       },
