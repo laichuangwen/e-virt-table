@@ -15,6 +15,7 @@ import Footer from "./Footer";
 import Selector from "./Selector";
 import Autofill from "./Autofill";
 import Tooltip from "./Tooltip";
+import Editor from "./Editor";
 export default class VirtTable {
   private targetContainer: HTMLDivElement;
   private target: HTMLCanvasElement;
@@ -25,6 +26,7 @@ export default class VirtTable {
   private selector: Selector;
   private autofill: Autofill;
   private tooltip: Tooltip;
+  private editor: Editor;
   ctx: Context;
   constructor(target: HTMLDivElement, options: EVirtTableOptions) {
     this.target = document.createElement("canvas");
@@ -39,6 +41,7 @@ export default class VirtTable {
     this.selector = new Selector(this.ctx);
     this.autofill = new Autofill(this.ctx);
     this.tooltip = new Tooltip(this.ctx);
+    this.editor = new Editor(this.ctx);
     console.log(this.ctx);
     // 外层容器样式
     const {
@@ -51,10 +54,15 @@ export default class VirtTable {
       `outline: none; position: relative; border-radius: ${BORDER_RADIUS}px; border: 1px solid ${BORDER_COLOR};`
     );
     this.ctx.on("draw", this.draw.bind(this));
+    // 更新targetRect
+    this.ctx.targetRect = this.target.getBoundingClientRect();
     this.draw();
   }
   draw() {
     requestAnimationFrame(() => {
+      this.ctx.targetRect = this.target.getBoundingClientRect();
+      console.log(this.target.width, this.ctx.targetRect.width);
+
       console.time("draw");
       this.header.update();
       this.footer.update();
@@ -74,18 +82,14 @@ export default class VirtTable {
   }
   loadColumns(columns: Column[]) {
     // 先关闭编辑
-    // if (this.editor.getShow()) {
-    //   this.editor.doneEdit();
-    // }
+    this.editor.doneEdit();
     this.ctx.database.setColumns(columns);
     this.header.init();
     this.ctx.emit("draw");
   }
   loadData(data: any[]) {
     // 先关闭编辑
-    // if (this.editor.getShow()) {
-    //   this.editor.doneEdit();
-    // }
+    this.editor.doneEdit();
     this.ctx.database.setData(data);
     this.ctx.emit("draw");
   }
@@ -115,9 +119,17 @@ export default class VirtTable {
     key: string,
     value: any,
     history = true,
-    reDraw = true
+    reDraw = true,
+    isEditor = false
   ) {
-    this.ctx.database.setItemValue(rowKey, key, value, history, reDraw, false);
+    this.ctx.database.setItemValue(
+      rowKey,
+      key,
+      value,
+      history,
+      reDraw,
+      isEditor
+    );
   }
   batchSetItemValue(list: ChangeItem[], history = true, reDraw = true) {
     this.ctx.database.batchSetItemValue(list, history);
@@ -133,7 +145,7 @@ export default class VirtTable {
     reDraw = true
   ) {
     this.ctx.database.setItemValue(rowKey, key, value, history, reDraw, true);
-    // this.editor.doneEdit();
+    this.editor.doneEdit();
   }
   doLayout() {
     this.ctx.emit("draw");
@@ -150,9 +162,7 @@ export default class VirtTable {
   }
   async validate(scrollError = true) {
     // 先关闭编辑
-    // if (this.editor.getShow()) {
-    //   this.editor.doneEdit();
-    // }
+    this.editor.doneEdit();
     return new Promise(async (resolve, reject) => {
       try {
         const res = await this.getValidations();
@@ -257,6 +267,7 @@ export default class VirtTable {
    * 销毁
    */
   destroy() {
+    this.editor.destroy();
     this.tooltip.destroy();
     this.selector.destroy();
     this.autofill.destroy();

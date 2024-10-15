@@ -7,6 +7,8 @@ export type HistoryItemData = {
 };
 export type HistoryItem = {
   changeList: HistoryItemData[];
+  scrollY: number;
+  scrollX: number;
   type: "single" | "multiple";
 };
 /**
@@ -62,7 +64,7 @@ export default class History {
   // 回退
   backState() {
     if (this.historyIndex >= 0) {
-      const { changeList } = this.history[this.historyIndex];
+      const { changeList, scrollX, scrollY } = this.history[this.historyIndex];
       const data = changeList.map(
         (item: { rowKey: string; key: string; oldValue: any }) => {
           return {
@@ -73,6 +75,8 @@ export default class History {
           };
         }
       );
+      // 设置滚动条位置
+      this.ctx.setScroll(scrollX, scrollY);
       // 不需要添加历史记录
       this.ctx.database.batchSetItemValue(data, false);
       this.historyIndex -= 1;

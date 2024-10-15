@@ -579,6 +579,7 @@ export default class Cell extends BaseCell {
     this.drawImage();
     this.drawSelector();
     this.drawAutofillPiont();
+    this.drawErrorTip();
   }
 
   /**
@@ -697,6 +698,35 @@ export default class Cell extends BaseCell {
       borderColor: this.ctx.config.SELECT_BORDER_COLOR || "rgb(82,146,247)",
       fillColor: this.ctx.config.SELECT_AREA_COLOR || "rgba(82,146,247,0.1)",
       borderWidth: 1,
+    });
+  }
+  private drawErrorTip() {
+    // 合计不显示
+    if (this.cellType === "footer") {
+      return;
+    }
+    // 没有错误消息
+    if (!this.message) {
+      return;
+    }
+    const { ERROR_TIP_ICON_SIZE, ERROR_TIP_COLOR } = this.ctx.config;
+    const { width } = this;
+    const x = this.drawX;
+    const y = this.drawY;
+    const points = [
+      x + width - ERROR_TIP_ICON_SIZE - 0.5,
+      y,
+      x + width - 0.5,
+      y,
+      x + width - 0.5,
+      y + ERROR_TIP_ICON_SIZE,
+    ];
+    this.ctx.paint.drawLine(points, {
+      borderColor: ERROR_TIP_COLOR,
+      fillColor: ERROR_TIP_COLOR,
+      borderWidth: 1,
+      lineCap: "round",
+      lineJoin: "round",
     });
   }
   private drawBorder(options: {

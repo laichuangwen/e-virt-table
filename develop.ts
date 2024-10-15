@@ -317,7 +317,7 @@ const columns: any[] = [
   // },
 ];
 let data: any[] = [];
-for (let i = 0; i < 7; i += 1) {
+for (let i = 0; i < 700; i += 1) {
   data.push({
     _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
     id: i,
@@ -437,7 +437,19 @@ const mergeRowCell = (data: any, key: string) => {
 const eVirtTable = new EVirtTable(canvas, {
   columns,
   data,
-  footerData: [],
+  footerData: [
+    {
+      emp_name: "合计",
+      emp_img: "122",
+      phone: "12222222",
+      dep_name: "3434bu",
+    },
+    {
+      emp_name: "合计34",
+      emp_img: "122",
+      phone: "12222223332",
+    },
+  ],
   config: {
     ICONS: [
       {
@@ -447,7 +459,7 @@ const eVirtTable = new EVirtTable(canvas, {
       },
     ],
     WIDTH: 0,
-    // HEIGHT: 500,
+    HEIGHT: 500,
     CHECKBOX_KEY: "emp_name",
     // CELL_HEIGHT: 28,
     ENABLE_AUTOFILL: true,
@@ -525,24 +537,59 @@ const eVirtTable = new EVirtTable(canvas, {
     },
   },
 });
-setInterval(() => {
-  const num = Math.floor(Math.random() * 1000);
-  eVirtTable.loadFooterData([
-    {
-      emp_name: "合计",
-      emp_img: "122",
-      phone: "12222222",
-      sex: `${num}`,
-      dep_name: "3434bu",
-    },
-    {
-      emp_name: "合计34",
-      emp_img: "122",
-      phone: "12222223332",
-      sex: `${num}`,
-    },
-  ]);
-}, 5000);
+eVirtTable.on("startEdit", (cell) => {
+  const { drawX = 0, drawY = 0, width = 0, height = 0, padding = 0 } = cell;
+  const value = cell.getValue();
+  const editor = document.getElementById("evirt-table-editor");
+  const text = document.getElementById("evirt-table-text");
+  if (!editor) {
+    return;
+  }
+  if (!text) {
+    return;
+  }
+  editor.style.left = `${drawX}px`;
+  editor.style.top = `${drawY}px`;
+  text.style.minWidth = `${width}px`;
+  text.style.minHeight = `${height}px`;
+  text.style.padding = `${padding}px`;
+  if (value !== null) {
+    text.innerText = value;
+  }
+  text.focus();
+  const selection = window.getSelection(); // 创建selection
+  selection?.selectAllChildren(text); // 清除选区并选择指定节点的所有子节点
+  selection?.collapseToEnd(); // 光标移至最后
+});
+eVirtTable.on("doneEdit", (cell) => {
+  const text = document.getElementById("evirt-table-text");
+  if (!text) {
+    return;
+  }
+  const { rowKey, key } = cell;
+  const value = cell.getValue();
+  // !(text.textContent === '' && value === null)剔除点击编辑后未修改会把null变为''的情况
+  if (
+    text.textContent !== value &&
+    !(text.textContent === "" && value === null)
+  ) {
+    eVirtTable.setItemValue(rowKey, key, text.textContent, true, true);
+  }
+  text.textContent = null;
+  const editor = document.getElementById("evirt-table-editor");
+  if (editor) {
+    editor.style.left = `${-10000}px`;
+    editor.style.top = `${-10000}px`;
+  }
+});
+document.getElementById("instantiation")?.addEventListener("click", () => {
+  console.log(eVirtTable);
+});
+document.getElementById("validator")?.addEventListener("click", () => {
+  eVirtTable.validate(true).then(() => {
+    console.log("校验通过");
+  });
+});
 // 销毁
 function destroy() {
   eVirtTable.destroy();

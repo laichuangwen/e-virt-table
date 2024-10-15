@@ -272,6 +272,7 @@ export default class Selector {
       const yArr = [minY, maxY];
       this.setSelector(xArr, yArr);
     } else {
+      this.ctx.emit("cellSelectedClick", focusCell);
       const xArr = [focusCell.colIndex, focusCell.colIndex];
       const yArr = [focusCell.rowIndex, focusCell.rowIndex];
       this.setSelector(xArr, yArr);

@@ -1,14 +1,9 @@
 import Cell from "./Cell";
 import Context from "./Context";
-import {
-  computePosition,
-  offset,
-  arrow,
-  flip,
-  shift,
-} from "@floating-ui/dom";
+import { computePosition, offset, arrow, flip, shift } from "@floating-ui/dom";
 export default class Tooltip {
   private ctx: Context;
+  private enable = false;
   private contentEl: HTMLDivElement;
   private floatingEl: HTMLDivElement;
   private arrowEl: HTMLDivElement;
@@ -53,13 +48,30 @@ export default class Tooltip {
   }
   private init() {
     this.ctx.on("mousemove", (e) => {
-      // 鼠标移动时，判断是否在目标元素上，不在则隐藏
-      if (!this.ctx.isTarget(e.target)) {
+      // 鼠标移动时，判断是否在target上，不在则隐藏
+      // if (!this.ctx.isTarget(e.target)) {
+      //   return;
+      // }
+      const { targetRect } = this.ctx;
+      if (!targetRect) {
+        return;
+      }
+      if (
+        e.clientX < targetRect.x ||
+        e.clientX > targetRect.x + targetRect.width ||
+        e.clientY < targetRect.y ||
+        e.clientY > targetRect.y + targetRect.height
+      ) {
         this.hide();
       }
     });
+    // 开始编辑时隐藏
+    this.ctx.on("startEdit", (e) => {
+      this.hide();
+    });
     this.ctx.on("cellHoverChange", (cell) => {
-      if (cell.ellipsis) {
+      // 有移除或者有错误message时显示
+      if (cell.ellipsis || cell.message) {
         this.show(cell);
       }
     });
@@ -73,14 +85,19 @@ export default class Tooltip {
       return;
     }
     // 如果是鼠标按下状态，则不显示
-    if (this.ctx.mousedown) { 
+    if (this.ctx.mousedown) {
       return;
     }
     this.floatingEl.style.display = "block";
     let text = cell.getText();
+    // 如果有message，则显示message
     if (cell.message) {
       text = cell.message;
     }
+    if (!this.ctx.targetRect) {
+      return;
+    }
+    this.enable = true;
     // 设置最大宽度
     this.contentEl.style.maxWidth = "500px";
     this.contentEl.style.width = "100%";
@@ -88,8 +105,8 @@ export default class Tooltip {
     this.contentEl.style.wordBreak = "break-all";
     this.contentEl.style.lineHeight = "1.5";
     this.contentEl.innerText = text;
-    const cellX = cell.drawX + this.ctx.targetContainer.offsetLeft;
-    const cellY = cell.drawY + this.ctx.targetContainer.offsetTop;
+    const cellX = cell.drawX + this.ctx.targetRect.x;
+    const cellY = cell.drawY + this.ctx.targetRect.y;
     // 这个是相对于视口的位置
     const virtualEl = {
       getBoundingClientRect() {
@@ -157,6 +174,10 @@ export default class Tooltip {
     });
   }
   private hide() {
+    if (!this.enable) {
+      return;
+    }
+    this.enable = false;
     this.floatingEl.style.display = "none";
   }
   destroy() {}

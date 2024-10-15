@@ -375,6 +375,8 @@ export default class Database {
     if (history) {
       this.ctx.history.pushState({
         changeList,
+        scrollX: this.ctx.scrollX,
+        scrollY: this.ctx.scrollY,
         type: "multiple",
       });
     }
@@ -456,6 +458,8 @@ export default class Database {
     if (history) {
       this.ctx.history.pushState({
         type: "single",
+        scrollX: this.ctx.scrollX,
+        scrollY: this.ctx.scrollY,
         changeList: [
           {
             rowKey,
