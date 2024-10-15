@@ -1,6 +1,6 @@
 import EVirtTable from "./src/EVirtTable";
 
-const canvas = document.getElementById("canvas") as HTMLDivElement;
+const canvas = document.getElementById("evirt-table") as HTMLDivElement;
 const columns: any[] = [
   // {
   //   title: "序号",
@@ -317,7 +317,7 @@ const columns: any[] = [
   // },
 ];
 let data: any[] = [];
-for (let i = 0; i < 50; i += 1) {
+for (let i = 0; i < 7; i += 1) {
   data.push({
     _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
     id: i,
@@ -447,7 +447,7 @@ const eVirtTable = new EVirtTable(canvas, {
       },
     ],
     WIDTH: 0,
-    HEIGHT: 500,
+    // HEIGHT: 500,
     CHECKBOX_KEY: "emp_name",
     // CELL_HEIGHT: 28,
     ENABLE_AUTOFILL: true,

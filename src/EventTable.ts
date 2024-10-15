@@ -304,6 +304,7 @@ export default class EventTable {
       }
     }
   }
+
   private isBusy(e: MouseEvent) {
     const y = e.offsetY;
     const x = e.offsetX;
@@ -339,11 +340,11 @@ export default class EventTable {
       return true;
     }
     // 点击滚动条不处理
-    if (y > this.ctx.target.offsetHeight - SCROLLER_TRACK_SIZE) {
+    if (y > this.ctx.target.height - SCROLLER_TRACK_SIZE) {
       return true;
     }
     // 点击滚动条不处理
-    if (x > this.ctx.target.offsetWidth - SCROLLER_TRACK_SIZE) {
+    if (x > this.ctx.target.width - SCROLLER_TRACK_SIZE) {
       return true;
     }
     return false;

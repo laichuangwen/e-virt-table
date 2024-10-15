@@ -201,7 +201,7 @@ export default class Body {
           const isYRange =
             y > row.y - scrollY + row.height - 1.5 &&
             y < row.y - scrollY + row.height + 1.5 &&
-            y < target.offsetHeight - 4;
+            y < target.height - 4;
           if (isYRange) {
             for (let j = 0; j < row.cells.length; j++) {
               const cell = row.cells[j];
@@ -243,7 +243,7 @@ export default class Body {
       const resizeTargetDrawY = this.resizeTarget.y - scrollY;
       const resizeTargetHeight = this.resizeTarget.height;
       const y = resizeTargetDrawY + resizeTargetHeight + this.resizeDiff - 0.5;
-      const poins = [0, y + 0.5, target.offsetWidth, y + 0.5];
+      const poins = [0, y + 0.5, target.width, y + 0.5];
       this.ctx.paint.drawLine(poins, {
         borderColor: RESIZE_ROW_LINE_COLOR,
         borderWidth: 1,
@@ -277,7 +277,7 @@ export default class Body {
       const x =
         header.width -
         (this.x + this.width) +
-        target.offsetWidth -
+        target.width -
         fixedRightWidth;
       this.ctx.paint.drawShadow(x + 0.5, this.y, fixedRightWidth, this.height, {
         fillColor: HEADER_BG_COLOR,

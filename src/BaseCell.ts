@@ -31,7 +31,7 @@ export default class BaseCell {
       return true;
     }
     const { target, fixedLeftWidth, scrollX, fixedRightWidth } = this.ctx;
-    const offsetWidth = target.offsetWidth;
+    const offsetWidth = target.width;
     return !(
       this.x + this.width - fixedLeftWidth - scrollX <= 0 ||
       this.x - scrollX >= offsetWidth - fixedRightWidth
@@ -39,7 +39,7 @@ export default class BaseCell {
   }
   isVerticalVisible() {
     const { target, scrollY } = this.ctx;
-    const offsetHeight = target.offsetHeight;
+    const offsetHeight = target.height;
     return !(
       this.y + this.height - scrollY <= 0 || this.y - scrollY >= offsetHeight
     );

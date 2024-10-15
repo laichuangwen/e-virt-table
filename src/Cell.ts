@@ -93,7 +93,10 @@ export default class Cell extends BaseCell {
     this.column = column;
     this.rules = column.rules;
     this.row = row;
-    this.rowKey = this.ctx.database.getRowKeyForRowIndex(rowIndex);
+    this.rowKey =
+      this.cellType === "body"
+        ? this.ctx.database.getRowKeyForRowIndex(rowIndex)
+        : `${this.cellType}_${this.rowIndex}`;
     this.value = this.getValue();
     this.render = column.render;
     this.overflowTooltipShow = column.overflowTooltipShow || true;
@@ -308,13 +311,19 @@ export default class Cell extends BaseCell {
     let bgColor = BODY_BG_COLOR;
     let textColor = READONLY_TEXT_COLOR;
     // 赋值编辑色
-    if (!this.ctx.database.getReadonly(rowKey, key)) {
+    if (
+      this.cellType === "body" &&
+      !this.ctx.database.getReadonly(rowKey, key)
+    ) {
       if (!["index", "index-selection", "selection"].includes(type)) {
         bgColor = EDIT_BG_COLOR;
       }
     }
     // 定义格子样式方法
-    if (typeof BODY_CELL_STYLE_METHOD === "function") {
+    if (
+      this.cellType === "body" &&
+      typeof BODY_CELL_STYLE_METHOD === "function"
+    ) {
       const cellStyleMethod: CellStyleMethod = BODY_CELL_STYLE_METHOD;
       const { backgroundColor, color } =
         cellStyleMethod({
@@ -461,11 +470,10 @@ export default class Cell extends BaseCell {
       if (this.renderFooter) {
         return "";
       }
-      const text = this.row[this.key];
       if (this.text === null || this.text === undefined) {
         return "";
       }
-      return text;
+      return this.text;
     } else {
       // cellType === "body"
       // 被跨度单元格
@@ -496,6 +504,10 @@ export default class Cell extends BaseCell {
    * @returns
    */
   getText() {
+    if (this.cellType === "footer") {
+      return this.row[this.key];
+    }
+    // cellType === "body"
     if (typeof this.formatter === "function") {
       const _text = this.formatter({
         row: this.row,

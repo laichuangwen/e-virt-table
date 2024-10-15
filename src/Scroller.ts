@@ -166,15 +166,14 @@ class Scrollbar {
       header,
       config: { SCROLLER_TRACK_SIZE = 0, SCROLLER_SIZE = 0 },
     } = this.ctx;
-    const visibleWidth = this.ctx.target.offsetWidth;
-    const visibleHeight = this.ctx.target.offsetHeight;
+    const visibleWidth = this.ctx.target.width;
+    const visibleHeight = this.ctx.target.height;
     const headerHeight = header.height;
     const headerWidth = header.width;
     const bodyHeight = body.height;
     const footerHeight = this.ctx.footer.height;
     if (this.type === "vertical") {
-      this.visibleDistance =
-        visibleHeight - SCROLLER_TRACK_SIZE - headerHeight;
+      this.visibleDistance = visibleHeight - SCROLLER_TRACK_SIZE - headerHeight;
       this.distance = bodyHeight - this.visibleDistance + footerHeight;
       this.trackX = visibleWidth - SCROLLER_TRACK_SIZE;
       this.trackY = 0;
@@ -215,7 +214,7 @@ class Scrollbar {
         visibleHeight,
       ];
       this.trackX = 0;
-      this.trackY = visibleHeight - SCROLLER_TRACK_SIZE;
+      this.trackY = visibleHeight - SCROLLER_TRACK_SIZE + 0.5;
       this.trackWidth = visibleWidth;
       this.trackHeight = SCROLLER_TRACK_SIZE;
 

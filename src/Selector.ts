@@ -527,13 +527,13 @@ export default class Selector {
     const diffRight =
       focusCell.drawX +
       focusCell.width -
-      (target.offsetWidth - fixedRightWidth) +
+      (target.width - fixedRightWidth) +
       1;
     const diffTop = header.height - focusCell.drawY;
     const diffBottom =
       focusCell.drawY +
       focusCell.height -
-      (target.offsetHeight - footerHeight - SCROLLER_TRACK_SIZE);
+      (target.height - footerHeight - SCROLLER_TRACK_SIZE);
     // fixed禁用左右横向移动
     if (diffRight > 0 && !focusCell.fixed) {
       this.ctx.setScrollX(scrollX + diffRight);

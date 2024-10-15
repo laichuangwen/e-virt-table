@@ -15,8 +15,8 @@
 ::: demo
 <iframe src="/height/setting.html" style="min-height:320px"></iframe>
 :::
-<!--
-## 可调整宽度
+
+## 行数据隐藏字段`_height`设置高度
 ::: demo
-<iframe src="/height/resize.html" style="min-height:220px"></iframe>
-::: -->
+<iframe src="/height/data-setting.html" style="min-height:320px"></iframe>
+:::

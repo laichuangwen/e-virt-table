@@ -80,7 +80,7 @@ export default class CellHeader extends BaseCell {
    */
   isVerticalVisible() {
     const { target } = this.ctx;
-    const offsetHeight = target.offsetHeight;
+    const offsetHeight = target.height;
     return !(this.y + this.height <= 0 || this.y >= offsetHeight);
   }
 

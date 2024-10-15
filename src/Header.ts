@@ -146,7 +146,7 @@ export default class Header {
           if (
             x > drawX + col.width - 5 &&
             x < drawX + col.width + 4 &&
-            x < target.offsetWidth - 4 && // 视窗中最后一列不允许调整宽
+            x < target.width - 4 && // 视窗中最后一列不允许调整宽
             col.colspan <= 1 // 父级表头不触发
           ) {
             // 在表头内
@@ -240,7 +240,7 @@ export default class Header {
       const resizeTargetDrawX = this.resizeTarget.getDrawX();
       const resizeTargetWidth = this.resizeTarget.width;
       const x = resizeTargetDrawX + resizeTargetWidth + this.resizeDiff - 0.5;
-      const poins = [x + 0.5, 0, x + 0.5, target.offsetHeight];
+      const poins = [x + 0.5, 0, x + 0.5, target.height];
       this.ctx.paint.drawLine(poins, {
         borderColor: RESIZE_COLUMN_LINE_COLOR,
         borderWidth: 1,
@@ -274,7 +274,7 @@ export default class Header {
       const x =
         header.width -
         (this.x + this.width) +
-        target.offsetWidth -
+        target.width -
         fixedRightWidth;
       this.ctx.paint.drawShadow(x + 0.5, this.y, fixedRightWidth, this.height, {
         fillColor: HEADER_BG_COLOR,
@@ -321,7 +321,7 @@ export default class Header {
       config: { SCROLLER_TRACK_SIZE = 0 },
       target,
     } = this.ctx;
-    this.visibleWidth = target.offsetWidth - SCROLLER_TRACK_SIZE;
+    this.visibleWidth = target.width - SCROLLER_TRACK_SIZE;
     this.ctx.header.visibleLeafColumns = this.visibleLeafColumns;
     this.ctx.header.visibleWidth = this.visibleWidth;
     this.ctx.header.visibleHeight = this.visibleHeight;

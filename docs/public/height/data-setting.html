@@ -7,7 +7,7 @@
   </head>
   <script src="../index.umd.js"></script>
   <body>
-    <div id="evirt-table" ></div>
+    <div id="evirt-table"></div>
   </body>
   <script>
     let data = [
@@ -26,6 +26,7 @@
         city: "普陀区",
         address: "上海市普陀区金沙江路 1517 弄",
         zip: 200333,
+        _height: 80, // 设置body行高
       },
       {
         date: "2016-05-01",
@@ -83,7 +84,6 @@
       columns,
       config: {
         HEADER_HEIGHT: 50, // 设置表头行高
-        CELL_HEIGHT: 50,// 设置body行高
       },
     });
   </script>

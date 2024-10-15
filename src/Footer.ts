@@ -32,7 +32,7 @@ export default class Footer {
     // 可视区高度
     this.visibleHeight = this.height;
     if (FOOTER_FIXED) {
-      this.y = this.ctx.target.offsetHeight - this.height - SCROLLER_TRACK_SIZE;
+      this.y = this.ctx.target.height - this.height - SCROLLER_TRACK_SIZE;
     } else {
       this.y = body.y + body.height;
     }
@@ -76,7 +76,7 @@ export default class Footer {
       const x =
         header.width -
         (this.x + this.width) +
-        target.offsetWidth -
+        target.width -
         fixedRightWidth;
       this.ctx.paint.drawShadow(x + 0.5, y, fixedRightWidth, this.height, {
         fillColor: HEADER_BG_COLOR,
