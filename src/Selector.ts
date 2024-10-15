@@ -494,6 +494,9 @@ export default class Selector {
     const yArr = [rowIndex, rowIndex];
     const cell = this.getCell(rowIndex, colIndex);
     if (cell) {
+      if (["index", "index-selection", "selection"].includes(cell.type)) {
+        return;
+      }
       this.ctx.setFocusCell(cell);
     }
     this.setSelector(xArr, yArr);
@@ -525,10 +528,7 @@ export default class Selector {
     // 加1补选中框的边框,且可以移动滚动，以为getCell是获取渲染的cell
     const diffLeft = fixedLeftWidth - focusCell.drawX + 1;
     const diffRight =
-      focusCell.drawX +
-      focusCell.width -
-      (target.width - fixedRightWidth) +
-      1;
+      focusCell.drawX + focusCell.width - (target.width - fixedRightWidth) + 1;
     const diffTop = header.height - focusCell.drawY;
     const diffBottom =
       focusCell.drawY +
