@@ -46,7 +46,6 @@ export default class Database {
     this.clearBufferData();
     this.rowKeyMap.clear();
     this.checkboxKeyMap.clear();
-    this.headerMap.clear();
     this.colIndexKeyMap.clear();
     this.rowIndexRowKeyMap.clear();
     this.originalDataMap.clear();

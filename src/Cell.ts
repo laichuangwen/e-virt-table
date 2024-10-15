@@ -305,48 +305,16 @@ export default class Cell extends BaseCell {
       HIGHLIGHT_HOVER_ROW,
       HIGHLIGHT_HOVER_ROW_COLOR,
     } = this.ctx.config;
-    const cell = this;
-    const { rowKey, key, type } = this;
-    // 恢复默认背景色
-    let bgColor = BODY_BG_COLOR;
-    let textColor = READONLY_TEXT_COLOR;
-    // 赋值编辑色
-    if (
-      this.cellType === "body" &&
-      !this.ctx.database.getReadonly(rowKey, key)
-    ) {
-      if (!["index", "index-selection", "selection"].includes(type)) {
-        bgColor = EDIT_BG_COLOR;
-      }
-    }
-    // 定义格子样式方法
-    if (
-      this.cellType === "body" &&
-      typeof BODY_CELL_STYLE_METHOD === "function"
-    ) {
-      const cellStyleMethod: CellStyleMethod = BODY_CELL_STYLE_METHOD;
-      const { backgroundColor, color } =
-        cellStyleMethod({
-          row: cell.row,
-          rowIndex: cell.rowIndex,
-          colIndex: cell.colIndex,
-          column: cell.column,
-          value: cell.getValue(),
-        }) || {};
-      if (backgroundColor) {
-        bgColor = backgroundColor;
-      }
-      // 文字颜色
-      if (color) {
-        textColor = color;
-      }
-    }
-    // 合计底部背景色
-    if (cell.cellType === "footer") {
-      bgColor = FOOTER_BG_COLOR;
+    if (this.cellType === "footer") {
+      // 合计底部背景色
+      this.drawCellSkyBgColor = "transparent";
+      this.drawCellBgColor = FOOTER_BG_COLOR;
+      this.drawTextColor = READONLY_TEXT_COLOR;
+      return;
     }
     // 高亮行,在背景色上加一层颜色
     let drawCellSkyBgColor = "transparent";
+    // 高亮行
     const focusCell = this.ctx.focusCell;
     const hoverCell = this.ctx.hoverCell;
     if (HIGHLIGHT_HOVER_ROW && hoverCell?.rowKey === this.rowKey) {
@@ -356,6 +324,37 @@ export default class Cell extends BaseCell {
       drawCellSkyBgColor = HIGHLIGHT_SELECTED_ROW_COLOR;
     }
     this.drawCellSkyBgColor = drawCellSkyBgColor;
+    // 恢复默认背景色
+    let bgColor = BODY_BG_COLOR;
+    let textColor = READONLY_TEXT_COLOR;
+    // 只读
+    if (["index", "index-selection", "selection"].includes(this.type)) {
+      this.drawCellBgColor = BODY_BG_COLOR;
+      this.drawTextColor = READONLY_TEXT_COLOR;
+      return;
+    }
+    if (!this.ctx.database.getReadonly(this.rowKey, this.key)) {
+      bgColor = EDIT_BG_COLOR;
+      textColor = READONLY_TEXT_COLOR;
+    }
+    if (typeof BODY_CELL_STYLE_METHOD === "function") {
+      const cellStyleMethod: CellStyleMethod = BODY_CELL_STYLE_METHOD;
+      const { backgroundColor, color } =
+        cellStyleMethod({
+          row: this.row,
+          rowIndex: this.rowIndex,
+          colIndex: this.colIndex,
+          column: this.column,
+          value: this.getValue(),
+        }) || {};
+      if (backgroundColor) {
+        bgColor = backgroundColor;
+      }
+      // 文字颜色
+      if (color) {
+        textColor = color;
+      }
+    }
     this.drawCellBgColor = bgColor;
     this.drawTextColor = textColor;
     // const change = this.grid.database.isHasChangedData(cell.rowKey, cell.key);
