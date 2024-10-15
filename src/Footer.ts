@@ -56,8 +56,6 @@ export default class Footer {
     // 不是footer固定时
     if (!this.ctx.config.FOOTER_FIXED) {
       y = this.y - this.ctx.scrollY;
-      console.log(y);
-      
     }
     if (scrollX > 0 && fixedLeftWidth !== 0) {
       this.ctx.paint.drawShadow(this.x, y, fixedLeftWidth, this.height, {

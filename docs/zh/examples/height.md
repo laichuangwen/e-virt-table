@@ -11,7 +11,7 @@
 <iframe src="/height/base.html" style="min-height:220px"></iframe>
 :::
 
-## 设置高度
+## `CELL_HEIGHT`设置高度
 ::: demo
 <iframe src="/height/setting.html" style="min-height:320px"></iframe>
 :::
