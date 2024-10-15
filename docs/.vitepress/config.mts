@@ -39,6 +39,7 @@ export default defineConfig({
             text: "例子",
             items: [
               { text: "虚拟滚动", link: "/zh/examples/virtualScroll" },
+              { text: "滚动条", link: "/zh/examples/scroller" },
               { text: "宽度", link: "/zh/examples/width" },
               { text: "高度", link: "/zh/examples/height" },
               { text: "固定", link: "/zh/examples/fixed" },

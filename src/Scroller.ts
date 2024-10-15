@@ -367,7 +367,7 @@ export default class Scroller {
     const cell = header.leafCellHeaders.find((cell) => cell.key === key);
     if (cell) {
       // 移动到窗口中间/2
-      this.setScrollX(cell.x + header.visibleWidth / 2);
+      this.setScrollX(cell.x - header.visibleWidth / 2);
     }
   }
   scrollToColIndex(colIndex: number) {
@@ -378,7 +378,7 @@ export default class Scroller {
     if (cell) {
       // 移动到窗口中间/2
       if (cell.x > header.visibleWidth / 2) {
-        this.setScrollX(cell.x + header.visibleWidth / 2);
+        this.setScrollX(cell.x - header.visibleWidth / 2);
       }
     }
   }
@@ -386,13 +386,13 @@ export default class Scroller {
     const { body, database } = this.ctx;
     const { top } = database.getPositionForRowIndex(rowIndex);
     if (top > body.visibleHeight) {
-      this.setScrollY(top + body.visibleHeight / 2);
+      this.setScrollY(top - body.visibleHeight / 2);
     }
   }
   scrollToRowKey(rowKey: string) {
     const { body, database } = this.ctx;
     const rowIndex = database.getRowIndexForRowKey(rowKey);
     const { top } = database.getPositionForRowIndex(rowIndex);
-    this.setScrollY(-top + body.visibleHeight / 2);
+    this.setScrollY(top - body.visibleHeight / 2);
   }
 }
