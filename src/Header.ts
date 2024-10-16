@@ -31,6 +31,7 @@ export default class Header {
     this.init();
     // 初始化调整列大小ENABLE_RESIZE_COLUMN
     this.initResizeColumn();
+    // this.resizeAllColumn(100);
   }
   init() {
     const {
@@ -180,17 +181,48 @@ export default class Header {
     setWidth(this.columns);
     this.ctx.database.setColumns(this.columns);
     this.init();
-
     this.ctx.emit("draw");
+    let overFiff = 0;
+    // 如果表头宽度小于可视宽度，平均分配
+    if (this.width < this.visibleWidth) {
+      const overWidth = this.visibleWidth - this.width;
+      overFiff =
+        Math.floor((overWidth / this.leafCellHeaders.length) * 100) / 100;
+      this.resizeAllColumn(overFiff);
+    }
     this.ctx.emit("resizeColumnChange", {
       colIndex: cell.colIndex,
       key: cell.key,
       oldWidth: cell.width,
-      width: cell.width + diff,
+      width: cell.width + diff + overFiff,
       column: cell.column,
       columns: this.columns,
     });
   }
+  resizeAllColumn(fellWidth: number) {
+    const widthMap = new Map();
+    // 存需要更改的宽度
+    for (const col of this.allCellHeaders) {
+      const width = col.width + fellWidth * col.colspan;
+      widthMap.set(col.key, width);
+    }
+    // 递归更改宽度
+    const uptateWidth = (columns: Column[]) => {
+      columns.forEach((column: Column) => {
+        if (widthMap.has(column.key)) {
+          column.width = widthMap.get(column.key);
+        }
+        if (column.children && column.children.length > 0) {
+          uptateWidth(column.children);
+        }
+      });
+    };
+    uptateWidth(this.columns);
+    this.ctx.database.setColumns(this.columns);
+    this.init();
+    this.ctx.emit("draw");
+  }
+
   private render(arr: Column[], originX: number) {
     const len = arr.length;
     let everyOffsetX = originX;

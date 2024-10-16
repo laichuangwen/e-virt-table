@@ -73,7 +73,7 @@ export default class Editor {
         return;
       }
       // 除了上面的建其他都开始编辑
-      // this.startEdit();
+      this.startEdit();
     });
     this.ctx.on("cellClick", (cell) => {
       if (
@@ -226,6 +226,7 @@ export default class Editor {
       this.ctx.emit("doneEdit", this.cellTarget);
       this.doneEditByInput();
       this.enable = false;
+      this.ctx.target.focus();
       this.ctx.editing = false;
       this.cellTarget = null;
       this.ctx.emit("draw");

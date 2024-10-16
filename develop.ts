@@ -310,11 +310,11 @@ const columns: any[] = [
     readonly: true,
     slotName: "salePrice",
   },
-  // {
-  //   title: '操作',
-  //   key: 'hander',
-  //   slotName: 'hander',
-  // },
+  {
+    title: "操作",
+    key: "hander",
+    slotName: "hander",
+  },
 ];
 let data: any[] = [];
 for (let i = 0; i < 700; i += 1) {

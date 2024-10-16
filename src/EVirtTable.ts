@@ -52,6 +52,16 @@ export default class VirtTable {
       "style",
       `outline: none; position: relative; border-radius: ${BORDER_RADIUS}px; border: 1px solid ${BORDER_COLOR};`
     );
+    //
+    this.header.update();
+    const { header } = this.ctx;
+    if (header.width < header.visibleWidth) {
+      const overWidth = header.visibleWidth - header.width;
+      const diff =
+        Math.floor((overWidth / header.leafCellHeaders.length) * 100) / 100;
+      console.log(diff);
+      this.header.resizeAllColumn(diff);
+    }
     this.ctx.on("draw", this.draw.bind(this));
     // 更新targetRect
     this.ctx.targetRect = this.target.getBoundingClientRect();
