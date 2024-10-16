@@ -12,6 +12,85 @@ export default class Editor {
     this.initTextEditor();
     this.init();
   }
+  private init() {
+    // 滚动时，结束编辑
+    this.ctx.on("onScroll", () => {
+      if (this.enable && this.cellTarget?.editorType !== "text") {
+        this.doneEdit();
+      }
+    });
+    this.ctx.on("cellHeaderMousedown", () => {
+      if (this.enable && this.cellTarget?.editorType !== "text") {
+        this.doneEdit();
+      }
+    });
+    this.ctx.on("keydown", (e) => {
+      const key = e.key;
+      const isCtrl = e.ctrlKey;
+      const isAlt = e.altKey;
+      const isShift = e.shiftKey;
+      const isMeta = e.metaKey;
+      // 检测是否按下了组合键（Ctrl、Alt、Shift、Meta）
+      if (isCtrl || isAlt || isShift || isMeta) {
+        return;
+      }
+      // 检测功能键（比如 F1, Escape,Tab 等）
+      const functionKeys = [
+        // "Enter",
+        "Escape",
+        "Tab",
+        "Backspace",
+        "Delete",
+        "ArrowUp",
+        "ArrowDown",
+        "ArrowLeft",
+        "ArrowRight",
+        "Home",
+        "End",
+        "PageUp",
+        "PageDown",
+        "Insert",
+        "F1",
+        "F2",
+        "F3",
+        "F4",
+        "F5",
+        "F6",
+        "F7",
+        "F8",
+        "F9",
+        "F10",
+        "F11",
+        "F12",
+      ];
+      if (functionKeys.includes(key)) {
+        return;
+      }
+      // 编辑模式按下按Enter进入编辑模式
+      if (e.code === "Enter" && !this.enable) {
+        e.preventDefault();
+        this.startEdit();
+        return;
+      }
+      // 除了上面的建其他都开始编辑
+      // this.startEdit();
+    });
+    this.ctx.on("cellClick", (cell) => {
+      if (
+        cell.rowKey === this.cellTarget?.rowKey &&
+        cell.key === this.cellTarget?.key
+      ) {
+        this.startEdit();
+      } else {
+        this.doneEdit();
+        this.cellTarget = cell;
+        // 单击单元格进入编辑模式
+        if (this.ctx.config.ENABLE_EDIT_SINGLE_CLICK) {
+          this.startEdit();
+        }
+      }
+    });
+  }
   private initTextEditor() {
     // 初始化文本编辑器
     const { CSS_PREFIX, SELECT_BORDER_COLOR } = this.ctx.config;
@@ -20,16 +99,15 @@ export default class Editor {
     this.inputEl.addEventListener("keydown", (e) => {
       if (this.enable && (e.code === "Enter" || e.code === "Escape")) {
         e.preventDefault();
-        // this.doneEdit();
         this.inputEl.blur();
       }
     });
-    this.inputEl.addEventListener("blur", (e) => {
+    this.inputEl.addEventListener("blur", () => {
       this.doneEdit();
     });
     this.editorEl = document.createElement("div");
-    this.editorEl.className = `${CSS_PREFIX}-editor`;
-    this.inputEl.className = `${CSS_PREFIX}-editor-input`;
+    this.editorEl.className = `${CSS_PREFIX}-self-editor`;
+    this.inputEl.className = `${CSS_PREFIX}-self-editor-input`;
     const editorStyle = {
       position: "absolute",
       top: "-10000px",
@@ -96,6 +174,10 @@ export default class Editor {
     if (!this.cellTarget) {
       return;
     }
+    // 如果不是是文本编辑器
+    if (this.cellTarget.editorType !== "text") {
+      return;
+    }
     const { rowKey, key } = this.cellTarget;
     const value = this.cellTarget.getValue();
     const textContent = this.inputEl.textContent;
@@ -114,74 +196,6 @@ export default class Editor {
     this.editorEl.style.left = `${-10000}px`;
     this.editorEl.style.top = `${-10000}px`;
   }
-  private init() {
-    this.ctx.on("keydown", (e) => {
-      const key = e.key;
-      const isCtrl = e.ctrlKey;
-      const isAlt = e.altKey;
-      const isShift = e.shiftKey;
-      const isMeta = e.metaKey;
-      // 检测是否按下了组合键（Ctrl、Alt、Shift、Meta）
-      if (isCtrl || isAlt || isShift || isMeta) {
-        return;
-      }
-      // 检测功能键（比如 F1, Escape,Tab 等）
-      const functionKeys = [
-        // "Enter",
-        "Escape",
-        "Tab",
-        "Backspace",
-        "Delete",
-        "ArrowUp",
-        "ArrowDown",
-        "ArrowLeft",
-        "ArrowRight",
-        "Home",
-        "End",
-        "PageUp",
-        "PageDown",
-        "Insert",
-        "F1",
-        "F2",
-        "F3",
-        "F4",
-        "F5",
-        "F6",
-        "F7",
-        "F8",
-        "F9",
-        "F10",
-        "F11",
-        "F12",
-      ];
-      if (functionKeys.includes(key)) {
-        return;
-      }
-      // 编辑模式按下按Enter进入编辑模式
-      if (e.code === "Enter" && !this.enable) {
-        e.preventDefault();
-        this.startEdit();
-        return;
-      }
-      // 除了上面的建其他都开始编辑
-      this.startEdit();
-    });
-    this.ctx.on("cellClick", (cell) => {
-      if (
-        cell.rowKey === this.cellTarget?.rowKey &&
-        cell.key === this.cellTarget?.key
-      ) {
-        this.startEdit();
-      } else {
-        this.doneEdit();
-        this.cellTarget = cell;
-        // 单击单元格进入编辑模式
-        if (this.ctx.config.ENABLE_EDIT_SINGLE_CLICK) {
-          this.startEdit();
-        }
-      }
-    });
-  }
   startEdit() {
     const focusCell = this.ctx.focusCell;
     if (!focusCell) {
@@ -198,6 +212,7 @@ export default class Editor {
     const readonly = this.ctx.database.getReadonly(rowKey, key);
     if (focusCell && !readonly) {
       this.enable = true;
+      this.ctx.editing = true;
       this.cellTarget = focusCell;
       this.startEditByInput(this.cellTarget);
       this.ctx.emit("startEdit", this.cellTarget);
@@ -208,9 +223,10 @@ export default class Editor {
       return;
     }
     if (this.cellTarget) {
+      this.ctx.emit("doneEdit", this.cellTarget);
       this.doneEditByInput();
-      this.ctx.target.focus();
       this.enable = false;
+      this.ctx.editing = false;
       this.cellTarget = null;
       this.ctx.emit("draw");
     }

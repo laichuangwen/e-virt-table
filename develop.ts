@@ -231,7 +231,7 @@ const columns: any[] = [
     title: "出生日期",
     size: "small",
     key: "birthday",
-    type: "date",
+    editorType: "date",
   },
   {
     title: "家庭地址",
@@ -537,51 +537,58 @@ const eVirtTable = new EVirtTable(canvas, {
     },
   },
 });
-// eVirtTable.on("startEdit", (cell) => {
-//   const { drawX = 0, drawY = 0, width = 0, height = 0, padding = 0 } = cell;
-//   const value = cell.getValue();
-//   const editor = document.getElementById("evirt-table-editor");
-//   const text = document.getElementById("evirt-table-text");
-//   if (!editor) {
-//     return;
-//   }
-//   if (!text) {
-//     return;
-//   }
-//   editor.style.left = `${drawX}px`;
-//   editor.style.top = `${drawY}px`;
-//   text.style.minWidth = `${width}px`;
-//   text.style.minHeight = `${height}px`;
-//   text.style.padding = `${padding}px`;
-//   if (value !== null) {
-//     text.innerText = value;
-//   }
-//   text.focus();
-//   const selection = window.getSelection(); // 创建selection
-//   selection?.selectAllChildren(text); // 清除选区并选择指定节点的所有子节点
-//   selection?.collapseToEnd(); // 光标移至最后
-// });
-// eVirtTable.on("doneEdit", (cell) => {
-//   const text = document.getElementById("evirt-table-text");
-//   if (!text) {
-//     return;
-//   }
-//   const { rowKey, key } = cell;
-//   const value = cell.getValue();
-//   // !(text.textContent === '' && value === null)剔除点击编辑后未修改会把null变为''的情况
-//   if (
-//     text.textContent !== value &&
-//     !(text.textContent === "" && value === null)
-//   ) {
-//     eVirtTable.setItemValue(rowKey, key, text.textContent, true, true);
-//   }
-//   text.textContent = null;
-//   const editor = document.getElementById("evirt-table-editor");
-//   if (editor) {
-//     editor.style.left = `${-10000}px`;
-//     editor.style.top = `${-10000}px`;
-//   }
-// });
+const editorEl = document.getElementById("evirt-table-editor");
+const dateEl = document.getElementById("evirt-table-date") as HTMLInputElement;
+if (editorEl && dateEl) {
+  eVirtTable.on("startEdit", (cell) => {
+    const { width, height, editorType } = cell;
+    // 内部已经处理了文本类型的编辑
+    if (editorType === "text") {
+      return;
+    }
+    const drawX = cell.getDrawX();
+    const drawY = cell.getDrawY();
+    editorEl.style.left = `${drawX}px`;
+    editorEl.style.top = `${drawY}px`;
+    // 日期
+    if (dateEl && ["date"].includes(editorType)) {
+      dateEl.focus();
+      dateEl.setAttribute("data-row-key", cell.rowKey);
+      dateEl.setAttribute("data-key", cell.key);
+      dateEl.style.display = "block";
+      dateEl.style.minWidth = `${width - 1}px`;
+      dateEl.style.minHeight = `${height - 1}px`;
+      dateEl.style.border = "none";
+      dateEl.value = cell.getValue();
+    }
+  });
+  eVirtTable.on("doneEdit", (cell) => {
+    // 内部已经处理了文本类型的编辑
+    if (cell.editorType === "text") {
+      return;
+    }
+    if (["date"].includes(cell.editorType)) {
+      dateEl.style.display = "none";
+    }
+    if (editorEl) {
+      editorEl.style.left = `${-10000}px`;
+      editorEl.style.top = `${-10000}px`;
+    }
+  });
+  dateEl.addEventListener("change", function (event) {
+    if (!event.target) {
+      return;
+    }
+    // 获取 input 元素的新值
+    const newValue = (event.target as HTMLInputElement).value;
+    const rowKey = dateEl.getAttribute("data-row-key");
+    const key = dateEl.getAttribute("data-key");
+    if (rowKey === null || key === null) {
+      return;
+    }
+    eVirtTable.setItemValueByEditor(rowKey, key, newValue, true, true);
+  });
+}
 document.getElementById("instantiation")?.addEventListener("click", () => {
   console.log(eVirtTable);
 });

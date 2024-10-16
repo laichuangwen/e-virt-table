@@ -112,6 +112,8 @@ export default class Header {
       this.offsetX = 0;
     });
     this.ctx.on("mousemove", (e) => {
+      // 编辑中不触发mousemove
+      if (this.ctx.editing) return;
       const {
         target,
         config: { RESIZE_COLUMN_MIN_WIDTH = 0 },

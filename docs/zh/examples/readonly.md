@@ -26,9 +26,11 @@
 <iframe src="/readonly/method.html" style="min-height:220px"></iframe>
 :::
 
-## 拓展时间选择
-- 日期、姓名不可编辑，第一行不可编辑，其他都可编辑
-- `config.CELL_READONLY_METHOD`方法控制只读
+## 拓展编辑器（时间选择....等）
+- 组件内部默认只有文本编辑
+- 利用`editorType`、两个`startEdit`、`doneEdit`事件回调及`setItemValueByEditor`更新数据方法可实现拓展任意编辑器
+
+下面例子是拓展了一个时间选择器的demo，其他拓展可参考
 ::: demo
-<iframe src="/readonly/method.html" style="min-height:220px"></iframe>
+<iframe src="/readonly/date.html" style="min-height:220px"></iframe>
 :::

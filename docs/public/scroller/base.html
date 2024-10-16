@@ -23,31 +23,38 @@
           type: "index",
           key: "index",
           width: 100,
+          readonly: true,
         },
         {
           title: "日期",
           key: "date",
+          readonly: true,
         },
         {
           title: "姓名",
           key: "name",
+          readonly: true,
         },
         {
           title: "省份",
           key: "province",
+          readonly: true,
         },
         {
           title: "市区",
           key: "city",
+          readonly: true,
         },
         {
           title: "地址",
           key: "address",
           width: 200,
+          readonly: true,
         },
         {
           title: "邮编",
           key: "zip",
+          readonly: true,
         },
       ];
       let gcData = {};
@@ -56,6 +63,7 @@
           id: i,
           title: `表头${i}`,
           key: `gc_${i}`,
+          readonly: true,
         });
         gcData[`gc_${i}`] = `数据${i}`;
       }

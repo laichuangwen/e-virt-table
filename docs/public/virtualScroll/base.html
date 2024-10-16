@@ -13,39 +13,6 @@
     .content {
       position: relative;
     }
-    .evirt-table-editor {
-      position: absolute;
-      top: -10000px;
-      left: -10000px;
-      text-align: left;
-      line-height: 0;
-      z-index: 100;
-      overflow: hidden;
-      background-color: #fff;
-      border: 2px solid rgb(82, 146, 247);
-      box-sizing: border-box;
-      box-shadow: rgba(0, 0, 0, 0.2) 0px 6px 16px;
-      pointer-events: auto;
-      display: flex;
-      align-items: center;
-    }
-
-    .evirt-table-editor div[contenteditable="true"] {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 8px;
-      outline: none;
-      font-weight: 400;
-      font-size: 12px;
-      color: inherit;
-      white-space: normal;
-      word-wrap: break-word;
-      word-break: break-all;
-      line-height: 18px;
-      margin: 0;
-      background: #fff;
-      cursor: text;
-    }
   </style>
   <body style="margin: 0px">
     <div id="evirt-table-view" class="view">
@@ -58,11 +25,7 @@
         </select>
       </div>
       <div class="content">
-        <!-- <div id="evirt-table" ></div> -->
         <div id="evirt-table"></div>
-        <div id="evirt-table-editor" class="evirt-table-editor">
-          <div id="evirt-table-text" contenteditable="true"></div>
-        </div>
       </div>
     </div>
   </body>
@@ -127,6 +90,17 @@
       };
     }
     const { columns, data } = gcData(1000, 1000);
+    const target = document.getElementById("evirt-table");
+    const grid = new EVirtTable(target, {
+      data,
+      columns,
+      config: {
+        ENABLE_SELECTOR: true,
+        ENABLE_AUTOFILL: true,
+        ENABLE_OFFSET_HEIGHT: true,
+        OFFSET_HEIGHT: 0,
+      },
+    });
     const fullpageBtn = document.getElementById("evirt-table-fullpage-btn");
     fullpageBtn.addEventListener("click", () => {
       const view = document.getElementById("evirt-table-view");
@@ -163,61 +137,6 @@
         const { columns, data } = gcData(10000, 1000);
         grid.loadColumns(columns);
         grid.loadData(data);
-      }
-    });
-    const target = document.getElementById("evirt-table");
-    console.log(EVirtTable);
-
-    const grid = new EVirtTable(target, {
-      data,
-      columns,
-      config: {
-        ENABLE_SELECTOR: true,
-        ENABLE_AUTOFILL: true,
-        ENABLE_OFFSET_HEIGHT: true,
-        OFFSET_HEIGHT: 0,
-      },
-    });
-    grid.on("startEdit", (cell) => {
-      const {
-        clientX = 0,
-        clientY = 0,
-        width = 0,
-        height = 0,
-        padding = 0,
-      } = cell?.getClient() || {};
-      const value = cell.getValue();
-      const editor = document.getElementById("evirt-table-editor");
-      editor.style.left = `${clientX}px`;
-      editor.style.top = `${clientY}px`;
-      const text = document.getElementById("evirt-table-text");
-      text.style.minWidth = `${width}px`;
-      text.style.minHeight = `${height}px`;
-      text.style.padding = `${padding}px`;
-      if (value !== null) {
-        text.innerText = value;
-      }
-      text.focus();
-      const selection = window.getSelection(); // 创建selection
-      selection?.selectAllChildren(text); // 清除选区并选择指定节点的所有子节点
-      selection?.collapseToEnd(); // 光标移至最后
-    });
-    grid.on("doneEdit", (cell) => {
-      const text = document.getElementById("evirt-table-text");
-      const { rowKey, key } = cell;
-      const value = cell.getValue();
-      // !(text.textContent === '' && value === null)剔除点击编辑后未修改会把null变为''的情况
-      if (
-        text.textContent !== value &&
-        !(text.textContent === "" && value === null)
-      ) {
-        grid.setItemValue(rowKey, key, text.textContent, true, true, true);
-      }
-      text.textContent = null;
-      const editor = document.getElementById("evirt-table-editor");
-      if (editor) {
-        editor.style.left = `${-10000}px`;
-        editor.style.top = `${-10000}px`;
       }
     });
   </script>

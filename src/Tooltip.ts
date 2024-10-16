@@ -70,7 +70,7 @@ export default class Tooltip {
       }
     });
     // 开始编辑时隐藏
-    this.ctx.on("startEdit", (e) => {
+    this.ctx.on("startEdit", () => {
       this.hide();
     });
     this.ctx.on("visibleCellHoverChange", (cell) => {

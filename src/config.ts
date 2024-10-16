@@ -91,7 +91,7 @@ export default class Config {
   RESIZE_COLUMN_LINE_COLOR: string = "#e1e6eb";
   RESIZE_ROW_MIN_HEIGHT: number = 36;
   RESIZE_COLUMN_MIN_WIDTH: number = 50;
-  ENABLE_KEYBOARD: boolean = false;
+  ENABLE_KEYBOARD: boolean = true;
   ENABLE_HISTORY: boolean = false;
   ENABLE_VALIDATOR_IMMEDIATE: boolean = true;
   HISTORY_NUM: number = 50;

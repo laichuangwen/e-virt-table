@@ -23,32 +23,10 @@
       display: flex;
       align-items: center;
     }
-
-    .evirt-table-editor div[contenteditable="true"] {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 8px;
-      outline: none;
-      font-weight: 400;
-      font-size: 12px;
-      color: inherit;
-      white-space: normal;
-      word-wrap: break-word;
-      word-break: break-all;
-      line-height: 18px;
-      margin: 0;
-      background: #fff;
-      cursor: text;
-    }
   </style>
   <body style="margin: 0px">
-    <div id="evirt-table" ></div>
+    <div id="evirt-table"></div>
     <div id="evirt-table-editor" class="evirt-table-editor">
-      <div
-        id="evirt-table-text"
-        style="display: none"
-        contenteditable="true"
-      ></div>
       <input id="evirt-table-date" style="display: none" type="date" />
     </div>
   </body>
@@ -91,7 +69,7 @@
       {
         title: "日期",
         key: "date",
-        type: "date",
+        editorType: "date",
       },
       {
         title: "姓名",
@@ -116,6 +94,8 @@
       },
     ];
     const target = document.getElementById("evirt-table");
+    const editorEl = document.getElementById("evirt-table-editor");
+    const dateEl = document.getElementById("evirt-table-date");
     const grid = new EVirtTable(target, {
       data,
       columns,
@@ -125,72 +105,46 @@
       },
     });
     grid.on("startEdit", (cell) => {
-      const dataType = cell.type;
-      const {
-        clientX = 0,
-        clientY = 0,
-        width = 0,
-        height = 0,
-        padding = 0,
-      } = cell?.getClient() || {};
-      const value = cell.getValue();
-      const editor = document.getElementById("evirt-table-editor");
-      editor.style.left = `${clientX}px`;
-      editor.style.top = `${clientY}px`;
-      if (["date"].includes(dataType)) {
-        const el = document.getElementById("evirt-table-date");
-        el.focus();
-        el.style.display = "block";
-        el.style.minWidth = `${width}px`;
-        el.style.minHeight = `${height}px`;
-        el.style.border = 'none';
-        el.value = value;
-      } else {
-        const text = document.getElementById("evirt-table-text");
-        text.style.display = "block";
-        text.style.minWidth = `${width}px`;
-        text.style.minHeight = `${height}px`;
-        text.style.padding = `${padding}px`;
-        if (value !== null) {
-          text.innerText = value;
-        }
-        text.focus();
-        const selection = window.getSelection(); // 创建selection
-        selection?.selectAllChildren(text); // 清除选区并选择指定节点的所有子节点
-        selection?.collapseToEnd(); // 光标移至最后
+      const { width, height, editorType } = cell;
+      // 内部已经处理了文本类型的编辑
+      if (editorType === "text") {
+        return;
+      }
+      const drawX = cell.getDrawX();
+      const drawY = cell.getDrawY();
+      editorEl.style.left = `${drawX}px`;
+      editorEl.style.top = `${drawY}px`;
+      // 日期
+      if (dateEl && ["date"].includes(editorType)) {
+        dateEl.focus();
+        dateEl.setAttribute("data-row-key", cell.rowKey);
+        dateEl.setAttribute("data-key", cell.key);
+        dateEl.style.display = "block";
+        dateEl.style.minWidth = `${width - 1}px`;
+        dateEl.style.minHeight = `${height - 1}px`;
+        dateEl.style.border = "none";
+        dateEl.value = cell.getValue();
       }
     });
     grid.on("doneEdit", (cell) => {
-      const date = document.getElementById("evirt-table-date");
-      date.style.display = "none";
-      const text = document.getElementById("evirt-table-text");
-      text.style.display = "none";
-      const { rowKey, key } = cell;
-      const value = cell.getValue();
-      if (["date"].includes(cell.type)) {
-        grid.setItemValue(rowKey, key, date.value, true, true, true);
-      } else {
-        // !(text.textContent === '' && value === null)剔除点击编辑后未修改会把null变为''的情况
-        if (
-          text.textContent !== value &&
-          !(text.textContent === "" && value === null)
-        ) {
-          grid.setItemValue(
-            rowKey,
-            key,
-            text.textContent,
-            true,
-            true,
-            true
-          );
-          text.textContent = null;
-        }
+      // 内部已经处理了文本类型的编辑
+      if (cell.editorType === "text") {
+        return;
       }
-      const editor = document.getElementById("evirt-table-editor");
-      if (editor) {
-        editor.style.left = `${-10000}px`;
-        editor.style.top = `${-10000}px`;
+      if (["date"].includes(cell.editorType)) {
+        dateEl.style.display = "none";
       }
+      if (editorEl) {
+        editorEl.style.left = `${-10000}px`;
+        editorEl.style.top = `${-10000}px`;
+      }
+    });
+    dateEl.addEventListener("change", function (event) {
+      // 获取 input 元素的新值
+      const newValue = event.target.value;
+      const rowKey = dateEl.getAttribute("data-row-key");
+      const key = dateEl.getAttribute("data-key");
+      grid.setItemValueByEditor(rowKey, key, newValue, true, true);
     });
   </script>
 </html>

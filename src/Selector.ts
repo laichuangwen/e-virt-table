@@ -459,6 +459,10 @@ export default class Selector {
    * @param dir
    */
   private moveFocus(dir: "LEFT" | "TOP" | "RIGHT" | "BOTTOM") {
+    // 编辑状态不处理
+    if (this.ctx.editing) {
+      return;
+    }
     const { focusCell } = this.ctx;
     if (!focusCell) {
       return;

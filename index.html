@@ -23,23 +23,6 @@
       display: flex;
       align-items: center;
     }
-
-    .evirt-table-editor div[contenteditable="true"] {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 8px;
-      outline: none;
-      font-weight: 400;
-      font-size: 12px;
-      color: inherit;
-      white-space: normal;
-      word-wrap: break-word;
-      word-break: break-all;
-      line-height: 18px;
-      margin: 0;
-      background: #fff;
-      cursor: text;
-    }
   </style>
   <body>
     <div id="app">
@@ -47,10 +30,10 @@
         <button id="instantiation">获取实例</button>
         <button id="validator">校验</button>
       </div>
-      <div style="position: relative;">
+      <div style="position: relative">
         <div id="evirt-table"></div>
         <div id="evirt-table-editor" class="evirt-table-editor">
-          <div id="evirt-table-text" contenteditable="true"></div>
+          <input id="evirt-table-date" style="display: none" type="date" />
         </div>
       </div>
     </div>

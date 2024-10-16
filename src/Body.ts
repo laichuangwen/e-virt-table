@@ -167,6 +167,8 @@ export default class Body {
       this.isMouseDown = true;
     });
     this.ctx.on("mousemove", (e) => {
+      // 编辑中不触发mousemove
+      if (this.ctx.editing) return;
       const y = e.offsetY;
       const x = e.offsetX;
       const {
@@ -275,10 +277,7 @@ export default class Body {
       fixedRightWidth !== SCROLLER_TRACK_SIZE
     ) {
       const x =
-        header.width -
-        (this.x + this.width) +
-        target.width -
-        fixedRightWidth;
+        header.width - (this.x + this.width) + target.width - fixedRightWidth;
       this.ctx.paint.drawShadow(x + 0.5, this.y, fixedRightWidth, this.height, {
         fillColor: HEADER_BG_COLOR,
         side: "left",
