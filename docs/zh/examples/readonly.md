@@ -34,3 +34,11 @@
 ::: demo
 <iframe src="/readonly/date.html" style="min-height:220px"></iframe>
 :::
+
+## 方法控制编辑器类型
+- 更改key=date&&rowIndex=text为text类型
+::: demo
+<iframe src="/readonly/editType-method.html" style="min-height:220px"></iframe>
+:::
+
+从上面的例子可以实现同一列可以支持很多编辑器类型而不是固定的。

@@ -1,6 +1,6 @@
 # 键盘事件
 
-- `config.ENABLE_KEYBOARD`为`true`即开启键盘事件，只支持全部启用或全部禁用，默认是禁用的
+- `config.ENABLE_KEYBOARD`为`true`即开启键盘事件，只支持全部启用或全部禁用，默认是启用
 
 | 操作                          | Windows 快捷键       | Mac 快捷键           |
 | ----------------------------- | -------------------- | -------------------- |
@@ -17,7 +17,7 @@
 | 恢复操作                      | `Ctrl + Y` 或 `Ctrl + Shift + Z` | `Command + Shift + Z` |
 ## 启用
 
-- `config.ENABLE_KEYBOARD`为`true`默认是禁用的
+- `config.ENABLE_KEYBOARD`为`true`默认是启用的
 ::: demo
 <iframe src="/keyboard/enable.html" style="min-height:220px"></iframe>
 :::

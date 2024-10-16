@@ -19,6 +19,16 @@
 | ------------------ | ------------ | --------------------------------------------------- |
 | resizeColumnChange | 表头调整回调 | `({colIndex, key, oldWidth, width,column,columns})` |
 
+## 总宽度
+
+- WIDTH=0 为自适应
+- WIDTH 设置超过总长度,超过部分会平均填充到每一列中
+
+::: demo
+
+<iframe src="/width/width.html" style="min-height:220px"></iframe>
+:::
+
 ## 默认宽度
 
 - 不设置 width 默认是 100
