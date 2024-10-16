@@ -1,7 +1,8 @@
-# 键盘事件
+# 回滚历史
 
-注意：历史回退会触发`change`事件
-
+注意：
+- 历史回退会触发`change`事件
+- 回滚历史会记录上次更改数据的滚动条位置
 - `config.ENABLE_HISTORY`为`true`开始可历史回退，默认是开开启的
 - `config.HISTORY_NUM`为历史栈数量，默认 50
 

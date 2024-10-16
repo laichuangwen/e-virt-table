@@ -14,10 +14,14 @@ export default class Tooltip {
       TOOLTIP_TEXT_COLOR,
       TOOLTIP_ZINDEX,
       TOOLTIP_CUSTOM_STYLE,
+      CSS_PREFIX,
     } = this.ctx.config;
     this.contentEl = document.createElement("div");
     this.arrowEl = document.createElement("div");
     this.floatingEl = document.createElement("div");
+    this.floatingEl.className = `${CSS_PREFIX}-tooltip`;
+    this.contentEl.className = `${CSS_PREFIX}-tooltip-content`;
+    this.arrowEl.className = `${CSS_PREFIX}-tooltip-arrow`;
     const floatingStyle = {
       display: "none",
       position: "absolute",
@@ -69,7 +73,7 @@ export default class Tooltip {
     this.ctx.on("startEdit", (e) => {
       this.hide();
     });
-    this.ctx.on("cellHoverChange", (cell) => {
+    this.ctx.on("visibleCellHoverChange", (cell) => {
       // 有移除或者有错误message时显示
       if (cell.ellipsis || cell.message) {
         this.show(cell);

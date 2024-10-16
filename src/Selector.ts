@@ -499,9 +499,11 @@ export default class Selector {
         return;
       }
       this.ctx.setFocusCell(cell);
+      console.log("cell", cell.rowIndex, cell.colIndex);
     }
     this.setSelector(xArr, yArr);
     this.adjustBoundaryPosition();
+    this.ctx.emit("draw");
   }
 
   /**

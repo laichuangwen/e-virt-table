@@ -172,6 +172,7 @@ export default class EventTable {
           ) {
             // selection移入移除事件
             this.imageEnterAndLeave(cell, e);
+            this.ctx.emit("visibleCellHoverChange", cell, e);
           }
           if (
             x > layerX &&

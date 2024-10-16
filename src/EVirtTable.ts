@@ -42,7 +42,6 @@ export default class VirtTable {
     this.autofill = new Autofill(this.ctx);
     this.tooltip = new Tooltip(this.ctx);
     this.editor = new Editor(this.ctx);
-    console.log(this.ctx);
     // 外层容器样式
     const {
       config: { BORDER_COLOR, BORDER_RADIUS, WIDTH = 0, HEIGHT = 0 },
@@ -61,9 +60,6 @@ export default class VirtTable {
   draw() {
     requestAnimationFrame(() => {
       this.ctx.targetRect = this.target.getBoundingClientRect();
-      console.log(this.target.width, this.ctx.targetRect.width);
-
-      console.time("draw");
       this.header.update();
       this.footer.update();
       this.body.update();
@@ -72,7 +68,6 @@ export default class VirtTable {
       this.footer.draw();
       this.header.draw();
       this.scroller.draw();
-      console.timeEnd("draw");
     });
   }
   loadConfig(_config: ConfigType) {
