@@ -103,7 +103,7 @@
       },
     ];
     // 合并50行数据,看虚拟滚动错位
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 10; i++) {
       data.push({
         id: 10 + i,
         date: "2016-05-05",
@@ -118,33 +118,26 @@
       {
         title: "日期",
         key: "date",
-        readonly: true,
       },
       {
         title: "姓名",
         key: "name",
-        readonly: true,
       },
       {
-        title: "省份",
-        key: "province",
-        readonly: true,
+        title: "数值1",
+        key: "num1",
       },
       {
-        title: "市区",
-        key: "city",
-        readonly: true,
+        title: "数值2",
+        key: "num2",
       },
       {
-        title: "地址",
-        key: "address",
-        readonly: true,
-        width: 200,
+        title: "数值3",
+        key: "num3",
       },
       {
-        title: "邮编",
-        key: "zip",
-        readonly: true,
+        title: "数值4",
+        key: "num4",
       },
     ];
     const target = document.getElementById("evirt-table");
@@ -210,20 +203,28 @@
       columns,
       config: {
         HEIGHT: 400,
+        ENABLE_SELECTOR: true,
+        ENABLE_AUTOFILL: true,
+        ENABLE_HISTORY: true,
         SPAN_METHOD: (params) => {
-          const { colIndex, rowIndex } = params;
-          if (colIndex === 0) {
-            if (rowIndex % 2 === 0) {
-              return {
-                rowspan: 2,
-                colspan: 1,
-              };
-            } else {
+          const { colIndex, rowIndex, column, row, visibleLeafColumns } =
+            params;
+          if (column.key === "date") {
+            // 合并行单元格
+            return mergeRowCell(params, "date");
+          }
+          if (colIndex > 1) {
+            const spanObj = getSpanObjByColumn(row, visibleLeafColumns);
+            if (spanObj[column.key] === 0) {
               return {
                 rowspan: 0,
                 colspan: 0,
               };
             }
+            return {
+              rowspan: 1,
+              colspan: spanObj[column.key],
+            };
           }
         },
       },

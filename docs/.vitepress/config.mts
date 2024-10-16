@@ -51,6 +51,7 @@ export default defineConfig({
               { text: "溢出提示", link: "/zh/examples/tooltip" },
               { text: "多级表头", link: "/zh/examples/level" },
               { text: "footer合计", link: "/zh/examples/footer" },
+              { text: "单元格合并", link: "/zh/examples/span" },
               { text: "单元格编辑", link: "/zh/examples/readonly" },
               { text: "单元格选择", link: "/zh/examples/selector" },
               { text: "单元格填充", link: "/zh/examples/autofill" },

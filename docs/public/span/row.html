@@ -148,77 +148,22 @@
       },
     ];
     const target = document.getElementById("evirt-table");
-    // 获取合并单元格的spanArr,针对行数据相同key合并
-    const getSpanArrByRow = function (list, key) {
-      let contactDot = 0;
-      const spanArr = [];
-      list.forEach((item, index) => {
-        if (index === 0) {
-          spanArr.push(1);
-        } else {
-          if (item[key] === list[index - 1][key]) {
-            spanArr[contactDot] += 1;
-            spanArr.push(0);
-          } else {
-            spanArr.push(1);
-            contactDot = index;
-          }
-        }
-      });
-      return spanArr;
-    };
-    const getSpanObjByColumn = (row, columns) => {
-      let keyPre = "";
-      let keyDot = "";
-      const spanObj = {};
-      columns.forEach((item, index) => {
-        if (index === 0) {
-          keyPre = item.key;
-          keyDot = item.key;
-          spanObj[item.key] = 1;
-        } else {
-          // eslint-disable-next-line no-undef
-          if (row[item.key] === row[keyPre]) {
-            spanObj[item.key] = 0;
-            spanObj[keyDot] += 1;
-          } else {
-            spanObj[item.key] = 1;
-            keyPre = item.key;
-            keyDot = item.key;
-          }
-        }
-      });
-      return spanObj;
-    };
-    const mergeRowCell = function (data, key) {
-      // 合并单元格
-      const { visibleRows, rowIndex, headIndex } = data;
-      const spanArr = getSpanArrByRow(visibleRows, key);
-      if (spanArr[rowIndex - headIndex] === 0) {
-        return {
-          rowspan: 0,
-          colspan: 0,
-        };
-      }
-      return {
-        rowspan: spanArr[rowIndex - headIndex],
-        colspan: 1,
-      };
-    };
     const grid = new EVirtTable(target, {
       data,
       columns,
       config: {
-        HEIGHT: 400,
+        HEIGHT:400,
+        ENABLE_SELECTOR: true,
         SPAN_METHOD: (params) => {
-          const { colIndex, rowIndex } = params;
-          if (colIndex === 0) {
-            if (rowIndex % 2 === 0) {
+          const { colIndex, rowIndex, column, row, visibleLeafColumns } =
+            params;
+          if (rowIndex % 2 === 0) {
+            if (colIndex === 0) {
               return {
-                rowspan: 2,
-                colspan: 1,
+                rowspan: 1,
+                colspan: 2,
               };
-            } else {
+            } else if (colIndex === 1) {
               return {
                 rowspan: 0,
                 colspan: 0,

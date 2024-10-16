@@ -7,7 +7,7 @@
   </head>
   <script src="../index.umd.js"></script>
   <body>
-    <div id="evirt-table"></div>
+    <div id="evirt-table" ></div>
   </body>
   <script>
     let data = [
@@ -116,6 +116,12 @@
     }
     let columns = [
       {
+        type: "selection",
+        key: "selection",
+        width: 50,
+        readonly: true,
+      },
+      {
         title: "日期",
         key: "date",
         readonly: true,
@@ -167,29 +173,6 @@
       });
       return spanArr;
     };
-    const getSpanObjByColumn = (row, columns) => {
-      let keyPre = "";
-      let keyDot = "";
-      const spanObj = {};
-      columns.forEach((item, index) => {
-        if (index === 0) {
-          keyPre = item.key;
-          keyDot = item.key;
-          spanObj[item.key] = 1;
-        } else {
-          // eslint-disable-next-line no-undef
-          if (row[item.key] === row[keyPre]) {
-            spanObj[item.key] = 0;
-            spanObj[keyDot] += 1;
-          } else {
-            spanObj[item.key] = 1;
-            keyPre = item.key;
-            keyDot = item.key;
-          }
-        }
-      });
-      return spanObj;
-    };
     const mergeRowCell = function (data, key) {
       // 合并单元格
       const { visibleRows, rowIndex, headIndex } = data;
@@ -209,21 +192,17 @@
       data,
       columns,
       config: {
-        HEIGHT: 400,
+        CHECKBOX_KEY: "date",
+        ENABLE_SELECTOR: true,
         SPAN_METHOD: (params) => {
-          const { colIndex, rowIndex } = params;
-          if (colIndex === 0) {
-            if (rowIndex % 2 === 0) {
-              return {
-                rowspan: 2,
-                colspan: 1,
-              };
-            } else {
-              return {
-                rowspan: 0,
-                colspan: 0,
-              };
-            }
+          const { colIndex, column, row, visibleLeafColumns } = params;
+          if (column.key === "date") {
+            // 合并行单元格
+            return mergeRowCell(params, "date");
+          }
+          if (column.key === "selection") {
+            // 合并行单元格
+            return mergeRowCell(params, "date");
           }
         },
       },
