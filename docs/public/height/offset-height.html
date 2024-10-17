@@ -6,9 +6,28 @@
     <title>evirt-table</title>
   </head>
   <script src="../index.umd.js"></script>
-  <body>
-    <button id="add-row-btn">添加数据</button>
-    <div id="evirt-table"></div>
+  <style>
+    body {
+      overflow: hidden;
+      padding: 8px;
+    }
+    .view:fullscreen {
+      background-color: white;
+    }
+    .content {
+      position: relative;
+    }
+  </style>
+  <body style="margin: 0px">
+    <div id="evirt-table-view" class="view">
+      <div style="margin-bottom: 8px">
+        <button id="evirt-table-fullpage-btn">全屏</button>
+        <button id="add-row-btn">添加数据</button>
+      </div>
+      <div class="content">
+        <div id="evirt-table"></div>
+      </div>
+    </div>
   </body>
   <script>
     let data = [
@@ -81,6 +100,26 @@
     const grid = new EVirtTable(target, {
       data,
       columns,
+      config: {
+        ENABLE_OFFSET_HEIGHT: true,
+        OFFSET_HEIGHT: 16, // 距离底部距离
+      },
+    });
+    const fullpageBtn = document.getElementById("evirt-table-fullpage-btn");
+    fullpageBtn.addEventListener("click", () => {
+      const view = document.getElementById("evirt-table-view");
+      if (view.requestFullscreen) {
+        view.requestFullscreen();
+      } else if (view.mozRequestFullScreen) {
+        // Firefox
+        view.mozRequestFullScreen();
+      } else if (view.webkitRequestFullscreen) {
+        // Chrome, Safari, Opera
+        view.webkitRequestFullscreen();
+      } else if (view.msRequestFullscreen) {
+        // IE/Edge
+        view.msRequestFullscreen();
+      }
     });
     // 添加数据的函数
     function addRow() {

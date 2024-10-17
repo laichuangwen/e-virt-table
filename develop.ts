@@ -207,114 +207,114 @@ const columns: any[] = [
     readonly: false,
     width: 100,
   },
-  {
-    title: "性别",
-    key: "sex",
-    // readonly: false,
-    // fixed: "right",
-    // render: "sex",
-    rules: {
-      required: true,
-      message: "该项必填哦！",
-    },
-  },
-  {
-    title: "计薪月份",
-    size: "small",
-    // fixed: "right",
-    key: "salary_month",
-    type: "month",
-    align: "right",
-    width: 200,
-  },
-  {
-    title: "出生日期",
-    size: "small",
-    key: "birthday",
-    editorType: "date",
-  },
-  {
-    title: "家庭地址",
-    key: "address",
-    align: "left",
-    width: 250,
-    overflowTooltipShow: true,
-    overflowTooltipWidth: 200,
-    overflowTooltipPlacement: "top",
-    rules: {
-      required: true,
-      message: "该项必填哦！",
-    },
-  },
-  {
-    title: "请假开始时间",
-    size: "small",
-    key: "start_dt",
-    type: "datetime",
-  },
-  {
-    title: "物料编码",
-    key: "materialNo",
-    align: "right",
-    formatter({ value }: { value: string }) {
-      if (!value) {
-        return "";
-      }
-      const v = parseFloat(value);
-      return v.toFixed(2);
-    },
-  },
-  {
-    title: "数量",
-    key: "requiredQuantity",
-    type: "number",
-    align: "right",
-  },
-  { title: "单位", key: "unit" },
-  { title: "工作性质", key: "work_type" },
-  { title: "工作状态", key: "work_status" },
-  { title: "户籍城市", key: "household_city" },
-  { title: "户籍地址", key: "household_address" },
-  { title: "民族", key: "nation" },
-  { title: "工作地址", size: "small", key: "work_address" },
-  {
-    title: "工作邮箱",
-    size: "small",
-    key: "work_email",
-    // rule: {
-    //   required: true, message: '请输入邮箱地址'
-    // },
-  },
-  { title: "个人邮箱", size: "small", key: "email" },
-  {
-    title: "工龄",
-    key: "work_age",
-  },
-  { title: "司龄", key: "company_age" },
-  { title: "合同公司", size: "small", key: "contract_company" },
-  { title: "qq号", key: "qq" },
-  { title: "年龄", key: "age" },
-  { title: "品牌", key: "brandName" },
-  { title: "商品名称", key: "goodsName" },
-  { title: "规格型号", key: "sn", slotName: "sn" },
-  { title: "客户备注", key: "customerRemarks", size: "small" },
-  {
-    title: "采购价(元)",
-    key: "purchasePrice",
-    type: "number",
-  },
-  {
-    title: "销售价(元)",
-    key: "salePrice",
-    type: "number",
-    readonly: true,
-    slotName: "salePrice",
-  },
-  {
-    title: "操作",
-    key: "hander",
-    slotName: "hander",
-  },
+  // {
+  //   title: "性别",
+  //   key: "sex",
+  //   // readonly: false,
+  //   // fixed: "right",
+  //   // render: "sex",
+  //   rules: {
+  //     required: true,
+  //     message: "该项必填哦！",
+  //   },
+  // },
+  // {
+  //   title: "计薪月份",
+  //   size: "small",
+  //   // fixed: "right",
+  //   key: "salary_month",
+  //   type: "month",
+  //   align: "right",
+  //   width: 200,
+  // },
+  // {
+  //   title: "出生日期",
+  //   size: "small",
+  //   key: "birthday",
+  //   editorType: "date",
+  // },
+  // {
+  //   title: "家庭地址",
+  //   key: "address",
+  //   align: "left",
+  //   width: 250,
+  //   overflowTooltipShow: true,
+  //   overflowTooltipWidth: 200,
+  //   overflowTooltipPlacement: "top",
+  //   rules: {
+  //     required: true,
+  //     message: "该项必填哦！",
+  //   },
+  // },
+  // {
+  //   title: "请假开始时间",
+  //   size: "small",
+  //   key: "start_dt",
+  //   type: "datetime",
+  // },
+  // {
+  //   title: "物料编码",
+  //   key: "materialNo",
+  //   align: "right",
+  //   formatter({ value }: { value: string }) {
+  //     if (!value) {
+  //       return "";
+  //     }
+  //     const v = parseFloat(value);
+  //     return v.toFixed(2);
+  //   },
+  // },
+  // {
+  //   title: "数量",
+  //   key: "requiredQuantity",
+  //   type: "number",
+  //   align: "right",
+  // },
+  // { title: "单位", key: "unit" },
+  // { title: "工作性质", key: "work_type" },
+  // { title: "工作状态", key: "work_status" },
+  // { title: "户籍城市", key: "household_city" },
+  // { title: "户籍地址", key: "household_address" },
+  // { title: "民族", key: "nation" },
+  // { title: "工作地址", size: "small", key: "work_address" },
+  // {
+  //   title: "工作邮箱",
+  //   size: "small",
+  //   key: "work_email",
+  //   // rule: {
+  //   //   required: true, message: '请输入邮箱地址'
+  //   // },
+  // },
+  // { title: "个人邮箱", size: "small", key: "email" },
+  // {
+  //   title: "工龄",
+  //   key: "work_age",
+  // },
+  // { title: "司龄", key: "company_age" },
+  // { title: "合同公司", size: "small", key: "contract_company" },
+  // { title: "qq号", key: "qq" },
+  // { title: "年龄", key: "age" },
+  // { title: "品牌", key: "brandName" },
+  // { title: "商品名称", key: "goodsName" },
+  // { title: "规格型号", key: "sn", slotName: "sn" },
+  // { title: "客户备注", key: "customerRemarks", size: "small" },
+  // {
+  //   title: "采购价(元)",
+  //   key: "purchasePrice",
+  //   type: "number",
+  // },
+  // {
+  //   title: "销售价(元)",
+  //   key: "salePrice",
+  //   type: "number",
+  //   readonly: true,
+  //   slotName: "salePrice",
+  // },
+  // {
+  //   title: "操作",
+  //   key: "hander",
+  //   slotName: "hander",
+  // },
 ];
 let data: any[] = [];
 for (let i = 0; i < 700; i += 1) {
@@ -459,6 +459,8 @@ const eVirtTable = new EVirtTable(canvas, {
       },
     ],
     WIDTH: 0,
+    ENABLE_OFFSET_WIDTH: false,
+    OFFSET_WIDTH: 8,
     HEIGHT: 500,
     CHECKBOX_KEY: "emp_name",
     // CELL_HEIGHT: 28,

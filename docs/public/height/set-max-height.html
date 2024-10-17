@@ -81,6 +81,11 @@
     const grid = new EVirtTable(target, {
       data,
       columns,
+      config: {
+        // 注意两个高度都设置为 0，表示没有滚动条这样水平不会虚拟滚动
+        HEIGHT: 0,
+        MAX_HEIGHT: 0,
+      },
     });
     // 添加数据的函数
     function addRow() {

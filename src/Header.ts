@@ -35,7 +35,13 @@ export default class Header {
   }
   init() {
     const {
-      config: { HEADER_HEIGHT = 0, SCROLLER_TRACK_SIZE = 0 },
+      target,
+      config: {
+        HEADER_HEIGHT,
+        SCROLLER_TRACK_SIZE,
+        ENABLE_OFFSET_WIDTH,
+        OFFSET_WIDTH,
+      },
     } = this.ctx;
     const columns = this.ctx.database.getColumns();
     this.columns = columns;

@@ -52,6 +52,13 @@ export default class VirtTable {
       "style",
       `outline: none; position: relative; border-radius: ${BORDER_RADIUS}px; border: 1px solid ${BORDER_COLOR};`
     );
+    const { ENABLE_OFFSET_WIDTH, OFFSET_WIDTH } = this.ctx.config;
+    if (ENABLE_OFFSET_WIDTH) {
+      const { left } = target.getBoundingClientRect();
+      const windowInnerWidth = window.innerWidth;
+      const targetWidth = windowInnerWidth - left - OFFSET_WIDTH;
+      this.ctx.target.width = targetWidth;
+    }
     //
     this.header.update();
     const { header } = this.ctx;
@@ -59,7 +66,6 @@ export default class VirtTable {
       const overWidth = header.visibleWidth - header.width;
       const diff =
         Math.floor((overWidth / header.leafCellHeaders.length) * 100) / 100;
-      console.log(diff);
       this.header.resizeAllColumn(diff);
     }
     this.ctx.on("draw", this.draw.bind(this));

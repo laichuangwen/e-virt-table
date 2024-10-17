@@ -81,6 +81,9 @@
     const grid = new EVirtTable(target, {
       data,
       columns,
+      config: {
+        MAX_HEIGHT: 400,
+      },
     });
     // 添加数据的函数
     function addRow() {

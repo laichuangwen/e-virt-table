@@ -28,6 +28,8 @@ export default class Config {
   BODY_LINE_HEIGHT: number = 1.2;
   BORDER_COLOR: string = "#e1e6eb";
   WIDTH: number = 0;
+  ENABLE_OFFSET_WIDTH: boolean = true;
+  OFFSET_WIDTH: number = 0;
   HEIGHT: number = 0;
   EMPTY_BODY_HEIGHT: number = 120;
   MAX_HEIGHT: number = 1000;
