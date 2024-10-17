@@ -68,15 +68,12 @@ export default class Footer {
     }
     // 右边阴影
     if (
-      scrollX < header.width - header.visibleWidth &&
+      scrollX < Math.floor(header.width - header.visibleWidth - 1) &&
       fixedRightWidth !== SCROLLER_TRACK_SIZE
     ) {
       const x =
-        header.width -
-        (this.x + this.width) +
-        target.width -
-        fixedRightWidth;
-      this.ctx.paint.drawShadow(x + 0.5, y, fixedRightWidth, this.height, {
+        header.width - (this.x + this.width) + target.width - fixedRightWidth;
+      this.ctx.paint.drawShadow(x + 1, y, fixedRightWidth, this.height, {
         fillColor: HEADER_BG_COLOR,
         side: "left",
         shadowWidth: 4,

@@ -35,7 +35,6 @@ export default class Body {
         BORDER_COLOR,
         BORDER_RADIUS,
         HEIGHT,
-        WIDTH,
         EMPTY_BODY_HEIGHT = 0,
         MAX_HEIGHT = 0,
         ENABLE_OFFSET_HEIGHT = 0,
@@ -52,23 +51,9 @@ export default class Body {
     this.height = sumHeight;
     // 更新数据
     this.data = data;
-    const { left, top } = target.getBoundingClientRect();
+    const { top } = target.getBoundingClientRect();
     // 更新宽度
     this.width = header.width;
-    const windowInnerWidth = window.innerWidth;
-    const visibleWidth =
-      target.parentElement?.clientWidth || windowInnerWidth - left;
-    const containerWidth = this.width + SCROLLER_TRACK_SIZE;
-    let stageWidth = 0;
-    if (WIDTH) {
-      stageWidth = WIDTH;
-    } else if (containerWidth > visibleWidth) {
-      stageWidth = visibleWidth;
-    } else {
-      stageWidth = containerWidth;
-    }
-    // 更新窗口高度
-    target.width = stageWidth;
     this.visibleWidth = target.width - SCROLLER_TRACK_SIZE;
     // 底部高度
     const footerHeight = this.ctx.footer.height;
@@ -104,16 +89,9 @@ export default class Body {
     } else {
       stageHeight = containerHeight;
     }
-    // 外层容器样式
-    target.setAttribute(
-      "style",
-      `outline: none; position: relative; border-radius: ${BORDER_RADIUS}px; border: 1px solid ${BORDER_COLOR}; height:${stageHeight}px;width:${
-        stageWidth - 1
-      }px;`
-    );
     // 更新窗口高度
     if (stageHeight > 0) {
-      target.height = stageHeight;
+      this.ctx.target.height = stageHeight;
     }
     // 可视区高度
     let _visibleHeight = target.height - header.height - SCROLLER_TRACK_SIZE;
@@ -130,6 +108,13 @@ export default class Body {
     this.ctx.body.visibleWidth = this.visibleWidth;
     this.ctx.body.visibleHeight = this.visibleHeight;
     this.ctx.body.data = data;
+    // 外层容器样式
+    this.ctx.target.setAttribute(
+      "style",
+      `outline: none; position: relative; border-radius: ${BORDER_RADIUS}px; border: 1px solid ${BORDER_COLOR}; height:${
+        this.ctx.target.height
+      }px;width:${this.ctx.target.width - 1}px;`
+    );
   }
   // 调整行的高度
   private initResizeRow() {
@@ -273,12 +258,12 @@ export default class Body {
     }
     // 右边阴影
     if (
-      scrollX < header.width - header.visibleWidth &&
+      scrollX < Math.floor(header.width - header.visibleWidth - 1) &&
       fixedRightWidth !== SCROLLER_TRACK_SIZE
     ) {
       const x =
         header.width - (this.x + this.width) + target.width - fixedRightWidth;
-      this.ctx.paint.drawShadow(x + 0.5, this.y, fixedRightWidth, this.height, {
+      this.ctx.paint.drawShadow(x + 1, this.y, fixedRightWidth, this.height, {
         fillColor: HEADER_BG_COLOR,
         side: "left",
         shadowWidth: 4,

@@ -51,7 +51,7 @@ export default class BaseCell {
     if (this.fixed === "right") {
       // 可见区域宽度 -到右边界的距离即(表头宽度 - x坐标)
       const x = this.ctx.header.visibleWidth - (this.ctx.header.width - this.x);
-      return x;
+      return x + 1; // +1是为了避免右边界的线被覆盖
     }
     return this.x - this.ctx.scrollX;
   }

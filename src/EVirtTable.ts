@@ -42,40 +42,11 @@ export default class VirtTable {
     this.autofill = new Autofill(this.ctx);
     this.tooltip = new Tooltip(this.ctx);
     this.editor = new Editor(this.ctx);
-    // 外层容器样式
-    const {
-      config: { BORDER_COLOR, BORDER_RADIUS, WIDTH = 0, HEIGHT = 0 },
-    } = this.ctx;
-    this.target.width = WIDTH - 1;
-    this.target.height = HEIGHT - 1;
-    this.target.setAttribute(
-      "style",
-      `outline: none; position: relative; border-radius: ${BORDER_RADIUS}px; border: 1px solid ${BORDER_COLOR};`
-    );
-    const { ENABLE_OFFSET_WIDTH, OFFSET_WIDTH } = this.ctx.config;
-    if (ENABLE_OFFSET_WIDTH) {
-      const { left } = target.getBoundingClientRect();
-      const windowInnerWidth = window.innerWidth;
-      const targetWidth = windowInnerWidth - left - OFFSET_WIDTH;
-      this.ctx.target.width = targetWidth;
-    }
-    //
-    this.header.update();
-    const { header } = this.ctx;
-    if (header.width < header.visibleWidth) {
-      const overWidth = header.visibleWidth - header.width;
-      const diff =
-        Math.floor((overWidth / header.leafCellHeaders.length) * 100) / 100;
-      this.header.resizeAllColumn(diff);
-    }
     this.ctx.on("draw", this.draw.bind(this));
-    // 更新targetRect
-    this.ctx.targetRect = this.target.getBoundingClientRect();
     this.draw();
   }
   draw() {
     requestAnimationFrame(() => {
-      this.ctx.targetRect = this.target.getBoundingClientRect();
       this.header.update();
       this.footer.update();
       this.body.update();

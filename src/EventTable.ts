@@ -5,6 +5,7 @@ import { ExpandLazyMethod } from "./types";
 
 export default class EventTable {
   ctx: Context;
+  private visibleHoverCell?: Cell;
   private resizeObserver!: ResizeObserver;
   constructor(ctx: Context) {
     this.ctx = ctx;
@@ -13,8 +14,8 @@ export default class EventTable {
   private init(): void {
     // 监听窗口大小变化
     this.resizeObserver = new ResizeObserver(() => {
+      this.ctx.emit("resetHeader");
       this.ctx.emit("resizeObserver");
-      this.ctx.emit("draw");
     });
     if (this.ctx.target.parentElement) {
       this.resizeObserver.observe(this.ctx.target);
@@ -172,7 +173,12 @@ export default class EventTable {
           ) {
             // selection移入移除事件
             this.imageEnterAndLeave(cell, e);
-            this.ctx.emit("visibleCellHoverChange", cell, e);
+            //  this.ctx.emit("visibleCellHoverChange", cell, e);
+            if (this.visibleHoverCell !== cell) {
+              this.ctx.emit("visibleCellMouseleave", cell, e);
+              this.visibleHoverCell = cell;
+              this.ctx.emit("visibleCellHoverChange", cell, e);
+            }
           }
           if (
             x > layerX &&

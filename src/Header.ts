@@ -1,8 +1,9 @@
 import Context from "./Context";
-import { getMaxRow, calCrossSpan, toLeaf, sortFixed } from "./util";
+import { getMaxRow, calCrossSpan, toLeaf, sortFixed, throttle } from "./util";
 import CellHeader from "./CellHeader";
 import type { Column } from "./types";
 export default class Header {
+  private targetRect: DOMRect;
   private ctx: Context; // 上下文
   private x = 0; // x坐标
   private y = 0; // y坐标
@@ -28,20 +29,22 @@ export default class Header {
   private renderFixedCellHeaders: CellHeader[] = [];
   constructor(ctx: Context) {
     this.ctx = ctx;
+    this.targetRect = this.ctx.target.getBoundingClientRect();
+    // 监听表头重置,窗口变化
+    this.ctx.on(
+      "resetHeader",
+      throttle(() => {
+        this.init();
+        this.ctx.emit("draw");
+      }, 100)
+    );
     this.init();
     // 初始化调整列大小ENABLE_RESIZE_COLUMN
     this.initResizeColumn();
-    // this.resizeAllColumn(100);
   }
   init() {
     const {
-      target,
-      config: {
-        HEADER_HEIGHT,
-        SCROLLER_TRACK_SIZE,
-        ENABLE_OFFSET_WIDTH,
-        OFFSET_WIDTH,
-      },
+      config: { HEADER_HEIGHT, SCROLLER_TRACK_SIZE },
     } = this.ctx;
     const columns = this.ctx.database.getColumns();
     this.columns = columns;
@@ -53,6 +56,9 @@ export default class Header {
     const maxHeaderRow = getMaxRow(columns);
     const leafColumns = toLeaf(columns);
     this.height = HEADER_HEIGHT * maxHeaderRow;
+    const targetContainer = this.ctx.targetContainer.getBoundingClientRect();
+    this.ctx.target.width = targetContainer.width;
+    this.visibleWidth = this.ctx.target.width - SCROLLER_TRACK_SIZE;
     this.width = leafColumns.reduce(
       (sum, _item) => sum + (_item?.width || 100),
       0
@@ -62,6 +68,15 @@ export default class Header {
     this.columnIndex = 0;
     this.render(spanColumns, 0);
     this.ctx.database.updateColIndexKeyMap(this.leafCellHeaders);
+    // 如果表头宽度小于可视宽度，平均分配
+    if (this.visibleWidth > this.width) {
+      const overWidth = this.visibleWidth - this.width;
+      const resizeNum = this.leafCellHeaders.filter(
+        (item) => !item.widthFillDisable
+      ).length;
+      const diff = Math.floor((overWidth / resizeNum) * 100) / 100;
+      this.resizeAllColumn(diff);
+    }
     const leafLeftCellHeaders = this.fixedLeftCellHeaders.filter(
       (item) => !item.hasChildren
     );
@@ -83,6 +98,7 @@ export default class Header {
     this.ctx.header.y = this.y;
     this.ctx.header.width = this.width;
     this.ctx.header.height = this.height;
+    this.ctx.header.visibleWidth = this.visibleWidth;
     this.ctx.header.visibleHeight = this.visibleHeight;
   }
   // 调整表头的宽度
@@ -192,9 +208,12 @@ export default class Header {
     // 如果表头宽度小于可视宽度，平均分配
     if (this.width < this.visibleWidth) {
       const overWidth = this.visibleWidth - this.width;
-      overFiff =
-        Math.floor((overWidth / this.leafCellHeaders.length) * 100) / 100;
+      const resizeNum = this.leafCellHeaders.filter(
+        (item) => !item.widthFillDisable
+      ).length;
+      overFiff = Math.floor((overWidth / resizeNum) * 100) / 100;
       this.resizeAllColumn(overFiff);
+      this.ctx.emit("draw");
     }
     this.ctx.emit("resizeColumnChange", {
       colIndex: cell.colIndex,
@@ -206,11 +225,17 @@ export default class Header {
     });
   }
   resizeAllColumn(fellWidth: number) {
+    if (fellWidth === 0) return;
     const widthMap = new Map();
     // 存需要更改的宽度
     for (const col of this.allCellHeaders) {
-      const width = col.width + fellWidth * col.colspan;
-      widthMap.set(col.key, width);
+      if (col.widthFillDisable) {
+        // 不允许调整宽度
+        widthMap.set(col.key, col.width);
+      } else {
+        const width = col.width + fellWidth * col.colspan;
+        widthMap.set(col.key, width);
+      }
     }
     // 递归更改宽度
     const uptateWidth = (columns: Column[]) => {
@@ -226,7 +251,7 @@ export default class Header {
     uptateWidth(this.columns);
     this.ctx.database.setColumns(this.columns);
     this.init();
-    this.ctx.emit("draw");
+    // this.ctx.emit("draw");
   }
 
   private render(arr: Column[], originX: number) {
@@ -308,12 +333,12 @@ export default class Header {
     }
     // 右边阴影
     if (
-      scrollX < header.width - header.visibleWidth &&
+      scrollX < Math.floor(header.width - header.visibleWidth - 1) &&
       fixedRightWidth !== SCROLLER_TRACK_SIZE
     ) {
       const x =
         header.width - (this.x + this.width) + target.width - fixedRightWidth;
-      this.ctx.paint.drawShadow(x + 0.5, this.y, fixedRightWidth, this.height, {
+      this.ctx.paint.drawShadow(x + 1, this.y, fixedRightWidth, this.height, {
         fillColor: HEADER_BG_COLOR,
         side: "left",
         shadowWidth: 4,
@@ -354,14 +379,8 @@ export default class Header {
     this.visibleLeafColumns = this.renderLeafCellHeaders.map(
       (item) => item.column
     );
-    const {
-      config: { SCROLLER_TRACK_SIZE = 0 },
-      target,
-    } = this.ctx;
-    this.visibleWidth = target.width - SCROLLER_TRACK_SIZE;
+
     this.ctx.header.visibleLeafColumns = this.visibleLeafColumns;
-    this.ctx.header.visibleWidth = this.visibleWidth;
-    this.ctx.header.visibleHeight = this.visibleHeight;
     this.ctx.header.leafCellHeaders = this.leafCellHeaders;
     this.ctx.header.renderLeafCellHeaders = this.renderLeafCellHeaders;
     this.ctx.header.renderCellHeaders = this.renderFixedCellHeaders.concat(

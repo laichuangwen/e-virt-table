@@ -91,6 +91,7 @@ export interface Column {
   hoverIconName: string;
   title: string;
   width: number;
+  widthFillDisable: boolean;
   align: Align;
   verticalAlign: VerticalAlign;
   fixed: Fixed;

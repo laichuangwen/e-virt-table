@@ -166,7 +166,7 @@ class Scrollbar {
       header,
       config: { SCROLLER_TRACK_SIZE = 0, SCROLLER_SIZE = 0 },
     } = this.ctx;
-    const visibleWidth = this.ctx.target.width;
+    const visibleWidth = this.ctx.target.width + 1;
     const visibleHeight = this.ctx.target.height;
     const headerHeight = header.height;
     const headerWidth = header.width;
@@ -219,12 +219,13 @@ class Scrollbar {
       this.trackHeight = SCROLLER_TRACK_SIZE;
 
       const ratio = this.distance ? this.visibleDistance / headerWidth : 0;
+
       let _barWidth = Math.floor(ratio * this.visibleDistance);
       this.barY = this.trackY + 0.5 + (SCROLLER_TRACK_SIZE - SCROLLER_SIZE) / 2;
       // 最小30,超出可见区域则隐藏
       if (_barWidth < 30) {
         _barWidth = 30;
-      } else if (_barWidth > this.visibleDistance) {
+      } else if (_barWidth >= this.visibleDistance) {
         _barWidth = 0;
       }
       this.barWidth = _barWidth;

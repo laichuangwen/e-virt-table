@@ -29,8 +29,6 @@ class EventBus {
     if (callbacks) {
       const index = callbacks.indexOf(callback);
       if (index >= 0) {
-        console.log("off", event, index);
-
         callbacks.splice(index, 1);
         if (callbacks.length === 0) {
           this.events.delete(event);

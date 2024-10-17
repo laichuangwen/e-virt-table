@@ -14,6 +14,7 @@ export default class CellHeader extends BaseCell {
   align: Align;
   verticalAlign: VerticalAlign = "middle";
   fixed: Fixed | undefined;
+  widthFillDisable: boolean;
   type: Type;
   editorType: string;
   level: number;
@@ -66,6 +67,7 @@ export default class CellHeader extends BaseCell {
     this.text = column.title;
     this.column = column;
     this.colspan = column.colspan;
+    this.widthFillDisable = column.widthFillDisable;
     this.rowspan = column.rowspan;
     this.rules = column.rules;
     this.readonly = column.readonly;

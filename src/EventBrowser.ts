@@ -26,8 +26,8 @@ export default class EventBrowser {
     this.eventTasks.clear();
   }
   private handleResize(e: Event) {
+    this.ctx.emit("resetHeader",e);
     this.ctx.emit("resize", e);
-    this.ctx.emit("draw");
   }
   private handleMouseDown(e: Event) {
     const _e = e as MouseEvent;

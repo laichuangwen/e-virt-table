@@ -64,7 +64,6 @@ export default class Context {
   private uuid = generateShortUUID();
   targetContainer: HTMLElement;
   target: HTMLCanvasElement;
-  targetRect?: DOMRect;
   paint: Paint;
   icons: Icons;
   mousedown = false;

@@ -56,7 +56,7 @@ export default class Tooltip {
       // if (!this.ctx.isTarget(e.target)) {
       //   return;
       // }
-      const { targetRect } = this.ctx;
+      const targetRect = this.ctx.target.getBoundingClientRect();
       if (!targetRect) {
         return;
       }
@@ -79,7 +79,7 @@ export default class Tooltip {
         this.show(cell);
       }
     });
-    this.ctx.on("cellMouseleave", () => {
+    this.ctx.on("visibleCellMouseleave", () => {
       this.hide();
     });
   }
@@ -98,7 +98,8 @@ export default class Tooltip {
     if (cell.message) {
       text = cell.message;
     }
-    if (!this.ctx.targetRect) {
+    const targetRect = this.ctx.target.getBoundingClientRect();
+    if (!targetRect) {
       return;
     }
     this.enable = true;
@@ -109,8 +110,8 @@ export default class Tooltip {
     this.contentEl.style.wordBreak = "break-all";
     this.contentEl.style.lineHeight = "1.5";
     this.contentEl.innerText = text;
-    const cellX = cell.drawX + this.ctx.targetRect.x;
-    const cellY = cell.drawY + this.ctx.targetRect.y;
+    const cellX = cell.drawX + targetRect.x;
+    const cellY = cell.drawY + targetRect.y;
     // 这个是相对于视口的位置
     const virtualEl = {
       getBoundingClientRect() {
