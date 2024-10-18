@@ -7,7 +7,7 @@
   </head>
   <script src="../index.umd.js"></script>
   <body>
-    <div id="evirt-table" style="width: 300px;"></div>
+    <div id="evirt-table"></div>
   </body>
   <script>
     let data = [
@@ -49,31 +49,38 @@
         title: "日期",
         key: "date",
         readonly: true,
+        widthFillDisable: true,
       },
       {
         title: "姓名",
         key: "name",
         readonly: true,
+        width: 200,
+        widthFillDisable: true,
       },
       {
         title: "省份",
         key: "province",
         readonly: true,
+        widthFillDisable: true,
       },
       {
         title: "市区",
         key: "city",
         readonly: true,
+        widthFillDisable: true,
       },
       {
         title: "地址",
         key: "address",
         readonly: true,
+        widthFillDisable: true,
       },
       {
         title: "邮编",
         key: "zip",
         readonly: true,
+        widthFillDisable: true,
       },
     ];
     const target = document.getElementById("evirt-table");

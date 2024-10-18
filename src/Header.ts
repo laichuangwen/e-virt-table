@@ -3,13 +3,13 @@ import { getMaxRow, calCrossSpan, toLeaf, sortFixed, throttle } from "./util";
 import CellHeader from "./CellHeader";
 import type { Column } from "./types";
 export default class Header {
-  private targetRect: DOMRect;
   private ctx: Context; // 上下文
   private x = 0; // x坐标
   private y = 0; // y坐标
   private width = 0; // 宽度
   private height = 0; // 高度
   private resizeTarget: CellHeader | null = null; //调整表头
+  private resizeNum = 0; // 调整列的数量
   private isResizing = false; // 是否移动中
   private offsetX = 0; // 鼠标按下时的x轴位置
   private resizeDiff = 0; // 是否移动中
@@ -29,7 +29,6 @@ export default class Header {
   private renderFixedCellHeaders: CellHeader[] = [];
   constructor(ctx: Context) {
     this.ctx = ctx;
-    this.targetRect = this.ctx.target.getBoundingClientRect();
     // 监听表头重置,窗口变化
     this.ctx.on(
       "resetHeader",
@@ -56,9 +55,6 @@ export default class Header {
     const maxHeaderRow = getMaxRow(columns);
     const leafColumns = toLeaf(columns);
     this.height = HEADER_HEIGHT * maxHeaderRow;
-    const targetContainer = this.ctx.targetContainer.getBoundingClientRect();
-    this.ctx.target.width = targetContainer.width;
-    this.visibleWidth = this.ctx.target.width - SCROLLER_TRACK_SIZE;
     this.width = leafColumns.reduce(
       (sum, _item) => sum + (_item?.width || 100),
       0
@@ -66,15 +62,21 @@ export default class Header {
     this.visibleHeight = this.height;
     const spanColumns = sortFixed(calCrossSpan(columns, maxHeaderRow));
     this.columnIndex = 0;
+    this.resizeNum = 0; // 可调整调整列数量
     this.render(spanColumns, 0);
     this.ctx.database.updateColIndexKeyMap(this.leafCellHeaders);
+    const targetContainer = this.ctx.targetContainer.getBoundingClientRect();
+    // 如果有可调整列，宽度等于容器宽度
+    if (this.resizeNum > 0) {
+      this.ctx.target.width = targetContainer.width;
+    } else {
+      this.ctx.target.width = this.width + SCROLLER_TRACK_SIZE - 1;
+    }
+    this.visibleWidth = this.ctx.target.width - SCROLLER_TRACK_SIZE;
     // 如果表头宽度小于可视宽度，平均分配
-    if (this.visibleWidth > this.width) {
+    if (this.resizeNum) {
       const overWidth = this.visibleWidth - this.width;
-      const resizeNum = this.leafCellHeaders.filter(
-        (item) => !item.widthFillDisable
-      ).length;
-      const diff = Math.floor((overWidth / resizeNum) * 100) / 100;
+      const diff = Math.floor((overWidth / this.resizeNum) * 100) / 100;
       this.resizeAllColumn(diff);
     }
     const leafLeftCellHeaders = this.fixedLeftCellHeaders.filter(
@@ -208,10 +210,7 @@ export default class Header {
     // 如果表头宽度小于可视宽度，平均分配
     if (this.width < this.visibleWidth) {
       const overWidth = this.visibleWidth - this.width;
-      const resizeNum = this.leafCellHeaders.filter(
-        (item) => !item.widthFillDisable
-      ).length;
-      overFiff = Math.floor((overWidth / resizeNum) * 100) / 100;
+      overFiff = Math.floor((overWidth / this.resizeNum) * 100) / 100;
       this.resizeAllColumn(overFiff);
       this.ctx.emit("draw");
     }
@@ -228,6 +227,7 @@ export default class Header {
     if (fellWidth === 0) return;
     const widthMap = new Map();
     // 存需要更改的宽度
+    let isResize = true;
     for (const col of this.allCellHeaders) {
       if (col.widthFillDisable) {
         // 不允许调整宽度
@@ -235,7 +235,14 @@ export default class Header {
       } else {
         const width = col.width + fellWidth * col.colspan;
         widthMap.set(col.key, width);
+        if (width < 100) {
+          isResize = false;
+        }
       }
+    }
+    // 如果有小于50的列，不允许调整
+    if (!isResize) {
+      return;
     }
     // 递归更改宽度
     const uptateWidth = (columns: Column[]) => {
@@ -282,6 +289,9 @@ export default class Header {
       this.allCellHeaders.push(cellHeader);
       if (!item.children) {
         this.leafCellHeaders.push(cellHeader);
+        if (!cellHeader.column.widthFillDisable) {
+          this.resizeNum++;
+        }
       }
       if (item.fixed === "left") {
         this.fixedLeftCellHeaders.push(cellHeader);

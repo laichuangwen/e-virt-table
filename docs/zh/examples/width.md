@@ -1,17 +1,20 @@
 # 宽度
 
+- 整体宽度跟容器的宽度有关系
+- 总宽度超过各列设置的宽度默认会平均填充，除非列设置`widthFillDisable`禁用填充
+
 ## Column
 
-| 参数  | 说明     | 类型   | 可选值 | 默认值 |
-| ----- | -------- | ------ | ------ | ------ |
-| width | 列的宽度 | number | —      | 100    |
+| 参数             | 说明                   | 类型    | 可选值 | 默认值 |
+| ---------------- | ---------------------- | ------- | ------ | ------ |
+| width            | 列的宽度               | number  | —      | 100    |
+| widthFillDisable | 指定当前列不可填充宽度 | boolean | —      | —      |
 
 ## Config
 
-| 参数                 | 说明                  | 类型    | 可选值 | 默认值 |
-| -------------------- | --------------------- | ------- | ------ | ------ |
-| WIDTH                | 宽度，为 0 表示自适应 | number  | —      | 0      |
-| ENABLE_RESIZE_COLUMN | 启用列宽可调整        | boolean | —      | true   |
+| 参数                 | 说明           | 类型    | 可选值 | 默认值 |
+| -------------------- | -------------- | ------- | ------ | ------ |
+| ENABLE_RESIZE_COLUMN | 启用列宽可调整 | boolean | —      | true   |
 
 ## Events
 
@@ -21,15 +24,30 @@
 
 ## 总宽度
 
-- WIDTH=0 为自适应
-- WIDTH 设置超过总长度,超过部分会平均填充到每一列中
+- 整体宽度跟容器的宽度有关系，所以设置外层宽度就行
 
 ::: demo
 
 <iframe src="/width/width.html" style="min-height:220px"></iframe>
 :::
 
-## 默认宽度
+## 动态总宽度
+
+1. 所有列 `widthFillDisable`为 true,这个总宽度就等于每一列的总和
+
+::: demo
+
+<iframe src="/width/width-dynamic.html" style="min-height:220px"></iframe>
+:::
+
+2. 列`widthFillDisable`为 false 超过会被平均填充，最小 100
+
+::: demo
+
+<iframe src="/width/width-dynamic1.html" style="min-height:220px"></iframe>
+:::
+
+## 默认列宽度
 
 - 不设置 width 默认是 100
 
@@ -38,14 +56,17 @@
 <iframe src="/width/base.html" style="min-height:220px"></iframe>
 :::
 
-## 设置宽度
+## 设置列宽度
 
 ::: demo
 
 <iframe src="/width/setting.html" style="min-height:220px"></iframe>
 :::
 
-## 可调整宽度
+## 可调整列宽度
+
+- `config.ENABLE_RESIZE_COLUMN`为 true,可启用调整列宽，默认 true
+- `resizeColumnChange`为调整列后的回调
 
 ::: demo
 

@@ -29,8 +29,6 @@
 
 ## 默认高度
 
-- 注意两个高度都设置为 0，表示没有滚动条这样水平不会虚拟滚动
-
 ::: demo
 
 <iframe src="/height/base.html" style="min-height:220px"></iframe>
@@ -54,7 +52,7 @@
 
 ## 设置高度和最大高度
 
-- 注意两个高度都设置为 0 会没有滚动条，水平不会虚拟滚动
+- 注意`HEIGHT`、`MAX_HEIGHT`都设置为 0，表示垂直没有滚动条
 
 ::: demo
 
@@ -63,7 +61,8 @@
 
 ## ENABLE_OFFSET_HEIGHT
 
-- 全屏看效果
+- 根据屏幕大小自适应（全屏看效果）
+- `OFFSET_HEIGHT`可调整偏移底部多少px
 
 ::: demo
 
