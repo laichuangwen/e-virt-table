@@ -1,7 +1,5 @@
 import { defineConfig } from "vitepress";
 import { markdownConfig } from "./plugins/markdown-plugin";
-import markdownTooltip from "./plugins/tooltip";
-
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   appearance: false,
@@ -50,7 +48,7 @@ export default defineConfig({
               { text: "多选", link: "/zh/examples/selection" },
               { text: "树形", link: "/zh/examples/tree" },
               { text: "溢出提示", link: "/zh/examples/tooltip" },
-              { text: "多级表头", link: "/zh/examples/level" },
+              { text: "表头", link: "/zh/examples/header" },
               { text: "footer合计", link: "/zh/examples/footer" },
               { text: "单元格合并", link: "/zh/examples/span" },
               { text: "单元格编辑", link: "/zh/examples/readonly" },

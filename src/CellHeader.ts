@@ -1,204 +1,179 @@
-import type Context from "./Context";
-import { generateShortUUID } from "./util";
-import type {
-  Align,
-  Column,
-  Fixed,
-  Render,
-  Rules,
-  Type,
-  VerticalAlign,
-} from "./types";
-import BaseCell from "./BaseCell";
+import type Context from './Context';
+import { generateShortUUID } from './util';
+import type { Align, Column, Fixed, Render, Rules, Type, VerticalAlign } from './types';
+import BaseCell from './BaseCell';
 export default class CellHeader extends BaseCell {
-  align: Align;
-  verticalAlign: VerticalAlign = "middle";
-  fixed: Fixed | undefined;
-  widthFillDisable: boolean;
-  type: Type;
-  editorType: string;
-  level: number;
-  text: string;
-  displayText: string = "";
-  colspan: number;
-  rowspan: number;
-  key: string;
-  required = false;
-  readonly = false;
-  children: Column[] = [];
-  column: Column;
-  colIndex: number;
-  rowKey: string;
-  rules: Rules;
-  hasChildren: boolean;
-  render: Render;
-  style: Partial<CSSStyleDeclaration> = {};
-  drawX = 0;
-  drawY = 0;
-  drawImageX = 0;
-  drawImageY = 0;
-  drawImageWidth = 0;
-  drawImageHeight = 0;
-  drawImageName = "";
-  drawImageSource: HTMLImageElement | undefined;
-  constructor(
-    ctx: Context,
-    colIndex: number,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    column: Column
-  ) {
-    super(ctx, x, y, width, height, column.fixed, "header");
-    this.ctx = ctx;
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.colIndex = colIndex;
-    this.key = column.key;
-    this.type = column.type;
-    this.editorType = column.editorType || "text";
-    this.align = column.align || "center";
-    this.verticalAlign = column.verticalAlign || "middle";
-    this.fixed = column.fixed;
-    this.level = column.level;
-    this.text = column.title;
-    this.column = column;
-    this.colspan = column.colspan;
-    this.widthFillDisable = column.widthFillDisable;
-    this.rowspan = column.rowspan;
-    this.rules = column.rules;
-    this.readonly = column.readonly;
-    this.required = column.required;
-    this.rowKey = generateShortUUID();
-    this.hasChildren = (column.children && column.children.length > 0) || false; // 是否有子
-    this.render = column.renderHeader;
-  }
-  /**
-   * 是否可见，覆盖基类方法，表头是跟y滚动条没有关系的所以不需要加滚动参数
-   * @returns
-   */
-  isVerticalVisible() {
-    const { target } = this.ctx;
-    const offsetHeight = target.height;
-    return !(this.y + this.height <= 0 || this.y >= offsetHeight);
-  }
-
-  /**
-   * 更新样式
-   */
-  updateStyle() {
-    // this.style = this.getOverlayerViewsStyle();
-  }
-
-  update() {
-    this.updateStyle();
-    this.displayText = this.getText();
-    this.drawX = this.getDrawX();
-    this.drawY = this.getDrawY();
-  }
-  draw() {
-    const {
-      paint,
-      config: {
-        BORDER_COLOR,
-        HEADER_BG_COLOR,
-        CELL_PADDING,
-        HEAD_FONTFAMILY,
-        HEAD_FONT_SIZE,
-        HEAD_FONT_STYLE,
-      },
-    } = this.ctx;
-    const { drawX, drawY, displayText } = this;
-    paint.drawRect(drawX, drawY, this.width, this.height, {
-      borderColor: BORDER_COLOR,
-      fillColor: HEADER_BG_COLOR,
-    });
-    const font = `${HEAD_FONT_SIZE}px ${HEAD_FONT_STYLE} ${HEAD_FONTFAMILY}`;
-    paint.drawText(displayText, drawX, drawY, this.width, this.height, {
-      font,
-      padding: CELL_PADDING,
-      align: this.align,
-      verticalAlign: this.verticalAlign,
-    });
-    this.drawSelection();
-  }
-  private drawSelection() {
-    const { width, height, type } = this;
-    // 选中框类型
-    if (["index-selection", "selection"].includes(type)) {
-      const { indeterminate, check, selectable } =
-        this.ctx.database.getCheckedState();
-      const { CHECKBOX_SIZE = 0 } = this.ctx.config;
-      const _x = this.drawX + (width - CHECKBOX_SIZE) / 2;
-      const _y = this.drawY + (height - CHECKBOX_SIZE) / 2;
-      let checkboxImage: HTMLImageElement | undefined =
-        this.ctx.icons.get("checkbox-uncheck");
-      let checkboxName = "checkbox-uncheck";
-      if (indeterminate) {
-        checkboxImage = this.ctx.icons.get("checkbox-indeterminate");
-        checkboxName = "checkbox-indeterminate";
-      } else if (check && selectable) {
-        checkboxImage = this.ctx.icons.get("checkbox-check");
-        checkboxName = "checkbox-check";
-      } else if (check && selectable) {
-        checkboxImage = this.ctx.icons.get("checkbox-check-disabled");
-        checkboxName = "checkbox-check-disabled";
-      } else if (!check && selectable) {
-        checkboxImage = this.ctx.icons.get("checkbox-uncheck");
-        checkboxName = "checkbox-uncheck";
-      } else {
-        checkboxImage = this.ctx.icons.get("checkbox-disabled");
-        checkboxName = "checkbox-disabled";
-      }
-      if (checkboxImage) {
-        this.drawImageX = _x;
-        this.drawImageY = _y;
-        this.drawImageWidth = CHECKBOX_SIZE;
-        this.drawImageHeight = CHECKBOX_SIZE;
-        this.drawImageName = checkboxName;
-        this.drawImageSource = checkboxImage;
-        this.ctx.paint.drawImage(
-          this.drawImageSource,
-          this.drawImageX,
-          this.drawImageY,
-          this.drawImageWidth,
-          this.drawImageHeight
-        );
-      }
+    align: Align;
+    verticalAlign: VerticalAlign = 'middle';
+    fixed: Fixed | undefined;
+    widthFillDisable: boolean;
+    type: Type;
+    editorType: string;
+    level: number;
+    text: string;
+    displayText: string = '';
+    colspan: number;
+    rowspan: number;
+    key: string;
+    required = false;
+    readonly = false;
+    children: Column[] = [];
+    column: Column;
+    colIndex: number;
+    rowKey: string;
+    rules: Rules;
+    hasChildren: boolean;
+    render: Render;
+    style: Partial<CSSStyleDeclaration> = {};
+    drawX = 0;
+    drawY = 0;
+    drawImageX = 0;
+    drawImageY = 0;
+    drawImageWidth = 0;
+    drawImageHeight = 0;
+    drawImageName = '';
+    drawImageSource: HTMLImageElement | undefined;
+    constructor(ctx: Context, colIndex: number, x: number, y: number, width: number, height: number, column: Column) {
+        super(ctx, x, y, width, height, column.fixed, 'header');
+        this.ctx = ctx;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.colIndex = colIndex;
+        this.key = column.key;
+        this.type = column.type;
+        this.editorType = column.editorType || 'text';
+        this.align = column.align || 'center';
+        this.verticalAlign = column.verticalAlign || 'middle';
+        this.fixed = column.fixed;
+        this.level = column.level;
+        this.text = column.title;
+        this.column = column;
+        this.colspan = column.colspan;
+        this.widthFillDisable = column.widthFillDisable;
+        this.rowspan = column.rowspan;
+        this.rules = column.rules;
+        this.readonly = column.readonly;
+        this.required = column.required;
+        this.rowKey = generateShortUUID();
+        this.hasChildren = (column.children && column.children.length > 0) || false; // 是否有子
+        this.render = column.renderHeader;
     }
-  }
-  getText() {
-    if (this.render) {
-      return "";
+    /**
+     * 是否可见，覆盖基类方法，表头是跟y滚动条没有关系的所以不需要加滚动参数
+     * @returns
+     */
+    isVerticalVisible() {
+        const { target } = this.ctx;
+        const offsetHeight = target.height;
+        return !(this.y + this.height <= 0 || this.y >= offsetHeight);
     }
-    return this.text;
-  }
-  /**
-   * 获取样式
-   */
-  // getOverlayerViewsStyle() {
-  //   let left = "";
-  //   if (this.fixed === "left") {
-  //     left = `${this.getClientX()}px`;
-  //   } else if (this.fixed === "right") {
-  //     left = `${
-  //       this.getClientX() -
-  //       (this.ctx.stage.width() - this.ctx.header.fixedRightWidth)
-  //     }px`;
-  //   } else {
-  //     left = `${this.getClientX() - this.ctx.header.fixedLeftWidth}px`;
-  //   }
-  //   return {
-  //     position: "absolute",
-  //     overflow: "hidden",
-  //     left: left,
-  //     top: `${this.y}px`,
-  //     width: `${this.width}px`,
-  //     height: `${this.height}px`,
-  //     pointerEvents: "none",
-  //   };
-  // }
+
+    /**
+     * 更新样式
+     */
+    updateStyle() {
+        // this.style = this.getOverlayerViewsStyle();
+    }
+
+    update() {
+        this.updateStyle();
+        this.displayText = this.getText();
+        this.drawX = this.getDrawX();
+        this.drawY = this.getDrawY();
+    }
+    draw() {
+        const {
+            paint,
+            config: { BORDER_COLOR, HEADER_BG_COLOR, CELL_PADDING, HEADER_FONT, HEADER_TEXT_COLOR },
+        } = this.ctx;
+        const { drawX, drawY, displayText } = this;
+        paint.drawRect(drawX, drawY, this.width, this.height, {
+            borderColor: BORDER_COLOR,
+            fillColor: HEADER_BG_COLOR,
+        });
+        paint.drawText(displayText, drawX, drawY, this.width, this.height, {
+            font: HEADER_FONT,
+            padding: CELL_PADDING,
+            color: HEADER_TEXT_COLOR,
+            align: this.align,
+            verticalAlign: this.verticalAlign,
+        });
+        this.drawSelection();
+    }
+    private drawSelection() {
+        const { width, height, type } = this;
+        // 选中框类型
+        if (['index-selection', 'selection'].includes(type)) {
+            const { indeterminate, check, selectable } = this.ctx.database.getCheckedState();
+            const { CHECKBOX_SIZE = 0 } = this.ctx.config;
+            const _x = this.drawX + (width - CHECKBOX_SIZE) / 2;
+            const _y = this.drawY + (height - CHECKBOX_SIZE) / 2;
+            let checkboxImage: HTMLImageElement | undefined = this.ctx.icons.get('checkbox-uncheck');
+            let checkboxName = 'checkbox-uncheck';
+            if (indeterminate) {
+                checkboxImage = this.ctx.icons.get('checkbox-indeterminate');
+                checkboxName = 'checkbox-indeterminate';
+            } else if (check && selectable) {
+                checkboxImage = this.ctx.icons.get('checkbox-check');
+                checkboxName = 'checkbox-check';
+            } else if (check && selectable) {
+                checkboxImage = this.ctx.icons.get('checkbox-check-disabled');
+                checkboxName = 'checkbox-check-disabled';
+            } else if (!check && selectable) {
+                checkboxImage = this.ctx.icons.get('checkbox-uncheck');
+                checkboxName = 'checkbox-uncheck';
+            } else {
+                checkboxImage = this.ctx.icons.get('checkbox-disabled');
+                checkboxName = 'checkbox-disabled';
+            }
+            if (checkboxImage) {
+                this.drawImageX = _x;
+                this.drawImageY = _y;
+                this.drawImageWidth = CHECKBOX_SIZE;
+                this.drawImageHeight = CHECKBOX_SIZE;
+                this.drawImageName = checkboxName;
+                this.drawImageSource = checkboxImage;
+                this.ctx.paint.drawImage(
+                    this.drawImageSource,
+                    this.drawImageX,
+                    this.drawImageY,
+                    this.drawImageWidth,
+                    this.drawImageHeight,
+                );
+            }
+        }
+    }
+    getText() {
+        if (this.render) {
+            return '';
+        }
+        return this.text;
+    }
+    /**
+     * 获取样式
+     */
+    // getOverlayerViewsStyle() {
+    //   let left = "";
+    //   if (this.fixed === "left") {
+    //     left = `${this.getClientX()}px`;
+    //   } else if (this.fixed === "right") {
+    //     left = `${
+    //       this.getClientX() -
+    //       (this.ctx.stage.width() - this.ctx.header.fixedRightWidth)
+    //     }px`;
+    //   } else {
+    //     left = `${this.getClientX() - this.ctx.header.fixedLeftWidth}px`;
+    //   }
+    //   return {
+    //     position: "absolute",
+    //     overflow: "hidden",
+    //     left: left,
+    //     top: `${this.y}px`,
+    //     width: `${this.width}px`,
+    //     height: `${this.height}px`,
+    //     pointerEvents: "none",
+    //   };
+    // }
 }

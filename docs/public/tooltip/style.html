@@ -7,22 +7,13 @@
   </head>
   <script src="../index.umd.js"></script>
   <body>
-    <button id="add-row-btn">添加数据</button>
-    <div id="evirt-table" ></div>
+    <div id="evirt-table"></div>
   </body>
   <script>
     let data = [
       {
-        date: "2016-05-03",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1518 弄",
-        zip: 200333,
-      },
-      {
         date: "2016-05-02",
-        name: "王小虎",
+        name: "王小虎111111111111王小虎111111111111王小虎111111111111王小虎111111111111王小虎111111111111王小虎111111111111王小虎111111111111王小虎111111111111王小虎111111111111王小虎111111111111王小虎111111111111王小虎111111111111",
         province: "上海",
         city: "普陀区",
         address: "上海市普陀区金沙江路 1518 弄",
@@ -33,7 +24,23 @@
         name: "王小虎",
         province: "上海",
         city: "普陀区",
-        address: "上海市普陀区金沙江路 1518 弄",
+        address: "上海市普陀区金沙江路 1517 弄",
+        zip: 200333,
+      },
+      {
+        date: "2016-05-01",
+        name: "王小虎",
+        province: "上海",
+        city: "普陀区",
+        address: "上海市普陀区金沙江路 1519 弄",
+        zip: 200333,
+      },
+      {
+        date: "2016-05-03",
+        name: "王小虎",
+        province: "上海",
+        city: "普陀区",
+        address: "上海市普陀区金沙江路 1516 弄",
         zip: 200333,
       },
     ];
@@ -42,40 +49,37 @@
         title: "日期",
         key: "date",
         readonly: true,
-        fixed: "left",
-        width: 200,
       },
       {
         title: "姓名",
         key: "name",
         readonly: true,
-        width: 200,
-        fixed: "left",
+        overflowTooltipPlacement: "right",
+        overflowTooltipMaxWidth: 200,
       },
       {
         title: "省份",
         key: "province",
-        width: 200,
         readonly: true,
       },
       {
         title: "市区",
         key: "city",
-        width: 200,
         readonly: true,
       },
       {
         title: "地址",
         key: "address",
         readonly: true,
-        width: 300,
+        overflowTooltipShow: true,
+        overflowTooltipWidth: 200,
+        width: 100,
       },
       {
         title: "邮编",
         key: "zip",
-        width: 200,
         readonly: true,
-        fixed: "right",
+        overflowTooltipPlacement: "bottom",
       },
     ];
     const target = document.getElementById("evirt-table");
@@ -83,24 +87,11 @@
       data,
       columns,
       config: {
-        HEIGHT: 300,
+        TOOLTIP_CUSTOM_STYLE: {
+          backgroundColor: "red",
+          color: "white",
+        },
       },
     });
-        // 添加数据的函数
-    function addRow() {
-      const newRow = {
-        date: '2024-08-12',
-        name: '张三',
-        province: '北京',
-        city: '朝阳区',
-        address: '北京市朝阳区某街道某号',
-        zip: 100000
-      };
-      data.push(newRow);
-      grid.loadData(data);
-    }
-
-    // 按钮点击事件
-    document.getElementById("add-row-btn").addEventListener("click", addRow);
   </script>
 </html>

@@ -13,7 +13,7 @@
         let data = [
             {
                 date: '2016-05-02',
-                name: '王小虎___限制长度200_______限制长度200_______限制长度200_______限制长度200_______限制长度200_______限制长度200_______限制长度200_______限制长度200____',
+                name: '王小虎',
                 province: '上海',
                 city: '普陀区',
                 address: '上海市普陀区金沙江路 1518 弄',
@@ -26,6 +26,7 @@
                 city: '普陀区',
                 address: '上海市普陀区金沙江路 1517 弄',
                 zip: 200333,
+                _height: 32,
             },
             {
                 date: '2016-05-01',
@@ -41,7 +42,7 @@
                 province: '上海',
                 city: '普陀区',
                 address: '上海市普陀区金沙江路 1516 弄',
-                zip: '禁用提示禁用提示禁用提示禁用提示禁用提示禁用提示禁用提示',
+                zip: 200333,
             },
         ];
         let columns = [
@@ -51,41 +52,55 @@
                 readonly: true,
             },
             {
-                title: '姓名',
-                key: 'name',
-                readonly: true,
-                overflowTooltipPlacement: 'right',
-                overflowTooltipMaxWidth: 200,
-            },
-            {
-                title: '省份',
-                key: 'province',
-                readonly: true,
-            },
-            {
-                title: '市区',
-                key: 'city',
-                readonly: true,
-            },
-            {
-                title: '地址',
-                key: 'address',
-                readonly: true,
-                overflowTooltipWidth: 200,
-                width: 100,
-            },
-            {
-                title: '邮编(禁用提示)',
-                key: 'zip',
-                readonly: true,
-                overflowTooltipShow: false,
-                overflowTooltipPlacement: 'bottom',
+                key: 'info',
+                title: '配送信息',
+                children: [
+                    {
+                        title: '姓名',
+                        key: 'name',
+                        readonly: true,
+                    },
+                    {
+                        title: '地址',
+                        key: 'addressInfo',
+                        readonly: true,
+                        children: [
+                            {
+                                title: '省份',
+                                key: 'province',
+                                readonly: true,
+                            },
+                            {
+                                title: '市区',
+                                key: 'city',
+                                readonly: true,
+                            },
+                            {
+                                title: '地址',
+                                key: 'address',
+                                readonly: true,
+                                width: 200,
+                            },
+                            {
+                                title: '邮编',
+                                key: 'zip',
+                                readonly: true,
+                            },
+                        ],
+                    },
+                ],
             },
         ];
         const target = document.getElementById('evirt-table');
         const grid = new EVirtTable(target, {
             data,
             columns,
+            config: {
+                HEADER_HEIGHT: 50,
+                HEADER_BG_COLOR: '#f0f0f0',
+                HEADER_TEXT_COLOR: 'blue',
+                HEADER_FONT: '16px bold Arial',
+            },
         });
     </script>
 </html>
