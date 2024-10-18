@@ -4,6 +4,7 @@ import prism from "prismjs";
 import path from "path";
 import fs from "fs";
 import mdContainer from "markdown-it-container";
+import { log } from "console";
 
 function wrap(code: string, lang: string): string {
   if (lang === "text") {
@@ -38,11 +39,30 @@ const highlight = (str: string, lang: string) => {
 };
 // 配置
 export const markdownConfig = (md) => {
+  // tooltip
+  md.renderer.rules.tooltip = (tokens, idx) => {
+    const token = tokens[idx];
+    return `<api-typing type="${token.content}" details="${token.info}" />`;
+  };
+  md.inline.ruler.before("emphasis", "tooltip", (state, silent) => {
+    const tooltipRegExp = /^\^\[([^\]]*)\](`[^`]*`)?/;
+    const str = state.src.slice(state.pos, state.posMax);
+    if (!tooltipRegExp.test(str)) return false;
+    if (silent) return true;
+    const result = str.match(tooltipRegExp);
+    if (!result) return false;
+    const token = state.push("tooltip", "tooltip", 0);
+    token.content = result[1].replace(/\\\|/g, "|");
+    token.info = (result[2] || "").replace(/^`(.*)`$/, "$1");
+    token.level = state.level;
+    state.pos += result[0].length;
+
+    return true;
+  });
   md.use(mdContainer, "demo", {
     validate(params) {
       return !!params.trim().match(/^demo\s*(.*)$/);
     },
-
     render(tokens, idx) {
       if (tokens[idx].nesting === 1 /* means the tag is opening */) {
         // 取出:::demo 后面的配置，即源码路径

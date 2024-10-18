@@ -1,5 +1,6 @@
 import { defineConfig } from "vitepress";
 import { markdownConfig } from "./plugins/markdown-plugin";
+import markdownTooltip from "./plugins/tooltip";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({

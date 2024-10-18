@@ -141,7 +141,7 @@ export default class Header {
       if (this.ctx.editing) return;
       const {
         target,
-        config: { RESIZE_COLUMN_MIN_WIDTH = 0 },
+        config: { RESIZE_COLUMN_MIN_WIDTH },
       } = this.ctx;
       // 鼠标移动
       if (this.isResizing && this.resizeTarget) {
@@ -206,19 +206,19 @@ export default class Header {
     this.ctx.database.setColumns(this.columns);
     this.init();
     this.ctx.emit("draw");
-    let overFiff = 0;
+    let overDiff = 0;
     // 如果表头宽度小于可视宽度，平均分配
     if (this.width < this.visibleWidth) {
       const overWidth = this.visibleWidth - this.width;
-      overFiff = Math.floor((overWidth / this.resizeNum) * 100) / 100;
-      this.resizeAllColumn(overFiff);
+      overDiff = Math.floor((overWidth / this.resizeNum) * 100) / 100;
+      this.resizeAllColumn(overDiff);
       this.ctx.emit("draw");
     }
     this.ctx.emit("resizeColumnChange", {
       colIndex: cell.colIndex,
       key: cell.key,
       oldWidth: cell.width,
-      width: cell.width + diff + overFiff,
+      width: cell.width + diff + overDiff,
       column: cell.column,
       columns: this.columns,
     });
@@ -235,12 +235,12 @@ export default class Header {
       } else {
         const width = col.width + fellWidth * col.colspan;
         widthMap.set(col.key, width);
-        if (width < 100) {
+        if (width < this.ctx.config.RESIZE_COLUMN_MIN_WIDTH) {
           isResize = false;
         }
       }
     }
-    // 如果有小于50的列，不允许调整
+    // 如果有小于RESIZE_COLUMN_MIN_WIDTH的列，不允许调整
     if (!isResize) {
       return;
     }

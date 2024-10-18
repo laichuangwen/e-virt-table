@@ -1,7 +1,7 @@
 # 宽度
 
-- 整体宽度跟容器的宽度有关系
-- 总宽度超过各列设置的宽度默认会平均填充，除非列设置`widthFillDisable`禁用填充
+-   整体宽度跟容器的宽度有关系
+-   总宽度超过各列设置的宽度默认会平均填充，除非列设置`widthFillDisable`禁用填充
 
 ## Column
 
@@ -12,9 +12,10 @@
 
 ## Config
 
-| 参数                 | 说明           | 类型    | 可选值 | 默认值 |
-| -------------------- | -------------- | ------- | ------ | ------ |
-| ENABLE_RESIZE_COLUMN | 启用列宽可调整 | boolean | —      | true   |
+| 参数                    | 说明           | 类型    | 可选值 | 默认值 |
+| ----------------------- | -------------- | ------- | ------ | ------ |
+| RESIZE_COLUMN_MIN_WIDTH | 列宽最小值     | number  | —      | 40     |
+| ENABLE_RESIZE_COLUMN    | 启用列宽可调整 | boolean | —      | true   |
 
 ## Events
 
@@ -24,7 +25,7 @@
 
 ## 总宽度
 
-- 整体宽度跟容器的宽度有关系，所以设置外层宽度就行
+-   整体宽度跟容器的宽度有关系，所以设置外层宽度就行
 
 ::: demo
 
@@ -49,7 +50,7 @@
 
 ## 默认列宽度
 
-- 不设置 width 默认是 100
+-   不设置 width 默认是 100
 
 ::: demo
 
@@ -65,8 +66,8 @@
 
 ## 可调整列宽度
 
-- `config.ENABLE_RESIZE_COLUMN`为 true,可启用调整列宽，默认 true
-- `resizeColumnChange`为调整列后的回调
+-   `config.ENABLE_RESIZE_COLUMN`为 true,可启用调整列宽，默认 true
+-   `resizeColumnChange`为调整列后的回调
 
 ::: demo
 

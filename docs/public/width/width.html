@@ -7,7 +7,7 @@
   </head>
   <script src="../index.umd.js"></script>
   <body>
-    <div id="evirt-table" style="width: 300px;"></div>
+    <div id="evirt-table" style="width: 600px;"></div>
   </body>
   <script>
     let data = [
@@ -79,7 +79,7 @@
     const target = document.getElementById("evirt-table");
     const grid = new EVirtTable(target, {
       data,
-      columns,
+      columns, // [!code ++]
     });
   </script>
 </html>
