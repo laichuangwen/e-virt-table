@@ -14,7 +14,7 @@
 | HEIGHT               | 高度，为 0 表示自适应                                       | number  | —      | 0      |
 | MAX_HEIGHT           | 最大高度，为 0 表示自适应高度根据 HEIGHT                    | number  | —      | 1000   |
 | CELL_HEIGHT          | body 单元格默认行高                                         | number  | —      | 32     |
-| ENABLE_OFFSET_HEIGHT | 启用自适应，内部根据屏幕计算大小，与 OFFSET_HEIGHT 配合使用 | boolean | —      | false  |
+| ENABLE_OFFSET_HEIGHT | 启用自适应调整，内部根据屏幕计算大小，与 OFFSET_HEIGHT 配合使用 | boolean | —      | false  |
 | OFFSET_HEIGHT        | 表格顶部距离屏幕底部的偏移量                                | number  | —      | 0      |
 
 ## Events
@@ -23,25 +23,24 @@
 | --------------- | ------------- | --------------------------------------------------- |
 | resizeRowChange | body 调整回调 | `({colIndex, key, oldWidth, width,column,columns})` |
 
-- `config.HEADER_HEIGHT`可调整表头行高度,默认 32
-- `config.CELL_HEIGHT`可调整行高度，默认 32
-- `RowData`中隐藏字段`_height`也可以调整高度，适应不同行高设置，默认`config.CELL_HEIGHT`
 
-## 默认高度
+## 默认总高度
+- `MAX_HEIGHT`为1000
+- `HEIGHT`为0，即自适应
 
 ::: demo
 
 <iframe src="/height/base.html" style="min-height:220px"></iframe>
 :::
 
-## 设置高度
+## 设置总高度
 
 ::: demo
 
 <iframe src="/height/set-height.html" style="min-height:445px"></iframe>
 :::
 
-## 最大高度
+## 最大总高度
 
 - 设置最大高度
 
@@ -50,7 +49,7 @@
 <iframe src="/height/max-height.html" style="min-height:445px"></iframe>
 :::
 
-## 设置高度和最大高度
+## 设置总高度和最大总高度
 
 - 注意`HEIGHT`、`MAX_HEIGHT`都设置为 0，表示垂直没有滚动条
 
