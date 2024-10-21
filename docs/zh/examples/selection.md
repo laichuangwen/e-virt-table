@@ -99,8 +99,9 @@
 
 -   `config.CHECKBOX_KEY` 选中 key
 -   `config.SPAN_METHOD` 合并方法
+-   会根据可视区合并，这样不会因为合并行过多超过合并行时导致合并格子显示不出
 
 ::: demo
 
-<iframe src="/selection/span.html" style="min-height:430px"></iframe>
+<iframe src="/selection/span.html" style="min-height:625px"></iframe>
 :::

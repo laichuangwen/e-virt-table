@@ -1,6 +1,6 @@
 import EVirtTable from "./src/EVirtTable";
 
-const canvas = document.getElementById("evirt-table") as HTMLDivElement;
+const canvas = document.getElementById("e-virt-table") as HTMLDivElement;
 const columns: any[] = [
   // {
   //   title: "序号",
@@ -318,7 +318,7 @@ const columns: any[] = [
   },
 ];
 let data: any[] = [];
-for (let i = 0; i < 700; i += 1) {
+for (let i = 0; i < 10; i += 1) {
   data.push({
     _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
     id: i,
@@ -537,8 +537,8 @@ const eVirtTable = new EVirtTable(canvas, {
     },
   },
 });
-const editorEl = document.getElementById("evirt-table-editor");
-const dateEl = document.getElementById("evirt-table-date") as HTMLInputElement;
+const editorEl = document.getElementById("e-virt-table-editor");
+const dateEl = document.getElementById("e-virt-table-date") as HTMLInputElement;
 if (editorEl && dateEl) {
   eVirtTable.on("startEdit", (cell) => {
     const { width, height, editorType } = cell;

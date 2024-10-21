@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>evirt-table</title>
+    <title>e-virt-table</title>
   </head>
   <script src="../index.umd.js"></script>
   <style>
@@ -19,13 +19,13 @@
     }
   </style>
   <body style="margin: 0px">
-    <div id="evirt-table-view" class="view">
+    <div id="e-virt-table-view" class="view">
       <div style="margin-bottom: 8px">
-        <button id="evirt-table-fullpage-btn">全屏</button>
+        <button id="e-virt-table-fullpage-btn">全屏</button>
         <button id="add-row-btn">添加数据</button>
       </div>
       <div class="content">
-        <div id="evirt-table"></div>
+        <div id="e-virt-table"></div>
       </div>
     </div>
   </body>
@@ -96,7 +96,7 @@
         fixed: "right",
       },
     ];
-    const target = document.getElementById("evirt-table");
+    const target = document.getElementById("e-virt-table");
     const grid = new EVirtTable(target, {
       data,
       columns,
@@ -105,9 +105,9 @@
         OFFSET_HEIGHT: 16, // 距离底部距离
       },
     });
-    const fullpageBtn = document.getElementById("evirt-table-fullpage-btn");
+    const fullpageBtn = document.getElementById("e-virt-table-fullpage-btn");
     fullpageBtn.addEventListener("click", () => {
-      const view = document.getElementById("evirt-table-view");
+      const view = document.getElementById("e-virt-table-view");
       if (view.requestFullscreen) {
         view.requestFullscreen();
       } else if (view.mozRequestFullScreen) {

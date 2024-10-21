@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>evirt-table</title>
+    <title>e-virt-table</title>
   </head>
   <script src="../index.umd.js"></script>
   <body>
     <button id="add-row-btn">添加数据</button>
-    <div id="evirt-table"></div>
+    <div id="e-virt-table"></div>
   </body>
   <script>
     let data = [
@@ -77,7 +77,7 @@
         fixed: "right",
       },
     ];
-    const target = document.getElementById("evirt-table");
+    const target = document.getElementById("e-virt-table");
     const grid = new EVirtTable(target, {
       data,
       columns,

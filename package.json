@@ -1,21 +1,23 @@
 {
-  "name": "evirt-table",
-  "private": true,
-  "version": "0.0.1",
-  "main": "index.ts",
-  "types": "types/index.d.ts",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build && tsc",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "rollup-plugin-copy": "^3.5.0",
-    "typescript": "^5.5.3",
-    "vite": "^5.4.1"
-  },
-  "dependencies": {
-    "@floating-ui/dom": "^1.6.11",
-    "async-validator": "^4.2.5"
-  }
+    "name": "e-virt-table",
+    "private": true,
+    "version": "0.0.1",
+    "main": "index.ts",
+    "types": "types/index.d.ts",
+    "scripts": {
+        "dev": "vite",
+        "dev:installl": "cd docs && npm run i",
+        "dev:docs": "cd docs && npm run dev",
+        "build": "vite build && tsc",
+        "preview": "vite preview"
+    },
+    "devDependencies": {
+        "rollup-plugin-copy": "^3.5.0",
+        "typescript": "^5.5.3",
+        "vite": "^5.4.1"
+    },
+    "dependencies": {
+        "@floating-ui/dom": "^1.6.11",
+        "async-validator": "^4.2.5"
+    }
 }

@@ -61,12 +61,13 @@ export default class Body {
       this.height = EMPTY_BODY_HEIGHT;
     }
     const isEmpty = !this.data.length ? "empty" : "not-empty";
-    this.ctx.emit("emptyChange", {
-      isEmpty,
-      headerHeight: header.height,
-      bodyHeight: this.height,
-      width: this.width,
-      height: !this.data.length ? EMPTY_BODY_HEIGHT + footerHeight : 0,
+    this.ctx.emit('emptyChange', {
+        isEmpty,
+        type: isEmpty,
+        headerHeight: header.height,
+        bodyHeight: this.height,
+        width: this.width,
+        height: !this.data.length ? EMPTY_BODY_HEIGHT + footerHeight : 0,
     });
     let containerHeight = this.height + header.height + SCROLLER_TRACK_SIZE;
     // 如果有底部,加上底部高度

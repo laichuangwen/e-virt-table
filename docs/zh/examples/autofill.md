@@ -1,13 +1,18 @@
 # 单元格填充
 
-注意默认不会带编辑输入功能的, 具体查看单元格编辑，填充依赖选择器所以启动填充也需要启动选择器
+填充依赖选择器所以启动填充也需要启动选择器
 
-- 启用选择器：`config.ENABLE_SELECTOR`为`false`
-- 启用填充：`config.ENABLE_AUTOFILL`为`false`
-- 启用选择器可跨列： `config.ENABLE_SELECTOR_SPAN_COL`为`true`
-- 启用选择器可跨行：`config.ENABLE_SELECTOR_SPAN_ROW`为`true`
-- 启用选择器批量选中行（全选行）：`config.ENABLE_SELECTOR_ALL_ROWS`为`true`
-- 启用选择器批量选中列（全选列）：`config.ENABLE_SELECTOR_ALL_COLS`为`true`
+## Config
+
+| 参数                     | 说明                    | 类型    | 可选值 | 默认值 |
+| ------------------------ | ----------------------- | ------- | ------ | ------ |
+| ENABLE_SELECTOR          | 启用选择器              | boolean | —      | false   |
+| ENABLE_AUTOFILL          | 启用填充器              | boolean | —      | false   |
+| ENABLE_SELECTOR_SINGLE   | 启用选择器-选择器单选   | boolean | —      | false  |
+| ENABLE_SELECTOR_SPAN_COL | 启用选择器-批量跨列选择 | boolean | —      | true   |
+| ENABLE_SELECTOR_SPAN_ROW | 启用选择器-批量跨行选择 | boolean | —      | true   |
+| ENABLE_SELECTOR_ALL_ROWS | 启用选择器-批量选中列   | boolean | —      | true   |
+| ENABLE_SELECTOR_ALL_COLS | 启用选择器-批量选中行   | boolean | —      | true   |
 
 ## 禁用
 

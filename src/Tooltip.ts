@@ -171,7 +171,11 @@ export default class Tooltip {
             return;
         }
         this.enable = false;
-        this.floatingEl.style.display = "none";
+        this.floatingEl.style.display = 'none';
     }
-    destroy() {}
+    destroy() {
+        this.contentEl.remove();
+        this.arrowEl.remove();
+        this.floatingEl.remove();
+    }
 }

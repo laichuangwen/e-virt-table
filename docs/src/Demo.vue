@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, onBeforeUnmount, h } from "vue";
 import KDataGrid from "./KDataGrid.vue";
-import { DataGrid } from "@evirt-table/core";
-import type { SpanParams } from "@evirt-table/core";
+import { DataGrid } from "@e-virt-table/core";
+import type { SpanParams } from "@e-virt-table/core";
 const canvasRef = ref();
 const canvasRef1 = ref();
 let grid: DataGrid;
@@ -921,7 +921,7 @@ const cellSelectedClick = (data) => {
         <div v-html="cell.getValue()" style="padding: 4px"></div>
       </template>
     </KDataGrid>
-    <!-- <div class="evirt-table">
+    <!-- <div class="e-virt-table">
       <div class="grid" ref="canvasRef"></div>
       <p>1111</p>
     </div> -->

@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>evirt-table</title>
+    <title>e-virt-table</title>
   </head>
   <script src="../index.umd.js"></script>
   <style>
-    .evirt-table-editor {
+    .e-virt-table-editor {
       position: absolute;
       top: -10000px;
       left: -10000px;
@@ -24,7 +24,7 @@
       align-items: center;
     }
 
-    .evirt-table-editor div[contenteditable="true"] {
+    .e-virt-table-editor div[contenteditable="true"] {
       width: 100%;
       box-sizing: border-box;
       padding: 8px;
@@ -42,9 +42,9 @@
     }
   </style>
   <body style="margin: 0px">
-    <div id="evirt-table" ></div>
-    <div id="evirt-table-editor" class="evirt-table-editor">
-      <div id="evirt-table-text" contenteditable="true"></div>
+    <div id="e-virt-table" ></div>
+    <div id="e-virt-table-editor" class="e-virt-table-editor">
+      <div id="e-virt-table-text" contenteditable="true"></div>
     </div>
   </body>
   <script>
@@ -109,7 +109,7 @@
         key: "zip",
       },
     ];
-    const target = document.getElementById("evirt-table");
+    const target = document.getElementById("e-virt-table");
     const grid = new EVirtTable(target, {
       data,
       columns,
@@ -127,10 +127,10 @@
         padding = 0,
       } = cell?.getClient() || {};
       const value = cell.getValue();
-      const editor = document.getElementById("evirt-table-editor");
+      const editor = document.getElementById("e-virt-table-editor");
       editor.style.left = `${clientX}px`;
       editor.style.top = `${clientY}px`;
-      const text = document.getElementById("evirt-table-text");
+      const text = document.getElementById("e-virt-table-text");
       text.style.minWidth = `${width}px`;
       text.style.minHeight = `${height}px`;
       text.style.padding = `${padding}px`;
@@ -143,7 +143,7 @@
       selection?.collapseToEnd(); // 光标移至最后
     });
     grid.on("doneEdit", (cell) => {
-      const text = document.getElementById("evirt-table-text");
+      const text = document.getElementById("e-virt-table-text");
       const { rowKey, key } = cell;
       const value = cell.getValue();
       // !(text.textContent === '' && value === null)剔除点击编辑后未修改会把null变为''的情况
@@ -154,7 +154,7 @@
         grid.setItemValue(rowKey, key, text.textContent, true, true, true);
       }
       text.textContent = null;
-      const editor = document.getElementById("evirt-table-editor");
+      const editor = document.getElementById("e-virt-table-editor");
       if (editor) {
         editor.style.left = `${-10000}px`;
         editor.style.top = `${-10000}px`;

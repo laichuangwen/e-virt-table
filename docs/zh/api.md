@@ -6,7 +6,7 @@
 
 | 参数 | 说明 | 类型 | 可选值 | 默认值 |
 | --- | --- | --- | --- | --- |
-| CSS_PREFIX | CSS 类名前缀 | string | — | evirt-table |
+| CSS_PREFIX | CSS 类名前缀 | string | — | e-virt-table |
 | ROW_KEY | 行的唯一标识键 | string | — | — |
 | HEAD_FONT | 表头字体 | string | — | — |
 | FONT | 单元格字体 | string | — | — |

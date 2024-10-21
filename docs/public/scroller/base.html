@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>evirt-table</title>
+    <title>e-virt-table</title>
   </head>
   <script src="../index.umd.js"></script>
   <body>
@@ -14,7 +14,7 @@
     <button id="scrollerColIndex">滚动到colIndex=500</button>
     <button id="scrollerRowKey">滚动到RowKey=500</button>
     <button id="scrollerRowIndex">滚动到RowIndex=400</button>
-    <div id="evirt-table"></div>
+    <div id="e-virt-table"></div>
   </body>
   <script>
     function gcData(c = 1000, r = 1000) {
@@ -86,7 +86,7 @@
       };
     }
     const { columns, data } = gcData(1000, 1000);
-    const target = document.getElementById("evirt-table");
+    const target = document.getElementById("e-virt-table");
     const grid = new EVirtTable(target, {
       data,
       columns,

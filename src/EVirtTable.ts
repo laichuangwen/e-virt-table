@@ -8,6 +8,7 @@ import Selector from './Selector';
 import Autofill from './Autofill';
 import Tooltip from './Tooltip';
 import Editor from './Editor';
+import Empty from './Empty';
 export default class VirtTable {
     private targetContainer: HTMLDivElement;
     private target: HTMLCanvasElement;
@@ -19,6 +20,7 @@ export default class VirtTable {
     private autofill: Autofill;
     private tooltip: Tooltip;
     private editor: Editor;
+    private empty: Empty;
     ctx: Context;
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
         this.target = document.createElement('canvas');
@@ -33,6 +35,7 @@ export default class VirtTable {
         this.selector = new Selector(this.ctx);
         this.autofill = new Autofill(this.ctx);
         this.tooltip = new Tooltip(this.ctx);
+        this.empty = new Empty(this.ctx);
         this.editor = new Editor(this.ctx);
         this.ctx.on('draw', this.draw.bind(this));
         this.draw();
@@ -223,6 +226,7 @@ export default class VirtTable {
      * 销毁
      */
     destroy() {
+        this.empty.destroy();
         this.editor.destroy();
         this.tooltip.destroy();
         this.selector.destroy();

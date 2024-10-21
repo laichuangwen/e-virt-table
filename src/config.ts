@@ -15,7 +15,7 @@ import {
 
 export default class Config {
     PROCESSOR_NUM: number = 50;
-    CSS_PREFIX: string = 'evirt-table';
+    CSS_PREFIX: string = 'e-virt-table';
     ICONS: IconType[] = [];
     ROW_KEY: string = '';
     HEADER_FONT: string = '12px normal Arial';
@@ -25,6 +25,9 @@ export default class Config {
     RESIZE_MIN_WIDTH: number = 40;
     HEIGHT: number = 0;
     EMPTY_BODY_HEIGHT: number = 120;
+    EMPTY_CUSTOM = false;
+    EMPTY_CUSTOM_STYLE: Partial<CSSStyleDeclaration> = {};
+    EMPTY_TEXT = '暂无数据';
     MAX_HEIGHT: number = 1000;
     BORDER_RADIUS: number = 8;
     ENABLE_OFFSET_HEIGHT: boolean = false;

@@ -3,13 +3,13 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>evirt-table</title>
+        <title>e-virt-table</title>
     </head>
     <script src="../index.umd.js"></script>
     <body>
         <button id="selection-rows-btn">设置1,3选中</button>
         <button id="clear-selection-btn">清除选中</button>
-        <div id="evirt-table"></div>
+        <div id="e-virt-table"></div>
     </body>
     <script>
         let data = [
@@ -89,7 +89,7 @@
                 readonly: true,
             },
         ];
-        const target = document.getElementById('evirt-table');
+        const target = document.getElementById('e-virt-table');
         const grid = new EVirtTable(target, {
             data,
             columns,

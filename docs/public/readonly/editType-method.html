@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>evirt-table</title>
+    <title>e-virt-table</title>
   </head>
   <script src="../index.umd.js"></script>
   <style>
-    .evirt-table-editor {
+    .e-virt-table-editor {
       position: absolute;
       top: -10000px;
       left: -10000px;
@@ -25,9 +25,9 @@
     }
   </style>
   <body style="margin: 0px">
-    <div id="evirt-table"></div>
-    <div id="evirt-table-editor" class="evirt-table-editor">
-      <input id="evirt-table-date" style="display: none" type="date" />
+    <div id="e-virt-table"></div>
+    <div id="e-virt-table-editor" class="e-virt-table-editor">
+      <input id="e-virt-table-date" style="display: none" type="date" />
     </div>
   </body>
   <script>
@@ -93,9 +93,9 @@
         key: "zip",
       },
     ];
-    const target = document.getElementById("evirt-table");
-    const editorEl = document.getElementById("evirt-table-editor");
-    const dateEl = document.getElementById("evirt-table-date");
+    const target = document.getElementById("e-virt-table");
+    const editorEl = document.getElementById("e-virt-table-editor");
+    const dateEl = document.getElementById("e-virt-table-date");
     const grid = new EVirtTable(target, {
       data,
       columns,
