@@ -1,89 +1,94 @@
-import type Cell from "./Cell";
-import type CellHeader from "./CellHeader";
-import type { RuleItem } from "async-validator";
-import Config from "./Config";
+import type Cell from './Cell';
+import type CellHeader from './CellHeader';
+import type { RuleItem } from 'async-validator';
+import Config from './Config';
 export type EVirtTableOptions = {
-  data: any[];
-  footerData: any[];
-  columns: Column[];
-  config?: ConfigType;
+    data: any[];
+    footerData: any[];
+    columns: Column[];
+    config?: ConfigType;
 };
 export type EventCallback = (...args: any[]) => void;
 export type ChangeItem = {
-  value: any;
-  key: string;
-  rowKey: string;
-  row: any;
+    value: any;
+    key: string;
+    rowKey: string;
+    row: any;
 };
 export type OverflowTooltipPlacement =
-  | "top"
-  | "top-start"
-  | "top-end"
-  | "right"
-  | "right-start"
-  | "right-end"
-  | "left"
-  | "left-start"
-  | "left-end"
-  | "bottom"
-  | "bottom-start"
-  | "bottom-end";
+    | 'top'
+    | 'top-start'
+    | 'top-end'
+    | 'right'
+    | 'right-start'
+    | 'right-end'
+    | 'left'
+    | 'left-start'
+    | 'left-end'
+    | 'bottom'
+    | 'bottom-start'
+    | 'bottom-end';
 
-export type VerticalAlign = "top" | "middle" | "bottom";
-export type Align = "left" | "center" | "right";
-export type Fixed = "left" | "right";
-export type Type = "index" | "selection" | "index-selection" | "tree";
+export type VerticalAlign = 'top' | 'middle' | 'bottom';
+export type Align = 'left' | 'center' | 'right';
+export type Fixed = 'left' | 'right';
+export type Type = 'index' | 'selection' | 'index-selection' | 'tree';
 
 export type TypeCheckbox =
-  | "checkbox-uncheck"
-  | "checkbox-check"
-  | "checkbox-check-disabled"
-  | "checkbox-disabled"
-  | "checkbox-hover"
-  | "checkbox-indeterminate";
-export type CellType = "header" | "body" | "footer";
+    | 'checkbox-uncheck'
+    | 'checkbox-check'
+    | 'checkbox-check-disabled'
+    | 'checkbox-disabled'
+    | 'checkbox-hover'
+    | 'checkbox-indeterminate';
+export type CellType = 'header' | 'body' | 'footer';
 export type RowType = CellType;
 export type MenuItem = {
-  label: string;
-  value: string | "copy" | "paste" | "cut" | "clearSelected";
-  children?: MenuItem[];
-  event?: Function;
+    label: string;
+    value: string | 'copy' | 'paste' | 'cut' | 'clearSelected';
+    children?: MenuItem[];
+    event?: Function;
 };
 export type OverlayerView = {
-  key: "left" | "center" | "right";
-  style: any;
-  cells: Cell[] | CellHeader[];
+    key: 'left' | 'center' | 'right';
+    style: any;
+    cells: Cell[] | CellHeader[];
 };
 export type OverlayerWrapper = {
-  type: "body" | "footer" | "header";
-  class: string;
-  style: any;
-  views: OverlayerView[];
+    type: 'body' | 'footer' | 'header';
+    class: string;
+    style: any;
+    views: OverlayerView[];
 };
 export type OverlayerContainer = {
-  style: any;
-  views: OverlayerWrapper[];
+    style: any;
+    views: OverlayerWrapper[];
 };
 export type ContextmenuItem = {
-  label: string;
-  value: string | number;
-  render: Function;
+    label: string;
+    value: string | number;
+    render: Function;
 };
 export type Render = Function | string | undefined;
 export interface KRuleItem extends RuleItem {
-  column?: Column;
-  row?: any; // 这里可以定义更具体的类型，根据你的需求
-  rowIndex?: number;
-  colIndex?: number;
+    column?: Column;
+    row?: any; // 这里可以定义更具体的类型，根据你的需求
+    rowIndex?: number;
+    colIndex?: number;
 }
 export type Rule = KRuleItem | KRuleItem[];
+export type ValidateItemError = {
+    rowIndex: number;
+    key: string;
+    message: string;
+};
 export type Rules = {
-  [x: string]: Rule;
+    [x: string]: Rule;
 };
 export type Position = {
-  height: number;
-  top: number;
-  bottom: number;
+    height: number;
+    top: number;
+    bottom: number;
 };
 export interface Column {
     type: Type;
@@ -115,45 +120,45 @@ export interface Column {
     options: any[];
 }
 export type OverlayerTooltip = {
-  style: any;
-  text: string;
-  show: boolean;
+    style: any;
+    text: string;
+    show: boolean;
 };
 export type OverlayerContextmenu = {
-  style: any;
-  list: any[];
-  show: boolean;
+    style: any;
+    list: any[];
+    show: boolean;
 };
 export type CellStyleOptions = {
-  color?: string;
-  backgroundColor?: string;
+    color?: string;
+    backgroundColor?: string;
 };
 export type CellParams = {
-  row: any;
-  rowIndex: number;
-  colIndex: number;
-  column: Column;
-  value: any;
+    row: any;
+    rowIndex: number;
+    colIndex: number;
+    column: Column;
+    value: any;
 };
 export type SpanType = {
-  rowspan: number;
-  colspan: number;
+    rowspan: number;
+    colspan: number;
 };
 export type SpanParams = {
-  row: any;
-  rowIndex: number;
-  colIndex: number;
-  column: Column;
-  visibleLeafColumns: Column[];
-  value: any;
-  headIndex: number;
-  headPosition: Position;
-  visibleRows: any[];
-  rows: any[];
+    row: any;
+    rowIndex: number;
+    colIndex: number;
+    column: Column;
+    visibleLeafColumns: Column[];
+    value: any;
+    headIndex: number;
+    headPosition: Position;
+    visibleRows: any[];
+    rows: any[];
 };
 export type SelectableParams = {
-  row: any;
-  rowIndex: number;
+    row: any;
+    rowIndex: number;
 };
 export type ConfigType = Partial<Config>;
 export type FilterMethod = (rows: any[]) => any[];

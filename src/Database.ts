@@ -1,4 +1,4 @@
-import Schema from 'async-validator';
+import Schema, { ValidateError } from 'async-validator';
 import type CellHeader from './CellHeader';
 import type Context from './Context';
 import type {
@@ -836,6 +836,16 @@ export default class Database {
     }
     getLoading() {
         return this.loading;
+    }
+    setValidationErrorByRowIndex(rowIndex: number, key: string, message: string) {
+        const rowKey = this.rowIndexRowKeyMap.get(rowIndex);
+        const _key = `${rowKey}_${key}`;
+        const errors: ValidateError[] = [
+            {
+                message,
+            },
+        ];
+        this.validationErrorMap.set(_key, errors);
     }
     setValidationError(rowKey: string, key: string, errors: any[]) {
         const _key = `${rowKey}_${key}`;

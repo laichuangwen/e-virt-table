@@ -1,4 +1,13 @@
-import { ChangeItem, Column, ConfigType, EventCallback, EVirtTableOptions, FilterMethod, Position } from './types';
+import {
+    ChangeItem,
+    Column,
+    ConfigType,
+    EventCallback,
+    EVirtTableOptions,
+    FilterMethod,
+    Position,
+    ValidateItemError,
+} from './types';
 import Context from './Context';
 import Scroller from './Scroller';
 import Header from './Header';
@@ -138,6 +147,21 @@ export default class VirtTable {
                 reject(errors);
             }
         });
+    }
+    setValidations(errors: ValidateItemError[]) {
+        errors.forEach((item) => {
+            const { rowIndex, key, message } = item;
+            this.ctx.database.setValidationErrorByRowIndex(rowIndex, key, message);
+        });
+        // 滚动到错误位置，取第一个错误
+        if (errors && Array.isArray(errors) && errors.length) {
+            const [err] = errors;
+            if (err && err.rowIndex >= 0 && err.key) {
+                const { rowIndex, key } = err;
+                this.scrollToRowIndex(rowIndex);
+                this.scrollToColkey(key);
+            }
+        }
     }
     getValidations() {
         return new Promise(async (resolve, reject) => {
