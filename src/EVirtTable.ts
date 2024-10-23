@@ -18,7 +18,7 @@ import Autofill from './Autofill';
 import Tooltip from './Tooltip';
 import Editor from './Editor';
 import Empty from './Empty';
-export default class VirtTable {
+export default class EVirtTable {
     private targetContainer: HTMLDivElement;
     private target: HTMLCanvasElement;
     private scroller: Scroller;

@@ -2,15 +2,30 @@
     "name": "e-virt-table",
     "private": true,
     "version": "0.0.1",
-    "main": "index.ts",
-    "types": "types/index.d.ts",
+    "description": "A powerful data table based on canvas. You can use it as data grid、Microsoft Excel or Google sheets. It supports virtual scroll、cell edit etc.",
+    "main": "lib/index.js",
+    "module": "lib/index.es.js",
+    "types": "lib/index.d.ts",
     "scripts": {
         "dev": "vite",
-        "dev:installl": "cd docs && npm run i",
+        "dev:install": "cd docs && npm run i",
         "dev:docs": "cd docs && npm run dev",
         "build": "vite build && tsc",
         "preview": "vite preview"
     },
+    "license": "MIT",
+    "author": "laichuangwen",
+    "bugs": {
+        "url": "https://github.com/laichuangwen/e-virt-table/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:laichuangwen/evirt-table.git"
+    },
+    "files": [
+        "dist",
+        "src"
+    ],
     "devDependencies": {
         "rollup-plugin-copy": "^3.5.0",
         "typescript": "^5.5.3",
