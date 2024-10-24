@@ -120,7 +120,7 @@ export default class Cell extends BaseCell {
         this.drawTextX = this.drawX;
         this.drawTextY = this.drawY;
         this.updateSpan();
-        // this.updateStyle();
+        this.updateStyle();
         this.updateType();
         this.updateHoverIcon();
         this.updateSelection();
@@ -539,32 +539,29 @@ export default class Cell extends BaseCell {
      * 获取样式
      */
     getOverlayerViewsStyle() {
-        // let left = `${this.getClientX() - this.ctx.header.fixedLeftWidth}px`;
-        // let top = `${this.getClientY() - this.ctx.body.y}px`;
-        // // 固定列
-        // if (this.fixed === "left") {
-        //   left = `${this.getClientX()}px`;
-        // } else if (this.fixed === "right") {
-        //   left = `${
-        //     this.getClientX() -
-        //     (this.ctx.stage.width() - this.ctx.header.fixedRightWidth)
-        //   }px`;
-        // }
-        // // 合计
-        // if (this.cellType === "footer") {
-        //   if (this.ctx.config.FOOTER_FIXED) {
-        //     top = `${this.getClientY() - this.ctx.footer.y}px`;
-        //   }
-        // }
-        // return {
-        //   position: "absolute",
-        //   overflow: "hidden",
-        //   left,
-        //   top,
-        //   width: `${this.visibleWidth}px`,
-        //   height: `${this.visibleHeight}px`,
-        //   pointerEvents: "none",
-        // };
+        let left = `${this.drawX - this.ctx.fixedLeftWidth}px`;
+        let top = `${this.drawY - this.ctx.body.y}px`;
+        // 固定列
+        if (this.fixed === 'left') {
+            left = `${this.drawX}px`;
+        } else if (this.fixed === 'right') {
+            left = `${this.drawX - (this.ctx.target.width - this.ctx.fixedRightWidth)}px`;
+        }
+        // 合计
+        if (this.cellType === 'footer') {
+            if (this.ctx.config.FOOTER_FIXED) {
+                top = `${this.drawY - this.ctx.footer.y}px`;
+            }
+        }
+        return {
+            position: 'absolute',
+            overflow: 'hidden',
+            left,
+            top,
+            width: `${this.visibleWidth}px`,
+            height: `${this.visibleHeight}px`,
+            pointerEvents: 'none',
+        };
     }
     draw() {
         const {

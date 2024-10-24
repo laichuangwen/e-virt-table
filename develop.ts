@@ -38,6 +38,19 @@ const columns: any[] = [
         fixed: 'left',
         align: 'left',
         verticalAlign: 'middle',
+        renderFooter: (pEl, cell) => {
+            const cellEl = document.createElement('div');
+            cellEl.style.width = '100%';
+            cellEl.style.height = '100%';
+            cellEl.style.opacity = '0.5';
+            cellEl.style.backgroundColor = 'cyan';
+            cellEl.style.display = 'flex';
+            cellEl.style.justifyContent = 'center';
+            cellEl.style.alignItems = 'center';
+
+            cellEl.innerHTML = cell.text;
+            pEl.appendChild(cellEl);
+        },
         // render: "emp_name",
     },
     // {
@@ -218,6 +231,19 @@ const columns: any[] = [
             required: true,
             message: '该项必填哦！',
         },
+        renderHeader: (pEl, cell) => {
+            const cellEl = document.createElement('div');
+            cellEl.style.width = '100%';
+            cellEl.style.height = '100%';
+            cellEl.style.opacity = '0.5';
+            cellEl.style.backgroundColor = 'cyan';
+            cellEl.style.display = 'flex';
+            cellEl.style.justifyContent = 'center';
+            cellEl.style.alignItems = 'center';
+
+            cellEl.innerHTML = cell.text;
+            pEl.appendChild(cellEl);
+        },
     },
     {
         title: '计薪月份',
@@ -245,6 +271,18 @@ const columns: any[] = [
         rules: {
             required: true,
             message: '该项必填哦！',
+        },
+        render: (pEl, cell) => {
+            const cellEl = document.createElement('div');
+            cellEl.style.width = '100%';
+            cellEl.style.height = '100%';
+            cellEl.style.opacity = '0.5';
+            cellEl.style.backgroundColor = 'cyan';
+            cellEl.style.display = 'flex';
+            cellEl.style.justifyContent = 'center';
+            cellEl.style.alignItems = 'center';
+            cellEl.innerHTML = cell.text;
+            pEl.appendChild(cellEl);
         },
     },
     {
@@ -531,6 +569,34 @@ const eVirtTable = new EVirtTable(canvas, {
             // }
         },
     },
+});
+const overlayerEl = document.getElementById('e-virt-table-overlayer');
+eVirtTable.on('overlayerChange', (container) => {
+    if (!overlayerEl) {
+        return;
+    }
+    // 移除所有子元素
+    overlayerEl.replaceChildren();
+    Object.assign(overlayerEl.style, container.style);
+    container.views.forEach((typeView) => {
+        const typeDiv = document.createElement('div');
+        typeDiv.className = typeView.class;
+        Object.assign(typeDiv.style, typeView.style);
+        typeView.views.forEach((cellWrapView) => {
+            const cellWrap = document.createElement('div');
+            Object.assign(cellWrap.style, cellWrapView.style);
+            cellWrapView.cells.forEach((cell) => {
+                const cellEl = document.createElement('div');
+                Object.assign(cellEl.style, cell.style);
+                if (typeof cell.render === 'function') {
+                    cell.render(cellEl, cell);
+                }
+                cellWrap.appendChild(cellEl);
+            });
+            typeDiv.appendChild(cellWrap);
+        });
+        overlayerEl.appendChild(typeDiv);
+    });
 });
 const editorEl = document.getElementById('e-virt-table-editor');
 const dateEl = document.getElementById('e-virt-table-date') as HTMLInputElement;

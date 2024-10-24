@@ -1,43 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>e-virt-table develop</title>
-  </head>
-  <style>
-    .e-virt-table-editor {
-      position: absolute;
-      top: -10000px;
-      left: -10000px;
-      text-align: left;
-      line-height: 0;
-      z-index: 100;
-      overflow: hidden;
-      background-color: #fff;
-      border: 2px solid rgb(82, 146, 247);
-      box-sizing: border-box;
-      box-shadow: rgba(0, 0, 0, 0.2) 0px 6px 16px;
-      pointer-events: auto;
-      display: flex;
-      align-items: center;
-    }
-  </style>
-  <body>
-    <div id="app">
-      <div>
-        <button id="instantiation">获取实例</button>
-        <button id="validator">校验</button>
-        <button id="setValidator">设置错误</button>
-      </div>
-      <div style="position: relative;">
-        <div id="e-virt-table"></div>
-        <div id="e-virt-table-editor" class="e-virt-table-editor">
-          <input id="e-virt-table-date" style="display: none" type="date" />
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table develop</title>
+    </head>
+    <style>
+        .e-virt-table-editor {
+            position: absolute;
+            top: -10000px;
+            left: -10000px;
+            text-align: left;
+            line-height: 0;
+            z-index: 100;
+            overflow: hidden;
+            background-color: #fff;
+            border: 2px solid rgb(82, 146, 247);
+            box-sizing: border-box;
+            box-shadow: rgba(0, 0, 0, 0.2) 0px 6px 16px;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+        }
+    </style>
+    <body>
+        <div id="app">
+            <div>
+                <button id="instantiation">获取实例</button>
+                <button id="validator">校验</button>
+                <button id="setValidator">设置错误</button>
+            </div>
+            <div style="position: relative">
+                <div id="e-virt-table"></div>
+                <div id="e-virt-table-overlayer"></div>
+                <div id="e-virt-table-editor" class="e-virt-table-editor">
+                    <input id="e-virt-table-date" style="display: none" type="date" />
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <script type="module" src="/develop.ts"></script>
-  </body>
+        <script type="module" src="/develop.ts"></script>
+    </body>
 </html>

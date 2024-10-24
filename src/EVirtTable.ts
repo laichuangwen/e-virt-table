@@ -18,6 +18,7 @@ import Autofill from './Autofill';
 import Tooltip from './Tooltip';
 import Editor from './Editor';
 import Empty from './Empty';
+import Overlayer from './Overlayer';
 export default class EVirtTable {
     private targetContainer: HTMLDivElement;
     private target: HTMLCanvasElement;
@@ -30,6 +31,7 @@ export default class EVirtTable {
     private tooltip: Tooltip;
     private editor: Editor;
     private empty: Empty;
+    private overlayer: Overlayer;
     ctx: Context;
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
         this.target = document.createElement('canvas');
@@ -46,6 +48,7 @@ export default class EVirtTable {
         this.tooltip = new Tooltip(this.ctx);
         this.empty = new Empty(this.ctx);
         this.editor = new Editor(this.ctx);
+        this.overlayer = new Overlayer(this.ctx);
         this.ctx.on('draw', this.draw.bind(this));
         this.draw();
     }
@@ -59,6 +62,7 @@ export default class EVirtTable {
             this.footer.draw();
             this.header.draw();
             this.scroller.draw();
+            this.overlayer.draw();
         });
     }
     loadConfig(_config: ConfigType) {

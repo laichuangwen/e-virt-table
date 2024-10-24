@@ -76,7 +76,7 @@ export default class CellHeader extends BaseCell {
      * 更新样式
      */
     updateStyle() {
-        // this.style = this.getOverlayerViewsStyle();
+        this.style = this.getOverlayerViewsStyle();
     }
     updateContainer() {
         const { HEADER_CELL_STYLE_METHOD, HEADER_BG_COLOR, HEADER_TEXT_COLOR } = this.ctx.config;
@@ -102,10 +102,10 @@ export default class CellHeader extends BaseCell {
     }
     update() {
         this.updateContainer();
-        this.updateStyle();
         this.displayText = this.getText();
         this.drawX = this.getDrawX();
         this.drawY = this.getDrawY();
+        this.updateStyle();
     }
     draw() {
         const {
@@ -178,26 +178,24 @@ export default class CellHeader extends BaseCell {
     /**
      * 获取样式
      */
-    // getOverlayerViewsStyle() {
-    //   let left = "";
-    //   if (this.fixed === "left") {
-    //     left = `${this.getClientX()}px`;
-    //   } else if (this.fixed === "right") {
-    //     left = `${
-    //       this.getClientX() -
-    //       (this.ctx.stage.width() - this.ctx.header.fixedRightWidth)
-    //     }px`;
-    //   } else {
-    //     left = `${this.getClientX() - this.ctx.header.fixedLeftWidth}px`;
-    //   }
-    //   return {
-    //     position: "absolute",
-    //     overflow: "hidden",
-    //     left: left,
-    //     top: `${this.y}px`,
-    //     width: `${this.width}px`,
-    //     height: `${this.height}px`,
-    //     pointerEvents: "none",
-    //   };
-    // }
+    getOverlayerViewsStyle() {
+        let left = '';
+        if (this.fixed === 'left') {
+            left = `${this.drawX}px`;
+        } else if (this.fixed === 'right') {
+            left = `${this.drawX - (this.ctx.target.width - this.ctx.fixedRightWidth)}px`;
+        } else {
+            // 中间的，需要减去左边固定列的宽度
+            left = `${this.drawX - this.ctx.fixedLeftWidth}px`;
+        }
+        return {
+            position: 'absolute',
+            overflow: 'hidden',
+            left: left,
+            top: `${this.drawY + 1}px`,
+            width: `${this.width}px`,
+            height: `${this.height}px`,
+            pointerEvents: 'none',
+        };
+    }
 }

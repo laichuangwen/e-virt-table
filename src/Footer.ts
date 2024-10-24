@@ -102,6 +102,7 @@ export default class Footer {
       rows.push(row);
     });
     this.renderRows = rows;
+    this.ctx.footer.renderRows = this.renderRows;
   }
   draw() {
     this.renderRows.forEach((row) => {
