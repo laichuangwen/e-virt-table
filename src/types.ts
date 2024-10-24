@@ -108,7 +108,7 @@ export interface Column {
     render: Function;
     renderFooter: Function;
     renderHeader: Function;
-    formatter: formatterMethod;
+    formatter: FormatterMethod;
     overflowTooltipShow: boolean;
     overflowTooltipMaxWidth: number;
     overflowTooltipPlacement: OverflowTooltipPlacement;
@@ -140,6 +140,10 @@ export type CellParams = {
     column: Column;
     value: any;
 };
+export type CellHeaderParams = {
+    colIndex?: number;
+    column?: Column;
+};
 export type SpanType = {
     rowspan: number;
     colspan: number;
@@ -162,8 +166,9 @@ export type SelectableParams = {
 };
 export type ConfigType = Partial<Config>;
 export type FilterMethod = (rows: any[]) => any[];
-export type formatterMethod = (params: CellParams) => string | void;
+export type FormatterMethod = (params: CellParams) => string | void;
 export type CellStyleMethod = (params: CellParams) => CellStyleOptions | void;
+export type CellHeaderStyleMethod = (params: CellHeaderParams) => CellStyleOptions | void;
 export type CellReadonlyMethod = (params: CellParams) => boolean | void;
 export type CellRulesMethod = (params: CellParams) => Rules | void;
 export type CellTypeMethod = (params: CellParams) => Type | void;

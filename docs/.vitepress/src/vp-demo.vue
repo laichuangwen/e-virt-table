@@ -131,6 +131,11 @@ iframe {
     margin: 0.5px;
     background-color: #fff;
 }
+.example-showcase:fullscreen {
+    padding: 0px;
+    margin: 0px;
+    background-color: #fff;
+}
 
 .example {
     border: 1px solid var(--vp-c-divider);

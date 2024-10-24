@@ -83,6 +83,34 @@
         const grid = new EVirtTable(target, {
             data,
             columns,
+            footerData: [
+                {
+                    date: '合计',
+                    name: '王小虎',
+                    province: '上海',
+                    city: '普陀区',
+                    address: '上海市普陀区金沙江路 1518 弄',
+                    zip: 200333,
+                },
+            ],
+            config: {
+                BODY_CELL_STYLE_METHOD: ({ rowIndex, column }) => {
+                    if (rowIndex == 2 && column.key === 'address')
+                        return {
+                            color: 'blue',
+                            backgroundColor: 'red',
+                        };
+                    return {};
+                },
+                FOOTER_CELL_STYLE_METHOD: ({ rowIndex, column }) => {
+                    if (rowIndex == 0 && column.key === 'address')
+                        return {
+                            color: 'blue',
+                            backgroundColor: 'yellow',
+                        };
+                    return {};
+                },
+            },
         });
     </script>
 </html>

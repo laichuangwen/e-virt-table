@@ -83,6 +83,18 @@
         const grid = new EVirtTable(target, {
             data,
             columns,
+            config: {
+                CELL_FORMATTER_METHOD({ rowIndex, colIndex, value, column, row }) {
+                    if (rowIndex === 1 && colIndex === 2) {
+                        return `${value}被格式化了`;
+                    }
+                    // 有formatter会失效
+                    if (rowIndex === 1 && colIndex === 1) {
+                        return `${value}被格式化了`;
+                    }
+                    return value;
+                },
+            },
         });
     </script>
 </html>

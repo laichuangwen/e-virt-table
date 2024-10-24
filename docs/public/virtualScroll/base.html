@@ -1,143 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>e-virt-table</title>
-  </head>
-  <script src="../index.umd.js"></script>
-  <style>
-    .view:fullscreen {
-      background-color: white;
-    }
-    .content {
-      position: relative;
-    }
-  </style>
-  <body style="margin: 0px">
-    <div id="e-virt-table-view" class="view">
-      <div style="margin-bottom: 8px">
-        <button id="e-virt-table-fullpage-btn">全屏</button>
-        <select id="options" name="options">
-          <option value="1">列1k行1K</option>
-          <option value="2">列100行20w</option>
-          <option value="3">列1W行1000</option>
-        </select>
-      </div>
-      <div class="content">
-        <div id="e-virt-table"></div>
-      </div>
-    </div>
-  </body>
-  <script>
-    function gcData(c = 1000, r = 1000) {
-      let columns = [
-        {
-          type: "index",
-          key: "index",
-          width: 100,
-        },
-        {
-          title: "日期",
-          key: "date",
-        },
-        {
-          title: "姓名",
-          key: "name",
-        },
-        {
-          title: "省份",
-          key: "province",
-        },
-        {
-          title: "市区",
-          key: "city",
-        },
-        {
-          title: "地址",
-          key: "address",
-          width: 200,
-        },
-        {
-          title: "邮编",
-          key: "zip",
-        },
-      ];
-      let gcData = {};
-      for (let i = 0; i < c; i += 1) {
-        columns.push({
-          title: `表头${i}`,
-          key: `gc_${i}`,
-        });
-        gcData[`gc_${i}`] = `数据${i}`;
-      }
-      let data = [];
-      _gcData = {
-        date: "2016-05-02",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1518 弄",
-        zip: 200333,
-        ...gcData,
-      };
-      for (let i = 0; i < r; i += 1) {
-        data.push(JSON.parse(JSON.stringify(_gcData)));
-      }
-      return {
-        columns,
-        data,
-      };
-    }
-    const { columns, data } = gcData(1000, 1000);
-    const target = document.getElementById("e-virt-table");
-    const grid = new EVirtTable(target, {
-      data,
-      columns,
-      config: {
-        ENABLE_SELECTOR: true,
-        ENABLE_AUTOFILL: true,
-        ENABLE_OFFSET_HEIGHT: true,
-        OFFSET_HEIGHT: 0,
-      },
-    });
-    const fullpageBtn = document.getElementById("e-virt-table-fullpage-btn");
-    fullpageBtn.addEventListener("click", () => {
-      const view = document.getElementById("e-virt-table-view");
-      if (view.requestFullscreen) {
-        view.requestFullscreen();
-      } else if (view.mozRequestFullScreen) {
-        // Firefox
-        view.mozRequestFullScreen();
-      } else if (view.webkitRequestFullscreen) {
-        // Chrome, Safari, Opera
-        view.webkitRequestFullscreen();
-      } else if (view.msRequestFullscreen) {
-        // IE/Edge
-        view.msRequestFullscreen();
-      }
-    });
-    // 获取 select 元素
-    const selectElement = document.getElementById("options");
-
-    // 添加 change 事件监听器
-    selectElement.addEventListener("change", function () {
-      grid.setLoading(true);
-      // 获取选中的值
-      const selectedValue = selectElement.value;
-      if (selectedValue === "1") {
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="../index.umd.js"></script>
+    <style>
+        .view:fullscreen {
+            background-color: white;
+        }
+        .content {
+            position: relative;
+        }
+    </style>
+    <body>
+        <div style="margin-bottom: 8px">
+            <select id="options" name="options">
+                <option value="1">列1k行1K</option>
+                <option value="2">列100行20w</option>
+                <option value="3">列1W行1000</option>
+            </select>
+        </div>
+        <div class="content">
+            <div id="e-virt-table"></div>
+        </div>
+    </body>
+    <script>
+        function gcData(c = 1000, r = 1000) {
+            let columns = [
+                {
+                    type: 'index',
+                    key: 'index',
+                    width: 100,
+                },
+                {
+                    title: '日期',
+                    key: 'date',
+                },
+                {
+                    title: '姓名',
+                    key: 'name',
+                },
+                {
+                    title: '省份',
+                    key: 'province',
+                },
+                {
+                    title: '市区',
+                    key: 'city',
+                },
+                {
+                    title: '地址',
+                    key: 'address',
+                    width: 200,
+                },
+                {
+                    title: '邮编',
+                    key: 'zip',
+                },
+            ];
+            let gcData = {};
+            for (let i = 0; i < c; i += 1) {
+                columns.push({
+                    title: `表头${i}`,
+                    key: `gc_${i}`,
+                });
+                gcData[`gc_${i}`] = `数据${i}`;
+            }
+            let data = [];
+            _gcData = {
+                date: '2016-05-02',
+                name: '王小虎',
+                province: '上海',
+                city: '普陀区',
+                address: '上海市普陀区金沙江路 1518 弄',
+                zip: 200333,
+                ...gcData,
+            };
+            for (let i = 0; i < r; i += 1) {
+                data.push(JSON.parse(JSON.stringify(_gcData)));
+            }
+            return {
+                columns,
+                data,
+            };
+        }
         const { columns, data } = gcData(1000, 1000);
-        grid.loadColumns(columns);
-        grid.loadData(data);
-      } else if (selectedValue === "2") {
-        const { columns, data } = gcData(100, 200000);
-        grid.loadColumns(columns);
-        grid.loadData(data);
-      } else if (selectedValue === "3") {
-        const { columns, data } = gcData(10000, 1000);
-        grid.loadColumns(columns);
-        grid.loadData(data);
-      }
-    });
-  </script>
+        const target = document.getElementById('e-virt-table');
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                ENABLE_SELECTOR: true,
+                ENABLE_AUTOFILL: true,
+                ENABLE_OFFSET_HEIGHT: true,
+                OFFSET_HEIGHT: 24,
+            },
+        });
+        // 获取 select 元素
+        const selectElement = document.getElementById('options');
+
+        // 添加 change 事件监听器
+        selectElement.addEventListener('change', function () {
+            grid.setLoading(true);
+            // 获取选中的值
+            const selectedValue = selectElement.value;
+            if (selectedValue === '1') {
+                const { columns, data } = gcData(1000, 1000);
+                grid.loadColumns(columns);
+                grid.loadData(data);
+            } else if (selectedValue === '2') {
+                const { columns, data } = gcData(100, 200000);
+                grid.loadColumns(columns);
+                grid.loadData(data);
+            } else if (selectedValue === '3') {
+                const { columns, data } = gcData(10000, 1000);
+                grid.loadColumns(columns);
+                grid.loadData(data);
+            }
+        });
+    </script>
 </html>

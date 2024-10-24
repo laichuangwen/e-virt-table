@@ -1,6 +1,6 @@
 import type Context from './Context';
 import { generateShortUUID } from './util';
-import type { Align, Column, Fixed, Render, Rules, Type, VerticalAlign } from './types';
+import type { Align, CellHeaderStyleMethod, Column, Fixed, Render, Rules, Type, VerticalAlign } from './types';
 import BaseCell from './BaseCell';
 export default class CellHeader extends BaseCell {
     align: Align;
@@ -27,6 +27,8 @@ export default class CellHeader extends BaseCell {
     style: Partial<CSSStyleDeclaration> = {};
     drawX = 0;
     drawY = 0;
+    drawCellBgColor = '';
+    drawTextColor = '';
     drawImageX = 0;
     drawImageY = 0;
     drawImageWidth = 0;
@@ -76,8 +78,30 @@ export default class CellHeader extends BaseCell {
     updateStyle() {
         // this.style = this.getOverlayerViewsStyle();
     }
-
+    updateContainer() {
+        const { HEADER_CELL_STYLE_METHOD, HEADER_BG_COLOR, HEADER_TEXT_COLOR } = this.ctx.config;
+        let bgColor = HEADER_BG_COLOR;
+        let textColor = HEADER_TEXT_COLOR;
+        if (typeof HEADER_CELL_STYLE_METHOD === 'function') {
+            const headerCellStyleMethod: CellHeaderStyleMethod = HEADER_CELL_STYLE_METHOD;
+            const { backgroundColor, color } =
+                headerCellStyleMethod({
+                    colIndex: this.colIndex,
+                    column: this.column,
+                }) || {};
+            if (backgroundColor) {
+                bgColor = backgroundColor;
+            }
+            // 文字颜色
+            if (color) {
+                textColor = color;
+            }
+        }
+        this.drawCellBgColor = bgColor;
+        this.drawTextColor = textColor;
+    }
     update() {
+        this.updateContainer();
         this.updateStyle();
         this.displayText = this.getText();
         this.drawX = this.getDrawX();
@@ -86,17 +110,17 @@ export default class CellHeader extends BaseCell {
     draw() {
         const {
             paint,
-            config: { BORDER_COLOR, HEADER_BG_COLOR, CELL_PADDING, HEADER_FONT, HEADER_TEXT_COLOR },
+            config: { BORDER_COLOR, CELL_PADDING, HEADER_FONT },
         } = this.ctx;
         const { drawX, drawY, displayText } = this;
         paint.drawRect(drawX, drawY, this.width, this.height, {
             borderColor: BORDER_COLOR,
-            fillColor: HEADER_BG_COLOR,
+            fillColor: this.drawCellBgColor,
         });
         paint.drawText(displayText, drawX, drawY, this.width, this.height, {
             font: HEADER_FONT,
             padding: CELL_PADDING,
-            color: HEADER_TEXT_COLOR,
+            color: this.drawTextColor,
             align: this.align,
             verticalAlign: this.verticalAlign,
         });

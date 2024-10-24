@@ -83,6 +83,16 @@
         const grid = new EVirtTable(target, {
             data,
             columns,
+            config: {
+                BODY_CELL_STYLE_METHOD: ({ rowIndex, column }) => {
+                    if (rowIndex == 2 && column.key === 'address')
+                        return {
+                            color: 'blue',
+                            backgroundColor: 'red',
+                        };
+                    return {};
+                },
+            },
         });
     </script>
 </html>

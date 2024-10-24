@@ -1,6 +1,7 @@
 import { IconType } from './Icons';
 import {
     CellEditorTypeMethod,
+    CellHeaderStyleMethod,
     CellHoverIconMethod,
     CellReadonlyMethod,
     CellRenderMethod,
@@ -8,6 +9,7 @@ import {
     CellStyleMethod,
     CellTypeMethod,
     ExpandLazyMethod,
+    FormatterMethod,
     MenuItem,
     SelectableMethod,
     SpanMethod,
@@ -107,8 +109,11 @@ export default class Config {
         { label: '粘贴', value: 'paste' },
         { label: '清空选中内容', value: 'clearSelected' },
     ];
+    HEADER_CELL_STYLE_METHOD?: CellHeaderStyleMethod;
     BODY_CELL_STYLE_METHOD?: CellStyleMethod;
+    FOOTER_CELL_STYLE_METHOD?: CellStyleMethod;
     CELL_READONLY_METHOD?: CellReadonlyMethod;
+    CELL_FORMATTER_METHOD?: FormatterMethod;
     CELL_RULES_METHOD?: CellRulesMethod;
     CELL_TYPE_METHOD?: CellTypeMethod;
     CELL_EDITOR_TYPE_METHOD?: CellEditorTypeMethod;

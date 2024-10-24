@@ -53,6 +53,7 @@ export default defineConfig({
                             { text: 'footer合计', link: '/zh/examples/footer' },
                             { text: '合并', link: '/zh/examples/span' },
                             { text: '格式化', link: '/zh/examples/formatter' },
+                            { text: '样式', link: '/zh/examples/cell-style' },
                             { text: '编辑', link: '/zh/examples/readonly' },
                             { text: '校验', link: '/zh/examples/validator' },
                             { text: '选择', link: '/zh/examples/selector' },

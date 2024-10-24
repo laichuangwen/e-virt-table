@@ -7,10 +7,9 @@ import type {
     VerticalAlign,
     CellType,
     Render,
-    formatterMethod,
+    FormatterMethod,
     CellTypeMethod,
     CellRenderMethod,
-    // SpanMethod,
     CellEditorTypeMethod,
     SpanMethod,
     CellHoverIconMethod,
@@ -20,7 +19,7 @@ import type {
 import Context from './Context';
 import BaseCell from './BaseCell';
 export default class Cell extends BaseCell {
-    formatter?: formatterMethod;
+    formatter?: FormatterMethod;
     hoverIconName: string = '';
     align: Align;
     verticalAlign: VerticalAlign;
@@ -284,6 +283,7 @@ export default class Cell extends BaseCell {
             BODY_BG_COLOR,
             EDIT_BG_COLOR,
             BODY_CELL_STYLE_METHOD,
+            FOOTER_CELL_STYLE_METHOD,
             READONLY_TEXT_COLOR,
             FOOTER_BG_COLOR,
             HIGHLIGHT_SELECTED_ROW,
@@ -292,10 +292,30 @@ export default class Cell extends BaseCell {
             HIGHLIGHT_HOVER_ROW_COLOR,
         } = this.ctx.config;
         if (this.cellType === 'footer') {
+            let bgColor = FOOTER_BG_COLOR;
+            let textColor = READONLY_TEXT_COLOR;
+            if (typeof FOOTER_CELL_STYLE_METHOD === 'function') {
+                const footerCellStyleMethod: CellStyleMethod = FOOTER_CELL_STYLE_METHOD;
+                const { backgroundColor, color } =
+                    footerCellStyleMethod({
+                        row: this.row,
+                        rowIndex: this.rowIndex,
+                        colIndex: this.colIndex,
+                        column: this.column,
+                        value: this.getValue(),
+                    }) || {};
+                if (backgroundColor) {
+                    bgColor = backgroundColor;
+                }
+                // 文字颜色
+                if (color) {
+                    textColor = color;
+                }
+            }
             // 合计底部背景色
             this.drawCellSkyBgColor = 'transparent';
-            this.drawCellBgColor = FOOTER_BG_COLOR;
-            this.drawTextColor = READONLY_TEXT_COLOR;
+            this.drawCellBgColor = bgColor;
+            this.drawTextColor = textColor;
             return;
         }
         // 高亮行,在背景色上加一层颜色
@@ -481,8 +501,22 @@ export default class Cell extends BaseCell {
             return this.row[this.key];
         }
         // cellType === "body"
+
+        // formatter优先等级比较高
         if (typeof this.formatter === 'function') {
             const _text = this.formatter({
+                row: this.row,
+                rowIndex: this.rowIndex,
+                colIndex: this.colIndex,
+                column: this.column,
+                value: this.getValue(),
+            });
+            return _text;
+        }
+        const { CELL_FORMATTER_METHOD } = this.ctx.config;
+        if (typeof CELL_FORMATTER_METHOD === 'function') {
+            const formatterMethod: FormatterMethod = CELL_FORMATTER_METHOD;
+            const _text = formatterMethod({
                 row: this.row,
                 rowIndex: this.rowIndex,
                 colIndex: this.colIndex,
