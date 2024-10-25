@@ -60,6 +60,7 @@ export default defineConfig({
                             { text: '填充', link: '/zh/examples/autofill' },
                             { text: '键盘事件', link: '/zh/examples/keyboard' },
                             { text: '历史回退', link: '/zh/examples/history' },
+                            { text: '插槽（覆盖层）', link: '/zh/examples/overlayer' },
                         ],
                     },
                 ],

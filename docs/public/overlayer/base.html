@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="../index.umd.js"></script>
+    <style>
+        .view:fullscreen {
+            background-color: white;
+        }
+        .content {
+            position: relative;
+        }
+    </style>
+    <body>
+        <div class="content">
+            <div id="e-virt-table"></div>
+            <div id="e-virt-table-overlayer"></div>
+        </div>
+    </body>
+    <script>
+        function gcData(c = 1000, r = 1000) {
+            let columns = [
+                {
+                    type: 'index',
+                    key: 'index',
+                    width: 100,
+                },
+                {
+                    title: '日期',
+                    key: 'date',
+                },
+                {
+                    title: '姓名',
+                    key: 'name',
+                },
+                {
+                    title: '省份',
+                    key: 'province',
+                },
+                {
+                    title: '市区',
+                    key: 'city',
+                },
+                {
+                    title: '地址',
+                    key: 'address',
+                    width: 200,
+                },
+                {
+                    title: '邮编',
+                    key: 'zip',
+                },
+            ];
+            let gcData = {};
+            for (let i = 0; i < c; i += 1) {
+                columns.push({
+                    title: `表头${i}`,
+                    key: `gc_${i}`,
+                });
+                gcData[`gc_${i}`] = `数据${i}`;
+            }
+            let data = [];
+            _gcData = {
+                date: '2016-05-02',
+                name: '王小虎',
+                province: '上海',
+                city: '普陀区',
+                address: '上海市普陀区金沙江路 1518 弄',
+                zip: 200333,
+                ...gcData,
+            };
+            for (let i = 0; i < r; i += 1) {
+                data.push(JSON.parse(JSON.stringify(_gcData)));
+            }
+            return {
+                columns,
+                data,
+            };
+        }
+        const { columns, data } = gcData(1000, 1000);
+        const target = document.getElementById('e-virt-table');
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                ENABLE_SELECTOR: true,
+                ENABLE_AUTOFILL: true,
+                ENABLE_OFFSET_HEIGHT: true,
+                OFFSET_HEIGHT: 24,
+            },
+        });
+        grid.on('overlayerChange', (container) => {
+            if (!overlayerEl) {
+                return;
+            }
+            // 移除所有子元素
+            overlayerEl.replaceChildren();
+            Object.assign(overlayerEl.style, container.style);
+            container.views.forEach((typeView) => {
+                const typeDiv = document.createElement('div');
+                typeDiv.className = typeView.class;
+                Object.assign(typeDiv.style, typeView.style);
+                typeView.views.forEach((cellWrapView) => {
+                    const cellWrap = document.createElement('div');
+                    Object.assign(cellWrap.style, cellWrapView.style);
+                    cellWrapView.cells.forEach((cell) => {
+                        const cellEl = document.createElement('div');
+                        Object.assign(cellEl.style, cell.style);
+                        // 渲染单元格逻辑
+                        if (typeof cell.render === 'function') {
+                            cell.render(cellEl, cell);
+                        }
+                        cellWrap.appendChild(cellEl);
+                    });
+                    typeDiv.appendChild(cellWrap);
+                });
+                overlayerEl.appendChild(typeDiv);
+            });
+        });
+    </script>
+</html>
