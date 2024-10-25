@@ -53,7 +53,7 @@ const enterFullscreen = () => {
 };
 const goCodepen = () => {
     const form = document.createElement('form');
-    form.action = 'https://codepen.io/pen/define?turn_off_js=true';
+    form.action = 'https://codepen.io/pen/define';
     form.method = 'POST';
     form.target = '_blank';
     form.style.display = 'none';

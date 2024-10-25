@@ -356,7 +356,7 @@ const columns: any[] = [
     },
 ];
 let data: any[] = [];
-for (let i = 0; i < 10; i += 1) {
+for (let i = 0; i < 1000; i += 1) {
     data.push({
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
         id: i,
@@ -492,7 +492,7 @@ const eVirtTable = new EVirtTable(canvas, {
                 color: '#4E5969',
             },
         ],
-        HEIGHT: 500,
+        HEIGHT: 300,
         CHECKBOX_KEY: 'emp_name',
         // CELL_HEIGHT: 28,
         ENABLE_AUTOFILL: true,

@@ -313,7 +313,7 @@ export default class Body {
             const data = this.visibleRows[i];
             const { height, top } = this.ctx.database.getPositionForRowIndex(index);
             const row = new Row(this.ctx, index, 0, top + this.y, header.width, height, data);
-            rows.push(row);
+            rows.unshift(row);
         }
         this.renderRows = rows;
         this.ctx.body.renderRows = rows;
