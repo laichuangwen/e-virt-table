@@ -72,7 +72,7 @@ export default class Config {
     READONLY_TEXT_COLOR: string = '#4E5969';
     ERROR_TIP_COLOR: string = '#ED3F14';
     FOOTER_BG_COLOR: string = '#fafafa';
-    FOOTER_FIXED: boolean = false;
+    FOOTER_FIXED: boolean = true;
     CELL_FOOTER_HEIGHT: number = 36;
     ENABLE_SELECTOR: boolean = false;
     ENABLE_EDIT_SINGLE_CLICK = false; // 启用单点击立马编辑

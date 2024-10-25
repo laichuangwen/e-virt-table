@@ -31,6 +31,44 @@
                 {
                     title: '日期',
                     key: 'date',
+                    renderHeader: (pEl, cell) => {
+                        const cellEl = document.createElement('div');
+                        cellEl.style.width = '100%';
+                        cellEl.style.height = '100%';
+                        cellEl.style.opacity = '0.5';
+                        cellEl.style.backgroundColor = 'blue';
+                        cellEl.style.display = 'flex';
+                        cellEl.style.justifyContent = 'center';
+                        cellEl.style.alignItems = 'center';
+
+                        cellEl.innerHTML = cell.text;
+                        pEl.appendChild(cellEl);
+                    },
+                    render: (pEl, cell) => {
+                        const cellEl = document.createElement('div');
+                        cellEl.style.width = '100%';
+                        cellEl.style.height = '100%';
+                        cellEl.style.opacity = '0.5';
+                        cellEl.style.backgroundColor = 'cyan';
+                        cellEl.style.display = 'flex';
+                        cellEl.style.justifyContent = 'center';
+                        cellEl.style.alignItems = 'center';
+                        cellEl.innerHTML = cell.text;
+                        pEl.appendChild(cellEl);
+                    },
+                    renderFooter: (pEl, cell) => {
+                        const cellEl = document.createElement('div');
+                        cellEl.style.width = '100%';
+                        cellEl.style.height = '100%';
+                        cellEl.style.opacity = '0.5';
+                        cellEl.style.backgroundColor = 'red';
+                        cellEl.style.display = 'flex';
+                        cellEl.style.justifyContent = 'center';
+                        cellEl.style.alignItems = 'center';
+
+                        cellEl.innerHTML = '底部';
+                        pEl.appendChild(cellEl);
+                    },
                 },
                 {
                     title: '姓名',
@@ -85,6 +123,11 @@
         const grid = new EVirtTable(target, {
             data,
             columns,
+            footerData: [
+                {
+                    index: '合计',
+                },
+            ],
             config: {
                 ENABLE_SELECTOR: true,
                 ENABLE_AUTOFILL: true,
@@ -92,6 +135,7 @@
                 OFFSET_HEIGHT: 24,
             },
         });
+        const overlayerEl = document.getElementById('e-virt-table-overlayer');
         grid.on('overlayerChange', (container) => {
             if (!overlayerEl) {
                 return;
