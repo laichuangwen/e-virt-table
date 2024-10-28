@@ -1,24 +1,17 @@
-import Cell from './Cell';
 import { MenuItem } from './types';
 import Context from './Context';
 import { computePosition, offset, flip, shift } from '@floating-ui/dom';
 export default class ContextMenu {
     private ctx: Context;
     private contextMenuEl: HTMLDivElement;
-    private vw: number;
-    private vh: number;
+    private viewportWidth: number;
+    private viewportHeight: number;
     constructor(ctx: Context) {
         this.ctx = ctx;
         this.contextMenuEl = document.createElement('div');
-        this.contextMenuEl.className = 'e-virt-table-context-menu';
-        this.ctx.targetContainer.appendChild(this.contextMenuEl);
-        const { CONTEXT_MENU } = this.ctx.config;
-        this.createContextMenuItems(CONTEXT_MENU, (e) => {
-            console.log(e.value);
-
-        });
-        this.vw = document.documentElement.clientWidth;
-        this.vh = document.documentElement.clientHeight;
+        this.viewportWidth = document.documentElement.clientWidth;
+        this.viewportHeight = document.documentElement.clientHeight;
+        this.createContextMenu()
         this.init();
     }
     private init() {
@@ -41,14 +34,15 @@ export default class ContextMenu {
                 middleware: [offset(10), shift(), flip()],
             }).then(({ x, y }) => {
                 this.show()
+                //处理边界情况
                 let posX = x
                 let posY = y
                 const cw = this.contextMenuEl.offsetWidth
                 const ch = this.contextMenuEl.offsetHeight
-                if (x > this.vw - cw) {
+                if (x > this.viewportWidth - cw) {
                     posX = x - cw;
                 }
-                if (y > this.vh - ch) {
+                if (y > this.viewportHeight - ch) {
                     posY = y - ch;
                 }
                 x = Math.min(x, posX)
@@ -62,23 +56,46 @@ export default class ContextMenu {
         this.ctx.on('click', this.hide.bind(this));
         this.ctx.on('wheel', this.hide.bind(this))
         this.ctx.on('resize', () => {
-            this.vw = document.documentElement.clientWidth;
-            this.vh = document.documentElement.clientHeight;
+            this.viewportWidth = document.documentElement.clientWidth;
+            this.viewportHeight = document.documentElement.clientHeight;
         })
     }
-    createContextMenuItems(items: MenuItem[], callback: (e: MenuItem) => void) {
-        items.forEach((item) => {
-            this.contextMenuEl.appendChild(this.createContextMenuItem(item, callback));
+    //创建右键菜单，绑定子项点击事件
+    createContextMenu() {
+        this.contextMenuEl.className = 'e-virt-table-context-menu';
+        this.ctx.targetContainer.appendChild(this.contextMenuEl);
+        const { CONTEXT_MENU } = this.ctx.config;
+        this.createContextMenuItems(CONTEXT_MENU, (item: MenuItem) => {
+            switch (item.value) {
+                case 'copy':
+                    // this.ctx.copy();//todo
+                    break;
+                case 'paste':
+                    // this.ctx.paste();//todo
+                    break;
+                case 'cut':
+                    // this.ctx.cut();//todo
+                    break;
+                case 'clearSelected':
+                    // this.ctx.clearSelector();
+                    // this.ctx.emit("draw");
+                    break;
+                default:
+            }
+            this.hide()
         });
     }
-    createContextMenuItem(menuItem: MenuItem, callback: (e: MenuItem) => void) {
-        const item = document.createElement('div');
-        item.className = 'e-virt-table-context-menu-item';
-        item.innerText = menuItem.label;
-        item.onclick = () => callback(menuItem);
-        return item;
+    //创建右键菜单子项元素
+    createContextMenuItems(items: MenuItem[], callback: (e: MenuItem) => void) {
+        items.forEach((item: MenuItem) => {
+            const menuItemEl: HTMLDivElement = document.createElement('div');
+            menuItemEl.className = 'e-virt-table-context-menu-item';
+            menuItemEl.innerText = item.label;
+            menuItemEl.onclick = () => callback(item);
+            this.contextMenuEl.appendChild(menuItemEl);
+        });
     }
-    show(){
+    show() {
         this.contextMenuEl.style.display = 'block';
     }
     hide() {
