@@ -20,6 +20,7 @@ import Editor from './Editor';
 import Empty from './Empty';
 import Overlayer from './Overlayer';
 import ContextMenu from './ContextMenu';
+import './style.css'
 export default class EVirtTable {
     private targetContainer: HTMLDivElement;
     private target: HTMLCanvasElement;

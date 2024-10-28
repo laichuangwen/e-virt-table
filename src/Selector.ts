@@ -129,6 +129,25 @@ export default class Selector {
         return;
       }
     });
+    this.ctx.on('contextMenuClearSelected', () => {
+      const { xArr, yArr } = this.ctx.selector
+      this.clearSelectedData(xArr, yArr);
+    })
+    this.ctx.on('contextMenuCopy', () => {
+      this.copy()
+    })
+    this.ctx.on('contextMenuPaste', () => {
+      this.paste()
+    })
+    this.ctx.on('contextMenuCut', () => {
+      this.isCut = true;
+      this.copy();
+    })
+    //解耦：外部调用选择单元格
+    this.ctx.on('setSelectorCell',(cell:Cell)=>{
+      this.ctx.setFocusCell(cell)
+      this.click()
+    })
   }
 
   private setSelector(xArr: number[], yArr: number[]) {
@@ -552,5 +571,5 @@ export default class Selector {
       this.ctx.setScrollY(scrollY + diffBottom);
     }
   }
-  destroy() {}
+  destroy() { }
 }

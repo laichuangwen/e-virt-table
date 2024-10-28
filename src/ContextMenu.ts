@@ -1,21 +1,29 @@
 import { MenuItem } from './types';
 import Context from './Context';
 import { computePosition, offset, flip, shift } from '@floating-ui/dom';
+import Cell from './Cell';
 export default class ContextMenu {
     private ctx: Context;
     private contextMenuEl: HTMLDivElement;
-    private viewportWidth: number;
-    private viewportHeight: number;
     constructor(ctx: Context) {
         this.ctx = ctx;
         this.contextMenuEl = document.createElement('div');
-        this.viewportWidth = document.documentElement.clientWidth;
-        this.viewportHeight = document.documentElement.clientHeight;
         this.createContextMenu()
         this.init();
     }
     private init() {
-        this.ctx.on('contextMenu', (e: MouseEvent) => {
+        this.ctx.on('cellContextMenuClick', (cell: Cell, e: MouseEvent) => {
+
+            const { xArr, yArr } = this.ctx.selector
+            const [minX, maxX] = xArr
+            const [minY, maxY] = yArr
+            const { rowIndex, colIndex } = cell
+            //判断是否在范围内
+            const isInRange = rowIndex >= minY && rowIndex <= maxY && colIndex >= minX && colIndex <= maxX
+            if (!isInRange) {
+                this.ctx.emit('setSelectorCell', cell, e)
+            }
+
             const virtualReference = {
                 getBoundingClientRect: () => ({
                     width: 0,
@@ -31,54 +39,33 @@ export default class ContextMenu {
             };
             computePosition(virtualReference, this.contextMenuEl, {
                 placement: 'right-start',
-                middleware: [offset(10), shift(), flip()],
+                middleware: [offset(), shift(), flip()],
             }).then(({ x, y }) => {
-                this.show()
-                //处理边界情况
-                let posX = x
-                let posY = y
-                const cw = this.contextMenuEl.offsetWidth
-                const ch = this.contextMenuEl.offsetHeight
-                if (x > this.viewportWidth - cw) {
-                    posX = x - cw;
-                }
-                if (y > this.viewportHeight - ch) {
-                    posY = y - ch;
-                }
-                x = Math.min(x, posX)
-                y = Math.min(y, posY)
-                Object.assign(this.contextMenuEl.style, {
-                    left: `${x}px`,
-                    top: `${y}px`,
-                });
+                this.show(x, y)
             });
         });
         this.ctx.on('click', this.hide.bind(this));
-        this.ctx.on('wheel', this.hide.bind(this))
-        this.ctx.on('resize', () => {
-            this.viewportWidth = document.documentElement.clientWidth;
-            this.viewportHeight = document.documentElement.clientHeight;
-        })
+        this.ctx.on('onScroll', this.hide.bind(this))
+        this.ctx.on('resize', this.hide.bind(this))
     }
     //创建右键菜单，绑定子项点击事件
-    createContextMenu() {
+    private createContextMenu() {
         this.contextMenuEl.className = 'e-virt-table-context-menu';
         this.ctx.targetContainer.appendChild(this.contextMenuEl);
         const { CONTEXT_MENU } = this.ctx.config;
         this.createContextMenuItems(CONTEXT_MENU, (item: MenuItem) => {
             switch (item.value) {
                 case 'copy':
-                    // this.ctx.copy();//todo
+                    this.ctx.emit("contextMenuCopy");
                     break;
                 case 'paste':
-                    // this.ctx.paste();//todo
+                    this.ctx.emit("contextMenuPaste");
                     break;
                 case 'cut':
-                    // this.ctx.cut();//todo
+                    this.ctx.emit("contextMenuCut");
                     break;
                 case 'clearSelected':
-                    // this.ctx.clearSelector();
-                    // this.ctx.emit("draw");
+                    this.ctx.emit("contextMenuClearSelected");
                     break;
                 default:
             }
@@ -86,7 +73,7 @@ export default class ContextMenu {
         });
     }
     //创建右键菜单子项元素
-    createContextMenuItems(items: MenuItem[], callback: (e: MenuItem) => void) {
+    private createContextMenuItems(items: MenuItem[], callback: (e: MenuItem) => void) {
         items.forEach((item: MenuItem) => {
             const menuItemEl: HTMLDivElement = document.createElement('div');
             menuItemEl.className = 'e-virt-table-context-menu-item';
@@ -95,11 +82,17 @@ export default class ContextMenu {
             this.contextMenuEl.appendChild(menuItemEl);
         });
     }
-    show() {
-        this.contextMenuEl.style.display = 'block';
+    private show(x: Number, y: Number) {
+        Object.assign(this.contextMenuEl.style, {
+            left: `${x}px`,
+            top: `${y}px`,
+        });
     }
-    hide() {
-        this.contextMenuEl.style.display = 'none';
+    private hide() {
+        Object.assign(this.contextMenuEl.style, {
+            left: '-99999px',
+            top: '-99999px',
+        })
     }
     destroy() {
         this.contextMenuEl.remove();

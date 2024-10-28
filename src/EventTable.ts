@@ -123,7 +123,51 @@ export default class EventTable {
         }
       }
     });
-    this.ctx.on("mousemove", (e) => {
+    this.ctx.on('contextMenu', (e: MouseEvent) => {
+      if (this.isBusy(e)) {
+        return;
+      }
+      const y = e.offsetY;
+      const x = e.offsetX;
+      // header
+      const renderCellHeaders = this.ctx.header.renderCellHeaders;
+      for (const cell of renderCellHeaders) {
+        const drawX = cell.getDrawX();
+        const drawY = cell.getDrawY();
+        if (
+          x > drawX &&
+          x < drawX + cell.width &&
+          y > drawY &&
+          y < drawY + cell.height
+        ) {
+
+          this.ctx.emit("cellHeaderContextMenuClick", cell, e);
+          return; // 找到后直接返回
+        }
+      }
+      // body
+      const renderRows = this.ctx.body.renderRows;
+      for (const row of renderRows) {
+        // 优先处理固定列
+        const cells = row.fixedCells.concat(row.noFixedCells);
+        for (const cell of cells) {
+          const layerX = cell.getDrawX();
+          const layerY = cell.getDrawY();
+
+          if (
+            x > layerX &&
+            x < layerX + cell.width &&
+            y > layerY &&
+            y < layerY + cell.height
+          ) {
+            this.ctx.emit("cellContextMenuClick", cell, e);
+            return; // 找到后直接返回
+          }
+        }
+      }
+
+    })
+    this.ctx.on("mousemove", (e: MouseEvent) => {
       // 是否忙碌，进行其他操作
       if (this.isBusy(e)) {
         return;
