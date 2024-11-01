@@ -18,6 +18,7 @@ export default class EventBrowser {
     this.bind(this.ctx.target, "click", this.handleClick.bind(this));
     this.bind(this.ctx.target, "keydown", this.handleKeydown.bind(this));
     this.bind(this.ctx.target, "wheel", this.handleWheel.bind(this));
+    this.bind(this.ctx.target, "contextmenu", this.handleContextMenu.bind(this));
   }
   destroy() {
     this.eventTasks.forEach((fn, event) => {
@@ -56,6 +57,10 @@ export default class EventBrowser {
   }
   private handleWheel(e: Event) {
     this.ctx.emit("wheel", e);
+  }
+  private handleContextMenu(e:Event){
+    e.preventDefault();
+    this.ctx.emit("contextMenu",e);
   }
   private bind(
     target: EventTarget,

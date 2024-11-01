@@ -19,6 +19,8 @@ import Tooltip from './Tooltip';
 import Editor from './Editor';
 import Empty from './Empty';
 import Overlayer from './Overlayer';
+import ContextMenu from './ContextMenu';
+import './style.css'
 export default class EVirtTable {
     private targetContainer: HTMLDivElement;
     private target: HTMLCanvasElement;
@@ -32,6 +34,7 @@ export default class EVirtTable {
     private editor: Editor;
     private empty: Empty;
     private overlayer: Overlayer;
+    private contextMenu: ContextMenu;
     ctx: Context;
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
         this.target = document.createElement('canvas');
@@ -49,12 +52,13 @@ export default class EVirtTable {
         this.empty = new Empty(this.ctx);
         this.editor = new Editor(this.ctx);
         this.overlayer = new Overlayer(this.ctx);
+        this.contextMenu = new ContextMenu(this.ctx);
         this.ctx.on('draw', this.draw.bind(this));
         this.draw();
     }
     draw() {
         requestAnimationFrame(() => {
-            console.time('draw');
+            // console.time('draw');
             this.header.update();
             this.footer.update();
             this.body.update();
@@ -64,7 +68,7 @@ export default class EVirtTable {
             this.header.draw();
             this.scroller.draw();
             this.overlayer.draw();
-            console.timeEnd('draw');
+            // console.timeEnd('draw');
         });
     }
     loadConfig(_config: ConfigType) {
@@ -261,6 +265,7 @@ export default class EVirtTable {
         this.tooltip.destroy();
         this.selector.destroy();
         this.autofill.destroy();
+        this.contextMenu.destroy();
         this.ctx.destroy();
         this.target.remove();
         console.log('销毁');
