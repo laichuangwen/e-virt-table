@@ -58,7 +58,7 @@ export default class EVirtTable {
     }
     draw() {
         requestAnimationFrame(() => {
-            console.time('draw');
+            // console.time('draw');
             this.header.update();
             this.footer.update();
             this.body.update();
@@ -68,7 +68,7 @@ export default class EVirtTable {
             this.header.draw();
             this.scroller.draw();
             this.overlayer.draw();
-            console.timeEnd('draw');
+            // console.timeEnd('draw');
         });
     }
     loadConfig(_config: ConfigType) {

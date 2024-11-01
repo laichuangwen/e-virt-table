@@ -1,3 +1,13 @@
+:root {
+    --e-virt-table-color-white: #fff;
+    --e-virt-table-color-black: #000000;
+    --e-virt-table-color-primary: rgb(82, 146, 247);
+    --e-virt-table-text-color-primary: '#333';
+    --e-virt-table-text-color-regular: '#666';
+    --e-virt-table-text-color-secondary: '#999';
+    --e-virt-table-box-shadow: 0 2px 12px 0 #0000001a;
+    --e-virt-table-editor-bg-color: #fff;
+}
 .e-virt-table-editor {
     position: absolute;
     top: -10000px;
@@ -6,30 +16,34 @@
     line-height: 0;
     z-index: 100;
     overflow: hidden;
-    background-color: #fff;
-    border: 2px solid rgb(82, 146, 247);
+    background-color: var(--e-virt-table-editor-bg-color);
+    border: 2px solid var(--e-virt-table-color-primary);
     box-sizing: border-box;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 6px 16px;
+    box-shadow: var(--e-virt-table-box-shadow);
     pointer-events: auto;
     display: flex;
     align-items: center;
 }
-.e-virt-table-context-menu{
+.e-virt-table-context-menu {
     /* display: none; */
     position: absolute;
-    background-color: white;
-    border: 1px solid #ccc;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    font-size: 14px;
+    color: var(--e-virt-table-text-color-regular);
+    background-color: var(--e-virt-table-color-white);
+    border-radius: 4px;
+    border: 1px solid #e4e7ed;
+    box-shadow: var(--e-virt-table-box-shadow);
     width: fit-content;
-    padding: 12px;
+    padding: 6px 0px;
     z-index: 9999;
     left: -99999px;
     top: -99999px;
 }
-.e-virt-table-context-menu-item{
+.e-virt-table-context-menu-item {
     cursor: pointer;
-    padding: 4px 8px;
+    padding: 8px 24px;
 }
-.e-virt-table-context-menu-item:hover{
-    color: rgb(82, 146, 247);
+.e-virt-table-context-menu-item:hover {
+    color: var(--e-virt-table-color-primary);
+    background-color: #f5f7fa;
 }

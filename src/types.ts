@@ -46,7 +46,6 @@ export type RowType = CellType;
 export type MenuItem = {
     label: string;
     value: string | 'copy' | 'paste' | 'cut' | 'clearSelected';
-    children?: MenuItem[];
     event?: Function;
 };
 export type OverlayerView = {
