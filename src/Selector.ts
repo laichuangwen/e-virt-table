@@ -196,21 +196,18 @@ export default class Selector {
     }
 
     private selectCols(cell: CellHeader) {
-        if (this.ctx.autofillMove) {
-            return;
-        }
-        if (this.ctx.selectorMove) {
-            return;
-        }
-        // 如果是拖拽改变列宽就不处理
-        if (this.ctx.columnResizing) {
-            return;
-        }
         // 启用单选就不能批量选中
         if (this.ctx.config.ENABLE_SELECTOR_SINGLE) {
             return;
         }
         if (!this.ctx.config.ENABLE_SELECTOR_ALL_ROWS) {
+            return;
+        }
+        if (this.ctx.autofillMove) {
+            return;
+        }
+        // 如果是拖拽改变列宽就不处理
+        if (this.ctx.columnResizing) {
             return;
         }
         // index, index-selection, selection全选
@@ -242,9 +239,6 @@ export default class Selector {
         if (this.ctx.autofillMove) {
             return;
         }
-        if (this.ctx.selectorMove) {
-            return;
-        }
         // 只有两个全选启用了才能全选
         const { ENABLE_SELECTOR_ALL_ROWS, ENABLE_SELECTOR_ALL_COLS } = this.ctx.config;
         if (ENABLE_SELECTOR_ALL_ROWS && ENABLE_SELECTOR_ALL_COLS) {
@@ -258,18 +252,14 @@ export default class Selector {
         }
     }
     private selectRows(cell: Cell, isSetFocus = true) {
-        if (this.ctx.autofillMove) {
-            return;
-        }
-        if (this.ctx.selectorMove) {
-            return;
-        }
-
         // 启用单选就不能批量选中
         if (this.ctx.config.ENABLE_SELECTOR_SINGLE) {
             return;
         }
         if (!this.ctx.config.ENABLE_SELECTOR_ALL_COLS) {
+            return;
+        }
+        if (this.ctx.autofillMove) {
             return;
         }
         const maxX = this.ctx.maxColIndex;
