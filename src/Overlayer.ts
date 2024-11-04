@@ -11,6 +11,12 @@ export default class Overlayer {
         const overlayer = this.getContainer();
         this.ctx.emit('overlayerChange', overlayer);
     }
+    destroy() {
+        this.ctx.emit('overlayerChange', {
+            style: {},
+            views: [],
+        });
+    }
     private getContainer(): OverlayerContainer {
         const {
             target,

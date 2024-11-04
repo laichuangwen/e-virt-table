@@ -260,6 +260,7 @@ export default class EVirtTable {
      * 销毁
      */
     destroy() {
+        this.overlayer.destroy();
         this.empty.destroy();
         this.editor.destroy();
         this.tooltip.destroy();
