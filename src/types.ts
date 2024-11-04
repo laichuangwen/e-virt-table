@@ -104,6 +104,7 @@ export interface Column {
     colspan: number;
     rowspan: number;
     key: string;
+    hide: boolean | Function;
     render: Function;
     renderFooter: Function;
     renderHeader: Function;

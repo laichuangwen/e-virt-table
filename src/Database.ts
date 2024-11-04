@@ -139,8 +139,24 @@ export default class Database {
         recursiveData(this.data);
         return list;
     }
+    private filterColumns(columns: Column[]) {
+        return columns.reduce((acc: Column[], column) => {
+            // 检查当前列的 hide 属性
+            const shouldHide = typeof column.hide === 'function' ? column.hide() : column.hide;
+            // 如果当前列不应该隐藏，则添加到结果中
+            if (!shouldHide) {
+                const newColumn = { ...column }; // 复制当前列
+                // 递归处理子列
+                if (newColumn.children && Array.isArray(newColumn.children)) {
+                    newColumn.children = this.filterColumns(newColumn.children);
+                }
+                acc.push(newColumn);
+            }
+            return acc;
+        }, []);
+    }
     getColumns() {
-        return this.columns;
+        return this.filterColumns(this.columns);
     }
     setColumns(columns: Column[]) {
         this.columns = columns;

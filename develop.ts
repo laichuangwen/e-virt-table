@@ -1,3 +1,4 @@
+import { hide } from '@floating-ui/dom';
 import EVirtTable from './src/EVirtTable';
 
 const canvas = document.getElementById('e-virt-table') as HTMLDivElement;
@@ -29,6 +30,7 @@ const columns: any[] = [
         readonly: true,
         type: 'tree',
         fixed: 'left',
+        // hide: () => 3 > 2,
     },
     {
         title: '姓名',
@@ -38,6 +40,7 @@ const columns: any[] = [
         fixed: 'left',
         align: 'left',
         verticalAlign: 'middle',
+        // hide: true,
         renderFooter: (pEl, cell) => {
             const cellEl = document.createElement('div');
             cellEl.style.width = '100%';

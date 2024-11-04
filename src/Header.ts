@@ -63,6 +63,8 @@ export default class Header {
     const spanColumns = sortFixed(calCrossSpan(columns, maxHeaderRow));
     this.columnIndex = 0;
     this.resizeNum = 0; // 可调整调整列数量
+    console.log("spanColumns", spanColumns);
+    
     this.render(spanColumns, 0);
     this.ctx.database.updateColIndexKeyMap(this.leafCellHeaders);
     const targetContainer = this.ctx.targetContainer.getBoundingClientRect();
