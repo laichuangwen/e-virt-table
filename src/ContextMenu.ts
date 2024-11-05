@@ -8,20 +8,21 @@ export default class ContextMenu {
     constructor(ctx: Context) {
         this.ctx = ctx;
         this.contextMenuEl = document.createElement('div');
-        this.createContextMenu()
+        this.createContextMenu();
         this.init();
     }
     private init() {
         this.ctx.on('cellContextMenuClick', (cell: Cell, e: MouseEvent) => {
-
-            const { xArr, yArr } = this.ctx.selector
-            const [minX, maxX] = xArr
-            const [minY, maxY] = yArr
-            const { rowIndex, colIndex } = cell
+            if (!this.ctx.config.ENABLE_CONTEXTMENU) return;
+            e.preventDefault();
+            const { xArr, yArr } = this.ctx.selector;
+            const [minX, maxX] = xArr;
+            const [minY, maxY] = yArr;
+            const { rowIndex, colIndex } = cell;
             //判断是否在范围内
-            const isInRange = rowIndex >= minY && rowIndex <= maxY && colIndex >= minX && colIndex <= maxX
+            const isInRange = rowIndex >= minY && rowIndex <= maxY && colIndex >= minX && colIndex <= maxX;
             if (!isInRange) {
-                this.ctx.emit('setSelectorCell', cell, e)
+                this.ctx.emit('setSelectorCell', cell, e);
             }
 
             const virtualReference = {
@@ -33,7 +34,7 @@ export default class ContextMenu {
                     right: e.clientX,
                     bottom: e.clientY,
                     x: e.clientX,
-                    y: e.clientY
+                    y: e.clientY,
                 }),
                 contextElement: document.body,
             };
@@ -41,12 +42,12 @@ export default class ContextMenu {
                 placement: 'right-start',
                 middleware: [offset(), shift(), flip()],
             }).then(({ x, y }) => {
-                this.show(x, y)
+                this.show(x, y);
             });
         });
         this.ctx.on('click', this.hide.bind(this));
-        this.ctx.on('onScroll', this.hide.bind(this))
-        this.ctx.on('resize', this.hide.bind(this))
+        this.ctx.on('onScroll', this.hide.bind(this));
+        this.ctx.on('resize', this.hide.bind(this));
     }
     //创建右键菜单，绑定子项点击事件
     private createContextMenu() {
@@ -56,20 +57,20 @@ export default class ContextMenu {
         this.createContextMenuItems(CONTEXT_MENU, (item: MenuItem) => {
             switch (item.value) {
                 case 'copy':
-                    this.ctx.emit("contextMenuCopy");
+                    this.ctx.emit('contextMenuCopy');
                     break;
                 case 'paste':
-                    this.ctx.emit("contextMenuPaste");
+                    this.ctx.emit('contextMenuPaste');
                     break;
                 case 'cut':
-                    this.ctx.emit("contextMenuCut");
+                    this.ctx.emit('contextMenuCut');
                     break;
                 case 'clearSelected':
-                    this.ctx.emit("contextMenuClearSelected");
+                    this.ctx.emit('contextMenuClearSelected');
                     break;
                 default:
             }
-            this.hide()
+            this.hide();
         });
     }
     //创建右键菜单子项元素
@@ -78,7 +79,14 @@ export default class ContextMenu {
             const menuItemEl: HTMLDivElement = document.createElement('div');
             menuItemEl.className = 'e-virt-table-context-menu-item';
             menuItemEl.innerText = item.label;
-            menuItemEl.onclick = () => callback(item);
+            if (item.event) {
+                menuItemEl.onclick = () => {
+                    item.event && item.event();
+                    callback(item);
+                };
+            } else {
+                menuItemEl.onclick = () => callback(item);
+            }
             this.contextMenuEl.appendChild(menuItemEl);
         });
     }
@@ -92,7 +100,7 @@ export default class ContextMenu {
         Object.assign(this.contextMenuEl.style, {
             left: '-99999px',
             top: '-99999px',
-        })
+        });
     }
     destroy() {
         this.contextMenuEl.remove();

@@ -59,7 +59,6 @@ export default class EventBrowser {
     this.ctx.emit("wheel", e);
   }
   private handleContextMenu(e:Event){
-    e.preventDefault();
     this.ctx.emit("contextMenu",e);
   }
   private bind(
