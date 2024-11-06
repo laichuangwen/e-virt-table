@@ -51,6 +51,7 @@ export default class ContextMenu {
     }
     //创建右键菜单，绑定子项点击事件
     private createContextMenu() {
+        this.contextMenuEl.replaceChildren();
         this.contextMenuEl.className = 'e-virt-table-context-menu';
         this.ctx.targetContainer.appendChild(this.contextMenuEl);
         const { CONTEXT_MENU } = this.ctx.config;
@@ -101,6 +102,9 @@ export default class ContextMenu {
             left: '-99999px',
             top: '-99999px',
         });
+    }
+    updated() {
+        this.createContextMenu();
     }
     destroy() {
         this.contextMenuEl.remove();

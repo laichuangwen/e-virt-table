@@ -8,6 +8,7 @@ import {
     CellRulesMethod,
     CellStyleMethod,
     CellTypeMethod,
+    ConfigType,
     ExpandLazyMethod,
     FormatterMethod,
     MenuItem,
@@ -124,6 +125,10 @@ export default class Config {
     SELECTABLE_METHOD?: SelectableMethod;
     EXPAND_LAZY_METHOD?: ExpandLazyMethod;
     constructor(config: Partial<Config>) {
+        Object.assign(this, config);
+    }
+
+    init(config: ConfigType) {
         Object.assign(this, config);
     }
 }

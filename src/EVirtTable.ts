@@ -74,9 +74,11 @@ export default class EVirtTable {
         });
     }
     loadConfig(_config: ConfigType) {
-        // this.config = { ...config, ..._config };
-        // this.ctx.database.init();
-        // this.ctx.emit("draw");
+        this.ctx.config.init(_config);
+        this.ctx.database.init();
+        // 更新右键菜单，有可能配置项变化
+        this.contextMenu.updated();
+        this.ctx.emit('draw');
     }
     loadColumns(columns: Column[]) {
         // 先关闭编辑

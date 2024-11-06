@@ -1,4 +1,3 @@
-import { hide } from '@floating-ui/dom';
 import EVirtTable from './src/EVirtTable';
 
 const canvas = document.getElementById('e-virt-table') as HTMLDivElement;
@@ -513,19 +512,19 @@ const eVirtTable = new EVirtTable(canvas, {
         // HIGHLIGHT_HOVER_ROW: true,
         // OFFSET_HEIGHT: 16,
         // ENABLE_CONTEXT_MENU: false,
-        CONTEXT_MENU: [
-            { label: '复制', value: 'copy' },
-            { label: '剪切', value: 'cut' },
-            { label: '粘贴', value: 'paste' },
-            { label: '清空选中内容', value: 'clearSelected' },
-            {
-                label: '新增',
-                value: 'add',
-                event: () => {
-                    console.log('新增');
-                },
-            },
-        ],
+        // CONTEXT_MENU: [
+        //     { label: '复制', value: 'copy' },
+        //     { label: '剪切', value: 'cut' },
+        //     { label: '粘贴', value: 'paste' },
+        //     { label: '清空选中内容', value: 'clearSelected' },
+        //     {
+        //         label: '新增',
+        //         value: 'add',
+        //         event: () => {
+        //             console.log('新增');
+        //         },
+        //     },
+        // ],
         EXPAND_LAZY_METHOD: (params: any) => {
             const i = params.row.id;
             return new Promise((resolve) => {
@@ -690,6 +689,33 @@ document.getElementById('setValidator')?.addEventListener('click', () => {
         },
     ];
     eVirtTable.setValidations(errors);
+});
+document.getElementById('setConfig')?.addEventListener('click', () => {
+    eVirtTable.loadConfig({
+        CELL_HEIGHT: 40,
+        ENABLE_AUTOFILL: true,
+        ENABLE_SELECTOR: true,
+        ENABLE_KEYBOARD: true,
+        ENABLE_HISTORY: true,
+        ENABLE_OFFSET_HEIGHT: true,
+        HIGHLIGHT_SELECTED_ROW: true,
+        HIGHLIGHT_HOVER_ROW: true,
+        OFFSET_HEIGHT: 16,
+        ENABLE_CONTEXT_MENU: true,
+        CONTEXT_MENU: [
+            { label: '复制', value: 'copy' },
+            { label: '剪切', value: 'cut' },
+            { label: '粘贴', value: 'paste' },
+            { label: '清空选中内容', value: 'clearSelected' },
+            {
+                label: '新增',
+                value: 'add',
+                event: () => {
+                    console.log('新增');
+                },
+            },
+        ],
+    });
 });
 // 销毁
 function destroy() {

@@ -158,6 +158,9 @@ export default class Context {
         this.history = new History(this);
         this.icons = new Icons(this);
     }
+    setConfig(config: Config) {
+        this.config = new Config(config);
+    }
     setFocusCell(cell: Cell) {
         if (this.focusCell === cell) return;
         if (this.focusCell?.rowKey !== cell.rowKey) {
