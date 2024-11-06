@@ -286,9 +286,10 @@ const columns: any[] = [
             cellEl.style.height = '100%';
             cellEl.style.opacity = '0.5';
             cellEl.style.backgroundColor = 'cyan';
-            cellEl.style.display = 'flex';
-            cellEl.style.justifyContent = 'center';
-            cellEl.style.alignItems = 'center';
+            cellEl.style.display = 'block';
+            // cellEl.style.justifyContent = 'center';
+            // cellEl.style.alignItems = 'center';
+            cellEl.style.whiteSpace = 'pre-line';
             cellEl.innerHTML = cell.text;
             pEl.appendChild(cellEl);
         },

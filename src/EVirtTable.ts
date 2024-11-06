@@ -271,6 +271,5 @@ export default class EVirtTable {
         this.contextMenu.destroy();
         this.ctx.destroy();
         this.target.remove();
-        console.log('销毁');
     }
 }

@@ -90,10 +90,14 @@ export default class Editor {
     }
     private initTextEditor() {
         // 初始化文本编辑器
-        const { CSS_PREFIX, SELECT_BORDER_COLOR } = this.ctx.config;
+        const { CSS_PREFIX, SELECT_BORDER_COLOR, ENABLE_EDIT_TEXT_ENTER } = this.ctx.config;
         this.inputEl = document.createElement('div');
         // 监听键盘事件
         this.inputEl.addEventListener('keydown', (e) => {
+            // 如果不启用文本编辑器回车键确认
+            if (!ENABLE_EDIT_TEXT_ENTER) {
+                return;
+            }
             if (this.enable && (e.code === 'Enter' || e.code === 'Escape')) {
                 e.preventDefault();
                 this.inputEl.blur();
@@ -160,7 +164,7 @@ export default class Editor {
         this.inputEl.style.minHeight = `${height - 1}px`;
         this.inputEl.style.padding = `${CELL_PADDING}px`;
         if (value !== null) {
-            this.inputEl.innerText = value;
+            this.inputEl.textContent = value;
         }
         this.inputEl.focus();
         const selection = window.getSelection(); // 创建selection
