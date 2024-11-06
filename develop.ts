@@ -502,29 +502,29 @@ const eVirtTable = new EVirtTable(canvas, {
         ],
         HEIGHT: 800,
         CHECKBOX_KEY: 'emp_name',
-        // CELL_HEIGHT: 28,
-        // ENABLE_AUTOFILL: true,
-        // ENABLE_SELECTOR: true,
-        // ENABLE_KEYBOARD: true,
-        // ENABLE_HISTORY: true,
-        // ENABLE_OFFSET_HEIGHT: true,
-        // HIGHLIGHT_SELECTED_ROW: true,
-        // HIGHLIGHT_HOVER_ROW: true,
-        // OFFSET_HEIGHT: 16,
-        // ENABLE_CONTEXT_MENU: false,
-        // CONTEXT_MENU: [
-        //     { label: '复制', value: 'copy' },
-        //     { label: '剪切', value: 'cut' },
-        //     { label: '粘贴', value: 'paste' },
-        //     { label: '清空选中内容', value: 'clearSelected' },
-        //     {
-        //         label: '新增',
-        //         value: 'add',
-        //         event: () => {
-        //             console.log('新增');
-        //         },
-        //     },
-        // ],
+        CELL_HEIGHT: 28,
+        ENABLE_AUTOFILL: true,
+        ENABLE_SELECTOR: true,
+        ENABLE_KEYBOARD: true,
+        ENABLE_HISTORY: true,
+        ENABLE_OFFSET_HEIGHT: true,
+        HIGHLIGHT_SELECTED_ROW: true,
+        HIGHLIGHT_HOVER_ROW: true,
+        OFFSET_HEIGHT: 16,
+        ENABLE_CONTEXT_MENU: false,
+        CONTEXT_MENU: [
+            { label: '复制', value: 'copy' },
+            { label: '剪切', value: 'cut' },
+            { label: '粘贴', value: 'paste' },
+            { label: '清空选中内容', value: 'clearSelected' },
+            {
+                label: '新增',
+                value: 'add',
+                event: () => {
+                    console.log('新增');
+                },
+            },
+        ],
         EXPAND_LAZY_METHOD: (params: any) => {
             const i = params.row.id;
             return new Promise((resolve) => {
@@ -701,7 +701,7 @@ document.getElementById('setConfig')?.addEventListener('click', () => {
         HIGHLIGHT_SELECTED_ROW: true,
         HIGHLIGHT_HOVER_ROW: true,
         OFFSET_HEIGHT: 16,
-        ENABLE_CONTEXT_MENU: true,
+        ENABLE_CONTEXT_MENU: false,
         CONTEXT_MENU: [
             { label: '复制', value: 'copy' },
             { label: '剪切', value: 'cut' },

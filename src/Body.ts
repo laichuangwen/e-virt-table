@@ -136,7 +136,10 @@ export default class Body {
             this.resizeTarget = null;
             this.resizeDiff = 0;
             this.isResizing = false;
-            this.ctx.rowResizing = false;
+            //加个延时，修复拖动时，开始编辑的问题
+            setTimeout(() => {
+                this.ctx.rowResizing = false;
+            }, 0);
             this.offsetY = 0;
         });
         this.ctx.on('mousedown', (e) => {
@@ -150,6 +153,7 @@ export default class Body {
                 this.ctx.rowResizing = true;
             } else {
                 this.isResizing = false;
+                this.ctx.rowResizing = false;
             }
             this.isMouseDown = true;
         });
