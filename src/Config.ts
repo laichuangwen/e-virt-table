@@ -82,7 +82,7 @@ export default class Config {
     ENABLE_SELECTOR_ALL_ROWS: boolean = true;
     ENABLE_SELECTOR_ALL_COLS: boolean = true;
     ENABLE_AUTOFILL: boolean = false;
-    ENABLE_CONTEXTMENU: boolean = true;
+    ENABLE_CONTEXT_MENU: boolean = false;
     ENABLE_COPY: boolean = true;
     ENABLE_PASTER: boolean = true;
     ENABLE_RESIZE_ROW: boolean = true;

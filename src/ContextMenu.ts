@@ -13,7 +13,7 @@ export default class ContextMenu {
     }
     private init() {
         this.ctx.on('cellContextMenuClick', (cell: Cell, e: MouseEvent) => {
-            if (!this.ctx.config.ENABLE_CONTEXTMENU) return;
+            if (!this.ctx.config.ENABLE_CONTEXT_MENU) return;
             e.preventDefault();
             const { xArr, yArr } = this.ctx.selector;
             const [minX, maxX] = xArr;

@@ -53,13 +53,17 @@ function sortFixed(arr: Column[] = []) {
             centers.push(item);
         }
     });
-    return [...lefts, ...centers, ...right];
+    return [
+        ...lefts.sort((a, b) => a.sort - b.sort),
+        ...centers.sort((a, b) => a.sort - b.sort),
+        ...right.sort((a, b) => a.sort - b.sort),
+    ];
 }
 function calCrossSpan(arr: Column[] = [], maxRow: number = 1, level: number = 0): Column[] {
-    return arr.map((config, index) => {
+    return arr.map((config) => {
         if (config.children) {
             let colspan = 0;
-          let fixed = config.fixed;
+            let fixed = config.fixed;
             config.children.forEach((item) => {
                 item.fixed = fixed;
             });
@@ -81,7 +85,6 @@ function calCrossSpan(arr: Column[] = [], maxRow: number = 1, level: number = 0)
         return {
             ...config,
             level,
-            sort: index,
             rowspan: maxRow,
             colspan: 1,
         };

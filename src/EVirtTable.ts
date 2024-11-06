@@ -20,10 +20,11 @@ import Editor from './Editor';
 import Empty from './Empty';
 import Overlayer from './Overlayer';
 import ContextMenu from './ContextMenu';
-import './style.css'
+import './style.css';
 export default class EVirtTable {
     private targetContainer: HTMLDivElement;
     private target: HTMLCanvasElement;
+    private options: EVirtTableOptions;
     private scroller: Scroller;
     private header: Header;
     private body: Body;
@@ -41,7 +42,8 @@ export default class EVirtTable {
         this.targetContainer = target;
         this.targetContainer.style.position = 'relative';
         this.targetContainer.appendChild(this.target);
-        this.ctx = new Context(this.targetContainer, this.target, options);
+        this.options = options;
+        this.ctx = new Context(this.targetContainer, this.target, this.options);
         this.header = new Header(this.ctx);
         this.body = new Body(this.ctx);
         this.footer = new Footer(this.ctx);

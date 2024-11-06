@@ -103,6 +103,7 @@ export interface Column {
     text: string;
     colspan: number;
     rowspan: number;
+    sort: number;
     key: string;
     hide: boolean | Function;
     render: Function;

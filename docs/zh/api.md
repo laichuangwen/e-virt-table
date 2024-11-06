@@ -57,7 +57,7 @@
 | ENABLE_SELECTOR_ALL_ROWS | 启用选择器-批量选中列 | boolean | — | true |
 | ENABLE_SELECTOR_ALL_COLS | 启用选择器-批量选中行 | boolean | — | true |
 | ENABLE_AUTOFILL | 启用填充 | boolean | — | true |
-| ENABLE_CONTEXTMENU | 启用右键 | boolean | — | true |
+| ENABLE_CONTEXT_MENU | 启用右键 | boolean | — | true |
 | ENABLE_COPY | 启用复制 | boolean | — | true |
 | ENABLE_RESIZE_COLUMN | 启用调整列宽 | boolean | — | true |
 | ENABLE_KEYBOARD | 启用键盘 | boolean | — | true |
