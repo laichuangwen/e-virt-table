@@ -511,7 +511,7 @@ const eVirtTable = new EVirtTable(canvas, {
         HIGHLIGHT_SELECTED_ROW: true,
         HIGHLIGHT_HOVER_ROW: true,
         OFFSET_HEIGHT: 16,
-        ENABLE_CONTEXT_MENU: false,
+        ENABLE_CONTEXT_MENU: true,
         CONTEXT_MENU: [
             { label: '复制', value: 'copy' },
             { label: '剪切', value: 'cut' },
@@ -658,6 +658,9 @@ if (editorEl && dateEl) {
             editorEl.style.top = `${-10000}px`;
         }
     });
+    eVirtTable.on('change', (value) => {
+        console.log(value);
+    });
     dateEl.addEventListener('change', function (event) {
         if (!event.target) {
             return;
@@ -716,6 +719,9 @@ document.getElementById('setConfig')?.addEventListener('click', () => {
             },
         ],
     });
+});
+document.getElementById('edit')?.addEventListener('click', () => {
+    eVirtTable.editCell(2, 3);
 });
 // 销毁
 function destroy() {

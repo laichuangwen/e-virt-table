@@ -114,6 +114,9 @@ export default class EVirtTable {
         this.ctx.database.setFilterMethod(func);
         this.ctx.emit('draw');
     }
+    editCell(rowIndex: number, colIndex: number) {
+        this.editor.editCell(rowIndex, colIndex);
+    }
     setItemValue(rowKey: string, key: string, value: any, history = true, reDraw = true, isEditor = false) {
         this.ctx.database.setItemValue(rowKey, key, value, history, reDraw, isEditor);
     }

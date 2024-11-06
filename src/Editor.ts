@@ -191,6 +191,42 @@ export default class Editor {
         this.editorEl.style.top = `${-10000}px`;
     }
     startEdit() {
+        // 如果不启用点击选择器编辑
+        const { ENABLE_EDIT_CLICK_SELECTOR } = this.ctx.config;
+        if (!ENABLE_EDIT_CLICK_SELECTOR) {
+            return;
+        }
+        const focusCell = this.ctx.focusCell;
+        if (!focusCell) {
+            return;
+        }
+        // 如果是index或者index-selection,selection类型的单元格，不允许编辑
+        if (['index', 'index-selection', 'selection'].includes(focusCell.type)) {
+            return;
+        }
+        if (this.enable) {
+            return;
+        }
+        const { rowKey, key } = focusCell;
+        const readonly = this.ctx.database.getReadonly(rowKey, key);
+        if (focusCell && !readonly) {
+            this.enable = true;
+            this.ctx.editing = true;
+            this.cellTarget = focusCell;
+            this.startEditByInput(this.cellTarget);
+            this.ctx.emit('startEdit', this.cellTarget);
+        }
+    }
+    editCell(rowIndex: number, colIndex: number) {
+        const row = this.ctx.body.renderRows.find((row) => row.rowIndex === rowIndex);
+        if (!row) {
+            return;
+        }
+        const cell = row.cells.find((cell: Cell) => cell.colIndex === colIndex);
+        if (!cell) {
+            return;
+        }
+        this.ctx.emit('setSelectorCell', cell);
         const focusCell = this.ctx.focusCell;
         if (!focusCell) {
             return;
