@@ -364,13 +364,16 @@ const columns: any[] = [
     },
 ];
 let data: any[] = [];
-for (let i = 0; i < 10000; i += 1) {
+for (let i = 0; i < 100; i += 1) {
     data.push({
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
         id: i,
         // _readonly: true,
         emp_img: 'https://devtest-oss-r.bananain.cn/wechat-mall/2024/08/27/1724754260406/20240827-182345.jpg',
-        emp_name: `张三${i % 30 ? 1 : 0}`,
+        emp_name: {
+            name: `张三${i % 30 ? 1 : 0}`,
+            img: '',
+        },
         emp_name11: `11张三${i}`,
         emp_name22: `22张三${i}`,
         emp_name2: `2张三${i}`,
@@ -500,14 +503,14 @@ const eVirtTable = new EVirtTable(canvas, {
                 color: '#4E5969',
             },
         ],
-        HEIGHT: 800,
+        HEIGHT: 500,
         CHECKBOX_KEY: 'emp_name',
         CELL_HEIGHT: 28,
         ENABLE_AUTOFILL: true,
         ENABLE_SELECTOR: true,
         ENABLE_KEYBOARD: true,
         ENABLE_HISTORY: true,
-        ENABLE_OFFSET_HEIGHT: true,
+        // ENABLE_OFFSET_HEIGHT: true,
         HIGHLIGHT_SELECTED_ROW: true,
         HIGHLIGHT_HOVER_ROW: true,
         OFFSET_HEIGHT: 16,

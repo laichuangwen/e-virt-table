@@ -16,8 +16,8 @@ class Scrollbar {
     private barHeight = 0;
     private distance = 0; // 滚动条的长度
     private visibleDistance = 0; //可见区域的长度
-    private offsetX = 0;
-    private offsetY = 0;
+    private clientX = 0;
+    private clientY = 0;
     private dragStart = 0; // 拖拽开始的位置
     isDragging = false;
     scroll = 0;
@@ -37,11 +37,11 @@ class Scrollbar {
     }
 
     onMouseDown(e: MouseEvent) {
-        const { offsetX, offsetY } = e;
-        if (offsetX == this.offsetX && offsetY == this.offsetY) return;
+        const { offsetX, offsetY, clientX, clientY } = e;
+        if (clientX == this.clientX && clientY == this.clientY) return;
         if (this.isOnScrollbar(offsetX, offsetY)) {
-            this.offsetX = offsetX;
-            this.offsetY = offsetY;
+            this.clientX = clientX;
+            this.clientY = clientY;
             this.isDragging = true;
             this.ctx.scrollerMove = true; // 滚动条移动
             this.isFocus = true;
@@ -65,12 +65,12 @@ class Scrollbar {
     onMouseUp() {
         this.isDragging = false;
         this.isFocus = false;
-        this.offsetY = 0;
-        this.offsetX = 0;
+        this.clientX = 0;
+        this.clientY = 0;
     }
 
     onMouseMove(e: MouseEvent) {
-        const { offsetX, offsetY } = e;
+        const { offsetX, offsetY, clientX, clientY } = e;
         // 悬浮提示
         if (this.isOnScrollbar(offsetX, offsetY) && e.target === this.ctx.target) {
             this.isFocus = true;
@@ -78,12 +78,12 @@ class Scrollbar {
             this.isFocus = false;
         }
         // 拖拽移动滚动条
-        if (offsetX == this.offsetX && offsetY == this.offsetY) return;
+        if (clientX == this.clientX && clientY == this.clientY) return;
         let offset = 0;
         if (this.type === 'horizontal') {
-            offset = offsetX - this.offsetX;
+            offset = clientX - this.clientX;
         } else {
-            offset = offsetY - this.offsetY;
+            offset = clientY - this.clientY;
         }
         if (this.isDragging && offset !== 0) {
             // scroll= 开始滚动条位置+（鼠标移动的距离/可见区域的长度）*滚动条的长度
@@ -121,13 +121,17 @@ class Scrollbar {
     }
 
     private updateScroll(e: WheelEvent) {
-        e.preventDefault();
         const deltaX = e.deltaX;
         const deltaY = e.deltaY;
         if (this.type === 'vertical' && e.shiftKey === false) {
+            // 只有在滚动条需要滚动时才阻止默认事件
+            if (!((this.scroll === 0 && deltaY < 0) || (this.scroll === this.distance && deltaY > 0))) {
+                e.preventDefault();
+            }
             this.scroll = Math.max(0, Math.min(this.scroll + deltaY, this.distance));
         } else if (this.type === 'horizontal') {
             if (e.shiftKey) {
+                console.log('jinlai');
                 this.scroll = Math.max(0, Math.min(this.scroll + deltaY, this.distance));
             } else {
                 this.scroll = Math.max(0, Math.min(this.scroll + deltaX, this.distance));
@@ -285,7 +289,7 @@ export default class Scroller {
         // 只有滚动条发生变化才触发绘制
         if (scrollX !== this.ctx.scrollX || scrollY !== this.ctx.scrollY) {
             this.ctx.emit('onScroll', scrollX, scrollY);
-          if (scrollX !== this.ctx.scrollX) {
+            if (scrollX !== this.ctx.scrollX) {
                 this.ctx.emit('onScrollX', scrollX);
             }
             if (scrollY !== this.ctx.scrollY) {
