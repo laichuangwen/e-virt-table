@@ -21,6 +21,7 @@ import BaseCell from './BaseCell';
 export default class Cell extends BaseCell {
     formatter?: FormatterMethod;
     hoverIconName: string = '';
+    operation = false;
     align: Align;
     verticalAlign: VerticalAlign;
     fixed?: Fixed;
@@ -89,6 +90,7 @@ export default class Cell extends BaseCell {
         this.verticalAlign = column.verticalAlign || 'middle';
         this.fixed = column.fixed;
         this.level = column.level;
+        this.operation = column.operation || false;
         this.column = column;
         this.rules = column.rules;
         this.row = row;

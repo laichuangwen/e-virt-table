@@ -8,6 +8,7 @@ export default class CellHeader extends BaseCell {
     fixed: Fixed | undefined;
     widthFillDisable: boolean;
     type: Type;
+    operation = false;
     editorType: string;
     level: number;
     text: string;
@@ -50,6 +51,7 @@ export default class CellHeader extends BaseCell {
         this.verticalAlign = column.verticalAlign || 'middle';
         this.fixed = column.fixed;
         this.level = column.level;
+        this.operation = column.operation || false;
         this.text = column.title;
         this.column = column;
         this.colspan = column.colspan;

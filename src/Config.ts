@@ -78,6 +78,10 @@ export default class Config {
     ENABLE_SELECTOR: boolean = false;
     ENABLE_EDIT_SINGLE_CLICK = false; // 启用单点击立马编辑
     ENABLE_EDIT_CLICK_SELECTOR = true; // 启用点击选择器编辑
+    SELECTOR_AREA_MIN_X = 0; // 选择器X最小范围
+    SELECTOR_AREA_MAX_X = 0; // 选择器X最大范围,0默认最大colMax
+    SELECTOR_AREA_MIN_Y = 0; // 选择器Y最小范围
+    SELECTOR_AREA_MAX_Y = 0; // 选择器Y最大范围,0默认rowMax
     ENABLE_SELECTOR_SINGLE: boolean = false;
     ENABLE_SELECTOR_SPAN_COL: boolean = true;
     ENABLE_SELECTOR_SPAN_ROW: boolean = true;

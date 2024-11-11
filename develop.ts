@@ -25,9 +25,11 @@ const columns: any[] = [
     {
         title: '工号',
         key: 'emp_no',
+        operation: true,
         slotName: 'emp_no',
         readonly: true,
-        type: 'tree',
+        // type: 'tree',
+        type: 'operation',
         fixed: 'left',
         sort: 4,
         // hide: () => 3 > 2,

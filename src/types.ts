@@ -91,6 +91,7 @@ export type Position = {
 };
 export interface Column {
     type: Type;
+    operation: boolean;
     editorType: string;
     hoverIconName: string;
     title: string;

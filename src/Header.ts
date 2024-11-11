@@ -80,7 +80,6 @@ export default class Header {
         const leafLeftCellHeaders = this.fixedLeftCellHeaders.filter((item) => !item.hasChildren);
         this.ctx.fixedLeftWidth = leafLeftCellHeaders.reduce((sum, _item) => sum + _item.width, 0);
         const leafRightCellHeaders = this.fixedRightCellHeaders.filter((item) => !item.hasChildren);
-        // 需要加右边滚动条的轨道宽度
         this.ctx.fixedRightWidth = leafRightCellHeaders.reduce((sum, _item) => sum + _item.width, SCROLLER_TRACK_SIZE);
         // 更新最大列索引
         this.ctx.maxColIndex = this.leafCellHeaders.length - 1;

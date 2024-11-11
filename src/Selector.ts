@@ -42,7 +42,7 @@ export default class Selector {
             if (this.ctx.autofillMove) {
                 return;
             }
-            if (['index-selection', 'selection', 'index'].includes(cell.type)) {
+            if (cell.operation) {
                 this.selectRows(cell, false);
                 // 如果是自动填充就不处理
                 return;
@@ -68,7 +68,7 @@ export default class Selector {
             if (this.ctx.target.style.cursor === 'crosshair') {
                 return;
             }
-            if (['index-selection', 'selection', 'index'].includes(cell.type)) {
+            if (cell.operation) {
                 this.isMultipleRow = true;
                 this.selectRows(cell);
                 return;
@@ -188,8 +188,22 @@ export default class Selector {
                 this.ctx.selectorMove = true;
             }
             this.ctx.selector.enable = true;
-            this.ctx.selector.xArr = _xArr;
-            this.ctx.selector.yArr = _yArr;
+            const { SELECTOR_AREA_MIN_X, SELECTOR_AREA_MAX_X, SELECTOR_AREA_MIN_Y, SELECTOR_AREA_MAX_Y } =
+                this.ctx.config;
+            const areaMinX = SELECTOR_AREA_MIN_X;
+            const areaMaxX = SELECTOR_AREA_MAX_X || this.ctx.maxColIndex;
+            const areaMinY = SELECTOR_AREA_MIN_Y;
+            const areaMaxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex;
+            let [minX, maxX] = _xArr;
+            let [minY, maxY] = _yArr;
+            if (minX < areaMinX) {
+                return;
+            }
+            if (minY < areaMinY) {
+                return;
+            }
+            this.ctx.selector.xArr = [Math.max(areaMinX, minX), Math.min(areaMaxX, maxX)];
+            this.ctx.selector.yArr = [Math.max(areaMinY, minY), Math.min(areaMaxY, maxY)];
             this.ctx.emit('setSelector', this.ctx.selector);
             this.ctx.emit('draw');
         }
@@ -210,13 +224,14 @@ export default class Selector {
         if (this.ctx.columnResizing) {
             return;
         }
-        // index, index-selection, selection全选
-        if (['index', 'index-selection', 'selection'].includes(cell.type)) {
+        // 是可操作列就全选
+        if (cell.operation) {
             this.selectAll();
             return;
         }
-        const minY = 0;
-        const maxY = this.ctx.maxRowIndex;
+        const { SELECTOR_AREA_MIN_Y, SELECTOR_AREA_MAX_Y } = this.ctx.config;
+        const minY = SELECTOR_AREA_MIN_Y;
+        const maxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex;
         if (this.ctx.mousedown && this.ctx.focusCellHeader) {
             const { colIndex } = this.ctx.focusCellHeader;
             if (cell.colIndex >= colIndex) {
@@ -242,11 +257,13 @@ export default class Selector {
         // 只有两个全选启用了才能全选
         const { ENABLE_SELECTOR_ALL_ROWS, ENABLE_SELECTOR_ALL_COLS } = this.ctx.config;
         if (ENABLE_SELECTOR_ALL_ROWS && ENABLE_SELECTOR_ALL_COLS) {
-            const minX = 0;
-            const maxX = this.ctx.maxColIndex;
-            const minY = 0;
-            const maxY = this.ctx.maxRowIndex;
-            const xArr = [minX + 1, maxX];
+            const { SELECTOR_AREA_MIN_X, SELECTOR_AREA_MAX_X, SELECTOR_AREA_MIN_Y, SELECTOR_AREA_MAX_Y } =
+                this.ctx.config;
+            const minX = SELECTOR_AREA_MIN_X;
+            const maxX = SELECTOR_AREA_MAX_X || this.ctx.maxColIndex;
+            const minY = SELECTOR_AREA_MIN_Y;
+            const maxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex;
+            const xArr = [minX, maxX];
             const yArr = [minY, maxY];
             this.setSelector(xArr, yArr);
         }
@@ -262,8 +279,9 @@ export default class Selector {
         if (this.ctx.autofillMove) {
             return;
         }
-        const maxX = this.ctx.maxColIndex;
-        const minX = cell.colIndex + 1;
+        const { SELECTOR_AREA_MIN_X, SELECTOR_AREA_MAX_X } = this.ctx.config;
+        const maxX = SELECTOR_AREA_MAX_X || this.ctx.maxColIndex;
+        const minX = SELECTOR_AREA_MIN_X;
         if (isSetFocus) {
             this.ctx.setFocusCell(cell);
             const xArr = [minX, maxX];
@@ -535,7 +553,7 @@ export default class Selector {
         const yArr = [rowIndex, rowIndex];
         const cell = this.getCell(rowIndex, colIndex);
         if (cell) {
-            if (['index', 'index-selection', 'selection'].includes(cell.type)) {
+            if (cell.operation) {
                 return;
             }
             this.ctx.setFocusCell(cell);
