@@ -77,7 +77,6 @@ export default class Config {
     CELL_FOOTER_HEIGHT: number = 36;
     ENABLE_SELECTOR: boolean = false;
     ENABLE_EDIT_SINGLE_CLICK = false; // 启用单点击立马编辑
-    ENABLE_EDIT_TEXT_ENTER = true; // 启用文本编辑器回车键确认
     ENABLE_EDIT_CLICK_SELECTOR = true; // 启用点击选择器编辑
     ENABLE_SELECTOR_SINGLE: boolean = false;
     ENABLE_SELECTOR_SPAN_COL: boolean = true;

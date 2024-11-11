@@ -9,13 +9,13 @@ const columns: any[] = [
     //   fixed: "left",
     //   width: 50,
     // },
-    {
-        key: 'selection',
-        type: 'selection',
-        fixed: 'left',
-        width: 50,
-        widthFillDisable: true,
-    },
+    // {
+    //     key: 'selection',
+    //     type: 'selection',
+    //     fixed: 'left',
+    //     width: 50,
+    //     widthFillDisable: true,
+    // },
     // {
     //   key: "selection",
     //   type: "index-selection",
@@ -364,16 +364,13 @@ const columns: any[] = [
     },
 ];
 let data: any[] = [];
-for (let i = 0; i < 100; i += 1) {
+for (let i = 0; i < 10000; i += 1) {
     data.push({
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
         id: i,
         // _readonly: true,
         emp_img: 'https://devtest-oss-r.bananain.cn/wechat-mall/2024/08/27/1724754260406/20240827-182345.jpg',
-        emp_name: {
-            name: `张三${i % 30 ? 1 : 0}`,
-            img: '',
-        },
+        emp_name: `张三${i % 30 ? 1 : 0}`,
         emp_name11: `11张三${i}`,
         emp_name22: `22张三${i}`,
         emp_name2: `2张三${i}`,
@@ -503,14 +500,14 @@ const eVirtTable = new EVirtTable(canvas, {
                 color: '#4E5969',
             },
         ],
-        HEIGHT: 500,
+        HEIGHT: 800,
         CHECKBOX_KEY: 'emp_name',
         CELL_HEIGHT: 28,
         ENABLE_AUTOFILL: true,
         ENABLE_SELECTOR: true,
         ENABLE_KEYBOARD: true,
         ENABLE_HISTORY: true,
-        // ENABLE_OFFSET_HEIGHT: true,
+        ENABLE_OFFSET_HEIGHT: true,
         HIGHLIGHT_SELECTED_ROW: true,
         HIGHLIGHT_HOVER_ROW: true,
         OFFSET_HEIGHT: 16,
@@ -724,7 +721,54 @@ document.getElementById('setConfig')?.addEventListener('click', () => {
     });
 });
 document.getElementById('edit')?.addEventListener('click', () => {
-    eVirtTable.editCell(2, 3);
+    let data: any[] = [];
+    for (let i = 0; i < 100; i += 1) {
+        data.push({
+            _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
+            id: i,
+            // _readonly: true,
+            emp_img: 'https://devtest-oss-r.bananain.cn/wechat-mall/2024/08/27/1724754260406/20240827-182345.jpg',
+            emp_name: `张三${i % 30 ? 1 : 0}`,
+            emp_name11: `11张三${i}`,
+            emp_name22: `22张三${i}`,
+            emp_name2: `2张三${i}`,
+            emp_no: i,
+            dep_name: ['zhinan', 'shejiyuanze', 'yizhi'],
+            job_name: i === 5 ? '产品经理测试很长的名字' : `产品经理${i}`,
+            phone: i === 4 ? '13159645561a' : `${13159645561 + i}`,
+            // eslint-disable-next-line no-nested-ternary
+            sex: i % 4 === 0 ? 1 : i === 3 ? null : 2,
+            address:
+                // eslint-disable-next-line no-nested-ternary
+                i === 1 ? `海淀区北京路海淀区北京路十分地${i}号` : i === 4 ? '' : `海淀区北京路${i}号`,
+            work_type: `兼职${i}`,
+            work_status: `在职${i}`,
+            household_city: `深圳${i}`,
+            household_address: `深南大道${i}号`,
+            nation: `汉${i}`,
+            work_address: `南京路${i}号`,
+            work_email: `${28976633 + i}@qq.com`,
+            email: `${4465566 + i}@qq.com`,
+            work_age: 2 + i,
+            company_age: 1 + i,
+            contract_company: `飞鸟物流公司${i}`,
+            qq: 35860567 + i,
+            salary_month: `${1996 + i}-09`,
+            birthday: `${1996 + i}-09-21`,
+            age: 1 + i,
+            brandName: `博世${i}`,
+            goodsName: `电钻${i}`,
+            sn: `SDFSD${i}`,
+            materialNo: `1231${i}`,
+            unit: '个',
+            requiredQuantity: 10,
+            customerRemarks: `测试测试${i}`,
+            purchasePrice: 10.2 + i,
+            salePrice: 12.3 + i,
+            children: [],
+        });
+    }
+    eVirtTable.loadData(data);
 });
 // 销毁
 function destroy() {

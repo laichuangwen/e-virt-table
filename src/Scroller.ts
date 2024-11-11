@@ -131,7 +131,6 @@ class Scrollbar {
             this.scroll = Math.max(0, Math.min(this.scroll + deltaY, this.distance));
         } else if (this.type === 'horizontal') {
             if (e.shiftKey) {
-                console.log('jinlai');
                 this.scroll = Math.max(0, Math.min(this.scroll + deltaY, this.distance));
             } else {
                 this.scroll = Math.max(0, Math.min(this.scroll + deltaX, this.distance));

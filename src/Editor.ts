@@ -90,15 +90,24 @@ export default class Editor {
     }
     private initTextEditor() {
         // 初始化文本编辑器
-        const { CSS_PREFIX, SELECT_BORDER_COLOR, ENABLE_EDIT_TEXT_ENTER } = this.ctx.config;
+        const { CSS_PREFIX, SELECT_BORDER_COLOR } = this.ctx.config;
         this.inputEl = document.createElement('div');
         // 监听键盘事件
         this.inputEl.addEventListener('keydown', (e) => {
-            // 如果不启用文本编辑器回车键确认
-            if (!ENABLE_EDIT_TEXT_ENTER) {
+            if (!this.enable) {
                 return;
             }
-            if (this.enable && (e.code === 'Enter' || e.code === 'Escape')) {
+            // 模拟excel  altKey enter换行
+            if ((e.altKey || e.metaKey) && e.code === 'Enter') {
+                e.preventDefault();
+                const text = this.inputEl.textContent;
+                this.inputEl.textContent = `${text}\n\n`;
+                const selection = window.getSelection(); // 创建selection
+                selection?.selectAllChildren(this.inputEl); // 清除选区并选择指定节点的所有子节点
+                selection?.collapseToEnd(); // 光标移至最后
+                return;
+            }
+            if (e.code === 'Escape' || e.code === 'Enter') {
                 e.preventDefault();
                 this.inputEl.blur();
             }

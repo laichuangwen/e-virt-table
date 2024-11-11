@@ -76,6 +76,7 @@ export default class EVirtTable {
     loadConfig(_config: ConfigType) {
         this.ctx.config.init(_config);
         this.ctx.database.init();
+        this.header.init();
         // 更新右键菜单，有可能配置项变化
         this.contextMenu.updated();
         this.ctx.emit('draw');
@@ -91,6 +92,7 @@ export default class EVirtTable {
         // 先关闭编辑
         this.editor.doneEdit();
         this.ctx.database.setData(data);
+        this.header.init();
         this.ctx.emit('draw');
     }
     loadFooterData(data: any[]) {
