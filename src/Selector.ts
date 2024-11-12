@@ -2,7 +2,7 @@ import type Context from './Context';
 import type Cell from './Cell';
 import type CellHeader from './CellHeader';
 import { ChangeItem } from './types';
-import { throttle } from './util';
+import { throttle, decodeSpreadsheetStr, encodeToSpreadsheetStr } from './util';
 export default class Selector {
     private isCut = false;
     private isMultipleRow = false;
@@ -234,6 +234,8 @@ export default class Selector {
         const maxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex;
         if (this.ctx.mousedown && this.ctx.focusCellHeader) {
             const { colIndex } = this.ctx.focusCellHeader;
+            // 
+            this.ctx.clearSelector();
             if (cell.colIndex >= colIndex) {
                 const xArr = [colIndex, cell.colIndex + cell.colspan - 1];
                 const yArr = [minY, maxY];
@@ -368,7 +370,8 @@ export default class Selector {
         if (!this.ctx.config.ENABLE_COPY) {
             return;
         }
-        const { text } = this.ctx.getSelectedData();
+        const { value } = this.ctx.getSelectedData();
+        const text = encodeToSpreadsheetStr(value);
         if (navigator.clipboard) {
             navigator.clipboard
                 .writeText(text)
@@ -438,14 +441,7 @@ export default class Selector {
             navigator.clipboard
                 .readText()
                 .then((val) => {
-                    let textArr = [];
-                    const arr = val.split('\r');
-                    if (arr.length === 1) {
-                        const _arr = arr[0].split('\n');
-                        textArr = _arr.map((item) => item.split('\t'));
-                    } else {
-                        textArr = arr.map((item) => item.split('\t'));
-                    }
+                    let textArr = decodeSpreadsheetStr(val);
                     let changeList: ChangeItem[] = [];
                     for (let ri = 0; ri <= textArr.length - 1; ri++) {
                         const len = textArr[ri].length;
