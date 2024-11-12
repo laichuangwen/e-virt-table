@@ -224,6 +224,10 @@ export default class Selector {
         if (this.ctx.columnResizing) {
             return;
         }
+        // 编辑中
+        if (this.ctx.editing) {
+            return;
+        }
         // 是可操作列就全选
         if (cell.operation) {
             this.selectAll();
@@ -234,7 +238,7 @@ export default class Selector {
         const maxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex;
         if (this.ctx.mousedown && this.ctx.focusCellHeader) {
             const { colIndex } = this.ctx.focusCellHeader;
-            // 
+            //
             this.ctx.clearSelector();
             if (cell.colIndex >= colIndex) {
                 const xArr = [colIndex, cell.colIndex + cell.colspan - 1];
@@ -254,6 +258,10 @@ export default class Selector {
     }
     private selectAll() {
         if (this.ctx.autofillMove) {
+            return;
+        }
+        // 编辑中
+        if (this.ctx.editing) {
             return;
         }
         // 只有两个全选启用了才能全选
@@ -281,6 +289,10 @@ export default class Selector {
         if (this.ctx.autofillMove) {
             return;
         }
+        // 编辑中
+        if (this.ctx.editing) {
+            return;
+        }
         const { SELECTOR_AREA_MIN_X, SELECTOR_AREA_MAX_X } = this.ctx.config;
         const maxX = SELECTOR_AREA_MAX_X || this.ctx.maxColIndex;
         const minX = SELECTOR_AREA_MIN_X;
@@ -306,6 +318,10 @@ export default class Selector {
 
     private mouseenter() {
         if (this.ctx.config.ENABLE_SELECTOR_SINGLE) {
+            return;
+        }
+        // 编辑中
+        if (this.ctx.editing) {
             return;
         }
         const { mousedown, focusCell, hoverCell } = this.ctx;
