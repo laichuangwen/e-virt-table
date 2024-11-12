@@ -23,6 +23,7 @@ export default class Editor {
             if (this.enable) {
                 this.doneEdit();
             }
+            this.cellTarget = null;
         });
         this.ctx.on('keydown', (e) => {
             const key = e.key;
