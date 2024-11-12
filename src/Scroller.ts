@@ -37,6 +37,12 @@ class Scrollbar {
     }
 
     onMouseDown(e: MouseEvent) {
+        if (!(e.target instanceof HTMLCanvasElement)) {
+            return;;
+        }
+        if (!this.ctx.isTarget(e.target)) {
+            return;
+        }
         const { offsetX, offsetY, clientX, clientY } = e;
         if (clientX == this.clientX && clientY == this.clientY) return;
         if (this.isOnScrollbar(offsetX, offsetY)) {
