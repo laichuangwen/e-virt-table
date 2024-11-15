@@ -38,10 +38,18 @@ class Scrollbar {
 
     onMouseDown(e: MouseEvent) {
         if (!(e.target instanceof HTMLCanvasElement)) {
-            return;;
+            return;
         }
         if (!this.ctx.isTarget(e.target)) {
             return;
+        }
+        // 行调整大小中不处理
+        if (this.ctx.target.style.cursor === 'row-resize') {
+            return true;
+        }
+        // 列调整大小中不处理
+        if (this.ctx.target.style.cursor === 'col-resize') {
+            return true;
         }
         const { offsetX, offsetY, clientX, clientY } = e;
         if (clientX == this.clientX && clientY == this.clientY) return;

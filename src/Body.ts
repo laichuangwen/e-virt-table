@@ -5,7 +5,7 @@ export default class Body {
     private resizeTarget: Row | null = null; //调整行大小的目标
     private isMouseDown = false; // 是否按下
     private resizeDiff = 0; // 是否移动中
-    private offsetY = 0; // 鼠标按下时的y轴位置
+    private clientY = 0; // 鼠标按下时的y轴位置
     private ctx: Context;
     private x = 0;
     private y = 0;
@@ -140,13 +140,13 @@ export default class Body {
             setTimeout(() => {
                 this.ctx.rowResizing = false;
             }, 0);
-            this.offsetY = 0;
+            this.clientY = 0;
         });
         this.ctx.on('mousedown', (e) => {
             if (!this.ctx.isTarget(e.target)) {
                 return;
             }
-            this.offsetY = e.offsetY;
+            this.clientY = e.clientY;
             if (this.resizeTarget) {
                 this.isResizing = true;
                 // 传递给上下文，防止其他事件触发，行调整大小时，不触发选择器
@@ -162,6 +162,7 @@ export default class Body {
             if (this.ctx.editing) return;
             const y = e.offsetY;
             const x = e.offsetX;
+            const clientY = e.clientY;
             const {
                 target,
                 scrollY,
@@ -169,7 +170,7 @@ export default class Body {
             } = this.ctx;
             if (this.isResizing && this.resizeTarget) {
                 const resizeTargetHeight = this.resizeTarget.height;
-                let diff = y - this.offsetY;
+                let diff = clientY - this.clientY;
                 if (diff + resizeTargetHeight < RESIZE_ROW_MIN_HEIGHT) {
                     diff = -(resizeTargetHeight - RESIZE_ROW_MIN_HEIGHT);
                 }

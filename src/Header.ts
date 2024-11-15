@@ -11,7 +11,7 @@ export default class Header {
     private resizeTarget: CellHeader | null = null; //调整表头
     private resizeNum = 0; // 调整列的数量
     private isResizing = false; // 是否移动中
-    private offsetX = 0; // 鼠标按下时的x轴位置
+    private clientX = 0; // 鼠标按下时的x轴位置
     private resizeDiff = 0; // 是否移动中
     private columnIndex = 0;
     private isMouseDown = false; // 是否按下
@@ -102,7 +102,7 @@ export default class Header {
             if (!this.ctx.isTarget(e.target)) {
                 return;
             }
-            this.offsetX = e.offsetX;
+            this.clientX = e.clientX;
             if (this.resizeTarget) {
                 this.isResizing = true;
                 this.ctx.columnResizing = true;
@@ -121,7 +121,7 @@ export default class Header {
             this.resizeTarget = null;
             this.isResizing = false;
             this.ctx.columnResizing = false;
-            this.offsetX = 0;
+            this.clientX = 0;
         });
         this.ctx.on('mousemove', (e) => {
             // 编辑中不触发mousemove
@@ -133,7 +133,7 @@ export default class Header {
             // 鼠标移动
             if (this.isResizing && this.resizeTarget) {
                 const resizeTargetWidth = this.resizeTarget.width;
-                let diff = e.offsetX - this.offsetX;
+                let diff = e.clientX - this.clientX;
                 if (diff + resizeTargetWidth < RESIZE_COLUMN_MIN_WIDTH) {
                     diff = -(resizeTargetWidth - RESIZE_COLUMN_MIN_WIDTH);
                 }
