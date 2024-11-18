@@ -196,7 +196,7 @@ export default class CellHeader extends BaseCell {
             left: left,
             top: `${this.drawY + 1}px`,
             width: `${this.width}px`,
-            height: `${this.height}px`,
+            height: `${this.height - 2}px`,
             pointerEvents: 'none',
         };
     }

@@ -36,6 +36,7 @@ export default class Config {
     ENABLE_OFFSET_HEIGHT: boolean = false;
     OFFSET_HEIGHT: number = 0;
     HEADER_HEIGHT: number = 36;
+    ENABLE_HEADER_STICKY = false; // 启用头部固定,需要外面实现覆盖层，或者所有表头都要是元素
     HEADER_BG_COLOR: string = '#F8FAFF';
     BODY_BG_COLOR: string = '#FFF';
     HEADER_TEXT_COLOR: string = '#1D2129';

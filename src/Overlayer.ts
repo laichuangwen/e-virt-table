@@ -6,6 +6,37 @@ export default class Overlayer {
     ctx: Context;
     constructor(ctx: Context) {
         this.ctx = ctx;
+        // 表头sticky处理
+        this.ctx.on('scroll', () => {
+            if (!this.ctx.config.ENABLE_HEADER_STICKY) {
+                return;
+            }
+            const rect = this.ctx.targetContainer.getBoundingClientRect();
+            let show = false;
+            let header = this.getHeader();
+            if (rect.top < 0 && rect.top < -this.ctx.header.visibleHeight && rect.top > -this.ctx.body.visibleHeight) {
+                show = true;
+            } else {
+                show = false;
+            }
+            const {
+                config: { CSS_PREFIX },
+            } = this.ctx;
+            const { visibleWidth } = this.ctx.body;
+            const headerSticky = {
+                type: 'header-sticky',
+                class: `${CSS_PREFIX}-overlayer-header-sticky`,
+                style: {
+                    position: 'sticky',
+                    top: `${0}px`,
+                    'z-index': 10,
+                    width: `${visibleWidth}px`,
+                    display: show ? 'block' : 'none',
+                },
+                views: header.views,
+            };
+            this.ctx.emit('headerStickyChange', headerSticky);
+        });
     }
     draw() {
         const overlayer = this.getContainer();
@@ -74,8 +105,8 @@ export default class Overlayer {
             key: 'left',
             style: {
                 position: 'absolute',
-                top: `${0.5}px`,
-                left: `${0.5}px`,
+                top: `${0}px`,
+                left: `${0}px`,
                 overflow: 'hidden',
                 width: `${fixedLeftWidth}px`,
                 height: `${visibleHeight}px`,
@@ -86,10 +117,10 @@ export default class Overlayer {
             key: 'center',
             style: {
                 position: 'absolute',
-                top: `${0.5}px`,
+                top: `${0}px`,
                 left: `${fixedLeftWidth}px`,
                 overflow: 'hidden',
-                width: `${visibleWidth - fixedLeftWidth - fixedRightWidth}px`,
+                width: `${visibleWidth - fixedLeftWidth - fixedRightWidth + 1}px`,
                 height: `${visibleHeight}px`,
             },
             cells: centerCells,
@@ -98,10 +129,10 @@ export default class Overlayer {
             key: 'right',
             style: {
                 position: 'absolute',
-                top: `${0.5}px`,
-                right: `${0.5}px`,
+                top: `${0}px`,
+                right: `${0}px`,
                 overflow: 'hidden',
-                width: `${fixedRightWidth}px`,
+                width: `${fixedRightWidth + 1}px`,
                 height: `${visibleHeight}px`,
             },
             cells: rightCells,
