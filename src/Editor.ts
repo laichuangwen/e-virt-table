@@ -164,9 +164,14 @@ export default class Editor {
             return;
         }
         const value = cell.getValue();
-        const { width, height } = cell;
+        const { width } = cell;
         const drawX = cell.getDrawX();
-        const drawY = cell.getDrawY();
+        let drawY = cell.getDrawY();
+        let { height } = cell;
+        if (cell.height > this.ctx.body.visibleHeight) {
+            height = this.ctx.body.visibleHeight;
+            drawY = this.ctx.header.visibleHeight;
+        }
         const { CELL_PADDING } = this.ctx.config;
         this.editorEl.style.left = `${drawX}px`;
         this.editorEl.style.top = `${drawY}px`;
