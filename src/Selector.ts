@@ -359,6 +359,12 @@ export default class Selector {
         if (!focusCell) {
             return;
         }
+        // 超过范围值就不处理
+        const { SELECTOR_AREA_MAX_Y, SELECTOR_AREA_MAX_Y_OFFSET } = this.ctx.config;
+        const areaMaxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex - SELECTOR_AREA_MAX_Y_OFFSET;
+        if (focusCell.rowIndex > areaMaxY) {
+            return;
+        }
         this.ctx.selector.enable = true;
         if (clickCell && shiftKey) {
             // shiftKey快捷选中
