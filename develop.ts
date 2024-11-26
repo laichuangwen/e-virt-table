@@ -514,6 +514,8 @@ const eVirtTable = new EVirtTable(canvas, {
         HIGHLIGHT_SELECTED_ROW: true,
         HIGHLIGHT_HOVER_ROW: true,
         OFFSET_HEIGHT: 16,
+        SELECTOR_AREA_MAX_X_OFFSET: 1,
+        SELECTOR_AREA_MAX_Y_OFFSET: 1,
         ENABLE_CONTEXT_MENU: true,
         CONTEXT_MENU: [
             { label: '复制', value: 'copy' },

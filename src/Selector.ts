@@ -188,18 +188,30 @@ export default class Selector {
                 this.ctx.selectorMove = true;
             }
             this.ctx.selector.enable = true;
-            const { SELECTOR_AREA_MIN_X, SELECTOR_AREA_MAX_X, SELECTOR_AREA_MIN_Y, SELECTOR_AREA_MAX_Y } =
-                this.ctx.config;
+            const {
+                SELECTOR_AREA_MIN_X,
+                SELECTOR_AREA_MAX_X,
+                SELECTOR_AREA_MIN_Y,
+                SELECTOR_AREA_MAX_Y,
+                SELECTOR_AREA_MAX_X_OFFSET,
+                SELECTOR_AREA_MAX_Y_OFFSET,
+            } = this.ctx.config;
             const areaMinX = SELECTOR_AREA_MIN_X;
-            const areaMaxX = SELECTOR_AREA_MAX_X || this.ctx.maxColIndex;
+            const areaMaxX = SELECTOR_AREA_MAX_X || this.ctx.maxColIndex - SELECTOR_AREA_MAX_X_OFFSET;
             const areaMinY = SELECTOR_AREA_MIN_Y;
-            const areaMaxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex;
+            const areaMaxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex - SELECTOR_AREA_MAX_Y_OFFSET;
             let [minX, maxX] = _xArr;
             let [minY, maxY] = _yArr;
             if (minX < areaMinX) {
                 return;
             }
+            if (maxX > areaMaxX) {
+                return;
+            }
             if (minY < areaMinY) {
+                return;
+            }
+            if (maxY > areaMaxY) {
                 return;
             }
             this.ctx.selector.xArr = [Math.max(areaMinX, minX), Math.min(areaMaxX, maxX)];
@@ -233,9 +245,9 @@ export default class Selector {
             this.selectAll();
             return;
         }
-        const { SELECTOR_AREA_MIN_Y, SELECTOR_AREA_MAX_Y } = this.ctx.config;
+        const { SELECTOR_AREA_MIN_Y, SELECTOR_AREA_MAX_Y, SELECTOR_AREA_MAX_Y_OFFSET } = this.ctx.config;
         const minY = SELECTOR_AREA_MIN_Y;
-        const maxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex;
+        const maxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex - SELECTOR_AREA_MAX_Y_OFFSET;
         if (this.ctx.mousedown && this.ctx.focusCellHeader) {
             const { colIndex } = this.ctx.focusCellHeader;
             //
@@ -267,12 +279,18 @@ export default class Selector {
         // 只有两个全选启用了才能全选
         const { ENABLE_SELECTOR_ALL_ROWS, ENABLE_SELECTOR_ALL_COLS } = this.ctx.config;
         if (ENABLE_SELECTOR_ALL_ROWS && ENABLE_SELECTOR_ALL_COLS) {
-            const { SELECTOR_AREA_MIN_X, SELECTOR_AREA_MAX_X, SELECTOR_AREA_MIN_Y, SELECTOR_AREA_MAX_Y } =
-                this.ctx.config;
+            const {
+                SELECTOR_AREA_MIN_X,
+                SELECTOR_AREA_MAX_X,
+                SELECTOR_AREA_MIN_Y,
+                SELECTOR_AREA_MAX_Y,
+                SELECTOR_AREA_MAX_X_OFFSET,
+                SELECTOR_AREA_MAX_Y_OFFSET,
+            } = this.ctx.config;
             const minX = SELECTOR_AREA_MIN_X;
-            const maxX = SELECTOR_AREA_MAX_X || this.ctx.maxColIndex;
+            const maxX = SELECTOR_AREA_MAX_X || this.ctx.maxColIndex - SELECTOR_AREA_MAX_X_OFFSET;
             const minY = SELECTOR_AREA_MIN_Y;
-            const maxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex;
+            const maxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex - SELECTOR_AREA_MAX_Y_OFFSET;
             const xArr = [minX, maxX];
             const yArr = [minY, maxY];
             this.setSelector(xArr, yArr);
@@ -293,8 +311,8 @@ export default class Selector {
         if (this.ctx.editing) {
             return;
         }
-        const { SELECTOR_AREA_MIN_X, SELECTOR_AREA_MAX_X } = this.ctx.config;
-        const maxX = SELECTOR_AREA_MAX_X || this.ctx.maxColIndex;
+        const { SELECTOR_AREA_MIN_X, SELECTOR_AREA_MAX_X, SELECTOR_AREA_MAX_X_OFFSET } = this.ctx.config;
+        const maxX = SELECTOR_AREA_MAX_X || this.ctx.maxColIndex - SELECTOR_AREA_MAX_X_OFFSET;
         const minX = SELECTOR_AREA_MIN_X;
         if (isSetFocus) {
             this.ctx.setFocusCell(cell);

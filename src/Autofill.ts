@@ -89,12 +89,18 @@ export default class Autofill {
             JSON.stringify(this.ctx.autofill.yArr) !== JSON.stringify(_yArr)
         ) {
             // 范围值和选择器的一致
-            const { SELECTOR_AREA_MIN_X, SELECTOR_AREA_MAX_X, SELECTOR_AREA_MIN_Y, SELECTOR_AREA_MAX_Y } =
-                this.ctx.config;
+            const {
+                SELECTOR_AREA_MIN_X,
+                SELECTOR_AREA_MAX_X,
+                SELECTOR_AREA_MIN_Y,
+                SELECTOR_AREA_MAX_Y,
+                SELECTOR_AREA_MAX_X_OFFSET,
+                SELECTOR_AREA_MAX_Y_OFFSET,
+            } = this.ctx.config;
             const areaMinX = SELECTOR_AREA_MIN_X;
-            const areaMaxX = SELECTOR_AREA_MAX_X || this.ctx.maxColIndex;
+            const areaMaxX = SELECTOR_AREA_MAX_X || this.ctx.maxColIndex - SELECTOR_AREA_MAX_X_OFFSET;
             const areaMinY = SELECTOR_AREA_MIN_Y;
-            const areaMaxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex;
+            const areaMaxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex - SELECTOR_AREA_MAX_Y_OFFSET;
             let [minX, maxX] = _xArr;
             let [minY, maxY] = _yArr;
             if (minX < areaMinX) {
