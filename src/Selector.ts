@@ -360,9 +360,7 @@ export default class Selector {
             return;
         }
         // 超过范围值就不处理
-        const { SELECTOR_AREA_MAX_Y, SELECTOR_AREA_MAX_Y_OFFSET } = this.ctx.config;
-        const areaMaxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex - SELECTOR_AREA_MAX_Y_OFFSET;
-        if (focusCell.rowIndex > areaMaxY) {
+        if (!this.isInSettingRange(focusCell.rowIndex, focusCell.colIndex)) {
             return;
         }
         this.ctx.selector.enable = true;
@@ -588,12 +586,18 @@ export default class Selector {
         const xArr = [colIndex, colIndex];
         const yArr = [rowIndex, rowIndex];
         const cell = this.getCell(rowIndex, colIndex);
-        if (cell) {
-            if (cell.operation) {
-                return;
-            }
-            this.ctx.setFocusCell(cell);
+        if (!cell) {
+            return;
         }
+        // 操作列不处理
+        if (cell.operation) {
+            return;
+        }
+        // 超过范围值就不处理，防止跳动
+        if (!this.isInSettingRange(cell.rowIndex, cell.colIndex)) {
+            return;
+        }
+        this.ctx.setFocusCell(cell);
         this.setSelector(xArr, yArr);
         this.adjustBoundaryPosition();
         this.ctx.emit('draw');
@@ -609,6 +613,34 @@ export default class Selector {
             clearInterval(this.timerY);
             this.timerY = 0;
         }
+    }
+    // 判断是否在设置范围内
+    private isInSettingRange(rowIndex: number, colIndex: number) {
+        const {
+            SELECTOR_AREA_MIN_X,
+            SELECTOR_AREA_MAX_X,
+            SELECTOR_AREA_MIN_Y,
+            SELECTOR_AREA_MAX_Y,
+            SELECTOR_AREA_MAX_X_OFFSET,
+            SELECTOR_AREA_MAX_Y_OFFSET,
+        } = this.ctx.config;
+        const areaMinX = SELECTOR_AREA_MIN_X;
+        const areaMaxX = SELECTOR_AREA_MAX_X || this.ctx.maxColIndex - SELECTOR_AREA_MAX_X_OFFSET;
+        const areaMinY = SELECTOR_AREA_MIN_Y;
+        const areaMaxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex - SELECTOR_AREA_MAX_Y_OFFSET;
+        if (colIndex < areaMinX) {
+            return false;
+        }
+        if (colIndex > areaMaxX) {
+            return false;
+        }
+        if (rowIndex < areaMinY) {
+            return false;
+        }
+        if (rowIndex > areaMaxY) {
+            return false;
+        }
+        return true;
     }
     /**
      * 调整滚动条位置，让到达边界时自动滚动
