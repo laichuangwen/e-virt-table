@@ -3,7 +3,7 @@ import type Context from './Context';
 
 export default class Editor {
     private editorEl!: HTMLDivElement;
-    private inputEl!: HTMLDivElement;
+    private inputEl!: HTMLTextAreaElement;
     private enable = false;
     private cellTarget: Cell | null = null;
     ctx: Context;
@@ -91,8 +91,7 @@ export default class Editor {
     }
     private initTextEditor() {
         // 初始化文本编辑器
-        const { CSS_PREFIX, SELECT_BORDER_COLOR } = this.ctx.config;
-        this.inputEl = document.createElement('div');
+        this.inputEl = document.createElement('textarea');
         // 监听键盘事件
         this.inputEl.addEventListener('keydown', (e) => {
             if (!this.enable) {
@@ -101,28 +100,16 @@ export default class Editor {
             // 模拟excel  altKey enter换行
             if ((e.altKey || e.metaKey) && e.code === 'Enter') {
                 e.preventDefault();
-                const inputEl = this.inputEl;
-                const selection = window.getSelection();
-                if (!inputEl || !selection) return;
-                if (!selection.rangeCount) return; // 如果没有选区，直接返回
-                const range = selection.getRangeAt(0); // 获取光标所在的 Range
-                // 如果光标已经在内容的最后
-                const isAtEnd = range.startContainer === inputEl && range.startOffset === inputEl.childNodes.length;
-                if (isAtEnd) {
-                    // 直接追加换行符到内容末尾
-                    inputEl.textContent += '\n\n';
-                    selection.selectAllChildren(this.inputEl); // 清除选区并选择指定节点的所有子节点
-                    selection.collapseToEnd(); // 光标移至最后
-                } else {
-                    // 中间插入换行符的情况
-                    // 创建换行符的文本节点
-                    const newLine = document.createTextNode('\n');
-                    range.insertNode(newLine); // 在光标位置插入换行符
-                    range.setStartAfter(newLine); // 将光标移到新换行符之后
-                    range.collapse(false); // 折叠到插入点末尾
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                }
+                // 插入换行符
+                const cursorPos = this.inputEl.selectionStart; // 获取光标位置
+                const textBefore = this.inputEl.value.substring(0, cursorPos); // 光标前的文本
+                const textAfter = this.inputEl.value.substring(cursorPos); // 光标后的文本
+
+                // 更新 textarea 的内容，在光标位置插入换行符
+                this.inputEl.value = textBefore + '\n' + textAfter;
+
+                // 设置光标位置到新行
+                this.inputEl.selectionStart = this.inputEl.selectionEnd = cursorPos + 1;
                 return;
             }
             if (e.code === 'Escape' || e.code === 'Enter') {
@@ -134,45 +121,8 @@ export default class Editor {
             this.doneEdit();
         });
         this.editorEl = document.createElement('div');
-        this.editorEl.className = `${CSS_PREFIX}-self-editor`;
-        this.inputEl.className = `${CSS_PREFIX}-self-editor-input`;
-        const editorStyle = {
-            position: 'absolute',
-            top: '-10000px',
-            left: '-10000px',
-            textAlign: 'left',
-            lineHeight: '0',
-            zIndex: 100,
-            overflow: 'hidden',
-            backgroundColor: '#fff',
-            border: `2px solid ${SELECT_BORDER_COLOR}`,
-            boxSizing: 'border-box',
-            boxShadow: 'rgba(0, 0, 0, 0.2) 0px 6px 16px',
-            pointerEvents: 'auto',
-            display: 'flex',
-            alignItems: 'center',
-        };
-        Object.assign(this.editorEl.style, editorStyle);
-        const inputStyle = {
-            width: '100%',
-            boxSizing: 'border-box',
-            padding: '8px',
-            outline: 'none',
-            fontWeight: '400',
-            fontSize: '12px',
-            color: 'inherit',
-            whiteSpace: 'normal',
-            wordWrap: 'break-word',
-            wordBreak: 'break-all',
-            lineHeight: '18px',
-            margin: '0',
-            background: '#fff',
-            cursor: 'text',
-        };
-        Object.assign(this.inputEl.style, inputStyle);
-        const isFirefox = navigator.userAgent.toLowerCase().includes('firefox'); // 判断是否是火狐浏览器
-        // https://developer.mozilla.org/zh-CN/docs/Web/HTML/Global_attributes/contenteditable
-        this.inputEl.contentEditable = isFirefox ? 'true' : 'plaintext-only';
+        this.editorEl.className = 'e-virt-table-editor';
+        this.inputEl.className = 'e-virt-table-editor-textarea';
         this.editorEl.appendChild(this.inputEl);
         this.ctx.targetContainer.appendChild(this.editorEl);
     }
@@ -194,14 +144,16 @@ export default class Editor {
         this.editorEl.style.top = `${drawY}px`;
         this.inputEl.style.minWidth = `${width - 1}px`;
         this.inputEl.style.minHeight = `${height - 1}px`;
+        this.inputEl.style.width = `${width - 1}px`;
+        this.inputEl.style.height = `${height - 1}px`;
         this.inputEl.style.padding = `${CELL_PADDING}px`;
         if (value !== null) {
-            this.inputEl.textContent = value;
+            this.inputEl.value = value;
         }
-        this.inputEl.focus();
         const selection = window.getSelection(); // 创建selection
         selection?.selectAllChildren(this.inputEl); // 清除选区并选择指定节点的所有子节点
         selection?.collapseToEnd(); // 光标移至最后
+        this.inputEl.focus();
     }
     private doneEditByInput() {
         if (!this.cellTarget) {
@@ -213,12 +165,12 @@ export default class Editor {
         }
         const { rowKey, key } = this.cellTarget;
         const value = this.cellTarget.getValue();
-        const textContent = this.inputEl.textContent;
+        const textContent = this.inputEl.value;
         // !(text.textContent === '' && value === null)剔除点击编辑后未修改会把null变为''的情况
         if (textContent !== value && !(textContent === '' && value === null)) {
             this.ctx.database.setItemValue(rowKey, key, textContent, true, true, true);
         }
-        this.inputEl.textContent = null;
+        this.inputEl.value = '';
         this.editorEl.style.left = `${-10000}px`;
         this.editorEl.style.top = `${-10000}px`;
     }

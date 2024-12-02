@@ -24,6 +24,24 @@
     display: flex;
     align-items: center;
 }
+.e-virt-table-editor-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    outline: none;
+    font-weight: 400;
+    font-size: 12px;
+    color: inherit;
+    white-space: normal;
+    word-wrap: break-word;
+    word-break: break-all;
+    line-height: 18px;
+    margin: 0;
+    border: none;
+    background: var(--e-virt-table-color-white);
+    overflow: hidden;
+    cursor: text;
+}
 .e-virt-table-context-menu {
     /* display: none; */
     position: absolute;
