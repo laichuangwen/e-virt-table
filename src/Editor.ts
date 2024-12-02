@@ -101,11 +101,28 @@ export default class Editor {
             // 模拟excel  altKey enter换行
             if ((e.altKey || e.metaKey) && e.code === 'Enter') {
                 e.preventDefault();
-                const text = this.inputEl.textContent;
-                this.inputEl.textContent = `${text}\n\n`;
-                const selection = window.getSelection(); // 创建selection
-                selection?.selectAllChildren(this.inputEl); // 清除选区并选择指定节点的所有子节点
-                selection?.collapseToEnd(); // 光标移至最后
+                const inputEl = this.inputEl;
+                const selection = window.getSelection();
+                if (!inputEl || !selection) return;
+                if (!selection.rangeCount) return; // 如果没有选区，直接返回
+                const range = selection.getRangeAt(0); // 获取光标所在的 Range
+                // 如果光标已经在内容的最后
+                const isAtEnd = range.startContainer === inputEl && range.startOffset === inputEl.childNodes.length;
+                if (isAtEnd) {
+                    // 直接追加换行符到内容末尾
+                    inputEl.textContent += '\n\n';
+                    selection.selectAllChildren(this.inputEl); // 清除选区并选择指定节点的所有子节点
+                    selection.collapseToEnd(); // 光标移至最后
+                } else {
+                    // 中间插入换行符的情况
+                    // 创建换行符的文本节点
+                    const newLine = document.createTextNode('\n');
+                    range.insertNode(newLine); // 在光标位置插入换行符
+                    range.setStartAfter(newLine); // 将光标移到新换行符之后
+                    range.collapse(false); // 折叠到插入点末尾
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
                 return;
             }
             if (e.code === 'Escape' || e.code === 'Enter') {
