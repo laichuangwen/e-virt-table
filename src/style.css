@@ -32,7 +32,7 @@
     font-weight: 400;
     font-size: 12px;
     color: inherit;
-    white-space: normal;
+    white-space: pre-wrap;
     word-wrap: break-word;
     word-break: break-all;
     line-height: 18px;

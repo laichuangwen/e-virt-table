@@ -150,10 +150,9 @@ export default class Editor {
         if (value !== null) {
             this.inputEl.value = value;
         }
-        const selection = window.getSelection(); // 创建selection
-        selection?.selectAllChildren(this.inputEl); // 清除选区并选择指定节点的所有子节点
-        selection?.collapseToEnd(); // 光标移至最后
         this.inputEl.focus();
+        const length = this.inputEl.value.length;
+        this.inputEl.setSelectionRange(length, length);
     }
     private doneEditByInput() {
         if (!this.cellTarget) {
