@@ -8,6 +8,15 @@
     --e-virt-table-box-shadow: 0 2px 12px 0 #0000001a;
     --e-virt-table-editor-bg-color: #fff;
 }
+.e-virt-table-container {
+    position: relative;
+    outline: none;
+}
+.e-virt-table-canvas {
+    position: relative;
+    outline: none;
+    z-index: 2;
+}
 .e-virt-table-editor {
     position: absolute;
     top: -10000px;
@@ -20,27 +29,34 @@
     border: 2px solid var(--e-virt-table-color-primary);
     box-sizing: border-box;
     box-shadow: var(--e-virt-table-box-shadow);
-    pointer-events: auto;
     display: flex;
     align-items: center;
+}
+.e-virt-table-overlayer {
+    position: 'absolute';
+    left: 0px;
+    top: 0px;
+    overflow: hidden;
+    z-index: 10;
 }
 .e-virt-table-editor-textarea {
     width: 100%;
     box-sizing: border-box;
-    padding: 8px;
     outline: none;
     font-weight: 400;
+    padding: 8px;
     font-size: 12px;
     color: inherit;
     white-space: pre-wrap;
     word-wrap: break-word;
     word-break: break-all;
-    line-height: 18px;
+    line-height: 1.5;
     margin: 0;
     border: none;
+    vertical-align: middle;
     background: var(--e-virt-table-color-white);
-    overflow: hidden;
-    cursor: text;
+    overflow-y: auto;
+    resize: none;
 }
 .e-virt-table-context-menu {
     /* display: none; */

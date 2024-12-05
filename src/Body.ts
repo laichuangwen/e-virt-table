@@ -111,9 +111,10 @@ export default class Body {
         this.ctx.body.visibleHeight = this.visibleHeight;
         this.ctx.body.data = data;
         // 外层容器样式
+        this.ctx.target.setAttribute('class', 'e-virt-table-canvas');
         this.ctx.target.setAttribute(
             'style',
-            `outline: none; position: relative; border-radius: ${BORDER_RADIUS}px; border: 1px solid ${BORDER_COLOR}; height:${
+            `border-radius: ${BORDER_RADIUS}px; border: 1px solid ${BORDER_COLOR}; height:${
                 this.ctx.target.height
             }px;width:${this.ctx.target.width - 1}px;`,
         );
@@ -143,7 +144,7 @@ export default class Body {
             this.clientY = 0;
         });
         this.ctx.on('mousedown', (e) => {
-            if (!this.ctx.isTarget(e.target)) {
+            if (!this.ctx.isTarget()) {
                 return;
             }
             this.clientY = e.clientY;
@@ -160,8 +161,9 @@ export default class Body {
         this.ctx.on('mousemove', (e) => {
             // 编辑中不触发mousemove
             if (this.ctx.editing) return;
-            const y = e.offsetY;
-            const x = e.offsetX;
+            const { offsetY, offsetX } = this.ctx.getOffset(e);
+            const y = offsetY;
+            const x = offsetX;
             const clientY = e.clientY;
             const {
                 target,
@@ -183,12 +185,12 @@ export default class Body {
                     return;
                 }
                 // 如果是拖动选择
-                if (this.ctx.target.style.cursor === 'crosshair') {
+                if (this.ctx.targetContainer.style.cursor === 'crosshair') {
                     return;
                 }
-                if (this.ctx.target.style.cursor === 'row-resize') {
+                if (this.ctx.targetContainer.style.cursor === 'row-resize') {
                     // 恢复默认样式
-                    this.ctx.target.style.cursor = 'default';
+                    this.ctx.targetContainer.style.cursor = 'default';
                 }
                 for (let i = 0; i < this.renderRows.length; i++) {
                     const row = this.renderRows[i];
@@ -204,7 +206,7 @@ export default class Body {
                                 x < cell.drawX + cell.width - 10 &&
                                 cell.rowspan === 1 //没有被合并的单元格
                             ) {
-                                this.ctx.target.style.cursor = 'row-resize';
+                                this.ctx.targetContainer.style.cursor = 'row-resize';
                                 this.resizeTarget = row;
                             }
                         }

@@ -92,11 +92,13 @@ export default class Editor {
     private initTextEditor() {
         // 初始化文本编辑器
         this.inputEl = document.createElement('textarea');
+        this.inputEl.setAttribute('rows', '1');
         // 监听键盘事件
         this.inputEl.addEventListener('keydown', (e) => {
             if (!this.enable) {
                 return;
             }
+            e.stopPropagation();
             // 模拟excel  altKey enter换行
             if ((e.altKey || e.metaKey) && e.code === 'Enter') {
                 e.preventDefault();
@@ -117,6 +119,11 @@ export default class Editor {
                 this.inputEl.blur();
             }
         });
+        // 监听输入事件，自动调整高度
+        this.inputEl.addEventListener('input', function () {
+            this.style.height = 'auto'; // 重置高度
+            this.style.height = `${this.scrollHeight}px`; // 设置为内容的高度
+        });
         this.inputEl.addEventListener('blur', () => {
             this.doneEdit();
         });
@@ -124,6 +131,16 @@ export default class Editor {
         this.editorEl.className = 'e-virt-table-editor';
         this.inputEl.className = 'e-virt-table-editor-textarea';
         this.editorEl.appendChild(this.inputEl);
+        // 父级阻止冒泡事件
+        // 在捕获阶段全局监听所有事件类型
+        const eventBrowserNames = this.ctx.getAllEventBrowserNames();
+        eventBrowserNames.forEach((eventType) => {
+            this.editorEl.addEventListener(eventType, (event) => {
+                if (this.ctx.editing) {
+                    event.stopPropagation();
+                }
+            });
+        });
         this.ctx.targetContainer.appendChild(this.editorEl);
     }
     private startEditByInput(cell: Cell) {
@@ -135,24 +152,24 @@ export default class Editor {
         const drawX = cell.getDrawX();
         let drawY = cell.getDrawY();
         let { height } = cell;
-        if (cell.height > this.ctx.body.visibleHeight) {
-            height = this.ctx.body.visibleHeight;
-            drawY = this.ctx.header.visibleHeight;
-        }
         const { CELL_PADDING } = this.ctx.config;
         this.editorEl.style.left = `${drawX}px`;
         this.editorEl.style.top = `${drawY}px`;
         this.inputEl.style.minWidth = `${width - 1}px`;
         this.inputEl.style.minHeight = `${height - 1}px`;
+        this.inputEl.style.maxHeight = `${this.ctx.body.visibleHeight - 1}px`;
         this.inputEl.style.width = `${width - 1}px`;
         this.inputEl.style.height = `${height - 1}px`;
-        this.inputEl.style.padding = `${CELL_PADDING}px`;
+        // this.inputEl.style.padding = `${CELL_PADDING}px`;
         if (value !== null) {
             this.inputEl.value = value;
         }
         this.inputEl.focus();
         const length = this.inputEl.value.length;
         this.inputEl.setSelectionRange(length, length);
+        if (this.inputEl.scrollHeight > height) {
+            this.inputEl.style.height = this.inputEl.scrollHeight + 'px';
+        }
     }
     private doneEditByInput() {
         if (!this.cellTarget) {
@@ -183,6 +200,8 @@ export default class Editor {
         if (!focusCell) {
             return;
         }
+ 
+        
         // 如果是index或者index-selection,selection类型的单元格，不允许编辑
         if (['index', 'index-selection', 'selection'].includes(focusCell.type)) {
             return;
@@ -245,5 +264,7 @@ export default class Editor {
             this.ctx.emit('draw');
         }
     }
-    destroy() {}
+    destroy() {
+        this.editorEl?.remove();
+    }
 }

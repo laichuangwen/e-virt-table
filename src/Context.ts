@@ -8,7 +8,6 @@ import { Column, EVirtTableOptions } from './types';
 import Icons from './Icons';
 import CellHeader from './CellHeader';
 import Row from './Row';
-import { generateShortUUID } from './util';
 import Cell from './Cell';
 import EventTable from './EventTable';
 export type ConfigType = Partial<typeof Config>;
@@ -65,11 +64,11 @@ export default class Context {
     private eventBus: EventBus;
     private eventBrowser: EventBrowser;
     private eventTable: EventTable;
-    private uuid = generateShortUUID();
     targetContainer: HTMLElement;
     target: HTMLCanvasElement;
     paint: Paint;
     icons: Icons;
+    isInsideTargetContainer = false;
     mousedown = false;
     isPointer = false;
     rowResizing = false; // 行调整大小中
@@ -148,7 +147,6 @@ export default class Context {
     constructor(targetContainer: HTMLDivElement, target: HTMLCanvasElement, options: EVirtTableOptions) {
         this.target = target;
         this.targetContainer = targetContainer;
-        this.target.setAttribute('uuid', this.uuid);
         this.config = new Config(options.config || {});
         this.eventBus = new EventBus();
         this.eventBrowser = new EventBrowser(this);
@@ -258,10 +256,20 @@ export default class Context {
         }
         this.emit('setScrollY', scrollY);
     }
-    isTarget(target: HTMLCanvasElement): boolean {
-        if (target === null) return false;
-        const uuid = target.getAttribute('uuid');
-        return this.uuid === uuid;
+    isTarget(): boolean {
+        // 鼠标在容器内
+        return this.isInsideTargetContainer;
+    }
+    getOffset(e: MouseEvent) {
+        const { left, top } = this.target.getBoundingClientRect();
+        return {
+            offsetX: e.clientX - left,
+            offsetY: e.clientY - top,
+        };
+    }
+    getAllEventBrowserNames(): string[] {
+        const keys = this.eventBrowser.eventTasks.keys();
+        return Array.from(keys);
     }
     hasEvent(event: string): boolean {
         return this.eventBus.has(event);

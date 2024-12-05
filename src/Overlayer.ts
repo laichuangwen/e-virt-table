@@ -6,37 +6,6 @@ export default class Overlayer {
     ctx: Context;
     constructor(ctx: Context) {
         this.ctx = ctx;
-        // 表头sticky处理
-        this.ctx.on('scroll', () => {
-            if (!this.ctx.config.ENABLE_HEADER_STICKY) {
-                return;
-            }
-            const rect = this.ctx.targetContainer.getBoundingClientRect();
-            let show = false;
-            let header = this.getHeader();
-            if (rect.top < 0 && rect.top < -this.ctx.header.visibleHeight && rect.top > -this.ctx.body.visibleHeight) {
-                show = true;
-            } else {
-                show = false;
-            }
-            const {
-                config: { CSS_PREFIX },
-            } = this.ctx;
-            const { visibleWidth } = this.ctx.body;
-            const headerSticky = {
-                type: 'header-sticky',
-                class: `${CSS_PREFIX}-overlayer-header-sticky`,
-                style: {
-                    position: 'sticky',
-                    top: `${0}px`,
-                    'z-index': 10,
-                    width: `${visibleWidth}px`,
-                    display: show ? 'block' : 'none',
-                },
-                views: header.views,
-            };
-            this.ctx.emit('headerStickyChange', headerSticky);
-        });
     }
     draw() {
         const overlayer = this.getContainer();
@@ -69,11 +38,13 @@ export default class Overlayer {
                 position: 'absolute',
                 left: `${0}px`,
                 top: `${0}px`,
-                pointerEvents: 'none',
+                userSelect: 'none',
                 overflow: 'hidden',
                 width: `${width}px`,
                 height: `${height}px`,
+                zIndex: 10,
             },
+            class: 'e-virt-table-overlayer',
             views,
         };
         return container;

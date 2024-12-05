@@ -37,18 +37,18 @@ class Scrollbar {
     }
 
     onMouseDown(e: MouseEvent) {
-        if (!(e.target instanceof HTMLCanvasElement)) {
+        if (!(e.target instanceof Element)) {
             return;
         }
-        if (!this.ctx.isTarget(e.target)) {
+        if (!this.ctx.isTarget()) {
             return;
         }
         // 行调整大小中不处理
-        if (this.ctx.target.style.cursor === 'row-resize') {
+        if (this.ctx.targetContainer.style.cursor === 'row-resize') {
             return true;
         }
         // 列调整大小中不处理
-        if (this.ctx.target.style.cursor === 'col-resize') {
+        if (this.ctx.targetContainer.style.cursor === 'col-resize') {
             return true;
         }
         const { offsetX, offsetY, clientX, clientY } = e;

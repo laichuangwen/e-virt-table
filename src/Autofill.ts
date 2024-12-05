@@ -8,9 +8,10 @@ export default class Autofill {
     }
     private init() {
         this.ctx.on('cellMouseenter', (cell, e) => {
-            if (this.ctx.target.style.cursor === 'crosshair') {
-                this.ctx.target.style.cursor = 'default';
+            if (this.ctx.targetContainer.style.cursor === 'crosshair') {
+                this.ctx.targetContainer.style.cursor = 'default';
             }
+            const {offsetX, offsetY} = this.ctx.getOffset(e);
             const { xArr, yArr } = this.ctx.selector;
             const maxX = xArr[1];
             const maxY = yArr[1];
@@ -20,15 +21,15 @@ export default class Autofill {
                 const pointWh = 6;
                 const pointX = drawX + width - pointWh;
                 const pointY = drawY + height - pointWh;
-                if (e.offsetX > pointX && e.offsetY > pointY) {
+                if (offsetX > pointX && offsetY > pointY) {
                     // 引进到点
-                    this.ctx.target.style.cursor = 'crosshair';
+                    this.ctx.targetContainer.style.cursor = 'crosshair';
                 }
             }
             this.mouseenter(cell);
         });
         this.ctx.on('cellMousedown', () => {
-            if (this.ctx.target.style.cursor === 'crosshair') {
+            if (this.ctx.targetContainer.style.cursor === 'crosshair') {
                 this.setMousedown();
             }
         });

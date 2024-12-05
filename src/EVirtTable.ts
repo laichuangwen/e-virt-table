@@ -40,7 +40,7 @@ export default class EVirtTable {
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
         this.target = document.createElement('canvas');
         this.targetContainer = target;
-        this.targetContainer.style.position = 'relative';
+        this.targetContainer.className = 'e-virt-table-container';
         this.targetContainer.appendChild(this.target);
         this.options = options;
         this.ctx = new Context(this.targetContainer, this.target, this.options);
@@ -55,12 +55,17 @@ export default class EVirtTable {
         this.editor = new Editor(this.ctx);
         this.overlayer = new Overlayer(this.ctx);
         this.contextMenu = new ContextMenu(this.ctx);
-        this.ctx.on('draw', this.draw.bind(this));
+        this.ctx.on('draw', () => {
+            this.draw();
+            
+        });
+        this.ctx.on('drawView', () => {
+            this.draw(true);
+        });
         this.draw();
     }
-    draw() {
+    draw(ignoreOverlayer = false) {
         requestAnimationFrame(() => {
-            // console.time('draw');
             this.header.update();
             this.footer.update();
             this.body.update();
@@ -69,8 +74,10 @@ export default class EVirtTable {
             this.footer.draw();
             this.header.draw();
             this.scroller.draw();
-            this.overlayer.draw();
-            // console.timeEnd('draw');
+            // 忽略重绘覆盖层，解决按下事件时，重绘覆盖层导致事件无法触发，目前只在Selector中使用
+            if (!ignoreOverlayer) {
+                this.overlayer.draw();
+            }
         });
     }
     loadConfig(_config: ConfigType) {
@@ -259,11 +266,25 @@ export default class EVirtTable {
         this.ctx.database.toggleAllSelection();
         this.ctx.emit('draw');
     }
+    toggleRowExpand(rowKey: string, expand: boolean) {
+        this.ctx.database.expandItem(rowKey, expand);
+        this.ctx.emit('draw');
+    }
+    toggleExpandAll(expand: boolean) {
+        this.ctx.database.expandAll(expand);
+        this.ctx.emit('draw');
+    }
     getSelectionRows() {
         return this.ctx.database.getSelectionRows();
     }
     getPositionForRowIndex(rowIndex: number): Position {
         return this.ctx.database.getPositionForRowIndex(rowIndex);
+    }
+    getCellValue(rowKey: string, key: string) {
+        return this.ctx.database.getItemValue(rowKey, key);
+    }
+    getCellValueByIndex(rowIndex: number, colIndex: number) {
+        return this.ctx.database.getItemValueForRowIndexAndColIndex(rowIndex, colIndex);
     }
     /**
      * 销毁

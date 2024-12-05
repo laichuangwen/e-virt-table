@@ -3,7 +3,7 @@ import Context from './Context';
 type EventTask = Map<string, EventListenerOrEventListenerObject>;
 
 export default class EventBrowser {
-    private eventTasks: EventTask = new Map();
+    eventTasks: EventTask = new Map();
     private ctx: Context;
     constructor(ctx: Context) {
         this.ctx = ctx;
@@ -12,14 +12,16 @@ export default class EventBrowser {
 
     init() {
         this.bind(window, 'resize', this.handleResize.bind(this));
-        this.bind(window, 'mousedown', this.handleMouseDown.bind(this));
         this.bind(window, 'mouseup', this.handleMouseUp.bind(this));
         this.bind(window, 'mousemove', this.handleMousemove.bind(this));
-        this.bind(window, 'scroll', this.handleScroll.bind(this));
-        this.bind(this.ctx.target, 'click', this.handleClick.bind(this));
-        this.bind(this.ctx.target, 'keydown', this.handleKeydown.bind(this));
-        this.bind(this.ctx.target, 'wheel', this.handleWheel.bind(this));
-        this.bind(this.ctx.target, 'contextmenu', this.handleContextMenu.bind(this));
+        this.bind(this.ctx.targetContainer, 'click', this.handleClick.bind(this));
+        this.bind(window, 'keydown', this.handleKeydown.bind(this));
+        this.bind(this.ctx.targetContainer, 'wheel', this.handleWheel.bind(this));
+        this.bind(this.ctx.targetContainer, 'contextmenu', this.handleContextMenu.bind(this));
+        this.bind(this.ctx.targetContainer, 'mousedown', this.handleMouseDown.bind(this));
+        this.bind(this.ctx.targetContainer, 'mouseenter', this.handleMouseEnter.bind(this));
+        this.bind(this.ctx.targetContainer, 'mouseleave', this.handleMouseLeave.bind(this));
+        this.bind(this.ctx.targetContainer, 'dblclick', this.handleDblclick.bind(this));
     }
     destroy() {
         this.eventTasks.forEach((fn, event) => {
@@ -32,6 +34,7 @@ export default class EventBrowser {
         this.ctx.emit('resize', e);
     }
     private handleMouseDown(e: Event) {
+        e.preventDefault();
         const _e = e as MouseEvent;
         if (_e.button === 0) {
             this.ctx.mousedown = true;
@@ -39,6 +42,7 @@ export default class EventBrowser {
         this.ctx.emit('mousedown', e);
     }
     private handleMousemove(e: Event) {
+        e.preventDefault();
         this.ctx.emit('mousemove', e);
     }
     private handleMouseUp(e: Event) {
@@ -54,6 +58,9 @@ export default class EventBrowser {
     private handleKeydown(e: Event) {
         const { ENABLE_KEYBOARD } = this.ctx.config;
         if (!ENABLE_KEYBOARD) return;
+        if (!this.ctx.isTarget()) {
+            return;
+        }
         this.ctx.emit('keydown', e);
     }
     private handleWheel(e: Event) {
@@ -62,15 +69,24 @@ export default class EventBrowser {
     private handleContextMenu(e: Event) {
         this.ctx.emit('contextMenu', e);
     }
-    private handleScroll(e: Event) {
-        this.ctx.emit('scroll', e);
+    private handleMouseEnter(e: Event) {
+        this.ctx.isInsideTargetContainer = true;
+        this.ctx.emit('mouseenter', e);
     }
-    private bind(target: EventTarget, name: string, fn: EventListenerOrEventListenerObject): void {
-        // canvas元素默认不支持键盘事件，需要设置tabIndex
-        if (target instanceof HTMLCanvasElement && name === 'keydown') {
-            target.tabIndex = 0;
-        }
-        target.addEventListener(name, fn);
+    private handleMouseLeave(e: Event) {
+        this.ctx.isInsideTargetContainer = false;
+        this.ctx.emit('mouseleave', e);
+    }
+    private handleDblclick(e: Event) {
+        this.ctx.emit('dblclick', e);
+    }
+    private bind(
+        target: EventTarget,
+        name: string,
+        fn: EventListenerOrEventListenerObject,
+        options?: AddEventListenerOptions | boolean,
+    ): void {
+        target.addEventListener(name, fn, options);
         this.eventTasks.set(name, fn);
     }
 

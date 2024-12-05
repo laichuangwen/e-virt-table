@@ -11,6 +11,8 @@ export default class Selector {
     private adjustPositionY = '';
     private timerX = 0; // 水平滚动定时器
     private timerY = 0; // 垂直滚动定时器
+    private adjustTimer = 0;
+
     constructor(ctx: Context) {
         this.ctx = ctx;
         this.init();
@@ -20,9 +22,9 @@ export default class Selector {
         this.ctx.on(
             'mousemove',
             throttle((e) => {
-                const { offsetX, offsetY } = e;
+                const { offsetY, offsetX } = this.ctx.getOffset(e);
                 const isInsideBody =
-                    this.ctx.isTarget(e.target) &&
+                    this.ctx.isTarget() &&
                     offsetX > 0 &&
                     offsetX < this.ctx.body.visibleWidth &&
                     offsetY > this.ctx.header.visibleHeight &&
@@ -54,18 +56,18 @@ export default class Selector {
             this.mouseenter();
         });
         this.ctx.on('cellMousedown', (cell, e) => {
-            if (!this.ctx.isTarget(e.target)) {
+            if (!this.ctx.isTarget()) {
                 return;
             }
             // 如果是选中就不处理，比如chexkbox
-            if (this.ctx.target.style.cursor === 'pointer') {
+            if (this.ctx.targetContainer.style.cursor === 'pointer') {
                 return;
             }
             if (this.ctx.isPointer) {
                 return;
             }
             // 如果是填充返回
-            if (this.ctx.target.style.cursor === 'crosshair') {
+            if (this.ctx.targetContainer.style.cursor === 'crosshair') {
                 return;
             }
             if (cell.operation) {
@@ -83,7 +85,7 @@ export default class Selector {
         });
         this.ctx.on('cellHeaderMousedown', (cell) => {
             // 如果是选中就不处理，比如chexkbox
-            if (this.ctx.target.style.cursor === 'pointer') {
+            if (this.ctx.targetContainer.style.cursor === 'pointer') {
                 return;
             }
             if (this.ctx.isPointer) {
@@ -217,7 +219,7 @@ export default class Selector {
             this.ctx.selector.xArr = [Math.max(areaMinX, minX), Math.min(areaMaxX, maxX)];
             this.ctx.selector.yArr = [Math.max(areaMinY, minY), Math.min(areaMaxY, maxY)];
             this.ctx.emit('setSelector', this.ctx.selector);
-            this.ctx.emit('draw');
+            this.ctx.emit('drawView');
         }
     }
 
@@ -409,6 +411,7 @@ export default class Selector {
             return;
         }
         const { value } = this.ctx.getSelectedData();
+
         const text = encodeToSpreadsheetStr(value);
         if (navigator.clipboard) {
             navigator.clipboard
@@ -418,7 +421,7 @@ export default class Selector {
                     this.ctx.selector.xArrCopy = this.ctx.selector.xArr.slice();
                     this.ctx.selector.yArrCopy = this.ctx.selector.yArr.slice();
                     this.ctx.emit('setCopy', this.ctx.selector);
-                    this.ctx.emit('draw');
+                    this.ctx.emit('drawView');
                 })
                 .catch((error) => console.error('复制失败：', error));
         } else {
@@ -463,7 +466,7 @@ export default class Selector {
             rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
         });
         this.ctx.emit('clearSelectedDataChange', changeList, rows);
-        this.ctx.emit('draw');
+        this.ctx.emit('drawView');
         return changeList;
     }
     private paste() {
@@ -536,7 +539,7 @@ export default class Selector {
                     this.ctx.emit('pasteChange', changeList, rows);
                     // 清除复制线
                     this.clearCopyLine();
-                    this.ctx.emit('draw');
+                    this.ctx.emit('drawView');
                 })
                 .catch((error) => {
                     console.error('获取剪贴板内容失败：', error);
@@ -600,7 +603,7 @@ export default class Selector {
         this.ctx.setFocusCell(cell);
         this.setSelector(xArr, yArr);
         this.adjustBoundaryPosition();
-        this.ctx.emit('draw');
+        this.ctx.emit('drawView');
     }
     private stopAdjustPosition() {
         this.adjustPositionX = '';
@@ -646,7 +649,7 @@ export default class Selector {
      * 调整滚动条位置，让到达边界时自动滚动
      */
     private startAdjustPosition(e: MouseEvent) {
-        const { offsetX, offsetY } = e;
+        const { offsetX, offsetY } = this.ctx.getOffset(e);
         let positionX = '';
         let positionY = '';
         if (offsetX < 0) {
@@ -705,7 +708,16 @@ export default class Selector {
      * 调整滚动条位置，让焦点单元格始终出现在可视区域内
      */
     private adjustBoundaryPosition() {
-        const { target, focusCell, fixedRightWidth, fixedLeftWidth, header, footer, scrollX, scrollY } = this.ctx;
+        const {
+            target,
+            focusCell,
+            fixedRightWidth,
+            fixedLeftWidth,
+            header,
+            footer,
+            scrollX,
+            scrollY,
+        } = this.ctx;
         if (!focusCell) {
             return;
         }
@@ -719,17 +731,25 @@ export default class Selector {
         const diffRight = focusCell.drawX + focusCell.width - (target.width - fixedRightWidth) + 1;
         const diffTop = header.height - focusCell.drawY;
         const diffBottom = focusCell.drawY + focusCell.height - (target.height - footerHeight - SCROLLER_TRACK_SIZE);
-        // fixed禁用左右横向移动
-        if (diffRight > 0 && !focusCell.fixed) {
-            this.ctx.setScrollX(scrollX + diffRight);
-        } else if (diffLeft > 0 && !focusCell.fixed) {
-            this.ctx.setScrollX(scrollX - diffLeft);
+        // 边界移动会导致重回，使事件无法冒泡，所以移动视图延时一下等待click事件冒泡后才执行draw
+    
+        if (this.adjustTimer) {
+            clearTimeout(this.adjustTimer);
+            this.adjustTimer = 0;
         }
-        if (diffTop > 0) {
-            this.ctx.setScrollY(scrollY - diffTop);
-        } else if (diffBottom > 0) {
-            this.ctx.setScrollY(scrollY + diffBottom);
-        }
+        this.adjustTimer = setTimeout(() => {
+            // fixed禁用左右横向移动
+            if (diffRight > 0 && !focusCell.fixed) {
+                this.ctx.setScrollX(scrollX + diffRight);
+            } else if (diffLeft > 0 && !focusCell.fixed) {
+                this.ctx.setScrollX(scrollX - diffLeft);
+            }
+            if (diffTop > 0) {
+                this.ctx.setScrollY(scrollY - diffTop);
+            } else if (diffBottom > 0) {
+                this.ctx.setScrollY(scrollY + diffBottom);
+            }
+        }, 167); // 每100毫秒执行一次
     }
     destroy() {
         if (this.timerX) {

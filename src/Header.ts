@@ -1,3 +1,4 @@
+import { offset } from '@floating-ui/dom';
 import Context from './Context';
 import { getMaxRow, calCrossSpan, toLeaf, sortFixed, throttle } from './util';
 import CellHeader from './CellHeader';
@@ -99,7 +100,7 @@ export default class Header {
             return;
         }
         this.ctx.on('mousedown', (e) => {
-            if (!this.ctx.isTarget(e.target)) {
+            if (!this.ctx.isTarget()) {
                 return;
             }
             this.clientX = e.clientX;
@@ -146,13 +147,14 @@ export default class Header {
                     return;
                 }
                 // 恢复默认样式
-                if (this.ctx.target.style.cursor === 'col-resize') {
-                    this.ctx.target.style.cursor = 'default';
+                if (this.ctx.targetContainer.style.cursor === 'col-resize') {
+                    this.ctx.targetContainer.style.cursor = 'default';
                 }
                 // 渲染的表头
                 const renderAllCellHeaders = [...this.renderFixedCellHeaders, ...this.renderCenterCellHeaders];
                 for (const col of renderAllCellHeaders) {
-                    const x = e.layerX;
+                    const { offsetX, offsetY } = this.ctx.getOffset(e);
+                    const x = offsetX;
                     const drawX = col.getDrawX();
                     if (
                         x > drawX + col.width - 5 &&
@@ -161,12 +163,8 @@ export default class Header {
                         col.colspan <= 1 // 父级表头不触发
                     ) {
                         // 在表头内
-                        if (
-                            e.target instanceof HTMLCanvasElement &&
-                            this.ctx.isTarget(e.target) &&
-                            e.layerY <= this.height
-                        ) {
-                            this.ctx.target.style.cursor = 'col-resize';
+                        if (this.ctx.isTarget() && offsetY <= this.height) {
+                            this.ctx.targetContainer.style.cursor = 'col-resize';
                             this.resizeTarget = col;
                         }
                     }

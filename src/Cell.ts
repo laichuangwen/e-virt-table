@@ -61,6 +61,8 @@ export default class Cell extends BaseCell {
     drawImageName = '';
     drawImageSource?: HTMLImageElement;
     ellipsis = false;
+    rowExpand = false;
+    rowHasChildren = false;
     overflowTooltipShow = true;
     overflowTooltipMaxWidth = 500;
     overflowTooltipPlacement: OverflowTooltipPlacement = 'top';
@@ -248,6 +250,8 @@ export default class Cell extends BaseCell {
         if (this.type === 'tree' && cellType === 'body') {
             const row = this.ctx.database.getRowForRowKey(rowKey);
             const { expand = false, hasChildren = false, expandLoading = false, level = 0 } = row || {};
+            this.rowExpand = expand;
+            this.rowHasChildren = hasChildren;
             if (expandLoading) {
                 const loadingIcon = this.ctx.icons.get('loading');
                 iconName = 'loading';
@@ -266,7 +270,7 @@ export default class Cell extends BaseCell {
                 let iconWidth = 20;
                 let iconHeight = 20;
                 let iconX = this.drawX + iconOffsetX + CELL_PADDING;
-                let iconY = this.drawY + (this.visibleHeight - iconHeight) / 2 + 2;
+                let iconY = this.drawY + (this.visibleHeight - iconHeight) / 2;
                 this.ctx.paint.drawImage(icon, iconX, iconY, iconWidth, iconHeight);
                 this.drawImageX = iconX;
                 this.drawImageY = iconY;
@@ -562,7 +566,6 @@ export default class Cell extends BaseCell {
             top,
             width: `${this.visibleWidth}px`,
             height: `${this.visibleHeight}px`,
-            pointerEvents: 'none',
         };
     }
     draw() {
@@ -582,7 +585,7 @@ export default class Cell extends BaseCell {
             fillColor: this.drawCellSkyBgColor,
         });
         // 画选中框
-        this.ellipsis = this.drawText();
+        this.drawText();
         this.drawImage();
         this.drawSelector();
         this.drawAutofillPiont();
@@ -606,7 +609,8 @@ export default class Cell extends BaseCell {
     }
     private drawText() {
         const { CELL_PADDING, BODY_FONT } = this.ctx.config;
-
+        const { ellipsis } = this.ctx.paint.handleEllipsis(this.text, this.width, CELL_PADDING, BODY_FONT);
+        this.ellipsis = ellipsis;
         return this.ctx.paint.drawText(
             this.displayText,
             this.drawTextX,

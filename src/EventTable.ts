@@ -1,6 +1,7 @@
 import Cell from './Cell';
 import CellHeader from './CellHeader';
 import Context from './Context';
+import Row from './Row';
 import { ExpandLazyMethod } from './types';
 
 export default class EventTable {
@@ -30,34 +31,17 @@ export default class EventTable {
             if (this.isBusy(e)) {
                 return;
             }
-            const y = e.offsetY;
-            const x = e.offsetX;
-            // header
-            const renderCellHeaders = this.ctx.header.renderCellHeaders;
-            for (const cell of renderCellHeaders) {
-                const drawX = cell.getDrawX();
-                const drawY = cell.getDrawY();
-                if (x > drawX && x < drawX + cell.width && y > drawY && y < drawY + cell.height) {
-                    this.ctx.focusCellHeader = cell;
-                    this.ctx.emit('cellHeaderMousedown', cell, e);
-                    return; // 找到后直接返回
-                }
-            }
-            // body
-            const renderRows = this.ctx.body.renderRows;
-            for (const row of renderRows) {
-                // 优先处理固定列
-                const cells = row.fixedCells.concat(row.noFixedCells);
-                for (const cell of cells) {
-                    const drawX = cell.getDrawX();
-                    const drawY = cell.getDrawY();
-                    if (x > drawX && x < drawX + cell.width && y > drawY && y < drawY + cell.height) {
-                        this.ctx.setFocusCell(cell);
-                        this.ctx.emit('cellMousedown', cell, e);
-                        return; // 找到后直接返回
-                    }
-                }
-            }
+            const { offsetY, offsetX } = this.ctx.getOffset(e);
+            const y = offsetY;
+            const x = offsetX;
+            this.handleHeaderEvent(x, y, this.ctx.header.renderCellHeaders, (cell: CellHeader) => {
+                this.ctx.focusCellHeader = cell;
+                this.ctx.emit('cellHeaderMousedown', cell, e);
+            });
+            this.handleBodyEvent(x, y, this.ctx.body.renderRows, (cell: Cell) => {
+                this.ctx.setFocusCell(cell);
+                this.ctx.emit('cellMousedown', cell, e);
+            });
         });
         this.ctx.on('click', (e) => {
             // 左边点击
@@ -68,139 +52,115 @@ export default class EventTable {
             if (this.isBusy(e)) {
                 return;
             }
-            const y = e.offsetY;
-            const x = e.offsetX;
-            // header
-            const renderCellHeaders = this.ctx.header.renderCellHeaders;
-            for (const cell of renderCellHeaders) {
-                const drawX = cell.getDrawX();
-                const drawY = cell.getDrawY();
-                if (x > drawX && x < drawX + cell.width && y > drawY && y < drawY + cell.height) {
-                    this.ctx.clickCellHeader = cell;
-                    this.ctx.emit('cellHeaderClick', cell, e);
-                    // selection事件
-                    this.selectionClick(cell);
-                    return; // 找到后直接返回
-                }
+
+            const y = this.ctx.getOffset(e).offsetY;
+            const x = this.ctx.getOffset(e).offsetX;
+            this.handleHeaderEvent(x, y, this.ctx.header.renderCellHeaders, (cell: CellHeader) => {
+                this.ctx.clickCellHeader = cell;
+                this.ctx.emit('cellHeaderClick', cell, e);
+                // selection事件
+                this.selectionClick(cell);
+            });
+
+            this.handleBodyEvent(x, y, this.ctx.body.renderRows, (cell: Cell) => {
+                this.ctx.clickCell = cell;
+                this.ctx.emit('cellClick', cell, e);
+                // selection事件
+                this.selectionClick(cell);
+                // 树事件
+                this.treeClick(cell);
+            });
+        });
+        this.ctx.on('dblclick', (e) => {
+            // 左边点击
+            if (e.button !== 0) {
+                return;
             }
-            // body
-            const renderRows = this.ctx.body.renderRows;
-            for (const row of renderRows) {
-                // 优先处理固定列
-                const cells = row.fixedCells.concat(row.noFixedCells);
-                for (const cell of cells) {
-                    const drawX = cell.getDrawX();
-                    const drawY = cell.getDrawY();
-                    if (x > drawX && x < drawX + cell.width && y > drawY && y < drawY + cell.height) {
-                        this.ctx.clickCell = cell;
-                        this.ctx.emit('cellClick', cell, e);
-                        // selection事件
-                        this.selectionClick(cell);
-                        // 树事件
-                        this.treeClick(cell);
-                        return; // 找到后直接返回
-                    }
-                }
+            // 是否忙碌，进行其他操作
+            if (this.isBusy(e)) {
+                return;
             }
+            const y = this.ctx.getOffset(e).offsetY;
+            const x = this.ctx.getOffset(e).offsetX;
+            this.handleHeaderEvent(x, y, this.ctx.header.renderCellHeaders, (cell: CellHeader) => {
+                this.ctx.emit('cellHeaderDblclick', cell, e);
+            });
+
+            this.handleBodyEvent(x, y, this.ctx.body.renderRows, (cell: Cell) => {
+                this.ctx.clickCell = cell;
+                this.ctx.emit('cellDblclick', cell, e);
+            });
         });
         this.ctx.on('contextMenu', (e: MouseEvent) => {
             if (this.isBusy(e)) {
                 return;
             }
-            const y = e.offsetY;
-            const x = e.offsetX;
-            // header
-            const renderCellHeaders = this.ctx.header.renderCellHeaders;
-            for (const cell of renderCellHeaders) {
-                const drawX = cell.getDrawX();
-                const drawY = cell.getDrawY();
-                if (x > drawX && x < drawX + cell.width && y > drawY && y < drawY + cell.height) {
-                    this.ctx.emit('cellHeaderContextMenuClick', cell, e);
-                    return; // 找到后直接返回
-                }
-            }
-            // body
-            const renderRows = this.ctx.body.renderRows;
-            for (const row of renderRows) {
-                // 优先处理固定列
-                const cells = row.fixedCells.concat(row.noFixedCells);
-                for (const cell of cells) {
-                    const layerX = cell.getDrawX();
-                    const layerY = cell.getDrawY();
+            const { offsetY, offsetX } = this.ctx.getOffset(e);
+            const y = offsetY;
+            const x = offsetX;
 
-                    if (x > layerX && x < layerX + cell.width && y > layerY && y < layerY + cell.height) {
-                        this.ctx.emit('cellContextMenuClick', cell, e);
-                        return; // 找到后直接返回
-                    }
-                }
-            }
+            this.handleHeaderEvent(x, y, this.ctx.header.renderCellHeaders, (cell: CellHeader) => {
+                this.ctx.emit('cellHeaderContextMenuClick', cell, e);
+            });
+            this.handleBodyEvent(x, y, this.ctx.body.renderRows, (cell: Cell) => {
+                this.ctx.emit('cellContextMenuClick', cell, e);
+            });
         });
         this.ctx.on('mousemove', (e: MouseEvent) => {
             // 是否忙碌，进行其他操作
             if (this.isBusy(e)) {
                 return;
             }
-            const y = e.offsetY;
-            const x = e.offsetX;
-            // header
-            const renderCellHeaders = this.ctx.header.renderCellHeaders;
-            for (const cell of renderCellHeaders) {
-                const drawX = cell.getDrawX();
-                const drawY = cell.getDrawY();
-                if (x > drawX && x < drawX + cell.width && y > drawY && y < drawY + cell.height) {
-                    this.ctx.emit('cellHeaderMouseenter', cell, e);
-                    // 移出事件
-                    if (this.ctx.hoverCellHeader && this.ctx.hoverCellHeader !== cell) {
-                        this.ctx.emit('cellHeaderMouseleave', this.ctx.hoverCellHeader, e);
-                    }
-                    // selection头部事件
+            const y = this.ctx.getOffset(e).offsetY;
+            const x = this.ctx.getOffset(e).offsetX;
+            this.handleHeaderEvent(x, y, this.ctx.header.renderCellHeaders, (cell: CellHeader) => {
+                this.ctx.emit('cellHeaderMouseenter', cell, e);
+                // 移出事件
+                if (this.ctx.hoverCellHeader && this.ctx.hoverCellHeader !== cell) {
+                    this.ctx.emit('cellHeaderMouseleave', this.ctx.hoverCellHeader, e);
+                }
+                // selection头部事件
+                this.imageEnterAndLeave(cell, e);
+                if (this.ctx.hoverCellHeader === cell) {
+                    return;
+                }
+                this.ctx.hoverCellHeader = cell;
+                this.ctx.emit('cellHeaderHoverChange', cell);
+            });
+            // 可视区
+            this.handleBodyEvent(
+                x,
+                y,
+                this.ctx.body.renderRows,
+                (cell: Cell) => {
+                    // selection移入移除事件
                     this.imageEnterAndLeave(cell, e);
-                    if (this.ctx.hoverCellHeader === cell) {
-                        return;
+                    //  this.ctx.emit("visibleCellHoverChange", cell, e);
+                    if (this.visibleHoverCell !== cell) {
+                        this.ctx.emit('visibleCellMouseleave', cell, e);
+                        this.visibleHoverCell = cell;
+                        this.ctx.emit('visibleCellHoverChange', cell, e);
                     }
-                    this.ctx.hoverCellHeader = cell;
-                    this.ctx.emit('cellHeaderHoverChange', cell);
-                    return; // 找到后直接返回
+                },
+                true,
+            );
+            // 正常
+            this.handleBodyEvent(x, y, this.ctx.body.renderRows, (cell: Cell) => {
+                this.ctx.emit('cellMouseenter', cell, e);
+                // 移出事件
+                if (this.ctx.hoverCell && this.ctx.hoverCell !== cell) {
+                    this.ctx.emit('cellMouseleave', this.ctx.hoverCell, e);
                 }
-            }
-            // body
-            const renderRows = this.ctx.body.renderRows;
-            for (const row of renderRows) {
-                // 优先处理固定列
-                const cells = row.fixedCells.concat(row.noFixedCells);
-                for (const cell of cells) {
-                    const layerX = cell.getDrawX();
-                    const layerY = cell.getDrawY();
-                    // 因为可能有合并单元格，所以这里要判断是可视区域
-                    if (x > layerX && x < layerX + cell.visibleWidth && y > layerY && y < layerY + cell.visibleHeight) {
-                        // selection移入移除事件
-                        this.imageEnterAndLeave(cell, e);
-                        //  this.ctx.emit("visibleCellHoverChange", cell, e);
-                        if (this.visibleHoverCell !== cell) {
-                            this.ctx.emit('visibleCellMouseleave', cell, e);
-                            this.visibleHoverCell = cell;
-                            this.ctx.emit('visibleCellHoverChange', cell, e);
-                        }
-                    }
-                    if (x > layerX && x < layerX + cell.width && y > layerY && y < layerY + cell.height) {
-                        this.ctx.emit('cellMouseenter', cell, e);
-                        // 移出事件
-                        if (this.ctx.hoverCell && this.ctx.hoverCell !== cell) {
-                            this.ctx.emit('cellMouseleave', this.ctx.hoverCell, e);
-                        }
-                        if (this.ctx.hoverCell === cell) return;
-                        if (this.ctx.hoverCell?.rowKey !== cell.rowKey) {
-                            this.ctx.hoverCell = cell;
-                            this.ctx.hoverRow = this.ctx.body.renderRows.find((item) => item.rowKey === cell.rowKey);
-                            this.ctx.emit('rowHoverChange', this.ctx.hoverRow, cell, e);
-                            this.ctx.emit('draw');
-                        }
-                        this.ctx.hoverCell = cell;
-                        this.ctx.emit('cellHoverChange', cell, e);
-                        return; // 找到后直接返回
-                    }
+                if (this.ctx.hoverCell === cell) return;
+                if (this.ctx.hoverCell?.rowKey !== cell.rowKey) {
+                    this.ctx.hoverCell = cell;
+                    this.ctx.hoverRow = this.ctx.body.renderRows.find((item) => item.rowKey === cell.rowKey);
+                    this.ctx.emit('rowHoverChange', this.ctx.hoverRow, cell, e);
+                    this.ctx.emit('drawView');
                 }
-            }
+                this.ctx.hoverCell = cell;
+                this.ctx.emit('cellHoverChange', cell, e);
+            });
         });
     }
     /**
@@ -275,47 +235,47 @@ export default class EventTable {
      * @param e
      */
     private imageEnterAndLeave(cell: Cell | CellHeader, e: MouseEvent) {
-        const y = e.offsetY;
-        const x = e.offsetX;
+        const { offsetY, offsetX } = this.ctx.getOffset(e);
+        const y = offsetY;
+        const x = offsetX;
         if (
             x > cell.drawImageX &&
             x < cell.drawImageX + cell.drawImageWidth &&
             y > cell.drawImageY &&
             y < cell.drawImageY + cell.drawImageHeight
         ) {
-            this.ctx.target.style.cursor = 'pointer';
+            this.ctx.targetContainer.style.cursor = 'pointer';
             this.ctx.isPointer = true;
             // body cell 选中图标
             if (cell instanceof Cell && ['selection', 'index-selection'].includes(cell.type)) {
                 // body cell 需要处理是否可选
                 const selectable = this.ctx.database.getRowSelectable(cell.rowKey);
                 if (!selectable) {
-                    this.ctx.target.style.cursor = 'not-allowed';
+                    this.ctx.targetContainer.style.cursor = 'not-allowed';
                 }
             }
         } else {
             this.ctx.isPointer = false;
-            if (this.ctx.target.style.cursor === 'pointer') {
-                this.ctx.target.style.cursor = 'default';
+            if (this.ctx.targetContainer.style.cursor === 'pointer') {
+                this.ctx.targetContainer.style.cursor = 'default';
             }
         }
     }
 
     private isBusy(e: MouseEvent) {
-        const y = e.offsetY;
-        const x = e.offsetX;
-        if (!(e.target instanceof HTMLCanvasElement)) {
-            return true;
-        }
-        if (!this.ctx.isTarget(e.target)) {
+        const { offsetY, offsetX } = this.ctx.getOffset(e);
+        const y = offsetY;
+        const x = offsetX;
+
+        if (!this.ctx.isTarget()) {
             return true;
         }
         // 行调整大小中不处理
-        if (this.ctx.target.style.cursor === 'row-resize') {
+        if (this.ctx.targetContainer.style.cursor === 'row-resize') {
             return true;
         }
         // 列调整大小中不处理
-        if (this.ctx.target.style.cursor === 'col-resize') {
+        if (this.ctx.targetContainer.style.cursor === 'col-resize') {
             return true;
         }
         // 列调整大小中不处理
@@ -344,6 +304,35 @@ export default class EventTable {
             return true;
         }
         return false;
+    }
+    private handleBodyEvent(x: number, y: number, renderRows: Row[], callback: Function, visible = false) {
+        for (const row of renderRows) {
+            // 优先处理固定列
+            const cells = row.fixedCells.concat(row.noFixedCells);
+            for (const cell of cells) {
+                const drawX = cell.getDrawX();
+                const drawY = cell.getDrawY();
+                if (visible) {
+                    if (x > drawX && x < drawX + cell.visibleWidth && y > drawY && y < drawY + cell.visibleHeight) {
+                        callback(cell);
+                        return; // 找到后直接返回
+                    }
+                } else if (x > drawX && x < drawX + cell.width && y > drawY && y < drawY + cell.height) {
+                    callback(cell);
+                    return; // 找到后直接返回
+                }
+            }
+        }
+    }
+    private handleHeaderEvent(x: number, y: number, renderCellHeaders: CellHeader[], callback: Function) {
+        for (const cell of renderCellHeaders) {
+            const drawX = cell.getDrawX();
+            const drawY = cell.getDrawY();
+            if (x > drawX && x < drawX + cell.width && y > drawY && y < drawY + cell.height) {
+                callback(cell);
+                return; // 找到后直接返回
+            }
+        }
     }
     destroy() {
         this.resizeObserver.unobserve(this.ctx.target);
