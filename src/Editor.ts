@@ -160,7 +160,7 @@ export default class Editor {
         this.inputEl.style.maxHeight = `${this.ctx.body.visibleHeight - 1}px`;
         this.inputEl.style.width = `${width - 1}px`;
         this.inputEl.style.height = `${height - 1}px`;
-        // this.inputEl.style.padding = `${CELL_PADDING}px`;
+        this.inputEl.style.padding = `${CELL_PADDING}px`;
         if (value !== null) {
             this.inputEl.value = value;
         }
