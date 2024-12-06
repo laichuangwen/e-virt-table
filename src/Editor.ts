@@ -1,3 +1,4 @@
+import { computePosition, offset, flip, shift } from '@floating-ui/dom';
 import type Cell from './Cell';
 import type Context from './Context';
 
@@ -120,10 +121,7 @@ export default class Editor {
             }
         });
         // 监听输入事件，自动调整高度
-        this.inputEl.addEventListener('input', function () {
-            this.style.height = 'auto'; // 重置高度
-            this.style.height = `${this.scrollHeight}px`; // 设置为内容的高度
-        });
+        this.inputEl.addEventListener('input', this.autoSize.bind(this));
         this.inputEl.addEventListener('blur', () => {
             this.doneEdit();
         });
@@ -132,6 +130,11 @@ export default class Editor {
         this.inputEl.className = 'e-virt-table-editor-textarea';
         this.editorEl.appendChild(this.inputEl);
         this.ctx.containerElement.appendChild(this.editorEl);
+    }
+    private autoSize() {
+        const scrollHeight = this.inputEl.scrollHeight;
+        this.inputEl.style.height = 'auto'; // 重置高度
+        this.inputEl.style.height = `${scrollHeight}px`; // 设置为内容的高度
     }
     private startEditByInput(cell: Cell) {
         if (cell.editorType !== 'text') {
@@ -142,12 +145,16 @@ export default class Editor {
         const drawX = cell.getDrawX();
         let drawY = cell.getDrawY();
         let { height } = cell;
-        const { CELL_PADDING } = this.ctx.config;
-        this.editorEl.style.left = `${drawX - 1.5}px`;
-        this.editorEl.style.top = `${drawY - 1.5}px`;
+        const {
+            config: { CELL_PADDING },
+        } = this.ctx;
+        let maxHeight = window.innerHeight / 2;
+        if (maxHeight > this.ctx.body.visibleHeight) {
+            maxHeight = this.ctx.body.visibleHeight;
+        }
         this.inputEl.style.minWidth = `${width - 1}px`;
         this.inputEl.style.minHeight = `${height - 1}px`;
-        this.inputEl.style.maxHeight = `${this.ctx.body.visibleHeight - 1}px`;
+        this.inputEl.style.maxHeight = `${maxHeight}px`;
         this.inputEl.style.width = `${width - 1}px`;
         this.inputEl.style.height = `${height - 1}px`;
         this.inputEl.style.padding = `${CELL_PADDING}px`;
@@ -157,8 +164,29 @@ export default class Editor {
         this.inputEl.focus();
         const length = this.inputEl.value.length;
         this.inputEl.setSelectionRange(length, length);
+        const { left, top } = this.ctx.containerElement.getBoundingClientRect();
+        const virtualReference = {
+            getBoundingClientRect: () => ({
+                width: 0,
+                height: 0,
+                top: top + drawY,
+                left: left + drawX,
+                right: left + drawX,
+                bottom: top + drawY,
+                x: drawX,
+                y: drawY,
+            }),
+            contextElement: document.body,
+        };
+        computePosition(virtualReference, this.editorEl, {
+            placement: 'right-start',
+            middleware: [offset(), shift(), flip()],
+        }).then(({ x, y }) => {
+            this.editorEl.style.left = `${x}px`;
+            this.editorEl.style.top = `${y}px`;
+        });
         if (this.inputEl.scrollHeight > height) {
-            this.inputEl.style.height = this.inputEl.scrollHeight + 'px';
+            this.autoSize();
         }
     }
     private doneEditByInput() {

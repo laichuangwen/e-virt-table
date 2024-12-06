@@ -731,14 +731,18 @@ export default class Selector {
         const diffLeft = fixedLeftWidth - focusCell.drawX + 1;
         const diffRight = focusCell.drawX + focusCell.width - (stageWidth - fixedRightWidth) + 1;
         const diffTop = header.height - focusCell.drawY;
-        const diffBottom = focusCell.drawY + focusCell.height - (stageHeight- footerHeight - SCROLLER_TRACK_SIZE);
+        const diffBottom = focusCell.drawY + focusCell.height - (stageHeight - footerHeight - SCROLLER_TRACK_SIZE);
         // 边界移动会导致重回，使事件无法冒泡，所以移动视图延时一下等待click事件冒泡后才执行draw
-    
+
         if (this.adjustTimer) {
             clearTimeout(this.adjustTimer);
             this.adjustTimer = 0;
         }
         this.adjustTimer = setTimeout(() => {
+            // 编辑状态不处理
+            if (this.ctx.editing) {
+                return;
+            }
             // fixed禁用左右横向移动
             if (diffRight > 0 && !focusCell.fixed) {
                 this.ctx.setScrollX(scrollX + diffRight);
