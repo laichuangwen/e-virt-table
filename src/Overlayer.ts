@@ -19,11 +19,12 @@ export default class Overlayer {
     }
     private getContainer(): OverlayerContainer {
         const {
-            target,
+            stageWidth,
+            stageHeight,
             config: { SCROLLER_TRACK_SIZE },
         } = this.ctx;
-        const width = target.width - SCROLLER_TRACK_SIZE;
-        const height = target.height - SCROLLER_TRACK_SIZE;
+        const width = stageWidth - SCROLLER_TRACK_SIZE;
+        const height = stageHeight - SCROLLER_TRACK_SIZE;
         const header = this.getHeader();
         const body = this.getBody();
         const footer = this.getFooter();
@@ -171,7 +172,7 @@ export default class Overlayer {
             style: {
                 position: 'absolute',
                 top: `${0.5}px`,
-                left: `${fixedLeftWidth + 0.5}px`,
+                left: `${fixedLeftWidth - 0.5}px`,
                 overflow: 'hidden',
                 width: `${visibleWidth - fixedLeftWidth - fixedRightWidth}px`,
                 height: `${visibleHeight}px`,
@@ -247,7 +248,7 @@ export default class Overlayer {
             style: {
                 position: 'absolute',
                 top: `${0.5}px`,
-                left: `${fixedLeftWidth + 0.5}px`,
+                left: `${fixedLeftWidth - 0.5}px`,
                 overflow: 'hidden',
                 width: `${visibleWidth - fixedLeftWidth - fixedRightWidth}px`,
                 height: `${visibleHeight}px`,

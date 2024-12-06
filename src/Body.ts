@@ -26,14 +26,12 @@ export default class Body {
     }
     private init() {
         const {
-            target,
+            canvasElement,
             header,
             database,
             config: {
                 FOOTER_FIXED,
                 SCROLLER_TRACK_SIZE = 0,
-                BORDER_COLOR,
-                BORDER_RADIUS,
                 HEIGHT,
                 EMPTY_BODY_HEIGHT = 0,
                 MAX_HEIGHT = 0,
@@ -51,10 +49,10 @@ export default class Body {
         this.height = sumHeight;
         // 更新数据
         this.data = data;
-        const { top } = target.getBoundingClientRect();
+        const { top } = canvasElement.getBoundingClientRect();
         // 更新宽度
         this.width = header.width;
-        this.visibleWidth = target.width - SCROLLER_TRACK_SIZE;
+        this.visibleWidth = this.ctx.stageWidth - SCROLLER_TRACK_SIZE;
         // 底部高度
         const footerHeight = this.ctx.footer.height;
         if (!this.data.length) {
@@ -93,10 +91,12 @@ export default class Body {
         }
         // 更新窗口高度
         if (stageHeight > 0) {
-            this.ctx.target.height = stageHeight;
+            // this.ctx.canvasElement.height = stageHeight;
+            this.ctx.stageHeight = Math.floor(stageHeight);
+            this.ctx.stageElement.style.height = `${this.ctx.stageHeight - 0.5}px`;
         }
         // 可视区高度
-        let _visibleHeight = target.height - header.height - SCROLLER_TRACK_SIZE;
+        let _visibleHeight = this.ctx.stageHeight - header.height - SCROLLER_TRACK_SIZE;
         // 底部高度,如果是固定底部,可视区减上底部高度
         if (FOOTER_FIXED) {
             this.visibleHeight = _visibleHeight - footerHeight;
@@ -110,14 +110,18 @@ export default class Body {
         this.ctx.body.visibleWidth = this.visibleWidth;
         this.ctx.body.visibleHeight = this.visibleHeight;
         this.ctx.body.data = data;
+        const dpr = window.devicePixelRatio || 1; // 获取设备像素比
+        const canvasWidth = this.ctx.stageWidth * dpr;
+        const canvasHeight = this.ctx.stageHeight * dpr;
+
+        canvasElement.width = Math.floor(canvasWidth);
+        canvasElement.height = Math.floor(canvasHeight);
         // 外层容器样式
-        this.ctx.target.setAttribute('class', 'e-virt-table-canvas');
-        this.ctx.target.setAttribute(
+        this.ctx.canvasElement.setAttribute(
             'style',
-            `border-radius: ${BORDER_RADIUS}px; border: 1px solid ${BORDER_COLOR}; height:${
-                this.ctx.target.height
-            }px;width:${this.ctx.target.width - 1}px;`,
+            ` height:${this.ctx.stageHeight}px;width:${this.ctx.stageWidth}px;`,
         );
+        this.ctx.paint.scale(dpr);
     }
     // 调整行的高度
     private initResizeRow() {
@@ -166,7 +170,7 @@ export default class Body {
             const x = offsetX;
             const clientY = e.clientY;
             const {
-                target,
+                stageHeight,
                 scrollY,
                 config: { RESIZE_ROW_MIN_HEIGHT = 0 },
             } = this.ctx;
@@ -185,19 +189,19 @@ export default class Body {
                     return;
                 }
                 // 如果是拖动选择
-                if (this.ctx.targetContainer.style.cursor === 'crosshair') {
+                if (this.ctx.stageElement.style.cursor === 'crosshair') {
                     return;
                 }
-                if (this.ctx.targetContainer.style.cursor === 'row-resize') {
+                if (this.ctx.stageElement.style.cursor === 'row-resize') {
                     // 恢复默认样式
-                    this.ctx.targetContainer.style.cursor = 'default';
+                    this.ctx.stageElement.style.cursor = 'default';
                 }
                 for (let i = 0; i < this.renderRows.length; i++) {
                     const row = this.renderRows[i];
                     const isYRange =
                         y > row.y - scrollY + row.height - 1.5 &&
                         y < row.y - scrollY + row.height + 1.5 &&
-                        y < target.height - 4;
+                        y < stageHeight - 4;
                     if (isYRange) {
                         for (let j = 0; j < row.cells.length; j++) {
                             const cell = row.cells[j];
@@ -206,7 +210,7 @@ export default class Body {
                                 x < cell.drawX + cell.width - 10 &&
                                 cell.rowspan === 1 //没有被合并的单元格
                             ) {
-                                this.ctx.targetContainer.style.cursor = 'row-resize';
+                                this.ctx.stageElement.style.cursor = 'row-resize';
                                 this.resizeTarget = row;
                             }
                         }
@@ -232,14 +236,14 @@ export default class Body {
     private drawTipLine() {
         if (this.isResizing && this.resizeTarget) {
             const {
-                target,
+                stageWidth,
                 scrollY,
                 config: { RESIZE_ROW_LINE_COLOR },
             } = this.ctx;
             const resizeTargetDrawY = this.resizeTarget.y - scrollY;
             const resizeTargetHeight = this.resizeTarget.height;
             const y = resizeTargetDrawY + resizeTargetHeight + this.resizeDiff - 0.5;
-            const poins = [0, y + 0.5, target.width, y + 0.5];
+            const poins = [0, y - 0.5, stageWidth, y - 0.5];
             this.ctx.paint.drawLine(poins, {
                 borderColor: RESIZE_ROW_LINE_COLOR,
                 borderWidth: 1,
@@ -252,7 +256,7 @@ export default class Body {
             fixedRightWidth,
             scrollX,
             header,
-            target,
+            stageWidth,
             config: { HEADER_BG_COLOR, SCROLLER_TRACK_SIZE },
         } = this.ctx;
 
@@ -266,8 +270,8 @@ export default class Body {
             });
         }
         // 右边阴影
-        if (scrollX < Math.floor(header.width - header.visibleWidth - 1) && fixedRightWidth !== SCROLLER_TRACK_SIZE) {
-            const x = header.width - (this.x + this.width) + target.width - fixedRightWidth;
+        if (scrollX < Math.floor(header.width - stageWidth - 1) && fixedRightWidth !== SCROLLER_TRACK_SIZE) {
+            const x = header.width - (this.x + this.width) + stageWidth - fixedRightWidth;
             this.ctx.paint.drawShadow(x + 1, this.y, fixedRightWidth, this.height, {
                 fillColor: HEADER_BG_COLOR,
                 side: 'left',

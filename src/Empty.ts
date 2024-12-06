@@ -9,7 +9,7 @@ export default class Tooltip {
         this.emptyEl.className = `${CSS_PREFIX}-empty`;
         this.emptyEl.style.display = 'none';
         this.emptyEl.innerText = EMPTY_TEXT;
-        this.ctx.targetContainer.appendChild(this.emptyEl);
+        this.ctx.containerElement.appendChild(this.emptyEl);
         this.ctx.on('emptyChange', ({ type, headerHeight, bodyHeight, footerHeight }) => {
             // 如果开启了自定义内容，则不显示默认内容
             if (EMPTY_CUSTOM) {

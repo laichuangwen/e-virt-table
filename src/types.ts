@@ -7,6 +7,7 @@ export type EVirtTableOptions = {
     footerData: any[];
     columns: Column[];
     config?: ConfigType;
+    overlayerElement?: HTMLDivElement
 };
 export type EventCallback = (...args: any[]) => void;
 export type ChangeItem = {

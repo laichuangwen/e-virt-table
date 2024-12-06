@@ -35,6 +35,9 @@ export class Paint {
         if (!ctx) throw new Error('canvas context not found');
         this.ctx = ctx;
     }
+    scale(dpr: number) {
+        this.ctx.scale(dpr, dpr);
+    }
     save() {
         this.ctx.save();
     }
@@ -112,9 +115,9 @@ export class Paint {
         const { borderColor = 'black', borderWidth = 1 } = options;
 
         this.ctx.beginPath();
-        this.ctx.moveTo(points[0] + 0.5, points[1] + 0.5);
+        this.ctx.moveTo(points[0] - 0.5, points[1] - 0.5);
         for (let i = 2; i < points.length; i += 2) {
-            this.ctx.lineTo(points[i] + 0.5, points[i + 1] + 0.5);
+            this.ctx.lineTo(points[i] - 0.5, points[i + 1] - 0.5);
         }
         this.ctx.strokeStyle = borderColor;
         this.ctx.lineWidth = borderWidth;
@@ -160,8 +163,8 @@ export class Paint {
             this.ctx.strokeStyle = borderColor;
         }
         if (radius === 0) {
-            // 绘制矩形路径，+ 0.5解决1px模糊的问题
-            this.ctx.rect(x + 0.5, y + 0.5, width, height);
+            // 绘制矩形路径，- 0.5解决1px模糊的问题
+            this.ctx.rect(x - 0.5, y - 0.5, width, height);
         } else {
             // 确保 radius 是一个包含四个元素的数组
             const [tl, tr, br, bl] = typeof radius === 'number' ? [radius, radius, radius, radius] : radius;

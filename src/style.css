@@ -2,20 +2,32 @@
     --e-virt-table-color-white: #fff;
     --e-virt-table-color-black: #000000;
     --e-virt-table-color-primary: rgb(82, 146, 247);
-    --e-virt-table-text-color-primary: '#333';
-    --e-virt-table-text-color-regular: '#666';
-    --e-virt-table-text-color-secondary: '#999';
+    --e-virt-table-text-color-primary: #333;
+    --e-virt-table-text-color-regular: #666;
+    --e-virt-table-text-color-secondary: #999;
     --e-virt-table-box-shadow: 0 2px 12px 0 #0000001a;
     --e-virt-table-editor-bg-color: #fff;
+    --e-virt-table-border-color: #e1e6eb;
 }
 .e-virt-table-container {
     position: relative;
     outline: none;
 }
-.e-virt-table-canvas {
+.e-virt-table-stage {
     position: relative;
+    overflow: hidden;
     outline: none;
-    z-index: 2;
+    z-index: 10;
+    border-radius: 8px;
+    border: 1px solid var(--e-virt-table-border-color);
+}
+.e-virt-table-canvas {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
 }
 .e-virt-table-editor {
     position: absolute;
@@ -76,6 +88,7 @@
 .e-virt-table-context-menu-item {
     cursor: pointer;
     padding: 8px 24px;
+    color: var(--e-virt-table-text-color-regular);
 }
 .e-virt-table-context-menu-item:hover {
     color: var(--e-virt-table-color-primary);

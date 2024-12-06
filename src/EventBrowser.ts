@@ -3,7 +3,7 @@ import Context from './Context';
 type EventTask = Map<string, EventListenerOrEventListenerObject>;
 
 export default class EventBrowser {
-    eventTasks: EventTask = new Map();
+    private eventTasks: EventTask = new Map();
     private ctx: Context;
     constructor(ctx: Context) {
         this.ctx = ctx;
@@ -14,14 +14,14 @@ export default class EventBrowser {
         this.bind(window, 'resize', this.handleResize.bind(this));
         this.bind(window, 'mouseup', this.handleMouseUp.bind(this));
         this.bind(window, 'mousemove', this.handleMousemove.bind(this));
-        this.bind(this.ctx.targetContainer, 'click', this.handleClick.bind(this));
+        this.bind(this.ctx.stageElement, 'click', this.handleClick.bind(this));
         this.bind(window, 'keydown', this.handleKeydown.bind(this));
-        this.bind(this.ctx.targetContainer, 'wheel', this.handleWheel.bind(this));
-        this.bind(this.ctx.targetContainer, 'contextmenu', this.handleContextMenu.bind(this));
-        this.bind(this.ctx.targetContainer, 'mousedown', this.handleMouseDown.bind(this));
-        this.bind(this.ctx.targetContainer, 'mouseenter', this.handleMouseEnter.bind(this));
-        this.bind(this.ctx.targetContainer, 'mouseleave', this.handleMouseLeave.bind(this));
-        this.bind(this.ctx.targetContainer, 'dblclick', this.handleDblclick.bind(this));
+        this.bind(this.ctx.stageElement, 'wheel', this.handleWheel.bind(this));
+        this.bind(this.ctx.stageElement, 'contextmenu', this.handleContextMenu.bind(this));
+        this.bind(this.ctx.stageElement, 'mousedown', this.handleMouseDown.bind(this));
+        this.bind(this.ctx.stageElement, 'mouseenter', this.handleMouseEnter.bind(this));
+        this.bind(this.ctx.stageElement, 'mouseleave', this.handleMouseLeave.bind(this));
+        this.bind(this.ctx.stageElement, 'dblclick', this.handleDblclick.bind(this));
     }
     destroy() {
         this.eventTasks.forEach((fn, event) => {

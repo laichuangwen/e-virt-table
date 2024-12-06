@@ -69,8 +69,8 @@ export default class CellHeader extends BaseCell {
      * @returns
      */
     isVerticalVisible() {
-        const { target } = this.ctx;
-        const offsetHeight = target.height;
+        const { stageHeight } = this.ctx;
+        const offsetHeight = stageHeight;
         return !(this.y + this.height <= 0 || this.y >= offsetHeight);
     }
 
@@ -185,7 +185,7 @@ export default class CellHeader extends BaseCell {
         if (this.fixed === 'left') {
             left = `${this.drawX}px`;
         } else if (this.fixed === 'right') {
-            left = `${this.drawX - (this.ctx.target.width - this.ctx.fixedRightWidth)}px`;
+            left = `${this.drawX - (this.ctx.stageWidth - this.ctx.fixedRightWidth)}px`;
         } else {
             // 中间的，需要减去左边固定列的宽度
             left = `${this.drawX - this.ctx.fixedLeftWidth}px`;

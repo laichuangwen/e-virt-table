@@ -18,9 +18,7 @@ export default class EventTable {
             this.ctx.emit('resetHeader');
             this.ctx.emit('resizeObserver');
         });
-        if (this.ctx.target.parentElement) {
-            this.resizeObserver.observe(this.ctx.target);
-        }
+        this.resizeObserver.observe(this.ctx.stageElement);
         // 按下事件
         this.ctx.on('mousedown', (e) => {
             // 左边点击
@@ -244,20 +242,20 @@ export default class EventTable {
             y > cell.drawImageY &&
             y < cell.drawImageY + cell.drawImageHeight
         ) {
-            this.ctx.targetContainer.style.cursor = 'pointer';
+            this.ctx.stageElement.style.cursor = 'pointer';
             this.ctx.isPointer = true;
             // body cell 选中图标
             if (cell instanceof Cell && ['selection', 'index-selection'].includes(cell.type)) {
                 // body cell 需要处理是否可选
                 const selectable = this.ctx.database.getRowSelectable(cell.rowKey);
                 if (!selectable) {
-                    this.ctx.targetContainer.style.cursor = 'not-allowed';
+                    this.ctx.stageElement.style.cursor = 'not-allowed';
                 }
             }
         } else {
             this.ctx.isPointer = false;
-            if (this.ctx.targetContainer.style.cursor === 'pointer') {
-                this.ctx.targetContainer.style.cursor = 'default';
+            if (this.ctx.stageElement.style.cursor === 'pointer') {
+                this.ctx.stageElement.style.cursor = 'default';
             }
         }
     }
@@ -271,11 +269,11 @@ export default class EventTable {
             return true;
         }
         // 行调整大小中不处理
-        if (this.ctx.targetContainer.style.cursor === 'row-resize') {
+        if (this.ctx.stageElement.style.cursor === 'row-resize') {
             return true;
         }
         // 列调整大小中不处理
-        if (this.ctx.targetContainer.style.cursor === 'col-resize') {
+        if (this.ctx.stageElement.style.cursor === 'col-resize') {
             return true;
         }
         // 列调整大小中不处理
@@ -296,11 +294,11 @@ export default class EventTable {
             return true;
         }
         // 点击滚动条不处理
-        if (y > this.ctx.target.height - SCROLLER_TRACK_SIZE) {
+        if (y > this.ctx.stageHeight - SCROLLER_TRACK_SIZE) {
             return true;
         }
         // 点击滚动条不处理
-        if (x > this.ctx.target.width - SCROLLER_TRACK_SIZE) {
+        if (x > this.ctx.stageWidth - SCROLLER_TRACK_SIZE) {
             return true;
         }
         return false;
@@ -335,6 +333,6 @@ export default class EventTable {
         }
     }
     destroy() {
-        this.resizeObserver.unobserve(this.ctx.target);
+        this.resizeObserver.unobserve(this.ctx.stageElement);
     }
 }

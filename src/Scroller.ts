@@ -44,11 +44,11 @@ class Scrollbar {
             return;
         }
         // 行调整大小中不处理
-        if (this.ctx.targetContainer.style.cursor === 'row-resize') {
+        if (this.ctx.stageElement.style.cursor === 'row-resize') {
             return true;
         }
         // 列调整大小中不处理
-        if (this.ctx.targetContainer.style.cursor === 'col-resize') {
+        if (this.ctx.stageElement.style.cursor === 'col-resize') {
             return true;
         }
         const { offsetX, offsetY, clientX, clientY } = e;
@@ -86,7 +86,7 @@ class Scrollbar {
     onMouseMove(e: MouseEvent) {
         const { offsetX, offsetY, clientX, clientY } = e;
         // 悬浮提示
-        if (this.isOnScrollbar(offsetX, offsetY) && e.target === this.ctx.target) {
+        if (this.isOnScrollbar(offsetX, offsetY) && e.target === this.ctx.canvasElement) {
             this.isFocus = true;
         } else {
             this.isFocus = false;
@@ -155,10 +155,12 @@ class Scrollbar {
         const {
             body,
             header,
+            stageHeight,
+            stageWidth,
             config: { SCROLLER_TRACK_SIZE = 0, SCROLLER_SIZE = 0 },
         } = this.ctx;
-        const visibleWidth = this.ctx.target.width + 1;
-        const visibleHeight = this.ctx.target.height;
+        const visibleWidth = stageWidth;
+        const visibleHeight = stageHeight;
         const headerHeight = header.height;
         const headerWidth = header.width;
         const bodyHeight = body.height;
@@ -173,7 +175,7 @@ class Scrollbar {
             this.trackWidth = SCROLLER_TRACK_SIZE;
             this.trackHeight = visibleHeight;
             // 滚动条的X位置=轨道的X位置+（轨道的宽度-滚动条的宽度）/2
-            this.barX = this.trackX + (SCROLLER_TRACK_SIZE - SCROLLER_SIZE) / 2;
+            this.barX = this.trackX - 0.5 + (SCROLLER_TRACK_SIZE - SCROLLER_SIZE) / 2;
             this.barWidth = SCROLLER_SIZE;
             const ratio = this.distance ? this.visibleDistance / bodyHeight : 0;
             let _barHeight = Math.floor(ratio * this.visibleDistance);
@@ -205,7 +207,7 @@ class Scrollbar {
             const ratio = this.distance ? this.visibleDistance / headerWidth : 0;
 
             let _barWidth = Math.floor(ratio * this.visibleDistance);
-            this.barY = this.trackY + 0.5 + (SCROLLER_TRACK_SIZE - SCROLLER_SIZE) / 2;
+            this.barY = this.trackY - 0.5 + (SCROLLER_TRACK_SIZE - SCROLLER_SIZE) / 2;
             // 最小30,超出可见区域则隐藏
             if (_barWidth < 30) {
                 _barWidth = 30;

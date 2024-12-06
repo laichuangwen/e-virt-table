@@ -32,7 +32,7 @@ export default class Footer {
     // 可视区高度
     this.visibleHeight = this.height;
     if (FOOTER_FIXED) {
-      this.y = this.ctx.target.height - this.height - SCROLLER_TRACK_SIZE;
+      this.y = this.ctx.stageHeight - this.height - SCROLLER_TRACK_SIZE;
     } else {
       this.y = body.y + body.height;
     }
@@ -49,7 +49,7 @@ export default class Footer {
       fixedRightWidth,
       scrollX,
       header,
-      target,
+      stageWidth,
       config: { HEADER_BG_COLOR, SCROLLER_TRACK_SIZE },
     } = this.ctx;
     let y = this.y;
@@ -68,11 +68,11 @@ export default class Footer {
     }
     // 右边阴影
     if (
-      scrollX < Math.floor(header.width - header.visibleWidth - 1) &&
+      scrollX < Math.floor(header.width - stageWidth - 1) &&
       fixedRightWidth !== SCROLLER_TRACK_SIZE
     ) {
       const x =
-        header.width - (this.x + this.width) + target.width - fixedRightWidth;
+        header.width - (this.x + this.width) + stageWidth - fixedRightWidth;
       this.ctx.paint.drawShadow(x + 1, y, fixedRightWidth, this.height, {
         fillColor: HEADER_BG_COLOR,
         side: "left",

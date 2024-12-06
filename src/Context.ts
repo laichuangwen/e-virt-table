@@ -11,6 +11,12 @@ import Row from './Row';
 import Cell from './Cell';
 import EventTable from './EventTable';
 export type ConfigType = Partial<typeof Config>;
+export type containerElementOptions = {
+    containerElement: HTMLDivElement;
+    stageElement: HTMLDivElement;
+    canvasElement: HTMLCanvasElement;
+    overlayerElement: HTMLDivElement;
+};
 export type HeaderOptions = {
     x: number;
     y: number;
@@ -64,8 +70,12 @@ export default class Context {
     private eventBus: EventBus;
     private eventBrowser: EventBrowser;
     private eventTable: EventTable;
-    targetContainer: HTMLElement;
-    target: HTMLCanvasElement;
+    containerElement: HTMLDivElement;
+    stageElement: HTMLDivElement;
+    canvasElement: HTMLCanvasElement;
+    overlayerElement: HTMLDivElement;
+    stageWidth = 0;
+    stageHeight = 0;
     paint: Paint;
     icons: Icons;
     isInsideTargetContainer = false;
@@ -144,14 +154,17 @@ export default class Context {
     history: History;
     config: Config;
 
-    constructor(targetContainer: HTMLDivElement, target: HTMLCanvasElement, options: EVirtTableOptions) {
-        this.target = target;
-        this.targetContainer = targetContainer;
+    constructor(containerOptions: containerElementOptions, options: EVirtTableOptions) {
+        const { containerElement, stageElement, canvasElement, overlayerElement } = containerOptions;
+        this.containerElement = containerElement;
+        this.stageElement = stageElement;
+        this.canvasElement = canvasElement;
+        this.overlayerElement = overlayerElement;
         this.config = new Config(options.config || {});
         this.eventBus = new EventBus();
         this.eventBrowser = new EventBrowser(this);
         this.eventTable = new EventTable(this);
-        this.paint = new Paint(target);
+        this.paint = new Paint(this.canvasElement);
         this.database = new Database(this, options);
         this.history = new History(this);
         this.icons = new Icons(this);
@@ -261,15 +274,11 @@ export default class Context {
         return this.isInsideTargetContainer;
     }
     getOffset(e: MouseEvent) {
-        const { left, top } = this.target.getBoundingClientRect();
+        const { left, top } = this.containerElement.getBoundingClientRect();
         return {
             offsetX: e.clientX - left,
             offsetY: e.clientY - top,
         };
-    }
-    getAllEventBrowserNames(): string[] {
-        const keys = this.eventBrowser.eventTasks.keys();
-        return Array.from(keys);
     }
     hasEvent(event: string): boolean {
         return this.eventBus.has(event);

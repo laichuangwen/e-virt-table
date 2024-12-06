@@ -22,8 +22,6 @@ import Overlayer from './Overlayer';
 import ContextMenu from './ContextMenu';
 import './style.css';
 export default class EVirtTable {
-    private targetContainer: HTMLDivElement;
-    private target: HTMLCanvasElement;
     private options: EVirtTableOptions;
     private scroller: Scroller;
     private header: Header;
@@ -38,12 +36,10 @@ export default class EVirtTable {
     private contextMenu: ContextMenu;
     ctx: Context;
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
-        this.target = document.createElement('canvas');
-        this.targetContainer = target;
-        this.targetContainer.className = 'e-virt-table-container';
-        this.targetContainer.appendChild(this.target);
         this.options = options;
-        this.ctx = new Context(this.targetContainer, this.target, this.options);
+        const { overlayerElement } = options;
+        const containerElement = this.createContainer(target, overlayerElement);
+        this.ctx = new Context(containerElement, this.options);
         this.header = new Header(this.ctx);
         this.body = new Body(this.ctx);
         this.footer = new Footer(this.ctx);
@@ -57,12 +53,29 @@ export default class EVirtTable {
         this.contextMenu = new ContextMenu(this.ctx);
         this.ctx.on('draw', () => {
             this.draw();
-            
         });
         this.ctx.on('drawView', () => {
             this.draw(true);
         });
         this.draw();
+    }
+    private createContainer(containerElement: HTMLDivElement, _overlayerElement?: HTMLDivElement) {
+        containerElement.className = 'e-virt-table-container';
+        const stageElement = document.createElement('div');
+        const canvasElement = document.createElement('canvas');
+        const overlayerElement = _overlayerElement || document.createElement('div');
+        stageElement.className = 'e-virt-table-stage';
+        canvasElement.className = 'e-virt-table-canvas';
+        overlayerElement.className = 'e-virt-table-overlayer';
+        stageElement.appendChild(canvasElement);
+        stageElement.appendChild(overlayerElement);
+        containerElement.appendChild(stageElement);
+        return {
+            containerElement,
+            stageElement,
+            canvasElement,
+            overlayerElement,
+        };
     }
     draw(ignoreOverlayer = false) {
         requestAnimationFrame(() => {
@@ -298,6 +311,6 @@ export default class EVirtTable {
         this.autofill.destroy();
         this.contextMenu.destroy();
         this.ctx.destroy();
-        this.target.remove();
+        this.ctx.containerElement.remove();
     }
 }

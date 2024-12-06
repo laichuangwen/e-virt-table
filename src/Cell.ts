@@ -280,7 +280,7 @@ export default class Cell extends BaseCell {
                 this.drawImageSource = icon;
                 // 更改文本距离
                 this.align = 'left';
-                this.drawTextX = iconOffsetX + this.drawX + iconWidth + 0.5;
+                this.drawTextX = iconOffsetX + this.drawX + iconWidth - 0.5;
             }
         }
     }
@@ -551,7 +551,7 @@ export default class Cell extends BaseCell {
         if (this.fixed === 'left') {
             left = `${this.drawX}px`;
         } else if (this.fixed === 'right') {
-            left = `${this.drawX - (this.ctx.target.width - this.ctx.fixedRightWidth)}px`;
+            left = `${this.drawX - (this.ctx.stageWidth - this.ctx.fixedRightWidth)}px`;
         }
         // 合计
         if (this.cellType === 'footer') {
@@ -736,13 +736,17 @@ export default class Cell extends BaseCell {
         lineDash?: number[];
     }) {
         const { drawX, drawY, width, rowIndex, colIndex } = this;
-        const x = drawX + 0.5;
+        let x = drawX + 0.5;
         let y = drawY + 0.5;
         let height = this.height;
         // 第一行减去1，不然会被表头覆盖
         if (rowIndex === 0) {
             y = this.y + 1;
             height = height - 1;
+        }
+        // 最后一列减去1，不然会被右边滚动条覆盖
+        if (colIndex === this.ctx.maxColIndex) {
+            x = x - 1;
         }
         const { xArr, yArr, lineDash = [], borderWidth = 1, borderColor, fillColor } = options;
 
@@ -785,7 +789,7 @@ export default class Cell extends BaseCell {
         }
         // right border
         if (colIndex === maxX && rowIndex >= minY && rowIndex <= maxY) {
-            this.ctx.paint.drawLine([x + width - 1, y, x + width - 1, y + height - 1], {
+            this.ctx.paint.drawLine([x + width - 1.5, y, x + width - 1.5, y + height - 1.5], {
                 borderColor,
                 fillColor,
                 borderWidth,

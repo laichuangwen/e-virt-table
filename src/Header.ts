@@ -62,14 +62,17 @@ export default class Header {
         this.resizeNum = 0; // 可调整调整列数量
         this.render(spanColumns, 0);
         this.ctx.database.updateColIndexKeyMap(this.leafCellHeaders);
-        const targetContainer = this.ctx.targetContainer.getBoundingClientRect();
+        const containerElement = this.ctx.containerElement.getBoundingClientRect();
         // 如果有可调整列，宽度等于容器宽度
         if (this.resizeNum > 0) {
-            this.ctx.target.width = targetContainer.width;
+            // this.ctx.canvasElement.width = containerElement.width;
+            this.ctx.stageWidth = Math.floor(containerElement.width);
         } else {
-            this.ctx.target.width = this.width + SCROLLER_TRACK_SIZE - 1;
+            // this.ctx.canvasElement.width = this.width + SCROLLER_TRACK_SIZE - 1;
+            this.ctx.stageWidth = Math.floor(this.width + SCROLLER_TRACK_SIZE);
         }
-        this.visibleWidth = this.ctx.target.width - SCROLLER_TRACK_SIZE;
+        this.ctx.stageElement.style.width = this.ctx.stageWidth - 0.5 + 'px';
+        this.visibleWidth =  this.ctx.stageWidth - SCROLLER_TRACK_SIZE;
 
         // 如果表头宽度小于可视宽度，平均分配
         const overWidth = this.visibleWidth - this.width;
@@ -127,7 +130,7 @@ export default class Header {
             // 编辑中不触发mousemove
             if (this.ctx.editing) return;
             const {
-                target,
+                stageWidth,
                 config: { RESIZE_COLUMN_MIN_WIDTH },
             } = this.ctx;
             // 鼠标移动
@@ -146,8 +149,8 @@ export default class Header {
                     return;
                 }
                 // 恢复默认样式
-                if (this.ctx.targetContainer.style.cursor === 'col-resize') {
-                    this.ctx.targetContainer.style.cursor = 'default';
+                if (this.ctx.stageElement.style.cursor === 'col-resize') {
+                    this.ctx.stageElement.style.cursor = 'default';
                 }
                 // 渲染的表头
                 const renderAllCellHeaders = [...this.renderFixedCellHeaders, ...this.renderCenterCellHeaders];
@@ -158,12 +161,12 @@ export default class Header {
                     if (
                         x > drawX + col.width - 5 &&
                         x < drawX + col.width + 4 &&
-                        x < target.width - 4 && // 视窗中最后一列不允许调整宽
+                        x < stageWidth - 4 && // 视窗中最后一列不允许调整宽
                         col.colspan <= 1 // 父级表头不触发
                     ) {
                         // 在表头内
                         if (this.ctx.isTarget() && offsetY <= this.height) {
-                            this.ctx.targetContainer.style.cursor = 'col-resize';
+                            this.ctx.stageElement.style.cursor = 'col-resize';
                             this.resizeTarget = col;
                         }
                     }
@@ -282,13 +285,13 @@ export default class Header {
     private drawTipLine() {
         if (this.isResizing && this.resizeTarget) {
             const {
-                target,
+                stageHeight,
                 config: { RESIZE_COLUMN_LINE_COLOR },
             } = this.ctx;
             const resizeTargetDrawX = this.resizeTarget.getDrawX();
             const resizeTargetWidth = this.resizeTarget.width;
             const x = resizeTargetDrawX + resizeTargetWidth + this.resizeDiff - 0.5;
-            const poins = [x + 0.5, 0, x + 0.5, target.height];
+            const poins = [x - 0.5, 0, x - 0.5, stageHeight];
             this.ctx.paint.drawLine(poins, {
                 borderColor: RESIZE_COLUMN_LINE_COLOR,
                 borderWidth: 1,
@@ -301,7 +304,7 @@ export default class Header {
             fixedRightWidth,
             scrollX,
             header,
-            target,
+            stageWidth,
             config: { HEADER_BG_COLOR, SCROLLER_TRACK_SIZE },
         } = this.ctx;
 
@@ -315,8 +318,8 @@ export default class Header {
             });
         }
         // 右边阴影
-        if (scrollX < Math.floor(header.width - header.visibleWidth - 1) && fixedRightWidth !== SCROLLER_TRACK_SIZE) {
-            const x = header.width - (this.x + this.width) + target.width - fixedRightWidth;
+        if (scrollX < Math.floor(header.width - stageWidth - 1) && fixedRightWidth !== SCROLLER_TRACK_SIZE) {
+            const x = header.width - (this.x + this.width) + stageWidth - fixedRightWidth;
             this.ctx.paint.drawShadow(x + 1, this.y, fixedRightWidth, this.height, {
                 fillColor: HEADER_BG_COLOR,
                 side: 'left',

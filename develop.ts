@@ -1,3 +1,4 @@
+import { Fixed } from './src/types';
 import EVirtTable from './src/EVirtTable';
 
 const canvas = document.getElementById('e-virt-table') as HTMLDivElement;
@@ -25,11 +26,10 @@ const columns: any[] = [
     {
         title: '工号',
         key: 'emp_no',
-        operation: true,
+        // operation: true,
         slotName: 'emp_no',
         readonly: true,
         // type: 'tree',
-        type: 'operation',
         fixed: 'left',
         sort: 4,
         // hide: () => 3 > 2,
@@ -274,6 +274,7 @@ const columns: any[] = [
         key: 'address',
         align: 'left',
         width: 250,
+        fixed: 'right',
         overflowTooltipShow: true,
         overflowTooltipWidth: 200,
         overflowTooltipPlacement: 'top',
@@ -283,6 +284,9 @@ const columns: any[] = [
         },
         render: (pEl, cell) => {
             const cellEl = document.createElement('div');
+            cellEl.addEventListener('click', () => {
+                console.log('点击了家庭地址');
+            });
             cellEl.style.width = '100%';
             cellEl.style.height = '100%';
             cellEl.style.opacity = '0.5';
@@ -362,6 +366,7 @@ const columns: any[] = [
     {
         title: '操作',
         key: 'hander',
+        fixed: 'right',
         slotName: 'hander',
     },
 ];
@@ -478,7 +483,9 @@ const mergeRowCell = (data: any, key: string) => {
         colspan: 1,
     };
 };
+const overlayerEl = document.getElementById('e-virt-table-overlayer') as HTMLDivElement;
 const eVirtTable = new EVirtTable(canvas, {
+    overlayerElement: overlayerEl,
     columns,
     data,
     footerData: [
@@ -505,7 +512,7 @@ const eVirtTable = new EVirtTable(canvas, {
         HEIGHT: 800,
         CHECKBOX_KEY: 'emp_name',
         CELL_HEIGHT: 36,
-        SELECTOR_AREA_MIN_X: 1,
+        SELECTOR_AREA_MIN_X: 0,
         ENABLE_AUTOFILL: true,
         ENABLE_SELECTOR: true,
         ENABLE_KEYBOARD: true,
@@ -514,8 +521,8 @@ const eVirtTable = new EVirtTable(canvas, {
         HIGHLIGHT_SELECTED_ROW: true,
         HIGHLIGHT_HOVER_ROW: true,
         OFFSET_HEIGHT: 16,
-        SELECTOR_AREA_MAX_X_OFFSET: 1,
-        SELECTOR_AREA_MAX_Y_OFFSET: 1,
+        // SELECTOR_AREA_MAX_X_OFFSET: 1,
+        // SELECTOR_AREA_MAX_Y_OFFSET: 1,
         ENABLE_CONTEXT_MENU: true,
         CONTEXT_MENU: [
             { label: '复制', value: 'copy' },
@@ -597,7 +604,6 @@ const eVirtTable = new EVirtTable(canvas, {
         },
     },
 });
-const overlayerEl = document.getElementById('e-virt-table-overlayer');
 eVirtTable.on('overlayerChange', (container) => {
     if (!overlayerEl) {
         return;

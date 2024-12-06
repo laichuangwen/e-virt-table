@@ -42,7 +42,7 @@ export default class Tooltip {
         Object.assign(this.floatingEl.style, floatingStyle);
         this.floatingEl.appendChild(this.contentEl);
         this.floatingEl.appendChild(this.arrowEl);
-        this.ctx.targetContainer.appendChild(this.floatingEl);
+        this.ctx.containerElement.appendChild(this.floatingEl);
         this.init();
     }
     private init() {
@@ -51,7 +51,7 @@ export default class Tooltip {
             if (!this.ctx.isTarget()) {
               return;
             }
-            const targetRect = this.ctx.target.getBoundingClientRect();
+            const targetRect = this.ctx.containerElement.getBoundingClientRect();
             if (!targetRect) {
                 return;
             }
@@ -93,7 +93,7 @@ export default class Tooltip {
         if (cell.message) {
             text = cell.message;
         }
-        const targetRect = this.ctx.target.getBoundingClientRect();
+        const targetRect = this.ctx.containerElement.getBoundingClientRect();
         if (!targetRect) {
             return;
         }

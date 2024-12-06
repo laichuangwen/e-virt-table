@@ -60,14 +60,14 @@ export default class Selector {
                 return;
             }
             // 如果是选中就不处理，比如chexkbox
-            if (this.ctx.targetContainer.style.cursor === 'pointer') {
+            if (this.ctx.stageElement.style.cursor === 'pointer') {
                 return;
             }
             if (this.ctx.isPointer) {
                 return;
             }
             // 如果是填充返回
-            if (this.ctx.targetContainer.style.cursor === 'crosshair') {
+            if (this.ctx.stageElement.style.cursor === 'crosshair') {
                 return;
             }
             if (cell.operation) {
@@ -85,7 +85,7 @@ export default class Selector {
         });
         this.ctx.on('cellHeaderMousedown', (cell) => {
             // 如果是选中就不处理，比如chexkbox
-            if (this.ctx.targetContainer.style.cursor === 'pointer') {
+            if (this.ctx.stageElement.style.cursor === 'pointer') {
                 return;
             }
             if (this.ctx.isPointer) {
@@ -709,7 +709,8 @@ export default class Selector {
      */
     private adjustBoundaryPosition() {
         const {
-            target,
+            stageHeight,
+            stageWidth,
             focusCell,
             fixedRightWidth,
             fixedLeftWidth,
@@ -728,9 +729,9 @@ export default class Selector {
         }
         // 加1补选中框的边框,且可以移动滚动，以为getCell是获取渲染的cell
         const diffLeft = fixedLeftWidth - focusCell.drawX + 1;
-        const diffRight = focusCell.drawX + focusCell.width - (target.width - fixedRightWidth) + 1;
+        const diffRight = focusCell.drawX + focusCell.width - (stageWidth - fixedRightWidth) + 1;
         const diffTop = header.height - focusCell.drawY;
-        const diffBottom = focusCell.drawY + focusCell.height - (target.height - footerHeight - SCROLLER_TRACK_SIZE);
+        const diffBottom = focusCell.drawY + focusCell.height - (stageHeight- footerHeight - SCROLLER_TRACK_SIZE);
         // 边界移动会导致重回，使事件无法冒泡，所以移动视图延时一下等待click事件冒泡后才执行draw
     
         if (this.adjustTimer) {

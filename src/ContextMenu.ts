@@ -53,7 +53,7 @@ export default class ContextMenu {
     private createContextMenu() {
         this.contextMenuEl.replaceChildren();
         this.contextMenuEl.className = 'e-virt-table-context-menu';
-        this.ctx.targetContainer.appendChild(this.contextMenuEl);
+        this.ctx.containerElement.appendChild(this.contextMenuEl);
         const { CONTEXT_MENU } = this.ctx.config;
         this.createContextMenuItems(CONTEXT_MENU, (item: MenuItem) => {
             switch (item.value) {

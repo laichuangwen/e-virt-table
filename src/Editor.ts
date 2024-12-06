@@ -131,17 +131,7 @@ export default class Editor {
         this.editorEl.className = 'e-virt-table-editor';
         this.inputEl.className = 'e-virt-table-editor-textarea';
         this.editorEl.appendChild(this.inputEl);
-        // 父级阻止冒泡事件
-        // 在捕获阶段全局监听所有事件类型
-        const eventBrowserNames = this.ctx.getAllEventBrowserNames();
-        eventBrowserNames.forEach((eventType) => {
-            this.editorEl.addEventListener(eventType, (event) => {
-                if (this.ctx.editing) {
-                    event.stopPropagation();
-                }
-            });
-        });
-        this.ctx.targetContainer.appendChild(this.editorEl);
+        this.ctx.containerElement.appendChild(this.editorEl);
     }
     private startEditByInput(cell: Cell) {
         if (cell.editorType !== 'text') {
@@ -153,8 +143,8 @@ export default class Editor {
         let drawY = cell.getDrawY();
         let { height } = cell;
         const { CELL_PADDING } = this.ctx.config;
-        this.editorEl.style.left = `${drawX}px`;
-        this.editorEl.style.top = `${drawY}px`;
+        this.editorEl.style.left = `${drawX - 1.5}px`;
+        this.editorEl.style.top = `${drawY - 1.5}px`;
         this.inputEl.style.minWidth = `${width - 1}px`;
         this.inputEl.style.minHeight = `${height - 1}px`;
         this.inputEl.style.maxHeight = `${this.ctx.body.visibleHeight - 1}px`;
@@ -200,8 +190,7 @@ export default class Editor {
         if (!focusCell) {
             return;
         }
- 
-        
+
         // 如果是index或者index-selection,selection类型的单元格，不允许编辑
         if (['index', 'index-selection', 'selection'].includes(focusCell.type)) {
             return;
@@ -258,7 +247,7 @@ export default class Editor {
             this.ctx.emit('doneEdit', this.cellTarget);
             this.doneEditByInput();
             this.enable = false;
-            this.ctx.target.focus();
+            this.ctx.stageElement.focus();
             this.ctx.editing = false;
             this.cellTarget = null;
             this.ctx.emit('draw');
