@@ -165,16 +165,18 @@ export default class Editor {
         const length = this.inputEl.value.length;
         this.inputEl.setSelectionRange(length, length);
         const { left, top } = this.ctx.containerElement.getBoundingClientRect();
+        const topRect = top + drawY - 1.5;
+        const leftRect = left + drawX - 1.5;
         const virtualReference = {
             getBoundingClientRect: () => ({
+                x: 0,
+                y: 0,
                 width: 0,
                 height: 0,
-                top: top + drawY,
-                left: left + drawX,
-                right: left + drawX,
-                bottom: top + drawY,
-                x: drawX,
-                y: drawY,
+                top: topRect,
+                left: leftRect,
+                right: 0,
+                bottom: 0,
             }),
             contextElement: document.body,
         };
