@@ -125,8 +125,7 @@ export default class Editor {
         this.inputEl.addEventListener('blur', () => {
             this.doneEdit();
         });
-        this.editorEl = document.createElement('div');
-        this.editorEl.className = 'e-virt-table-editor';
+        this.editorEl = this.ctx.editorElement;
         this.inputEl.className = 'e-virt-table-editor-textarea';
         this.editorEl.appendChild(this.inputEl);
         this.ctx.containerElement.appendChild(this.editorEl);
@@ -137,9 +136,6 @@ export default class Editor {
         this.inputEl.style.height = `${scrollHeight}px`; // 设置为内容的高度
     }
     private startEditByInput(cell: Cell) {
-        if (cell.editorType !== 'text') {
-            return;
-        }
         const value = cell.getValue();
         const { width } = cell;
         const drawX = cell.getDrawX();
@@ -152,18 +148,6 @@ export default class Editor {
         if (maxHeight > this.ctx.body.visibleHeight) {
             maxHeight = this.ctx.body.visibleHeight;
         }
-        this.inputEl.style.minWidth = `${width - 1}px`;
-        this.inputEl.style.minHeight = `${height - 1}px`;
-        this.inputEl.style.maxHeight = `${maxHeight}px`;
-        this.inputEl.style.width = `${width - 1}px`;
-        this.inputEl.style.height = `${height - 1}px`;
-        this.inputEl.style.padding = `${CELL_PADDING}px`;
-        if (value !== null) {
-            this.inputEl.value = value;
-        }
-        this.inputEl.focus();
-        const length = this.inputEl.value.length;
-        this.inputEl.setSelectionRange(length, length);
         const { left, top } = this.ctx.containerElement.getBoundingClientRect();
         const topRect = top + drawY - 1.5;
         const leftRect = left + drawX - 1.5;
@@ -187,14 +171,35 @@ export default class Editor {
             this.editorEl.style.left = `${x}px`;
             this.editorEl.style.top = `${y}px`;
         });
-        if (this.inputEl.scrollHeight > height) {
-            this.autoSize();
+        if (cell.editorType !== 'text') {
+            this.inputEl.style.display = 'none';
+            return;
         }
+        this.inputEl.style.display = 'block';
+        this.inputEl.style.minWidth = `${width - 1}px`;
+        this.inputEl.style.minHeight = `${height - 1}px`;
+        this.inputEl.style.maxHeight = `${maxHeight}px`;
+        this.inputEl.style.width = `${width - 1}px`;
+        this.inputEl.style.height = `${height - 1}px`;
+        this.inputEl.style.padding = `${CELL_PADDING}px`;
+        if (value !== null) {
+            this.inputEl.value = value;
+        }
+        requestAnimationFrame(() => {
+            this.inputEl.focus();
+            const length = this.inputEl.value.length;
+            this.inputEl.setSelectionRange(length, length);
+            if (this.inputEl.scrollHeight > height) {
+                this.autoSize();
+            }
+        });
     }
     private doneEditByInput() {
         if (!this.cellTarget) {
             return;
         }
+        this.editorEl.style.left = `${-10000}px`;
+        this.editorEl.style.top = `${-10000}px`;
         // 如果不是是文本编辑器
         if (this.cellTarget.editorType !== 'text') {
             return;
@@ -207,8 +212,6 @@ export default class Editor {
             this.ctx.database.setItemValue(rowKey, key, textContent, true, true, true);
         }
         this.inputEl.value = '';
-        this.editorEl.style.left = `${-10000}px`;
-        this.editorEl.style.top = `${-10000}px`;
     }
     startEdit() {
         // 如果不启用点击选择器编辑

@@ -484,8 +484,10 @@ const mergeRowCell = (data: any, key: string) => {
     };
 };
 const overlayerEl = document.getElementById('e-virt-table-overlayer') as HTMLDivElement;
+const editorEl = document.getElementById('e-virt-table-editor') as HTMLDivElement;
 const eVirtTable = new EVirtTable(canvas, {
     overlayerElement: overlayerEl,
+    editorElement: editorEl,
     columns,
     data,
     footerData: [
@@ -631,19 +633,14 @@ eVirtTable.on('overlayerChange', (container) => {
         overlayerEl.appendChild(typeDiv);
     });
 });
-const editorEl = document.getElementById('e-virt-table-editor');
 const dateEl = document.getElementById('e-virt-table-date') as HTMLInputElement;
-if (editorEl && dateEl) {
+if (dateEl) {
     eVirtTable.on('startEdit', (cell) => {
         const { width, height, editorType } = cell;
         // 内部已经处理了文本类型的编辑
         if (editorType === 'text') {
             return;
         }
-        const drawX = cell.getDrawX();
-        const drawY = cell.getDrawY();
-        editorEl.style.left = `${drawX}px`;
-        editorEl.style.top = `${drawY}px`;
         // 日期
         if (dateEl && ['date'].includes(editorType)) {
             dateEl.focus();
@@ -651,7 +648,9 @@ if (editorEl && dateEl) {
             dateEl.setAttribute('data-key', cell.key);
             dateEl.style.display = 'block';
             dateEl.style.minWidth = `${width - 1}px`;
+            dateEl.style.width = `${width - 1}px`;
             dateEl.style.minHeight = `${height - 1}px`;
+            dateEl.style.maxHeight = `${window.innerHeight / 2}px`;
             dateEl.style.border = 'none';
             dateEl.value = cell.getValue();
         }
@@ -663,10 +662,6 @@ if (editorEl && dateEl) {
         }
         if (['date'].includes(cell.editorType)) {
             dateEl.style.display = 'none';
-        }
-        if (editorEl) {
-            editorEl.style.left = `${-10000}px`;
-            editorEl.style.top = `${-10000}px`;
         }
     });
     eVirtTable.on('change', (value) => {

@@ -8,6 +8,7 @@ export type EVirtTableOptions = {
     columns: Column[];
     config?: ConfigType;
     overlayerElement?: HTMLDivElement
+    editorElement?: HTMLDivElement
 };
 export type EventCallback = (...args: any[]) => void;
 export type ChangeItem = {

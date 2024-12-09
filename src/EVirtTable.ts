@@ -37,8 +37,8 @@ export default class EVirtTable {
     ctx: Context;
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
         this.options = options;
-        const { overlayerElement } = options;
-        const containerElement = this.createContainer(target, overlayerElement);
+        const { overlayerElement, editorElement } = options;
+        const containerElement = this.createContainer(target, overlayerElement, editorElement);
         this.ctx = new Context(containerElement, this.options);
         this.header = new Header(this.ctx);
         this.body = new Body(this.ctx);
@@ -59,7 +59,11 @@ export default class EVirtTable {
         });
         this.draw();
     }
-    private createContainer(containerElement: HTMLDivElement, _overlayerElement?: HTMLDivElement) {
+    private createContainer(
+        containerElement: HTMLDivElement,
+        _overlayerElement?: HTMLDivElement,
+        _editorElement?: HTMLDivElement,
+    ) {
         containerElement.className = 'e-virt-table-container';
         const stageElement = document.createElement('div');
         const canvasElement = document.createElement('canvas');
@@ -67,6 +71,8 @@ export default class EVirtTable {
         stageElement.className = 'e-virt-table-stage';
         canvasElement.className = 'e-virt-table-canvas';
         overlayerElement.className = 'e-virt-table-overlayer';
+        const editorElement = _editorElement || document.createElement('div');
+        editorElement.className = 'e-virt-table-editor';
         stageElement.appendChild(canvasElement);
         stageElement.appendChild(overlayerElement);
         containerElement.appendChild(stageElement);
@@ -75,6 +81,7 @@ export default class EVirtTable {
             stageElement,
             canvasElement,
             overlayerElement,
+            editorElement,
         };
     }
     draw(ignoreOverlayer = false) {
@@ -90,7 +97,9 @@ export default class EVirtTable {
             // 忽略重绘覆盖层，解决按下事件时，重绘覆盖层导致事件无法触发，目前只在Selector中使用
             if (!ignoreOverlayer) {
                 this.overlayer.draw();
+                // console.log('draw overlayer');
             }
+            // console.log('draw');
         });
     }
     loadConfig(_config: ConfigType) {

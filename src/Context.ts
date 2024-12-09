@@ -16,6 +16,7 @@ export type containerElementOptions = {
     stageElement: HTMLDivElement;
     canvasElement: HTMLCanvasElement;
     overlayerElement: HTMLDivElement;
+    editorElement: HTMLDivElement;
 };
 export type HeaderOptions = {
     x: number;
@@ -74,6 +75,7 @@ export default class Context {
     stageElement: HTMLDivElement;
     canvasElement: HTMLCanvasElement;
     overlayerElement: HTMLDivElement;
+    editorElement: HTMLDivElement;
     stageWidth = 0;
     stageHeight = 0;
     paint: Paint;
@@ -155,11 +157,12 @@ export default class Context {
     config: Config;
 
     constructor(containerOptions: containerElementOptions, options: EVirtTableOptions) {
-        const { containerElement, stageElement, canvasElement, overlayerElement } = containerOptions;
+        const { containerElement, stageElement, canvasElement, overlayerElement, editorElement } = containerOptions;
         this.containerElement = containerElement;
         this.stageElement = stageElement;
         this.canvasElement = canvasElement;
         this.overlayerElement = overlayerElement;
+        this.editorElement = editorElement;
         this.config = new Config(options.config || {});
         this.eventBus = new EventBus();
         this.eventBrowser = new EventBrowser(this);

@@ -96,7 +96,7 @@ export default class Selector {
         this.ctx.on('keydown', (e) => {
             // CTRL+C／Command+C
             if ((e.ctrlKey && e.code === 'KeyV') || (e.metaKey && e.code === 'KeyV')) {
-                // e.preventDefault() // 注意：这里一定不能阻止默认事件，因为粘贴功能依赖原生的paste事件
+                e.preventDefault()
                 this.paste();
                 return;
             }
