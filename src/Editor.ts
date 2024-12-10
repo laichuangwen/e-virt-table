@@ -8,6 +8,8 @@ export default class Editor {
     private enable = false;
     private cellTarget: Cell | null = null;
     ctx: Context;
+    private drawY = 0;
+    private drawX = 0;
     constructor(ctx: Context) {
         this.ctx = ctx;
         this.initTextEditor();
@@ -131,8 +133,30 @@ export default class Editor {
         this.ctx.containerElement.appendChild(this.editorEl);
     }
     private autoSize() {
-        const scrollHeight = this.inputEl.scrollHeight;
+        let scrollHeight = this.inputEl.scrollHeight;
         this.inputEl.style.height = 'auto'; // 重置高度
+        console.log(scrollHeight);
+        let maxHeight = this.ctx.body.visibleHeight;
+        if (scrollHeight > maxHeight) {
+            scrollHeight = maxHeight;
+        }
+        const {
+            stageHeight,
+            footer,
+            header,
+            config: { SCROLLER_TRACK_SIZE },
+        } = this.ctx;
+        const bottomY = stageHeight - footer.height - SCROLLER_TRACK_SIZE;
+        this.editorEl.style.bottom = `auto`;
+        if (this.drawY + scrollHeight > bottomY || this.drawY < header.height) {
+            // this.editorEl.style.top = `${this.drawY - scrollHeight}px`;
+            console.log('bottom');
+            this.editorEl.style.left = `${this.drawX}px`;
+            this.editorEl.style.top = `auto`;
+            this.editorEl.style.bottom = `${stageHeight - bottomY}px`;
+        }
+        console.log('bottom', scrollHeight);
+
         this.inputEl.style.height = `${scrollHeight}px`; // 设置为内容的高度
     }
     private startEditByInput(cell: Cell) {
@@ -140,59 +164,38 @@ export default class Editor {
         const { width } = cell;
         const drawX = cell.getDrawX();
         let drawY = cell.getDrawY();
+        this.drawX = drawX;
+        this.drawY = drawY;
         let { height } = cell;
         const {
             config: { CELL_PADDING },
+            header,
         } = this.ctx;
-        let maxHeight = window.innerHeight / 2;
-        if (maxHeight > this.ctx.body.visibleHeight) {
-            maxHeight = this.ctx.body.visibleHeight;
+        let maxHeight = this.ctx.body.visibleHeight;
+        if (height > maxHeight) {
+            height = maxHeight;
         }
-        const { left, top } = this.ctx.containerElement.getBoundingClientRect();
-        const topRect = top + drawY - 1.5;
-        const leftRect = left + drawX - 1.5;
-        const virtualReference = {
-            getBoundingClientRect: () => ({
-                x: 0,
-                y: 0,
-                width: 0,
-                height: 0,
-                top: topRect,
-                left: leftRect,
-                right: 0,
-                bottom: 0,
-            }),
-            contextElement: document.body,
-        };
-        computePosition(virtualReference, this.editorEl, {
-            placement: 'right-start',
-            middleware: [offset(), shift(), flip()],
-        }).then(({ x, y }) => {
-            this.editorEl.style.left = `${x}px`;
-            this.editorEl.style.top = `${y}px`;
-        });
-        if (cell.editorType !== 'text') {
-            this.inputEl.style.display = 'none';
-            return;
-        }
+        this.editorEl.style.left = `${drawX}px`;
+        this.editorEl.style.top = `${drawY}px`;
+        this.editorEl.style.bottom = `auto`;
         this.inputEl.style.display = 'block';
         this.inputEl.style.minWidth = `${width - 1}px`;
         this.inputEl.style.minHeight = `${height - 1}px`;
         this.inputEl.style.maxHeight = `${maxHeight}px`;
         this.inputEl.style.width = `${width - 1}px`;
-        this.inputEl.style.height = `${height - 1}px`;
+        this.inputEl.style.height = `auto`;
         this.inputEl.style.padding = `${CELL_PADDING}px`;
         if (value !== null) {
             this.inputEl.value = value;
         }
-        requestAnimationFrame(() => {
-            this.inputEl.focus();
-            const length = this.inputEl.value.length;
-            this.inputEl.setSelectionRange(length, length);
-            if (this.inputEl.scrollHeight > height) {
-                this.autoSize();
-            }
-        });
+        console.log('startEditByInput', this.drawY);
+
+        this.inputEl.focus();
+        const length = this.inputEl.value.length;
+        this.inputEl.setSelectionRange(length, length);
+        if (this.inputEl.scrollHeight > height || drawY < header.height) {
+            this.autoSize();
+        }
     }
     private doneEditByInput() {
         if (!this.cellTarget) {
@@ -200,6 +203,7 @@ export default class Editor {
         }
         this.editorEl.style.left = `${-10000}px`;
         this.editorEl.style.top = `${-10000}px`;
+        this.editorEl.style.bottom = `atuo`;
         // 如果不是是文本编辑器
         if (this.cellTarget.editorType !== 'text') {
             return;

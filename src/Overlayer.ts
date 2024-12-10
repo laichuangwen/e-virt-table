@@ -18,13 +18,6 @@ export default class Overlayer {
         });
     }
     private getContainer(): OverlayerContainer {
-        const {
-            stageWidth,
-            stageHeight,
-            config: { SCROLLER_TRACK_SIZE },
-        } = this.ctx;
-        const width = stageWidth - SCROLLER_TRACK_SIZE;
-        const height = stageHeight - SCROLLER_TRACK_SIZE;
         const header = this.getHeader();
         const body = this.getBody();
         const footer = this.getFooter();
@@ -34,21 +27,9 @@ export default class Overlayer {
         if (!FOOTER_FIXED) {
             views = [header, body];
         }
-        const container = {
-            style: {
-                position: 'absolute',
-                left: `${0}px`,
-                top: `${0}px`,
-                userSelect: 'none',
-                overflow: 'hidden',
-                width: `${width}px`,
-                height: `${height}px`,
-                zIndex: 10,
-            },
-            class: 'e-virt-table-overlayer',
+        return {
             views,
         };
-        return container;
     }
     private getHeader() {
         const {

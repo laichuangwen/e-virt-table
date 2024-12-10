@@ -28,12 +28,14 @@
     box-sizing: border-box;
     border: none;
     outline: none;
+    z-index: 10px;
 }
 .e-virt-table-editor {
     position: absolute;
     top: -10000px;
     left: -10000px;
     text-align: left;
+    height: auto;
     line-height: 0;
     z-index: 100;
     overflow: hidden;

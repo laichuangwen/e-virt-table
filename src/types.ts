@@ -62,7 +62,6 @@ export type OverlayerWrapper = {
     views: OverlayerView[];
 };
 export type OverlayerContainer = {
-    style: any;
     views: OverlayerWrapper[];
 };
 export type ContextmenuItem = {
