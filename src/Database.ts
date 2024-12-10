@@ -416,7 +416,7 @@ export default class Database {
         if (item[key] !== null && typeof item[key] === 'object') {
             oldValue = JSON.parse(JSON.stringify(item[key]));
         }
-        const changeKey = `${rowKey}_${key}`;
+        const changeKey = `${rowKey}\u200b_${key}`;
         // 设置原始值,只设置一次
         if (!this.originalDataMap.has(changeKey)) {
             this.originalDataMap.set(changeKey, oldValue);
@@ -682,8 +682,8 @@ export default class Database {
         }[] = [];
         this.changedDataMap.forEach((value, key) => {
             const originalValue = this.originalDataMap.get(key);
-            const rowKey = key.split('_')[0];
-            const colKey = key.split('_')[1];
+            const rowKey = key.split('\u200b_')[0];
+            const colKey = key.split('\u200b_')[1];
             if (originalValue !== value) {
                 list.push({
                     rowKey,
@@ -700,7 +700,7 @@ export default class Database {
         const rowKeyList: Set<string> = new Set();
         this.changedDataMap.forEach((value, key) => {
             const originalValue = this.originalDataMap.get(key);
-            const rowKey = key.split('_')[0];
+            const rowKey = key.split('\u200b_')[0];
             if (originalValue !== value) {
                 rowKeyList.add(rowKey);
             }
@@ -718,7 +718,7 @@ export default class Database {
      * @returns
      */
     isHasChangedData(rowKey: string, key: string) {
-        const changedKey = `${rowKey}_${key}`;
+        const changedKey = `${rowKey}\u200b_${key}`;
         if (!this.changedDataMap.has(changedKey)) {
             return false;
         }
@@ -857,7 +857,7 @@ export default class Database {
     }
     setValidationErrorByRowIndex(rowIndex: number, key: string, message: string) {
         const rowKey = this.rowIndexRowKeyMap.get(rowIndex);
-        const _key = `${rowKey}_${key}`;
+        const _key = `${rowKey}\u200b_${key}`;
         const errors: ValidateError[] = [
             {
                 message,
@@ -866,11 +866,11 @@ export default class Database {
         this.validationErrorMap.set(_key, errors);
     }
     setValidationError(rowKey: string, key: string, errors: any[]) {
-        const _key = `${rowKey}_${key}`;
+        const _key = `${rowKey}\u200b_${key}`;
         this.validationErrorMap.set(_key, errors);
     }
     getValidationError(rowKey: string, key: string) {
-        const _key = `${rowKey}_${key}`;
+        const _key = `${rowKey}\u200b_${key}`;
         return this.validationErrorMap.get(_key) || [];
     }
 }
