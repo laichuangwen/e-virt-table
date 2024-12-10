@@ -96,7 +96,7 @@ export default class Selector {
         this.ctx.on('keydown', (e) => {
             // CTRL+C／Command+C
             if ((e.ctrlKey && e.code === 'KeyV') || (e.metaKey && e.code === 'KeyV')) {
-                e.preventDefault()
+                e.preventDefault();
                 this.paste();
                 return;
             }
@@ -720,6 +720,10 @@ export default class Selector {
             scrollY,
         } = this.ctx;
         if (!focusCell) {
+            return;
+        }
+        // 格子大于可视高度不给滚动
+        if (focusCell.height > stageHeight) {
             return;
         }
         const { SCROLLER_TRACK_SIZE = 0, FOOTER_FIXED } = this.ctx.config;

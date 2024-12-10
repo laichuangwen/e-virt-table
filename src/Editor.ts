@@ -156,7 +156,7 @@ export default class Editor {
     }
     private startEditByInput(cell: Cell) {
         const value = cell.getValue();
-        const { width } = cell;
+        const { width, editorType } = cell;
         const drawX = cell.getDrawX();
         let drawY = cell.getDrawY();
         this.drawX = drawX;
@@ -173,19 +173,25 @@ export default class Editor {
         this.editorEl.style.left = `${drawX}px`;
         this.editorEl.style.top = `${drawY}px`;
         this.editorEl.style.bottom = `auto`;
-        this.inputEl.style.display = 'block';
-        this.inputEl.style.minWidth = `${width - 1}px`;
-        this.inputEl.style.minHeight = `${height - 1}px`;
-        this.inputEl.style.maxHeight = `${maxHeight}px`;
-        this.inputEl.style.width = `${width - 1}px`;
-        this.inputEl.style.height = `auto`;
-        this.inputEl.style.padding = `${CELL_PADDING}px`;
-        if (value !== null) {
-            this.inputEl.value = value;
+        this.editorEl.style.maxHeight = `${maxHeight}px`;
+        if (editorType === 'text') {
+            this.inputEl.style.display = 'block';
+            this.inputEl.style.minWidth = `${width - 1}px`;
+            this.inputEl.style.minHeight = `${height - 1}px`;
+            this.inputEl.style.maxHeight = `${maxHeight}px`;
+            this.inputEl.style.width = `${width - 1}px`;
+            this.inputEl.style.height = `auto`;
+            this.inputEl.style.padding = `${CELL_PADDING}px`;
+            if (value !== null) {
+                this.inputEl.value = value;
+            }
+            this.inputEl.focus();
+            const length = this.inputEl.value.length;
+            this.inputEl.setSelectionRange(length, length);
+        } else {
+            this.inputEl.style.display = 'none';
         }
-        this.inputEl.focus();
-        const length = this.inputEl.value.length;
-        this.inputEl.setSelectionRange(length, length);
+
         if (this.inputEl.scrollHeight > height || drawY < header.height) {
             this.autoSize();
         }
@@ -197,18 +203,17 @@ export default class Editor {
         this.editorEl.style.left = `${-10000}px`;
         this.editorEl.style.top = `${-10000}px`;
         this.editorEl.style.bottom = `atuo`;
-        // 如果不是是文本编辑器
-        if (this.cellTarget.editorType !== 'text') {
-            return;
+        // 如果是文本编辑器
+        if (this.cellTarget.editorType === 'text') {
+            const { rowKey, key } = this.cellTarget;
+            const value = this.cellTarget.getValue();
+            const textContent = this.inputEl.value;
+            // !(text.textContent === '' && value === null)剔除点击编辑后未修改会把null变为''的情况
+            if (textContent !== value && !(textContent === '' && value === null)) {
+                this.ctx.database.setItemValue(rowKey, key, textContent, true, true, true);
+            }
+            this.inputEl.value = '';
         }
-        const { rowKey, key } = this.cellTarget;
-        const value = this.cellTarget.getValue();
-        const textContent = this.inputEl.value;
-        // !(text.textContent === '' && value === null)剔除点击编辑后未修改会把null变为''的情况
-        if (textContent !== value && !(textContent === '' && value === null)) {
-            this.ctx.database.setItemValue(rowKey, key, textContent, true, true, true);
-        }
-        this.inputEl.value = '';
     }
     startEdit() {
         // 如果不启用点击选择器编辑
@@ -274,8 +279,8 @@ export default class Editor {
             return;
         }
         if (this.cellTarget) {
-            this.ctx.emit('doneEdit', this.cellTarget);
             this.doneEditByInput();
+            this.ctx.emit('doneEdit', this.cellTarget);
             this.enable = false;
             this.ctx.stageElement.focus();
             this.ctx.editing = false;

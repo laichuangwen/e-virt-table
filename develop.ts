@@ -1,5 +1,3 @@
-import { Callback } from './docs/node_modules/undici-types/connector.d';
-import { Fixed } from './src/types';
 import EVirtTable from './src/EVirtTable';
 
 const canvas = document.getElementById('e-virt-table') as HTMLDivElement;
