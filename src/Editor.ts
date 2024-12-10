@@ -1,4 +1,3 @@
-import { computePosition, offset, flip, shift } from '@floating-ui/dom';
 import type Cell from './Cell';
 import type Context from './Context';
 
