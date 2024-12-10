@@ -97,9 +97,7 @@ export default class EVirtTable {
             // 忽略重绘覆盖层，解决按下事件时，重绘覆盖层导致事件无法触发，目前只在Selector中使用
             if (!ignoreOverlayer) {
                 this.overlayer.draw();
-                // console.log('draw overlayer');
             }
-            // console.log('draw');
         });
     }
     loadConfig(_config: ConfigType) {

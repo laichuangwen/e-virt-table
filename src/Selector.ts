@@ -11,7 +11,6 @@ export default class Selector {
     private adjustPositionY = '';
     private timerX = 0; // 水平滚动定时器
     private timerY = 0; // 垂直滚动定时器
-    private adjustTimer = 0;
 
     constructor(ctx: Context) {
         this.ctx = ctx;
@@ -718,6 +717,7 @@ export default class Selector {
             footer,
             scrollX,
             scrollY,
+            config: { SCROLLER_TRACK_SIZE, FOOTER_FIXED },
         } = this.ctx;
         if (!focusCell) {
             return;
@@ -726,39 +726,45 @@ export default class Selector {
         if (focusCell.height > stageHeight) {
             return;
         }
-        const { SCROLLER_TRACK_SIZE = 0, FOOTER_FIXED } = this.ctx.config;
+
         let footerHeight = 0;
         if (FOOTER_FIXED) {
             footerHeight = footer.visibleHeight;
+        }
+        if (focusCell.fixed) {
+            return;
+        }
+        // 如果在可视区域内就不处理
+        if (
+            !(
+                focusCell.drawX < fixedLeftWidth ||
+                focusCell.drawX + focusCell.width > stageWidth - fixedRightWidth ||
+                focusCell.drawY < this.ctx.header.height ||
+                focusCell.drawY + focusCell.height > stageHeight - footerHeight - SCROLLER_TRACK_SIZE
+            )
+        ) {
+            return;
         }
         // 加1补选中框的边框,且可以移动滚动，以为getCell是获取渲染的cell
         const diffLeft = fixedLeftWidth - focusCell.drawX + 1;
         const diffRight = focusCell.drawX + focusCell.width - (stageWidth - fixedRightWidth) + 1;
         const diffTop = header.height - focusCell.drawY;
         const diffBottom = focusCell.drawY + focusCell.height - (stageHeight - footerHeight - SCROLLER_TRACK_SIZE);
-        // 边界移动会导致重回，使事件无法冒泡，所以移动视图延时一下等待click事件冒泡后才执行draw
-
-        if (this.adjustTimer) {
-            clearTimeout(this.adjustTimer);
-            this.adjustTimer = 0;
+        // 编辑状态不处理
+        if (this.ctx.editing) {
+            return;
         }
-        this.adjustTimer = setTimeout(() => {
-            // 编辑状态不处理
-            if (this.ctx.editing) {
-                return;
-            }
-            // fixed禁用左右横向移动
-            if (diffRight > 0 && !focusCell.fixed) {
-                this.ctx.setScrollX(scrollX + diffRight);
-            } else if (diffLeft > 0 && !focusCell.fixed) {
-                this.ctx.setScrollX(scrollX - diffLeft);
-            }
-            if (diffTop > 0) {
-                this.ctx.setScrollY(scrollY - diffTop);
-            } else if (diffBottom > 0) {
-                this.ctx.setScrollY(scrollY + diffBottom);
-            }
-        }, 167); // 每100毫秒执行一次
+        // fixed禁用左右横向移动
+        if (diffRight > 0 && !focusCell.fixed) {
+            this.ctx.setScrollX(scrollX + diffRight);
+        } else if (diffLeft > 0 && !focusCell.fixed) {
+            this.ctx.setScrollX(scrollX - diffLeft);
+        }
+        if (diffTop > 0) {
+            this.ctx.setScrollY(scrollY - diffTop);
+        } else if (diffBottom > 0) {
+            this.ctx.setScrollY(scrollY + diffBottom);
+        }
     }
     destroy() {
         if (this.timerX) {
