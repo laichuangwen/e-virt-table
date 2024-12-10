@@ -469,6 +469,8 @@ export default class Database {
                 ],
             });
         }
+        // 实时校验错误
+        this.getValidator(rowKey, key);
         // 重绘
         if (reDraw) {
             this.ctx.emit('draw');

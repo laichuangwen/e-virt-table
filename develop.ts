@@ -1,3 +1,4 @@
+import { Callback } from './docs/node_modules/undici-types/connector.d';
 import { Fixed } from './src/types';
 import EVirtTable from './src/EVirtTable';
 
@@ -233,10 +234,17 @@ const columns: any[] = [
         // readonly: false,
         fixed: 'right',
         // render: "sex",
-        rules: {
-            required: true,
-            message: '该项必填哦！',
-        },
+        rules: [
+            {
+                validator: (rule, value, callback) => {
+                    if (!value) {
+                        callback('该项必填哦！');
+                    } else {
+                        callback();
+                    }
+                },
+            },
+        ],
         renderHeader: (pEl, cell) => {
             const cellEl = document.createElement('div');
             cellEl.style.width = '100%';

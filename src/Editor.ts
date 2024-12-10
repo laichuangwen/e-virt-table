@@ -135,7 +135,6 @@ export default class Editor {
     private autoSize() {
         let scrollHeight = this.inputEl.scrollHeight;
         this.inputEl.style.height = 'auto'; // 重置高度
-        console.log(scrollHeight);
         let maxHeight = this.ctx.body.visibleHeight;
         if (scrollHeight > maxHeight) {
             scrollHeight = maxHeight;
@@ -149,14 +148,10 @@ export default class Editor {
         const bottomY = stageHeight - footer.height - SCROLLER_TRACK_SIZE;
         this.editorEl.style.bottom = `auto`;
         if (this.drawY + scrollHeight > bottomY || this.drawY < header.height) {
-            // this.editorEl.style.top = `${this.drawY - scrollHeight}px`;
-            console.log('bottom');
             this.editorEl.style.left = `${this.drawX}px`;
             this.editorEl.style.top = `auto`;
             this.editorEl.style.bottom = `${stageHeight - bottomY}px`;
         }
-        console.log('bottom', scrollHeight);
-
         this.inputEl.style.height = `${scrollHeight}px`; // 设置为内容的高度
     }
     private startEditByInput(cell: Cell) {
@@ -188,8 +183,6 @@ export default class Editor {
         if (value !== null) {
             this.inputEl.value = value;
         }
-        console.log('startEditByInput', this.drawY);
-
         this.inputEl.focus();
         const length = this.inputEl.value.length;
         this.inputEl.setSelectionRange(length, length);
