@@ -90,6 +90,10 @@ export default class Editor {
                 }
             }
         });
+        // adjustBoundaryPosition移动时需要赋值cellTarget
+        this.ctx.on('adjustBoundaryPosition', (cell) => {
+            this.cellTarget = cell;
+        });
     }
     private initTextEditor() {
         // 初始化文本编辑器
@@ -147,7 +151,7 @@ export default class Editor {
         const bottomY = stageHeight - footer.height - SCROLLER_TRACK_SIZE;
         this.editorEl.style.bottom = `auto`;
         if (this.drawY + scrollHeight > bottomY || this.drawY < header.height) {
-            this.editorEl.style.left = `${this.drawX}px`;
+            this.editorEl.style.left = `${this.drawX - 1}px`;
             this.editorEl.style.top = `auto`;
             this.editorEl.style.bottom = `${stageHeight - bottomY}px`;
         }
@@ -169,8 +173,8 @@ export default class Editor {
         if (height > maxHeight) {
             height = maxHeight;
         }
-        this.editorEl.style.left = `${drawX}px`;
-        this.editorEl.style.top = `${drawY}px`;
+        this.editorEl.style.left = `${drawX - 1}px`;
+        this.editorEl.style.top = `${drawY - 1}px`;
         this.editorEl.style.bottom = `auto`;
         this.editorEl.style.maxHeight = `${maxHeight}px`;
         if (editorType === 'text') {
@@ -277,15 +281,12 @@ export default class Editor {
         if (!this.enable) {
             return;
         }
-        if (this.cellTarget) {
-            this.doneEditByInput();
-            this.ctx.emit('doneEdit', this.cellTarget);
-            this.enable = false;
-            this.ctx.stageElement.focus();
-            this.ctx.editing = false;
-            this.cellTarget = null;
-            this.ctx.emit('draw');
-        }
+        this.doneEditByInput();
+        this.ctx.emit('doneEdit', this.cellTarget);
+        this.enable = false;
+        this.ctx.stageElement.focus();
+        this.ctx.editing = false;
+        this.ctx.emit('draw');
     }
     destroy() {
         this.editorEl?.remove();

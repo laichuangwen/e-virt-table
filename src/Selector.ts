@@ -715,6 +715,7 @@ export default class Selector {
             fixedLeftWidth,
             header,
             footer,
+            body,
             scrollX,
             scrollY,
             config: { SCROLLER_TRACK_SIZE, FOOTER_FIXED },
@@ -723,10 +724,12 @@ export default class Selector {
             return;
         }
         // 格子大于可视高度不给滚动
-        if (focusCell.height > stageHeight) {
+        if (
+            focusCell.height > body.visibleHeight ||
+            focusCell.width > body.visibleWidth - fixedLeftWidth - fixedRightWidth
+        ) {
             return;
         }
-
         let footerHeight = 0;
         if (FOOTER_FIXED) {
             footerHeight = footer.visibleHeight;
@@ -750,10 +753,6 @@ export default class Selector {
         const diffRight = focusCell.drawX + focusCell.width - (stageWidth - fixedRightWidth) + 1;
         const diffTop = header.height - focusCell.drawY;
         const diffBottom = focusCell.drawY + focusCell.height - (stageHeight - footerHeight - SCROLLER_TRACK_SIZE);
-        // 编辑状态不处理
-        if (this.ctx.editing) {
-            return;
-        }
         // fixed禁用左右横向移动
         if (diffRight > 0 && !focusCell.fixed) {
             this.ctx.setScrollX(scrollX + diffRight);
@@ -765,6 +764,8 @@ export default class Selector {
         } else if (diffBottom > 0) {
             this.ctx.setScrollY(scrollY + diffBottom);
         }
+        // fix:处理移动后编辑器，需要再点击一次,b编辑器那边有监听
+        this.ctx.emit('adjustBoundaryPosition', focusCell);
     }
     destroy() {
         if (this.timerX) {
