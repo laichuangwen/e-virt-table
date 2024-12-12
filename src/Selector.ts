@@ -734,18 +734,15 @@ export default class Selector {
         if (FOOTER_FIXED) {
             footerHeight = footer.visibleHeight;
         }
-        if (focusCell.fixed) {
+        const leftAdjust = focusCell.drawX < fixedLeftWidth;
+        const rightAdjust = focusCell.drawX + focusCell.width > stageWidth - fixedRightWidth;
+        const topAdjust = focusCell.drawY < header.height;
+        const bottomAdjust = focusCell.drawY + focusCell.height > stageHeight - footerHeight - SCROLLER_TRACK_SIZE;
+        if (focusCell.fixed && !(topAdjust || bottomAdjust)) {
             return;
         }
         // 如果在可视区域内就不处理
-        if (
-            !(
-                focusCell.drawX < fixedLeftWidth ||
-                focusCell.drawX + focusCell.width > stageWidth - fixedRightWidth ||
-                focusCell.drawY < this.ctx.header.height ||
-                focusCell.drawY + focusCell.height > stageHeight - footerHeight - SCROLLER_TRACK_SIZE
-            )
-        ) {
+        if (!(leftAdjust || rightAdjust || topAdjust || bottomAdjust)) {
             return;
         }
         // 加1补选中框的边框,且可以移动滚动，以为getCell是获取渲染的cell
