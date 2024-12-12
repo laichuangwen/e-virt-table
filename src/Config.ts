@@ -1,5 +1,6 @@
 import { IconType } from './Icons';
 import {
+    BeforeCellValueChangeMethod,
     CellEditorTypeMethod,
     CellHeaderStyleMethod,
     CellHoverIconMethod,
@@ -131,6 +132,7 @@ export default class Config {
     SPAN_METHOD?: SpanMethod;
     SELECTABLE_METHOD?: SelectableMethod;
     EXPAND_LAZY_METHOD?: ExpandLazyMethod;
+    BEFORE_CELL_VALUE_CHANGE_METHOD?: BeforeCellValueChangeMethod;
     constructor(config: Partial<Config>) {
         Object.assign(this, config);
     }

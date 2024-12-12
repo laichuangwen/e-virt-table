@@ -11,6 +11,7 @@ import type {
     Rules,
     SelectableMethod,
     EVirtTableOptions,
+    BeforeCellValueChangeMethod,
 } from './types';
 import { generateShortUUID } from './util';
 import { HistoryItemData } from './History';
@@ -398,7 +399,7 @@ export default class Database {
      * @param isEditor 是否是编辑器
      * @returns
      */
-    setItemValue(rowKey: string, key: string, value: any, history = false, reDraw = false, isEditor = false) {
+    setItemValue(rowKey: string, key: string, _value: any, history = false, reDraw = false, isEditor = false) {
         // 异常情况
         if (!this.rowKeyMap.has(rowKey)) {
             return {};
@@ -421,6 +422,20 @@ export default class Database {
         if (!this.originalDataMap.has(changeKey)) {
             this.originalDataMap.set(changeKey, oldValue);
         }
+        const originalValue = this.originalDataMap.get(changeKey);
+        // 设置改变值
+        const { BEFORE_CELL_VALUE_CHANGE_METHOD } = this.ctx.config;
+        let value = _value;
+        if (typeof BEFORE_CELL_VALUE_CHANGE_METHOD === 'function') {
+            const beforeCellValueChange: BeforeCellValueChangeMethod = BEFORE_CELL_VALUE_CHANGE_METHOD;
+            value = beforeCellValueChange({
+                rowKey,
+                key,
+                oldValue,
+                value: _value,
+                originalValue,
+            });
+        }
         this.changedDataMap.set(changeKey, value);
         item[key] = value;
         // 是否是否是编辑器进来的
@@ -438,7 +453,7 @@ export default class Database {
                 key,
                 oldValue,
                 value,
-                originalValue: this.originalDataMap.get(changeKey),
+                originalValue,
                 row,
             });
         }

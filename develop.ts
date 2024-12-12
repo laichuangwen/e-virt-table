@@ -545,6 +545,22 @@ const eVirtTable = new EVirtTable(canvas, {
                 },
             },
         ],
+        // 改变前需要篡改数据
+        BEFORE_CELL_VALUE_CHANGE_METHOD: (params) => {
+            const { value, key, oldValue } = params;
+            if (key === 'requiredQuantity') {
+                // 清空的
+                if ([null, '', undefined].includes(value)) {
+                    return value;
+                }
+                // 数字的
+                if (!isNaN(value) && Number(value) < 1000000000) {
+                    return Number(value);
+                }
+                return oldValue;
+            }
+            return value;
+        },
         EXPAND_LAZY_METHOD: (params: any) => {
             const i = params.row.id;
             return new Promise((resolve) => {
