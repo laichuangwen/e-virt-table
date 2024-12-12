@@ -112,6 +112,7 @@ export interface Column {
     renderFooter: Function;
     renderHeader: Function;
     formatter: FormatterMethod;
+    formatterFooter: FormatterMethod;
     overflowTooltipShow: boolean;
     overflowTooltipMaxWidth: number;
     overflowTooltipPlacement: OverflowTooltipPlacement;

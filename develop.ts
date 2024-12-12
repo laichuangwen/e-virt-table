@@ -224,6 +224,9 @@ const columns: any[] = [
         fixed: 'right',
         type: 'phone',
         readonly: false,
+        formatterFooter: ({ value }) => {
+            return `合：${value}`;
+        },
         width: 100,
     },
     {

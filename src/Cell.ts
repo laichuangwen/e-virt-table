@@ -20,6 +20,7 @@ import Context from './Context';
 import BaseCell from './BaseCell';
 export default class Cell extends BaseCell {
     formatter?: FormatterMethod;
+    formatterFooter?: FormatterMethod;
     hoverIconName: string = '';
     operation = false;
     align: Align;
@@ -109,6 +110,7 @@ export default class Cell extends BaseCell {
         this.renderFooter = column.renderFooter;
         this.hoverIconName = column.hoverIconName;
         this.formatter = column.formatter;
+        this.formatterFooter = column.formatterFooter;
         this.update();
     }
     getValidationMessage() {
@@ -507,6 +509,16 @@ export default class Cell extends BaseCell {
      */
     getText() {
         if (this.cellType === 'footer') {
+            if (typeof this.formatterFooter === 'function') {
+                const _text = this.formatterFooter({
+                    row: this.row,
+                    rowIndex: this.rowIndex,
+                    colIndex: this.colIndex,
+                    column: this.column,
+                    value: this.row[this.key],
+                });
+                return _text;
+            }
             return this.row[this.key];
         }
         // cellType === "body"
