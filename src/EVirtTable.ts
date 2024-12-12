@@ -258,6 +258,9 @@ export default class EVirtTable {
     scrollYTo(y: number) {
         this.ctx.setScrollY(y);
     }
+    setExpandRowKeys(keys: any[], expand = true) {
+        this.ctx.database.setExpandRowKeys(keys, expand);
+    }
     clearSelection() {
         this.ctx.database.clearSelection();
         this.ctx.emit('draw');

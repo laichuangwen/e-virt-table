@@ -213,6 +213,7 @@ export default class EventTable {
                         .then((res: any) => {
                             this.ctx.database.setExpandChildren(cell.rowKey, res);
                             this.ctx.database.expandLoading(cell.rowKey, false);
+                            this.ctx.emit('expandChange', this.ctx.database.getExpandRowKeys());
                         })
                         .catch((err: any) => {
                             this.ctx.database.expandLoading(cell.rowKey, false);
@@ -223,7 +224,7 @@ export default class EventTable {
             } else {
                 const isExpand = this.ctx.database.getIsExpand(cell.rowKey);
                 this.ctx.database.expandItem(cell.rowKey, !isExpand);
-                this.ctx.emit('expandChange');
+                this.ctx.emit('expandChange', this.ctx.database.getExpandRowKeys());
             }
         }
     }

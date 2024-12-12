@@ -247,6 +247,23 @@ export default class Database {
         this.clearBufferData(); // 清除缓存数据
         this.ctx.emit('draw');
     }
+    setExpandRowKeys(rowKeys: any[], expand = true) {
+        rowKeys.forEach((rowkey) => {
+            const row = this.rowKeyMap.get(rowkey);
+            row.expand = expand;
+        });
+        this.clearBufferData(); // 清除缓存数据
+        this.ctx.emit('draw');
+    }
+    getExpandRowKeys() {
+        let list: string[] = [];
+        this.rowKeyMap.forEach((row: any, key: string) => {
+            if (row.expand) {
+                list.push(key);
+            }
+        });
+        return list;
+    }
     expandAll(expand: boolean) {
         this.rowKeyMap.forEach((row: any) => {
             row.expand = expand;

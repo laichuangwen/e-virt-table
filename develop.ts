@@ -28,7 +28,7 @@ const columns: any[] = [
         // operation: true,
         slotName: 'emp_no',
         readonly: true,
-        // type: 'tree',
+        type: 'tree',
         fixed: 'left',
         sort: 4,
         // hide: () => 3 > 2,
@@ -519,6 +519,7 @@ const eVirtTable = new EVirtTable(canvas, {
         ],
         HEIGHT: 500,
         CHECKBOX_KEY: 'emp_name',
+        ROW_KEY: 'emp_no',
         CELL_HEIGHT: 36,
         SELECTOR_AREA_MIN_X: 0,
         ENABLE_AUTOFILL: true,
@@ -655,6 +656,7 @@ eVirtTable.on('overlayerChange', (container) => {
         overlayerEl.appendChild(typeDiv);
     });
 });
+
 const dateEl = document.getElementById('e-virt-table-date') as HTMLInputElement;
 if (dateEl) {
     eVirtTable.on('startEdit', (cell) => {
@@ -703,6 +705,12 @@ if (dateEl) {
         eVirtTable.setItemValueByEditor(rowKey, key, newValue, true, true);
     });
 }
+eVirtTable.on('expandChange', (rowkeys) => {
+    console.log('expandChange', rowkeys);
+});
+document.getElementById('expand')?.addEventListener('click', () => {
+    eVirtTable.setExpandRowKeys(['0-1-1']);
+});
 document.getElementById('instantiation')?.addEventListener('click', () => {
     console.log(eVirtTable);
 });
