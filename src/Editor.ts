@@ -90,10 +90,6 @@ export default class Editor {
                 }
             }
         });
-        // adjustBoundaryPosition移动时需要赋值cellTarget
-        this.ctx.on('adjustBoundaryPosition', (cell) => {
-            this.cellTarget = cell;
-        });
     }
     private initTextEditor() {
         // 初始化文本编辑器
