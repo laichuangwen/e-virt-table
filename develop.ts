@@ -550,7 +550,7 @@ const eVirtTable = new EVirtTable(canvas, {
             },
         ],
         // 改变前需要篡改数据
-        BEFORE_CELL_VALUE_CHANGE_METHOD: (params) => {
+        BEFORE_VALUE_CHANGE_METHOD: (params) => {
             const { value, key, oldValue } = params;
             if (key === 'requiredQuantity') {
                 // 清空的
@@ -599,7 +599,7 @@ const eVirtTable = new EVirtTable(canvas, {
                 };
             return {};
         },
-        CELL_READONLY_METHOD: (params: any) => {
+        BODY_CELL_READONLY_METHOD: (params: any) => {
             const { rowIndex, column } = params;
             if (rowIndex == 15 && ['emp_name221', 'emp_name2'].includes(column.key)) {
                 return true;

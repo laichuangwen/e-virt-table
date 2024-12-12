@@ -122,17 +122,17 @@ export default class Config {
     HEADER_CELL_STYLE_METHOD?: CellHeaderStyleMethod;
     BODY_CELL_STYLE_METHOD?: CellStyleMethod;
     FOOTER_CELL_STYLE_METHOD?: CellStyleMethod;
-    CELL_READONLY_METHOD?: CellReadonlyMethod;
-    CELL_FORMATTER_METHOD?: FormatterMethod;
-    CELL_RULES_METHOD?: CellRulesMethod;
-    CELL_TYPE_METHOD?: CellTypeMethod;
-    CELL_EDITOR_TYPE_METHOD?: CellEditorTypeMethod;
-    CELL_RENDER_METHOD?: CellRenderMethod;
-    CELL_HOVER_ICON_METHOD?: CellHoverIconMethod;
+    BODY_CELL_READONLY_METHOD?: CellReadonlyMethod;
+    BODY_CELL_FORMATTER_METHOD?: FormatterMethod;
+    BODY_CELL_RULES_METHOD?: CellRulesMethod;
+    BODY_CELL_TYPE_METHOD?: CellTypeMethod;
+    BODY_CELL_EDITOR_TYPE_METHOD?: CellEditorTypeMethod;
+    BODY_CELL_RENDER_METHOD?: CellRenderMethod;
+    BODY_CELL_HOVER_ICON_METHOD?: CellHoverIconMethod;
     SPAN_METHOD?: SpanMethod;
     SELECTABLE_METHOD?: SelectableMethod;
     EXPAND_LAZY_METHOD?: ExpandLazyMethod;
-    BEFORE_CELL_VALUE_CHANGE_METHOD?: BeforeCellValueChangeMethod;
+    BEFORE_VALUE_CHANGE_METHOD?: BeforeCellValueChangeMethod;
     constructor(config: Partial<Config>) {
         Object.assign(this, config);
     }

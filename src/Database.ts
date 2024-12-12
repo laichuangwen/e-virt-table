@@ -441,10 +441,10 @@ export default class Database {
         }
         const originalValue = this.originalDataMap.get(changeKey);
         // 设置改变值
-        const { BEFORE_CELL_VALUE_CHANGE_METHOD } = this.ctx.config;
+        const { BEFORE_VALUE_CHANGE_METHOD } = this.ctx.config;
         let value = _value;
-        if (typeof BEFORE_CELL_VALUE_CHANGE_METHOD === 'function') {
-            const beforeCellValueChange: BeforeCellValueChangeMethod = BEFORE_CELL_VALUE_CHANGE_METHOD;
+        if (typeof BEFORE_VALUE_CHANGE_METHOD === 'function') {
+            const beforeCellValueChange: BeforeCellValueChangeMethod = BEFORE_VALUE_CHANGE_METHOD;
             value = beforeCellValueChange({
                 rowKey,
                 key,
@@ -781,10 +781,10 @@ export default class Database {
         const colHeader = this.headerMap.get(key);
         const rowReadonly = row?.readonly;
         const colReadonly = colHeader?.readonly;
-        const { CELL_READONLY_METHOD } = this.ctx.config;
+        const { BODY_CELL_READONLY_METHOD } = this.ctx.config;
         // 自定义只读
-        if (typeof CELL_READONLY_METHOD === 'function') {
-            const cellReadonlyMethod: CellReadonlyMethod = CELL_READONLY_METHOD;
+        if (typeof BODY_CELL_READONLY_METHOD === 'function') {
+            const cellReadonlyMethod: CellReadonlyMethod = BODY_CELL_READONLY_METHOD;
             const readonly = cellReadonlyMethod({
                 row: row.item,
                 rowIndex: row.rowIndex,
@@ -805,12 +805,12 @@ export default class Database {
         return new Promise((resolve) => {
             const row = this.rowKeyMap.get(rowKey);
             const colHeader = this.headerMap.get(key);
-            const { CELL_RULES_METHOD } = this.ctx.config;
+            const { BODY_CELL_RULES_METHOD } = this.ctx.config;
             const column = colHeader.column;
             let rules = column.rules;
             // 自定义只读
-            if (typeof CELL_RULES_METHOD === 'function') {
-                const cellRulesMethod: CellRulesMethod = CELL_RULES_METHOD;
+            if (typeof BODY_CELL_RULES_METHOD === 'function') {
+                const cellRulesMethod: CellRulesMethod = BODY_CELL_RULES_METHOD;
                 const _rules = cellRulesMethod({
                     row: row.item,
                     rowIndex: row.rowIndex,

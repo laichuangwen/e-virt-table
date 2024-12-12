@@ -169,9 +169,9 @@ export default class Cell extends BaseCell {
     }
     updateType() {
         // 更改类型
-        const { CELL_TYPE_METHOD } = this.ctx.config;
-        if (typeof CELL_TYPE_METHOD === 'function') {
-            const cellTypeMethod: CellTypeMethod = CELL_TYPE_METHOD;
+        const { BODY_CELL_TYPE_METHOD } = this.ctx.config;
+        if (typeof BODY_CELL_TYPE_METHOD === 'function') {
+            const cellTypeMethod: CellTypeMethod = BODY_CELL_TYPE_METHOD;
             const type = cellTypeMethod({
                 row: this.row,
                 rowIndex: this.rowIndex,
@@ -187,9 +187,9 @@ export default class Cell extends BaseCell {
     }
     updateEditorType() {
         // 更改类型
-        const { CELL_EDITOR_TYPE_METHOD } = this.ctx.config;
-        if (typeof CELL_EDITOR_TYPE_METHOD === 'function') {
-            const cellEditorTypeMethod: CellEditorTypeMethod = CELL_EDITOR_TYPE_METHOD;
+        const { BODY_CELL_EDITOR_TYPE_METHOD } = this.ctx.config;
+        if (typeof BODY_CELL_EDITOR_TYPE_METHOD === 'function') {
+            const cellEditorTypeMethod: CellEditorTypeMethod = BODY_CELL_EDITOR_TYPE_METHOD;
             const editorType = cellEditorTypeMethod({
                 row: this.row,
                 rowIndex: this.rowIndex,
@@ -204,9 +204,9 @@ export default class Cell extends BaseCell {
         }
     }
     updateRender() {
-        const { CELL_RENDER_METHOD } = this.ctx.config;
-        if (typeof CELL_RENDER_METHOD === 'function') {
-            const cellRenderMethod: CellRenderMethod = CELL_RENDER_METHOD;
+        const { BODY_CELL_RENDER_METHOD } = this.ctx.config;
+        if (typeof BODY_CELL_RENDER_METHOD === 'function') {
+            const cellRenderMethod: CellRenderMethod = BODY_CELL_RENDER_METHOD;
             const render = cellRenderMethod({
                 row: this.row,
                 rowIndex: this.rowIndex,
@@ -434,9 +434,9 @@ export default class Cell extends BaseCell {
         }
     }
     private updateHoverIcon() {
-        const { CELL_HOVER_ICON_METHOD, CELL_HOVER_ICON_SIZE, CELL_PADDING } = this.ctx.config;
-        if (typeof CELL_HOVER_ICON_METHOD === 'function') {
-            const hoverIconMethod: CellHoverIconMethod = CELL_HOVER_ICON_METHOD;
+        const { BODY_CELL_HOVER_ICON_METHOD, CELL_HOVER_ICON_SIZE, CELL_PADDING } = this.ctx.config;
+        if (typeof BODY_CELL_HOVER_ICON_METHOD === 'function') {
+            const hoverIconMethod: CellHoverIconMethod = BODY_CELL_HOVER_ICON_METHOD;
             const hoverIconName = hoverIconMethod({
                 row: this.row,
                 rowIndex: this.rowIndex,
@@ -534,9 +534,9 @@ export default class Cell extends BaseCell {
             });
             return _text;
         }
-        const { CELL_FORMATTER_METHOD } = this.ctx.config;
-        if (typeof CELL_FORMATTER_METHOD === 'function') {
-            const formatterMethod: FormatterMethod = CELL_FORMATTER_METHOD;
+        const { BODY_CELL_FORMATTER_METHOD } = this.ctx.config;
+        if (typeof BODY_CELL_FORMATTER_METHOD === 'function') {
+            const formatterMethod: FormatterMethod = BODY_CELL_FORMATTER_METHOD;
             const _text = formatterMethod({
                 row: this.row,
                 rowIndex: this.rowIndex,
