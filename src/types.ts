@@ -7,8 +7,8 @@ export type EVirtTableOptions = {
     footerData: any[];
     columns: Column[];
     config?: ConfigType;
-    overlayerElement?: HTMLDivElement
-    editorElement?: HTMLDivElement
+    overlayerElement?: HTMLDivElement;
+    editorElement?: HTMLDivElement;
 };
 export type EventCallback = (...args: any[]) => void;
 export type ChangeItem = {
@@ -143,6 +143,14 @@ export type CellParams = {
     column: Column;
     value: any;
 };
+export type CellStyleParams = {
+    row: any;
+    rowIndex: number;
+    colIndex: number;
+    column: Column;
+    value: any;
+    isHasChanged?: boolean;
+};
 export type CellHeaderParams = {
     colIndex?: number;
     column?: Column;
@@ -170,7 +178,7 @@ export type SelectableParams = {
 export type ConfigType = Partial<Config>;
 export type FilterMethod = (rows: any[]) => any[];
 export type FormatterMethod = (params: CellParams) => string | void;
-export type CellStyleMethod = (params: CellParams) => CellStyleOptions | void;
+export type CellStyleMethod = (params: CellStyleParams) => CellStyleOptions | void;
 export type CellHeaderStyleMethod = (params: CellHeaderParams) => CellStyleOptions | void;
 export type CellReadonlyMethod = (params: CellParams) => boolean | void;
 export type CellRulesMethod = (params: CellParams) => Rules | void;

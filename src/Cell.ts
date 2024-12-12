@@ -47,6 +47,7 @@ export default class Cell extends BaseCell {
     displayText: string = '';
     visibleWidth = 0;
     visibleHeight = 0;
+    isHasChanged = false;
     drawX = 0;
     drawY = 0;
     drawCellBgColor = '';
@@ -123,6 +124,7 @@ export default class Cell extends BaseCell {
         this.drawY = this.getDrawY();
         this.drawTextX = this.drawX;
         this.drawTextY = this.drawY;
+        this.isHasChanged = this.ctx.database.isHasChangedData(this.rowKey, this.key);
         this.updateSpan();
         this.updateStyle();
         this.updateType();
@@ -357,6 +359,7 @@ export default class Cell extends BaseCell {
                     rowIndex: this.rowIndex,
                     colIndex: this.colIndex,
                     column: this.column,
+                    isHasChanged: this.isHasChanged,
                     value: this.getValue(),
                 }) || {};
             if (backgroundColor) {
@@ -369,7 +372,7 @@ export default class Cell extends BaseCell {
         }
         this.drawCellBgColor = bgColor;
         this.drawTextColor = textColor;
-        // const change = this.grid.database.isHasChangedData(cell.rowKey, cell.key);
+
         // if (change) {
         //   this.setBackgroundColor("red");
         // }
