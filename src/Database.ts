@@ -394,6 +394,9 @@ export default class Database {
         rowKeyList.forEach((rowKey) => {
             rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
         });
+        if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
+            this.ctx.emit('validateChangedData', this.getChangedData());
+        }
         this.ctx.emit('change', _changeList, rows);
         // 推历史记录
         if (history) {
@@ -464,6 +467,9 @@ export default class Database {
                 value,
                 row,
             };
+            if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
+                this.ctx.emit('validateChangedData', this.getChangedData());
+            }
             this.ctx.emit('change', [changeItem], [row]);
             this.ctx.emit('editChange', {
                 rowKey,
@@ -802,14 +808,7 @@ export default class Database {
         this.validationErrorMap.clear();
     }
     hasValidationError() {
-        let result = false;
-        for (const value of this.validationErrorMap.values()) {
-            if (Array.isArray(value) && value.length) {
-                result = true;
-                break;
-            }
-        }
-        return result;
+        return this.validationErrorMap.size !== 0;
     }
     getValidator(rowKey: string, key: string) {
         return new Promise((resolve) => {
@@ -861,8 +860,11 @@ export default class Database {
                 validator
                     .validate(data)
                     .then(() => {
-                        this.setValidationError(rowKey, key, []);
+                        this.clearValidationError(rowKey, key);
                         resolve([]);
+                        if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
+                            this.ctx.emit('validateChangedData', this.getChangedData());
+                        }
                     })
                     .catch(({ errors }) => {
                         const _errors = errors.map((error: any) => ({
@@ -910,6 +912,12 @@ export default class Database {
     setValidationError(rowKey: string, key: string, errors: any[]) {
         const _key = `${rowKey}\u200b_${key}`;
         this.validationErrorMap.set(_key, errors);
+    }
+    clearValidationError(rowKey: string, key: string) {
+        const _key = `${rowKey}\u200b_${key}`;
+        if (this.validationErrorMap.has(_key)) {
+            this.validationErrorMap.delete(_key);
+        }
     }
     getValidationError(rowKey: string, key: string) {
         const _key = `${rowKey}\u200b_${key}`;

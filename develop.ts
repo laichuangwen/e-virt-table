@@ -712,6 +712,9 @@ if (dateEl) {
 eVirtTable.on('expandChange', (rowkeys) => {
     console.log('expandChange', rowkeys);
 });
+eVirtTable.on('validateChangedData', (list) => {
+    console.log('validateChangedData', list);
+});
 document.getElementById('expand')?.addEventListener('click', () => {
     eVirtTable.setExpandRowKeys(['0-1-1']);
 });
