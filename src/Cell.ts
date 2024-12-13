@@ -581,6 +581,7 @@ export default class Cell extends BaseCell {
             top,
             width: `${this.visibleWidth}px`,
             height: `${this.visibleHeight}px`,
+            pointerEvents: 'initial',
         };
     }
     draw() {
@@ -606,7 +607,7 @@ export default class Cell extends BaseCell {
         this.drawAutofillPiont();
         this.drawErrorTip();
     }
-
+    
     /**
      * 根据列的索引获取列的宽度
      * @param {Number} colIndex

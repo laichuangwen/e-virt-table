@@ -693,6 +693,7 @@ if (dateEl) {
     });
     eVirtTable.on('change', (value) => {
         console.log(value);
+        console.log(eVirtTable.hasValidationError());
     });
     dateEl.addEventListener('change', function (event) {
         if (!event.target) {

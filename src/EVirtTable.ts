@@ -94,7 +94,7 @@ export default class EVirtTable {
             this.footer.draw();
             this.header.draw();
             this.scroller.draw();
-            // 忽略重绘覆盖层，解决按下事件时，重绘覆盖层导致事件无法触发，目前只在Selector中使用
+            // 忽略重绘覆盖层，解决按下事件时，重绘覆盖层导致事件无法触发，目前只在Selector中按下事件使用
             if (!ignoreOverlayer) {
                 this.overlayer.draw();
             }
@@ -233,6 +233,9 @@ export default class EVirtTable {
                 this.ctx.emit('draw');
             }
         });
+    }
+    hasValidationError() {
+        return this.ctx.database.hasValidationError();
     }
     scrollTo(x: number, y: number) {
         this.scrollXTo(x);

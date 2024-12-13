@@ -77,6 +77,14 @@ export default class Selector {
             this.isMultipleRow = false;
             this.click(e.shiftKey);
         });
+        this.ctx.on('mouseup', () => {
+            // mousedown销毁dom会导致click事件清除
+            // 加个setTimeout小延迟一下，使得editor cellClick 判断adjustPositioning正常
+            const timer = setTimeout(() => {
+                this.ctx.adjustPositioning = false;
+                clearTimeout(timer);
+            }, 0);
+        });
         this.ctx.on('cellHeaderHoverChange', (cell) => {
             if (this.ctx.mousedown) {
                 this.selectCols(cell);
@@ -420,7 +428,7 @@ export default class Selector {
                     this.ctx.selector.xArrCopy = this.ctx.selector.xArr.slice();
                     this.ctx.selector.yArrCopy = this.ctx.selector.yArr.slice();
                     this.ctx.emit('setCopy', this.ctx.selector);
-                    this.ctx.emit('drawView');
+                    this.ctx.emit('draw');
                 })
                 .catch((error) => console.error('复制失败：', error));
         } else {
@@ -465,7 +473,7 @@ export default class Selector {
             rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
         });
         this.ctx.emit('clearSelectedDataChange', changeList, rows);
-        this.ctx.emit('drawView');
+        this.ctx.emit('draw');
         return changeList;
     }
     private paste() {
@@ -538,7 +546,7 @@ export default class Selector {
                     this.ctx.emit('pasteChange', changeList, rows);
                     // 清除复制线
                     this.clearCopyLine();
-                    this.ctx.emit('drawView');
+                    this.ctx.emit('draw');
                 })
                 .catch((error) => {
                     console.error('获取剪贴板内容失败：', error);
@@ -602,7 +610,7 @@ export default class Selector {
         this.ctx.setFocusCell(cell);
         this.setSelector(xArr, yArr);
         this.adjustBoundaryPosition();
-        this.ctx.emit('drawView');
+        this.ctx.emit('draw');
     }
     private stopAdjustPosition() {
         this.adjustPositionX = '';
@@ -750,6 +758,7 @@ export default class Selector {
         const diffRight = focusCell.drawX + focusCell.width - (stageWidth - fixedRightWidth) + 1;
         const diffTop = header.height - focusCell.drawY;
         const diffBottom = focusCell.drawY + focusCell.height - (stageHeight - footerHeight - SCROLLER_TRACK_SIZE);
+        this.ctx.adjustPositioning = true;
         // fixed禁用左右横向移动
         if (diffRight > 0 && !focusCell.fixed) {
             this.ctx.setScrollX(scrollX + diffRight);
@@ -761,7 +770,7 @@ export default class Selector {
         } else if (diffBottom > 0) {
             this.ctx.setScrollY(scrollY + diffBottom);
         }
-        // fix:处理移动后编辑器，需要再点击一次,b编辑器那边有监听
+        // fix:处理移动后编辑器，需要再点击一次,编辑器那边有监听
         this.ctx.emit('adjustBoundaryPosition', focusCell);
     }
     destroy() {

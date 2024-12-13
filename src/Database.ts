@@ -801,6 +801,16 @@ export default class Database {
     clearValidate() {
         this.validationErrorMap.clear();
     }
+    hasValidationError() {
+        let result = false;
+        for (const value of this.validationErrorMap.values()) {
+            if (Array.isArray(value) && value.length) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
     getValidator(rowKey: string, key: string) {
         return new Promise((resolve) => {
             const row = this.rowKeyMap.get(rowKey);

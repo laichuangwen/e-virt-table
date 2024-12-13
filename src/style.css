@@ -28,7 +28,7 @@
     box-sizing: border-box;
     border: none;
     outline: none;
-    z-index: 10px;
+    z-index: 10;
 }
 .e-virt-table-editor {
     position: absolute;
@@ -47,11 +47,12 @@
     align-items: center;
 }
 .e-virt-table-overlayer {
-    position: 'absolute';
+    position: absolute;
     left: 0px;
     top: 0px;
     overflow: hidden;
-    z-index: 10;
+    z-index: 100;
+    pointer-events: none;
 }
 .e-virt-table-editor-textarea {
     width: 100%;

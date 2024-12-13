@@ -78,7 +78,15 @@ export default class Editor {
             // 除了上面的建其他都开始编辑
             this.startEdit();
         });
+        this.ctx.on('adjustBoundaryPosition', (cell) => {
+            // 调整位置会触发重绘可能会导致cellClick事件不能触发，调整位置时需要赋值cellTarget
+            this.cellTarget = cell;
+        });
         this.ctx.on('cellClick', (cell) => {
+            // 如果是调整边界位置，不进入编辑模式
+            if (this.ctx.adjustPositioning) {
+                return;
+            }
             if (cell.rowKey === this.cellTarget?.rowKey && cell.key === this.cellTarget?.key) {
                 this.startEdit();
             } else {
@@ -277,6 +285,7 @@ export default class Editor {
         if (!this.enable) {
             return;
         }
+
         this.doneEditByInput();
         this.ctx.emit('doneEdit', this.cellTarget);
         this.enable = false;

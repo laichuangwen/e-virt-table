@@ -89,6 +89,7 @@ export default class Context {
     scrollerFocus = false; // 滚动条focus中
     autofillMove = false; // 自动填充移动中
     selectorMove = false; // 选择器移动中
+    adjustPositioning = false; // 调整位置中
     editing = false; // 编辑中
     scrollY = 0;
     scrollX = 0;
