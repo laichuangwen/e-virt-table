@@ -75,7 +75,7 @@ export default class Database {
             }
             const { ROW_KEY = '', DEFAULT_EXPAND_ALL, CELL_HEIGHT, SELECTABLE_METHOD, CHECKBOX_KEY } = this.ctx.config;
             const _rowKey = item[ROW_KEY]; // 行唯一标识,否则就rowKey
-            const rowKey = _rowKey !== undefined && _rowKey !== null ? _rowKey : generateShortUUID();
+            const rowKey = _rowKey !== undefined && _rowKey !== null ? `${_rowKey}` : generateShortUUID();
             this.itemRowKeyMap.set(item, rowKey);
             const height = item._height || CELL_HEIGHT;
             const readonly = item._readonly;
@@ -529,6 +529,8 @@ export default class Database {
      * @returns
      */
     getRowDataItemForRowKey(rowKey: string) {
+        console.log(typeof rowKey);
+
         if (!this.rowKeyMap.has(rowKey)) {
             return {};
         }
@@ -732,7 +734,7 @@ export default class Database {
                     rowKey,
                     colKey,
                     originalValue,
-                    row: this.rowKeyMap.get(rowKey),
+                    row: this.ctx.database.getRowDataItemForRowKey(rowKey),
                     value,
                 });
             }
