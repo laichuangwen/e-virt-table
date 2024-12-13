@@ -394,9 +394,12 @@ export default class Database {
         rowKeyList.forEach((rowKey) => {
             rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
         });
-        if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
-            this.ctx.emit('validateChangedData', this.getChangedData());
-        }
+        const promsieValidators = _changeList.map(({ rowKey, key }) => this.getValidator(rowKey, key));
+        Promise.all(promsieValidators).then(() => {
+            if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
+                this.ctx.emit('validateChangedData', this.getChangedData());
+            }
+        });
         this.ctx.emit('change', _changeList, rows);
         // 推历史记录
         if (history) {
@@ -467,9 +470,12 @@ export default class Database {
                 value,
                 row,
             };
-            if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
-                this.ctx.emit('validateChangedData', this.getChangedData());
-            }
+            // 实时校验错误
+            this.getValidator(rowKey, key).then(() => {
+                if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
+                    this.ctx.emit('validateChangedData', this.getChangedData());
+                }
+            });
             this.ctx.emit('change', [changeItem], [row]);
             this.ctx.emit('editChange', {
                 rowKey,
@@ -507,8 +513,7 @@ export default class Database {
                 ],
             });
         }
-        // 实时校验错误
-        this.getValidator(rowKey, key);
+
         // 重绘
         if (reDraw) {
             this.ctx.emit('draw');
@@ -862,9 +867,6 @@ export default class Database {
                     .then(() => {
                         this.clearValidationError(rowKey, key);
                         resolve([]);
-                        if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
-                            this.ctx.emit('validateChangedData', this.getChangedData());
-                        }
                     })
                     .catch(({ errors }) => {
                         const _errors = errors.map((error: any) => ({
