@@ -265,7 +265,11 @@ export default class Context {
     setScrollY(y: number): void {
         // 边界处理
         let scrollY = Math.floor(y);
-        const scrollMaxY = this.body.height - this.body.visibleHeight - this.footer.height;
+        let footerHeight = 0;
+        if (!this.config.FOOTER_FIXED) {
+            footerHeight = this.footer.height;
+        }
+        const scrollMaxY = this.body.height - this.body.visibleHeight + footerHeight;
         if (scrollY < 0) {
             scrollY = 0;
         } else if (scrollY > scrollMaxY) {
