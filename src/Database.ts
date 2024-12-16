@@ -529,8 +529,6 @@ export default class Database {
      * @returns
      */
     getRowDataItemForRowKey(rowKey: string) {
-        console.log(typeof rowKey);
-
         if (!this.rowKeyMap.has(rowKey)) {
             return {};
         }
