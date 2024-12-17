@@ -749,17 +749,17 @@ export default class Selector {
         let _scrollY = scrollY;
         // fixed禁用左右横向移动
         if (diffRight > 0 && !focusCell.fixed) {
-            _scrollX = scrollX + diffRight;
+            _scrollX = Math.floor(scrollX + diffRight);
         } else if (diffLeft > 0 && !focusCell.fixed) {
-            _scrollX = scrollX - diffLeft;
+            _scrollX = Math.floor(scrollX - diffLeft);
         }
         if (diffTop > 0) {
-            _scrollY = scrollY - diffTop;
+            _scrollY = Math.floor(scrollY - diffTop);
         } else if (diffBottom > 0) {
-            _scrollY = scrollY + diffBottom;
+            _scrollY = Math.floor(scrollY + diffBottom);
         }
-        // >1是因为上面为了可移动加1，所以这里要大于1
-        if (Math.abs(scrollX - _scrollX) > 1 || Math.abs(scrollY - _scrollY) > 1) {
+        // >1是因为上面为了可移动加1，所以这里要大于2(保险一点)
+        if (Math.abs(scrollX - _scrollX) > 2 || Math.abs(scrollY - _scrollY) > 2) {
             this.ctx.adjustPositioning = true;
             this.ctx.setScroll(_scrollX, _scrollY);
             // fix:处理移动后编辑器，需要再点击一次,编辑器那边有监听
