@@ -731,47 +731,40 @@ export default class Selector {
         if (!focusCell) {
             return;
         }
-        // 格子大于可视高度不给滚动
-        if (
-            focusCell.height > body.visibleHeight ||
-            focusCell.width > body.visibleWidth - fixedLeftWidth - fixedRightWidth
-        ) {
-            return;
+        // 加1补选中框的边框,且可以移动滚动，以为getCell是获取渲染的cell
+        const diffLeft = fixedLeftWidth - focusCell.drawX + 1;
+        const diffRight = focusCell.drawX + focusCell.width - (stageWidth - fixedRightWidth) + 1;
+        const diffTop = header.height - focusCell.drawY;
+        // 格子大于可视高度就取可视高度，防止上下跳动
+        let cellheight = focusCell.height;
+        if (cellheight > body.visibleHeight) {
+            cellheight = body.visibleHeight;
         }
         let footerHeight = 0;
         if (FOOTER_FIXED) {
             footerHeight = footer.visibleHeight;
         }
-        const leftAdjust = focusCell.drawX < fixedLeftWidth;
-        const rightAdjust = focusCell.drawX + focusCell.width > stageWidth - fixedRightWidth;
-        const topAdjust = focusCell.drawY < header.height;
-        const bottomAdjust = focusCell.drawY + focusCell.height > stageHeight - footerHeight - SCROLLER_TRACK_SIZE;
-        if (focusCell.fixed && !(topAdjust || bottomAdjust)) {
-            return;
-        }
-        // 如果在可视区域内就不处理
-        if (!(leftAdjust || rightAdjust || topAdjust || bottomAdjust)) {
-            return;
-        }
-        // 加1补选中框的边框,且可以移动滚动，以为getCell是获取渲染的cell
-        const diffLeft = fixedLeftWidth - focusCell.drawX + 1;
-        const diffRight = focusCell.drawX + focusCell.width - (stageWidth - fixedRightWidth) + 1;
-        const diffTop = header.height - focusCell.drawY;
-        const diffBottom = focusCell.drawY + focusCell.height - (stageHeight - footerHeight - SCROLLER_TRACK_SIZE);
-        this.ctx.adjustPositioning = true;
+        const diffBottom = focusCell.drawY + cellheight - (stageHeight - footerHeight - SCROLLER_TRACK_SIZE);
+        let _scrollX = scrollX;
+        let _scrollY = scrollY;
         // fixed禁用左右横向移动
         if (diffRight > 0 && !focusCell.fixed) {
-            this.ctx.setScrollX(scrollX + diffRight);
+            _scrollX = scrollX + diffRight;
         } else if (diffLeft > 0 && !focusCell.fixed) {
-            this.ctx.setScrollX(scrollX - diffLeft);
+            _scrollX = scrollX - diffLeft;
         }
         if (diffTop > 0) {
-            this.ctx.setScrollY(scrollY - diffTop);
+            _scrollY = scrollY - diffTop;
         } else if (diffBottom > 0) {
-            this.ctx.setScrollY(scrollY + diffBottom);
+            _scrollY = scrollY + diffBottom;
         }
-        // fix:处理移动后编辑器，需要再点击一次,编辑器那边有监听
-        this.ctx.emit('adjustBoundaryPosition', focusCell);
+        // >1是因为上面为了可移动加1，所以这里要大于1
+        if (Math.abs(scrollX - _scrollX) > 1 || Math.abs(scrollY - _scrollY) > 1) {
+            this.ctx.adjustPositioning = true;
+            this.ctx.setScroll(_scrollX, _scrollY);
+            // fix:处理移动后编辑器，需要再点击一次,编辑器那边有监听
+            this.ctx.emit('adjustBoundaryPosition', focusCell);
+        }
     }
     destroy() {
         if (this.timerX) {
