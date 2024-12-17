@@ -111,7 +111,7 @@
                 ENABLE_SELECTOR: true,
                 ENABLE_AUTOFILL: true,
                 ENABLE_HISTORY: true,
-                CELL_RULES_METHOD: ({ rowIndex, column }) => {
+                BODY_CELL_RULES_METHOD: ({ rowIndex, column }) => {
                     // email的rowIndex= 0,1不校验不必填
                     if (column.key === 'email' && [0, 1].includes(rowIndex)) {
                         return [

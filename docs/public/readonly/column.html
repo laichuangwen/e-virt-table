@@ -6,7 +6,7 @@
     <title>e-virt-table</title>
   </head>
   <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
-  <body style="margin: 0px">
+  <body>
     <div id="e-virt-table"></div>
   </body>
   <script>
@@ -80,6 +80,9 @@
       config:{
         ENABLE_SELECTOR: true,
       }
+    });
+    grid.on('change', (data) => {
+      console.log(data);
     });
   </script>
 </html>

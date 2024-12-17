@@ -7,8 +7,8 @@
 | 参数            | 说明     | 类型    | 可选值 | 默认值 |
 | --------------- | -------- | ------- | ------ | ------ |
 | ENABLE_KEYBOARD | 启用键盘 | boolean | —      | true   |
-| ENABLE_COPY | 启用复制 | boolean | —      | true   |
-| ENABLE_PASTER | 启用粘贴 | boolean | —      | true   |
+| ENABLE_COPY     | 启用复制 | boolean | —      | true   |
+| ENABLE_PASTER   | 启用粘贴 | boolean | —      | true   |
 
 ## 支持操作
 
@@ -23,6 +23,7 @@
 | 左移选中单元格              | `←`                              | `←`                       |
 | 右移选中单元格              | `→`                              | `→`                       |
 | 开始编辑或完成编辑          | `Enter`                          | `Enter`                   |
+| 输入框换行                        | `Ctrl+Enter`                     | `Command+Enter`           |
 | 撤销操作                    | `Ctrl + Z`                       | `Command + Z`             |
 | 恢复操作                    | `Ctrl + Y` 或 `Ctrl + Shift + Z` | `Command + Shift + Z`     |
 

@@ -6,7 +6,7 @@
         <title>e-virt-table</title>
     </head>
     <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
-    <body style="margin: 0px">
+    <body>
         <div id="e-virt-table"></div>
     </body>
     <script>
@@ -18,6 +18,7 @@
                 city: '普陀区',
                 address: '上海市普陀区金沙江路 1518 弄',
                 zip: 200333,
+                age: 32,
             },
             {
                 date: '2016-05-04',
@@ -26,6 +27,7 @@
                 city: '普陀区',
                 address: '上海市普陀区金沙江路 1517 弄',
                 zip: 200333,
+                age: 32,
             },
             {
                 date: '2016-05-01',
@@ -34,6 +36,7 @@
                 city: '普陀区',
                 address: '上海市普陀区金沙江路 1519 弄',
                 zip: 200333,
+                age: 32,
             },
             {
                 date: '2016-05-03',
@@ -42,16 +45,14 @@
                 city: '普陀区',
                 address: '上海市普陀区金沙江路 1516 弄',
                 zip: 200333,
+                age: 32,
             },
         ];
         let columns = [
             {
-                title: '日期',
-                key: 'date',
-            },
-            {
                 title: '姓名',
                 key: 'name',
+                readonly: true,
             },
             {
                 title: '省份',
@@ -70,6 +71,10 @@
                 title: '邮编',
                 key: 'zip',
             },
+            {
+                title: '年龄',
+                key: 'age',
+            },
         ];
         const target = document.getElementById('e-virt-table');
         const grid = new EVirtTable(target, {
@@ -77,7 +82,15 @@
             columns,
             config: {
                 ENABLE_SELECTOR: true,
-                ENABLE_SELECTOR_SINGLE: true,
+                BEFORE_VALUE_CHANGE_METHOD: ({ value, oldValue }) => {
+                    if (value === null) {
+                        return;
+                    }
+                    if (/^-?\d+(\.\d+)?$/.test(value)) {
+                        return Number(value);
+                    }
+                    return oldValue;
+                },
             },
         });
     </script>

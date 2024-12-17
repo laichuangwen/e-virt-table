@@ -57,3 +57,18 @@
 
 <iframe src="/autofill/row.html" style="min-height:220px"></iframe>
 :::
+
+## 限定范围
+-   `SELECTOR_AREA_MIN_X` 选择器X最小范围
+-   `SELECTOR_AREA_MAX_X_OFFSET` 选择器X最大范围colMax - offset
+-   `SELECTOR_AREA_MAX_X` 选择器X最大范围,0默认最大colMax
+-   `SELECTOR_AREA_MIN_Y` 选择器Y最小范围
+-   `SELECTOR_AREA_MAX_Y` 选择器Y最大范围,0默认rowMax
+-   `SELECTOR_AREA_MAX_Y_OFFSET` 选择器Y最大范围,0默认rowMax- offset
+
+下面例子限制可编辑区域，注意目前只能支持一个区域，不能跨域区域
+
+::: demo
+
+<iframe src="/autofill/scope.html" style="min-height:220px"></iframe>
+:::

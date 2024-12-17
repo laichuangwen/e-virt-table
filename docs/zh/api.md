@@ -72,7 +72,7 @@
 | TOOLTIP_CUSTOM | 自定义提示 `建议自己实现，内部会覆盖层遮住` | boolean | — | true |
 | CONTEXT_MENU | 自定义右键菜单 | array | — | `CONTEXT_MENU_ITEM` |
 | BODY_CELL_STYLE_METHOD | 自定义单元格样式 | `Function({row, column, rowIndex, colIndex,value})` | — | — |
-| CELL_READONLY_METHOD | 自定义只读 | `Function({row, column, rowIndex, colIndex,value})` | — | — |
+| BODY_CELL_READONLY_METHOD | 自定义只读 | `Function({row, column, rowIndex, colIndex,value})` | — | — |
 | CELL_RULE_METHOD | 自定义校验规则 | `Function({row, column, rowIndex, colIndex,value})` | — | — |
 | CELL_TYPE_METHOD | 自定义类型 | `Function({row, column, rowIndex, colIndex,value})` | — | — |
 | CELL_RENDER_METHOD | 自定义单元格渲染 | `Function({row, column, rowIndex, colIndex,headIndex,visibleRows,rows})` | — | — |

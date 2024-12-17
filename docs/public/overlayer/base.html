@@ -120,6 +120,7 @@
         }
         const { columns, data } = gcData(1000, 1000);
         const target = document.getElementById('e-virt-table');
+        const overlayerEl = document.getElementById('e-virt-table-overlayer');
         const grid = new EVirtTable(target, {
             data,
             columns,
@@ -134,8 +135,8 @@
                 ENABLE_OFFSET_HEIGHT: true,
                 OFFSET_HEIGHT: 24,
             },
+            overlayerElement: overlayerEl,
         });
-        const overlayerEl = document.getElementById('e-virt-table-overlayer');
         grid.on('overlayerChange', (container) => {
             if (!overlayerEl) {
                 return;

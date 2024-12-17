@@ -12,10 +12,17 @@
 
 | 参数 | 说明 | 类型 | 可选值 | 默认值 |
 | --- | --- | --- | --- | --- |
-| CELL_RULES_METHOD | 自定义校验规则 | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean` | — | — |
+| BODY_CELL_RULES_METHOD| 自定义校验规则 | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean` | — | — |
+
+## Events
+
+| 事件名称  | 说明         | 回调参数 |
+| --------- | ------------ | -------- |
+| validateChangedData  | 更改值后全部校验通过后的回调 | 当前改变值数组   |
 
 ## 校验器
-
+- 注意validateChangedData事件，全部校验通过后才会回调更改的结果
+  
 ::: demo
 
 <iframe src="/validator/base.html" style="min-height:250px"></iframe>
@@ -23,7 +30,7 @@
 
 ## 自定义校验器
 
--   `CELL_RULES_METHOD` 可自定义 cell 校验规则
+-   `BODY_CELL_RULES_METHOD` 可自定义 cell 校验规则
 -   email的rowIndex= 0,1不校验不必填
 
 ::: demo
