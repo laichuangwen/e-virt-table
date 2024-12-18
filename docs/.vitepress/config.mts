@@ -35,7 +35,7 @@ export default defineConfig({
                         items: [
                             { text: '虚拟滚动', link: '/zh/examples/virtualScroll' },
                             { text: '滚动条', link: '/zh/examples/scroller' },
-                        
+
                             { text: '宽度', link: '/zh/examples/width' },
                             { text: '高度', link: '/zh/examples/height' },
                             { text: '固定', link: '/zh/examples/fixed' },
@@ -58,6 +58,23 @@ export default defineConfig({
                             { text: '键盘事件', link: '/zh/examples/keyboard' },
                             { text: '历史回退', link: '/zh/examples/history' },
                             { text: '插槽（覆盖层）', link: '/zh/examples/overlayer' },
+                        ],
+                    },
+                    {
+                        text: '框架例子',
+                        items: [
+                            {
+                                text: 'Vue2',
+                                link: '/zh/framework/vue2',
+                            },
+                            {
+                                text: 'Vue3',
+                                link: '/zh/framework/vue3',
+                            },
+                            {
+                                text: 'React',
+                                link: '/zh/framework/react',
+                            },
                         ],
                     },
                 ],

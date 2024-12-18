@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table vue2示例</title>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+        <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <div ref="eVirtTableRef"></div>
+        </div>
+
+        <script>
+            new Vue({
+                el: '#app',
+                data() {
+                    return {
+                        show: true,
+                    };
+                },
+                mounted() {
+                    const columns = [
+                        { title: 'Name', key: 'name' },
+                        { title: 'Age', key: 'age' },
+                        { title: 'Address', key: 'address' },
+                    ];
+                    const data = [
+                        { name: 'John Brown', age: 18, address: 'New York No. 1 Lake Park' },
+                        { name: 'Jim Green', age: 24, address: 'London No. 1 Lake Park' },
+                        { name: 'Joe Black', age: 30, address: 'Sydney No. 1 Lake Park' },
+                        { name: 'Jon Snow', age: 26, address: 'Ottawa No. 1 Lake Park' },
+                    ];
+                    const eVirtTable = new EVirtTable(this.$refs.eVirtTableRef, {
+                        columns,
+                        data,
+                        config: {
+                            ENABLE_SELECTOR: true,
+                        },
+                    });
+                },
+            });
+        </script>
+    </body>
+</html>

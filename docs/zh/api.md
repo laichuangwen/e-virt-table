@@ -8,18 +8,25 @@
 | --- | --- | --- | --- | --- |
 | CSS_PREFIX | CSS 类名前缀 | string | — | e-virt-table |
 | ROW_KEY | 行的唯一标识键 | string | — | — |
-| HEAD_FONT | 表头字体 | string | — | — |
-| FONT | 单元格字体 | string | — | — |
+| HEAD_FONT | 表头字体 | string | — | 12px normal Arial |
+| BODY_FONT | 单元格字体 | string | — | 12px normal Arial |
 | BORDER_COLOR | 区域边框颜色 | string | — | #e1e6eb |
 | WIDTH | 宽度，高度为 0 表示自适应，根据 OFFSET_HEIGHT 调整 | number | — | 0 |
+| RESIZE_MIN_WIDTH | 最小可调整宽度 | number | — | 40 |
 | HEIGHT | 高度，高度为 0 表示自适应，根据 OFFSET_HEIGHT 调整 | number | — | 0 |
 | EMPTY_BODY_HEIGHT | 数据为空时表格体的高度 | number | — | 120 |
+| EMPTY_CUSTOM_STYLE | 自定义空数据样式 | CSSStyleDeclaration | — | — |
+| EMPTY_TEXT | 空数据文本 | string | — | 暂无数据 |
 | MAX_HEIGHT | 最大高度，高度为 0 表示自适应，根据 OFFSET_HEIGHT 调整 | number | — | 0 |
 | BORDER_RADIUS | 区域边框圆角 | number | — | 8 |
+| ENABLE_OFFSET_HEIGHT | 启动固定底部（不建议使用） | boolean | — | false |
 | OFFSET_HEIGHT | 距离底部的偏移量，0 表示根据窗口自动计算 | number | — | 0 |
-| HEADER_HEIGHT | 表头行高 | number | — | 32 |
+| HEADER_HEIGHT | 表头行高 | number | — | 36 |
 | HEADER_BG_COLOR | 表头背景色 | string | — | #F8FAFF |
+| BODY_BG_COLOR | body 背景色 | string | — | #F8FAFF |
 | HEADER_TEXT_COLOR | 表头文本颜色 | string | — | #1D2129 |
+| LOADING_ICON_SVG | 加载 svg 图标 | string | — | — |
+| LOADING_ICON_COLOR | 加载 svg 图标颜色 | string | — | — |
 | EXPAND_ICON_SVG | 树形展开图标 | string | — | — |
 | SHRINK_ICON_SVG | 树形收缩图标 | string | — | — |
 | EXPAND_ICON_COLOR | 展开图标颜色 | string | — | #4E5969 |
@@ -52,6 +59,12 @@
 | FOOTER_DATA | 表格 footer 数据 | array | —— | [] |
 | ENABLE_SELECTOR | 启用选择器 | boolean | — | true |
 | ENABLE_SELECTOR_SINGLE | 启用选择器-选择器单选 | boolean | — | false |
+| ENABLE_EDIT_CLICK_SELECTOR | 启用点击选择器编辑 | boolean | — | true |
+| SELECTOR_AREA_MIN_X | 选择器 X 最小范围 | number | — | 0 |
+| SELECTOR_AREA_MAX_X_OFFSET | 选择器 X 最大范围 colMax - offset | number | — | 0 |
+| SELECTOR_AREA_MAX_X | 选择器 X 最大范围,0 默认最大 colMax | number | — | 0 |
+| SELECTOR_AREA_MIN_Y | 选择器 Y 最大范围,0 默认 rowMax | number | — | 0 |
+| SELECTOR_AREA_MAX_Y_OFFSET | 选择器 Y 最大范围,0 默认 rowMax-offset | number | — | 0 |
 | ENABLE_SELECTOR_SPAN_COL | 启用选择器-批量跨列选择 | boolean | — | true |
 | ENABLE_SELECTOR_SPAN_ROW | 启用选择器-批量跨行选择 | boolean | — | true |
 | ENABLE_SELECTOR_ALL_ROWS | 启用选择器-批量选中列 | boolean | — | true |
@@ -59,35 +72,50 @@
 | ENABLE_AUTOFILL | 启用填充 | boolean | — | true |
 | ENABLE_CONTEXT_MENU | 启用右键 | boolean | — | true |
 | ENABLE_COPY | 启用复制 | boolean | — | true |
+| ENABLE_PASTER | 启用粘贴 | boolean | — | true |
+| ENABLE_RESIZE_ROW | 启用调整行高 | boolean | — | true |
 | ENABLE_RESIZE_COLUMN | 启用调整列宽 | boolean | — | true |
+| RESIZE_ROW_LINE_COLOR | 行调整线颜色 | string | — | #e1e6eb |
+| RESIZE_COLUMN_LINE_COLOR | 列调整线颜色 | string | — | #e1e6eb |
+| RESIZE_ROW_MIN_HEIGHT | 最小调整行高 | number | — | 36 |
+| RESIZE_COLUMN_MIN_WIDTH | 最小调整列宽 | number | — | 40 |
 | ENABLE_KEYBOARD | 启用键盘 | boolean | — | true |
 | ENABLE_HISTORY | 启用历史记录，可回退 | boolean | — | true |
 | HISTORY_NUM | 启用历史记录数量 | number | — | 50 |
-| HIGHLIGHT_HOVER_ROW | hover 高亮当前行 | boolean | — | true |
+| HIGHLIGHT_HOVER_ROW | hover 高亮当前行 | boolean | — | false |
 | HIGHLIGHT_HOVER_ROW_COLOR | hover 高亮当前行颜色 | string | — | `rgba(186,203,231,0.1)` |
 | HIGHLIGHT_SELECTED_ROW | 高亮选中当前行 | boolean | — | true |
 | HIGHLIGHT_SELECTED_ROW_COLOR | 高亮当前行颜色 | string | — | `rgba(82,146,247,0.1)` |
-| TOOLTIP_BG_COLOR | 提示背景颜色 | string | — | #000 |
+| TOOLTIP_BG_COLOR | 提示背景颜色 | string | — | #303133 |
 | TOOLTIP_TEXT_COLOR | 提示文本颜色 | string | — | #fff |
-| TOOLTIP_CUSTOM | 自定义提示 `建议自己实现，内部会覆盖层遮住` | boolean | — | true |
+| TOOLTIP_ZINDEX | 提示文本颜色 | number | — | 3000 |
+| TOOLTIP_CUSTOM_STYLE | 提示样式 | CSSStyleDeclaration | — | true |
 | CONTEXT_MENU | 自定义右键菜单 | array | — | `CONTEXT_MENU_ITEM` |
-| BODY_CELL_STYLE_METHOD | 自定义单元格样式 | `Function({row, column, rowIndex, colIndex,value})` | — | — |
-| BODY_CELL_READONLY_METHOD | 自定义只读 | `Function({row, column, rowIndex, colIndex,value})` | — | — |
-| CELL_RULE_METHOD | 自定义校验规则 | `Function({row, column, rowIndex, colIndex,value})` | — | — |
-| CELL_TYPE_METHOD | 自定义类型 | `Function({row, column, rowIndex, colIndex,value})` | — | — |
-| CELL_RENDER_METHOD | 自定义单元格渲染 | `Function({row, column, rowIndex, colIndex,headIndex,visibleRows,rows})` | — | — |
-| SPAN_METHOD | 自定义跨列/行渲染 | `Function({row, column, rowIndex, colIndex,value})` | — | — |
-| SELECTABLE_METHOD | 自定义选择禁用 | `Function({row, column, rowIndex, colIndex,value})` | — | — |
+| HEADER_CELL_STYLE_METHOD | 自定义表头单元格样式 | ^[Function]`({column,colIndex})` | — | — |
+| BODY_CELL_STYLE_METHOD | 自定义 body 单元格样式 | ^[Function]`({row, column, rowIndex, colIndex,value})` | — | — |
+| FOOTER_CELL_STYLE_METHOD | 自定 footer 义单元格样式 | ^[Function]`({row, column, rowIndex, colIndex,value})` | — | — |
+| BODY_CELL_READONLY_METHOD | 自定义只读 | ^[Function]`({row, column, rowIndex, colIndex,value})` | — | — |
+| BODY_CELL_FORMATTER_METHOD | 自定义格式化 | ^[Function]`({row, column, rowIndex, colIndex,value})` | — | — |
+| BODY_CELL_RULES_METHOD | 自定义校验规则 | ^[Function]`({row, column, rowIndex, colIndex,value})` | — | — |
+| BODY_CELL_TYPE_METHOD | 自定义类型 | ^[Function]`({row, column, rowIndex, colIndex,value})` | — | — |
+| BODY_CELL_EDITOR_TYPE_METHOD | 自定义编辑器类型 | ^[Function]`({row, column, rowIndex, colIndex,value})` | — | — |
+| BODY_CELL_RENDER_METHOD | 自定义单元格渲染 | ^[Function]`({row, column, rowIndex, colIndex,headIndex,visibleRows,rows})` | — | — |
+| SPAN_METHOD | 自定义跨列/行渲染 | ^[Function]`({row, column, rowIndex, colIndex,value,visibleLeafColumns,headIndex,headPosition,visibleRows,rows})` | — | — |
+| SELECTABLE_METHOD | 自定义选择禁用 | ^[Function]`({row, rowIndex})` | — | — |
+| EXPAND_LAZY_METHOD | tree 懒加载展开 | ^[Function]`({row, column, rowIndex, colIndex,value})` | — | — |
+| BEFORE_VALUE_CHANGE_METHOD | 数值改变前回调 | ^[Function]`({rowKey, key, oldValue, originalValue,value})` | — | — |
 
 ## Events
 
 | 事件名称 | 说明 | 回调参数 |
 | --- | --- | --- |
-| change | `最重要的方法`，数据改变回调包括复制填充等 | `{rowKey,key,value,row}` |
+| change | `最重要的方法之一`，数据改变回调包括复制填充等 | `{rowKey,key,value,row}` |
+| validateChangedData | `最重要的方法之一`，数据改变回调包括复制填充等，只有数据全部通过校验才会回调 | `{rowKey,key,value,row}` |
 | autofillChange | 填充回调 | `{rowKey,key,value,row}` |
 | editChange | 编辑回调 | `{rowKey,key,value,row}` |
 | iterationChange | 每改变一个值的回调 | `{rowKey,key,value,row,oldValue,originalValue}` |
-| resizeColumnChange | 表头调整回调 | columns |
+| resizeColumnChange | 表头调整回调 | `{colIndex,key,oldWidth, width, column, columns}` |
+| resizeRowChange | 行调整回调 | `{rowIndex,oldHeight,height,rowKey, row, data}` |
 | emptyChange | 空数据回调 | `{isEmpty,headerHeight,bodyHeight,width,height}` |
 | expandChange | 展开回调 | — |
 | toggleRowSelection | 行选择回调 | — |
@@ -99,37 +127,65 @@
 | onScrollX | 横向滚动条回调 | scrollX |
 | onScrollY | 纵向滚动条回调 | scrollY |
 | clearSelectedDataChange | 清除数据回调 | changeList |
-| overlayerTooltipChange | 提示层改变回调，用字自定义提示 | `cell,text,show ` |
+| cellMouseenter | 格子移入回调 | — |
+| cellMousedown | 格子按下回调 | — |
+| cellContextMenuClick | 右键菜单按下回调 | — |
+| cellHeaderMousedown | 表头格子按下回调 | — |
+| cellClick | body格子按下回调 | — |
+| cellHoverChange | 格子hover回调 | — |
+| cellHeaderHoverChange | 表头格子hover回调 | — |
+| mouseup | mouseup回调 | — |
+| click | click回调 | — |
+| dblclick | dblclick回调 | — |
+| contextMenu | contextMenu回调 | — |
+| resize | resize回调 | — |
+| mousedown | mousedown回调 | — |
+| mousemove | mousemove回调 | — |
+| keydown | keydown回调 | — |
 
 ## Methods
 
-| 方法名称              | 说明                     | 参数                             |
-| --------------------- | ------------------------ | -------------------------------- |
-| loadConfig            | 加载配置                 | 配置参考 config                  |
-| loadColumns           | 加载列配置               | Column[]                         |
-| loadData              | 加载数据                 | Column[]                         |
-| on                    | 监听事件                 | `(event,callback)`配置参考 event |
-| off                   | 移除监听事件             | `(event,callback)`配置参考 event |
-| filterMethod          | 过滤数据方法             | FilterMethod                     |
-| getChangedData        | 获取已改变数据           | —                                |
-| getChangedRows        | 获取已改变行数据         | —                                |
-| validate              | 校验数据并滚到错误的地方 | —                                |
-| getValidations        | 校验数据并返回错误信息   | —                                |
-| scrollTo              | 滚动位置                 | `(x,y)`                          |
-| scrollXTo             | 滚动位置                 | x                                |
-| scrollYTo             | 滚动位置                 | y                                |
-| scrollToColkey        | 滚动位置                 | colKey                           |
-| scrollToRowkey        | 滚动位置                 | rowKey                           |
-| scrollToRowkey        | 滚动位置                 | rowKey                           |
-| scrollToColIndex      | 滚动位置                 | colIndex                         |
-| scrollToColIndex      | 滚动位置                 | colIndex                         |
-| clearSelection        | 清除选中                 | —                                |
-| toggleRowSelection    | 取反                     | row                              |
-| setSelectionByRows    | 设置选中                 | (rows,selected)                  |
-| setSelectionByRowKeys | 通过 RowKeys 设置选中    | (RowKeys,selected)               |
-| getSelectionRows      | 获取选中                 | —                                |
-| toggleAllSelection    | 切换所有行的选中状态     | —                                |
-| destroy               | 销毁                     | —                                |
+| 方法名称               | 说明                          | 参数                                                      |
+| ---------------------- | ----------------------------- | --------------------------------------------------------- |
+| loadConfig             | 加载配置                      | 配置参考 config                                           |
+| loadColumns            | 加载列配置                    | Column[]                                                  |
+| loadData               | 加载 body 数据                | Row[]                                                     |
+| loadFooterData         | 加载 footer 数据              | Row[]                                                     |
+| on                     | 监听事件                      | `(event,callback)`配置参考 event                          |
+| off                    | 移除监听事件                  | `(event,callback)`配置参考 event                          |
+| filterMethod           | 过滤数据方法                  | FilterMethod                                              |
+| setLoading             | 设置加载方法                  | boolean                                                   |
+| editCell               | 主动启动编辑格子              | (rowIndex, colIndex)                                      |
+| setItemValue           | 设置值                        | (rowKey, key, value, history, reDraw=true, isEditor=true) |
+| setItemValueByEditor   | 通过编辑器设置值              | (rowKey, key, value, history, reDraw=true, isEditor=true) |
+| batchSetItemValue      | 批量设置值                    | (ChangeItem[], reDraw=true, isEditor=true)                |
+| getChangedData         | 获取已改变数据                | —                                                         |
+| getChangedRows         | 获取已改变行数据              | —                                                         |
+| validate               | 校验数据，true 滚到错误的地方 | boolean                                                   |
+| clearValidate          | 清除校验                      | —                                                         |
+| setValidations         | 设置错误信息                  | ^[ValidateItemError]`[{message,key,rowKey}]`                                       |
+| getValidations         | 校验数据并返回错误信息        | —                                                         |
+| hasValidationError     | 是否有错误校验                | —                                                         |
+| scrollTo               | 滚动位置                      | ^`(x,y)`                                                  |
+| scrollXTo              | 滚动位置                      | x                                                         |
+| scrollYTo              | 滚动位置                      | y                                                         |
+| scrollToColkey         | 滚动位置                      | colKey                                                    |
+| scrollToRowkey         | 滚动位置                      | rowKey                                                    |
+| scrollToRowkey         | 滚动位置                      | rowKey                                                    |
+| scrollToColIndex       | 滚动位置                      | colIndex                                                  |
+| scrollToColIndex       | 滚动位置                      | colIndex                                                  |
+| setExpandRowKeys       | 通过 rowKey 设置展开项        | (rowkeys[],boolean)                                       |
+| toggleRowExpand        | 展开项取反                    | (rowKey, expand)                                          |
+| toggleExpandAll        | 展开全部                      | boolean                                                   |
+| clearSelection         | 清除选中                      | —                                                         |
+| toggleRowSelection     | 取反                          | row                                                       |
+| setSelectionByRows     | 设置选中                      | (rows,selected)                                           |
+| setSelectionByRowKeys  | 通过 RowKeys 设置选中         | (RowKeys,selected)                                        |
+| getSelectionRows       | 获取选中                      | —                                                         |
+| toggleAllSelection     | 切换所有行的选中状态          | —                                                         |
+| getPositionForRowIndex | 获取当前行的高度定位          | —                                                         |
+| getCellValue           | 通过 rowKey 和 key 获取格子值 | (rowKey, key)                                             |
+| destroy                | 销毁                          | —                                                         |
 
 ## CONTEXT_MENU_ITEM
 
@@ -143,7 +199,7 @@
 
 | 参数 | 说明 | 类型 | 可选值 | 默认值 |
 | --- | --- | --- | --- | --- |
-| type | 列的类型 | Type | `"index"`, `"selection"`, `"index-selection"`, `"tree"` | — |
+| type | 列的类型 | Type |  ^[string]`index, selection, index-selection,tree` | — |
 | key | 列的唯一标识 | string | — | — |
 | title | 列的标题 | string | — | — |
 | width | 列的宽度 | number | — | — |
@@ -159,7 +215,7 @@
 | column | 当前列对象 | Column | — | — |
 | overflowTooltipShow | 是否显示溢出提示,自定义 Tooltip 不生效 | boolean | — | — |
 | overflowTooltipWidth | 溢出提示的宽度，自定义 Tooltip 不生效 | number | — | — |
-| overflowTooltipPlacement | 溢出提示的位置，自定义 Tooltip 不生效 | OverflowTooltipPlacement | `"top"`, `"top-start"`, `"top-end"`, `"right"`, `"right-start"`, `"right-end"`, `"left"`, `"left-start"`, `"left-end"`, `"bottom"`, `"bottom-start"`, `"bottom-end"` | — |
+| overflowTooltipPlacement | 溢出提示的位置，自定义 Tooltip 不生效 | OverflowTooltipPlacement |  ^[string]`top, top-start, top-end, right, right-start, right-end, left, left-start, left-end, bottom, bottom-start, bottom-end` | — |
 | rule | 校验规则 | Rules | — | — |
 | options | 选项列表 | any[] | — | — |
 
@@ -175,3 +231,12 @@
 ## Rule
 
 -   可参考 [async-validator](https://github.com/yiminghe/async-validator)
+
+## ChangeItem
+
+| 参数   | 说明   | 类型   |
+| ------ | ------ | ------ |
+| value  | 值     | any    |
+| key    | colKey | string |
+| rowKey | rowKey | string |
+

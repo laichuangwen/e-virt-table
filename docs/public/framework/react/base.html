@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table React Example</title>
+        <script src="https://cdn.jsdelivr.net/npm/react@17/umd/react.development.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/react-dom@17/umd/react-dom.development.js"></script>
+        <script src="https://unpkg.com/@babel/standalone@7.21.4/babel.min.js"></script>
+        <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    </head>
+    <body>
+        <div id="app"></div>
+
+        <script type="text/babel">
+            const { useEffect, useRef } = React;
+
+            const EVirtTableExample = () => {
+                const eVirtTableRef = useRef(null);
+
+                useEffect(() => {
+                    const columns = [
+                        { title: 'Name', key: 'name' },
+                        { title: 'Age', key: 'age' },
+                        { title: 'Address', key: 'address' },
+                    ];
+                    const data = [
+                        { name: 'John Brown', age: 18, address: 'New York No. 1 Lake Park' },
+                        { name: 'Jim Green', age: 24, address: 'London No. 1 Lake Park' },
+                        { name: 'Joe Black', age: 30, address: 'Sydney No. 1 Lake Park' },
+                        { name: 'Jon Snow', age: 26, address: 'Ottawa No. 1 Lake Park' },
+                    ];
+
+                    const eVirtTable = new window.EVirtTable(eVirtTableRef.current, {
+                        columns,
+                        data,
+                        config: {
+                            ENABLE_SELECTOR: true,
+                        },
+                    });
+
+                    return () => {
+                        if (eVirtTable) {
+                            eVirtTable.destroy();
+                        }
+                    };
+                }, []);
+
+                return <div ref={eVirtTableRef}></div>;
+            };
+
+            ReactDOM.render(<EVirtTableExample />, document.getElementById('app'));
+        </script>
+    </body>
+</html>
