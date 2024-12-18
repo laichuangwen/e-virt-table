@@ -35,7 +35,7 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: '16'
+                  node-version: '22'
             - name: Install dependencies
               run: cd docs && npm ci
             - name: Build with VitePress
