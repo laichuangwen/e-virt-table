@@ -33,7 +33,7 @@ jobs:
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
       - name: Install dependencies
-        run:  npm run install:docs
+        run:  cd docs && npm ci
       - name: Build with VitePress
         run: npm run build:docs
       - name: Upload artifact
