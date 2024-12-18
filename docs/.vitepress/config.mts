@@ -2,6 +2,7 @@ import { defineConfig } from 'vitepress';
 import { markdownConfig } from './plugins/markdown-plugin';
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+    base: "/",
     appearance: false,
     title: 'e-virt-table',
     description: '一个canvas实现的数据表格',
