@@ -10,6 +10,7 @@
         "dev": "vite",
         "dev:install": "cd docs && npm install",
         "dev:docs": "cd docs && npm run dev",
+        "install:docs": "cd docs && npm install",
         "build:docs": "cd docs && npm run build",
         "build": "vite build && tsc",
         "preview": "vite preview"
