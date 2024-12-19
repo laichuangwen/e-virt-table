@@ -12,5 +12,5 @@
 
 ::: demo
 
-<iframe src="/highlight/base.html" style="min-height:220px"></iframe>
+<d-iframe src="/highlight/base.html" style="min-height:220px"></d-iframe>
 :::

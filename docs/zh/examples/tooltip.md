@@ -23,12 +23,12 @@
 
 ::: demo
 
-<iframe src="/tooltip/base.html" style="min-height:220px"></iframe>
+<d-iframe src="/tooltip/base.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 自定义样式
 
 ::: demo
 
-<iframe src="/tooltip/style.html" style="min-height:220px"></iframe>
+<d-iframe src="/tooltip/style.html" style="min-height:220px"></d-iframe>
 :::

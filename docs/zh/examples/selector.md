@@ -30,7 +30,7 @@
 
 ::: demo
 
-<iframe src="/selector/disabled.html" style="min-height:220px"></iframe>
+<d-iframe src="/selector/disabled.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 启用
@@ -40,7 +40,7 @@
 
 ::: demo
 
-<iframe src="/selector/enable.html" style="min-height:220px"></iframe>
+<d-iframe src="/selector/enable.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 单选
@@ -49,7 +49,7 @@
 
 ::: demo
 
-<iframe src="/selector/single.html" style="min-height:220px"></iframe>
+<d-iframe src="/selector/single.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 只选列
@@ -64,7 +64,7 @@
 
 ::: demo
 
-<iframe src="/selector/col.html" style="min-height:220px"></iframe>
+<d-iframe src="/selector/col.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 只选行
@@ -81,7 +81,7 @@
 
 ::: demo
 
-<iframe src="/selector/row.html" style="min-height:220px"></iframe>
+<d-iframe src="/selector/row.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 禁用批量
@@ -94,7 +94,7 @@
 
 ::: demo
 
-<iframe src="/selector/batch.html" style="min-height:220px"></iframe>
+<d-iframe src="/selector/batch.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 限定范围
@@ -109,5 +109,5 @@
 
 ::: demo
 
-<iframe src="/selector/scope.html" style="min-height:220px"></iframe>
+<d-iframe src="/selector/scope.html" style="min-height:220px"></d-iframe>
 :::

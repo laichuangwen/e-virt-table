@@ -6,6 +6,7 @@ import "element-plus/dist/index.css";
 import "element-plus/theme-chalk/dark/css-vars.css";
 import "prismjs/themes/prism-solarizedlight.css";
 import VpDemo from "../src/vp-demo.vue";
+import VpIframe from "../src/vp-iframe.vue";
 import VpApiTyping from "../src/vp-api-typing.vue";
 import "./custom-style.css";
 export default {
@@ -15,6 +16,7 @@ export default {
       locale: zhCn,
     });
     app.component("Demo", VpDemo);
+    app.component("DIframe", VpIframe);
     app.component("ApiTyping", VpApiTyping);
   },
 };

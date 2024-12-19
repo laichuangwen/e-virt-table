@@ -19,7 +19,7 @@
 - 选择器默认是禁用
 - 填充默认是禁用
 ::: demo
-<iframe src="/autofill/disabled.html" style="min-height:220px"></iframe>
+<d-iframe src="/autofill/disabled.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 启用
@@ -27,7 +27,7 @@
 - 选择器默认是禁用，如果需要启用设置`config.ENABLE_SELECTOR`为`true`
 - 选择器默认是禁用，如果需要启用设置`config.ENABLE_AUTOFILL`为`true`
 ::: demo
-<iframe src="/autofill/enable.html" style="min-height:220px"></iframe>
+<d-iframe src="/autofill/enable.html" style="min-height:220px"></d-iframe>
 :::
 
 
@@ -41,7 +41,7 @@
 - 设置`config.ENABLE_SELECTOR_ALL_COLS`为`false`
 ::: demo
 
-<iframe src="/autofill/col.html" style="min-height:220px"></iframe>
+<d-iframe src="/autofill/col.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 行填充
@@ -55,7 +55,7 @@
 - 设置`config.ENABLE_SELECTOR_ALL_COLS`为`true`
 ::: demo
 
-<iframe src="/autofill/row.html" style="min-height:220px"></iframe>
+<d-iframe src="/autofill/row.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 限定范围
@@ -70,5 +70,5 @@
 
 ::: demo
 
-<iframe src="/autofill/scope.html" style="min-height:220px"></iframe>
+<d-iframe src="/autofill/scope.html" style="min-height:220px"></d-iframe>
 :::

@@ -14,7 +14,7 @@
 
 ::: demo
 
-<iframe src="/align/horizontal.html" style="min-height:220px"></iframe>
+<d-iframe src="/align/horizontal.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 垂直对齐
@@ -24,5 +24,5 @@
 
 ::: demo
 
-<iframe src="/align/vertical.html" style="min-height:280px"></iframe>
+<d-iframe src="/align/vertical.html" style="min-height:280px"></d-iframe>
 :::

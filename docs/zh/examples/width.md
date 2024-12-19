@@ -29,7 +29,7 @@
 
 ::: demo
 
-<iframe src="/width/width.html" style="min-height:220px"></iframe>
+<d-iframe src="/width/width.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 动态总宽度
@@ -38,14 +38,14 @@
 
 ::: demo
 
-<iframe src="/width/width-dynamic.html" style="min-height:220px"></iframe>
+<d-iframe src="/width/width-dynamic.html" style="min-height:220px"></d-iframe>
 :::
 
 2. 列`widthFillDisable`为 false 超过会被平均填充，最小 100
 
 ::: demo
 
-<iframe src="/width/width-dynamic1.html" style="min-height:220px"></iframe>
+<d-iframe src="/width/width-dynamic1.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 默认列宽度
@@ -54,14 +54,14 @@
 
 ::: demo
 
-<iframe src="/width/base.html" style="min-height:220px"></iframe>
+<d-iframe src="/width/base.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 设置列宽度
 
 ::: demo
 
-<iframe src="/width/setting.html" style="min-height:220px"></iframe>
+<d-iframe src="/width/setting.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 可调整列宽度
@@ -71,5 +71,5 @@
 
 ::: demo
 
-<iframe src="/width/resize.html" style="min-height:220px"></iframe>
+<d-iframe src="/width/resize.html" style="min-height:220px"></d-iframe>
 :::

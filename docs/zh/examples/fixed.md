@@ -13,7 +13,7 @@
 
 ::: demo
 
-<iframe src="/fixed/header.html" style="min-height:350px"></iframe>
+<d-iframe src="/fixed/header.html" style="min-height:350px"></d-iframe>
 :::
 
 ## 固定表头(最大高度)
@@ -22,7 +22,7 @@
 
 ::: demo
 
-<iframe src="/fixed/header1.html" style="min-height:400px"></iframe>
+<d-iframe src="/fixed/header1.html" style="min-height:400px"></d-iframe>
 :::
 
 ## 固定列
@@ -31,5 +31,5 @@
 
 ::: demo
 
-<iframe src="/fixed/left-right.html" style="min-height:220px"></iframe>
+<d-iframe src="/fixed/left-right.html" style="min-height:220px"></d-iframe>
 :::

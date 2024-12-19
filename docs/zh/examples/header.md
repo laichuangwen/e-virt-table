@@ -15,12 +15,12 @@
 
 ::: demo
 
-<iframe src="/header/level.html" style="min-height:285px"></iframe>
+<d-iframe src="/header/level.html" style="min-height:285px"></d-iframe>
 :::
 
 ## 自定义样式
 
 ::: demo
 
-<iframe src="/header/base.html" style="min-height:335px"></iframe>
+<d-iframe src="/header/base.html" style="min-height:335px"></d-iframe>
 :::

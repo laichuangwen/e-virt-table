@@ -32,7 +32,7 @@
 -   `config.ENABLE_KEYBOARD`为`true`默认是启用的 
 
 ::: demo
-<iframe src="/keyboard/enable.html" style="min-height:220px"></iframe>
+<d-iframe src="/keyboard/enable.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 禁用
@@ -40,5 +40,5 @@
 -   `config.ENABLE_KEYBOARD`为`false` 
 
 ::: demo
-<iframe src="/keyboard/disabled.html" style="min-height:220px"></iframe>
+<d-iframe src="/keyboard/disabled.html" style="min-height:220px"></d-iframe>
 :::

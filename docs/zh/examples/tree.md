@@ -25,7 +25,7 @@
 
 ::: demo
 
-<iframe src="/tree/base.html" style="min-height:250px"></iframe>
+<d-iframe src="/tree/base.html" style="min-height:250px"></d-iframe>
 :::
 
 ## 展开
@@ -34,7 +34,7 @@
 
 ::: demo
 
-<iframe src="/tree/expand.html" style="min-height:400px"></iframe>
+<d-iframe src="/tree/expand.html" style="min-height:400px"></d-iframe>
 :::
 
 ## 指定展开
@@ -45,7 +45,7 @@
 
 ::: demo
 
-<iframe src="/tree/key-expand.html" style="min-height:400px"></iframe>
+<d-iframe src="/tree/key-expand.html" style="min-height:400px"></d-iframe>
 :::
 
 
@@ -56,5 +56,5 @@
 
 ::: demo
 
-<iframe src="/tree/lazy.html" style="min-height:400px"></iframe>
+<d-iframe src="/tree/lazy.html" style="min-height:400px"></d-iframe>
 :::

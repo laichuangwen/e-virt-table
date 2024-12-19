@@ -45,7 +45,7 @@
 
 ::: demo
 
-<iframe src="/readonly/column.html" style="min-height:220px"></iframe>
+<d-iframe src="/readonly/column.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 行只读/编辑
@@ -55,7 +55,7 @@
 
 ::: demo
 
-<iframe src="/readonly/row.html" style="min-height:220px"></iframe>
+<d-iframe src="/readonly/row.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 方法控制只读/编辑
@@ -65,7 +65,7 @@
 
 ::: demo
 
-<iframe src="/readonly/method.html" style="min-height:220px"></iframe>
+<d-iframe src="/readonly/method.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 拓展编辑器（时间选择....等）
@@ -78,7 +78,7 @@
 
 ::: demo
 
-<iframe src="/readonly/date.html" style="min-height:220px"></iframe>
+<d-iframe src="/readonly/date.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 方法控制编辑器类型
@@ -89,7 +89,7 @@
 
 ::: demo
 
-<iframe src="/readonly/editType-method.html" style="min-height:220px"></iframe>
+<d-iframe src="/readonly/editType-method.html" style="min-height:220px"></d-iframe>
 :::
 
 ## 更改编辑后的值
@@ -100,5 +100,5 @@
 
 ::: demo
 
-<iframe src="/readonly/value-change.html" style="min-height:220px"></iframe>
+<d-iframe src="/readonly/value-change.html" style="min-height:220px"></d-iframe>
 :::

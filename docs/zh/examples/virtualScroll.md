@@ -7,5 +7,5 @@
 ## 例子
 
 ::: demo
-<iframe src="/virtualScroll/base.html" style="min-height:600px"></iframe>
+<d-iframe src="/virtualScroll/base.html" style="min-height:600px"></d-iframe>
 :::

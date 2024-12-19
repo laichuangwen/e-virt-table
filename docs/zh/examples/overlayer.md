@@ -20,5 +20,5 @@
 
 ::: demo
 
-<iframe src="/overlayer/base.html" style="min-height:220px"></iframe>
+<d-iframe src="/overlayer/base.html" style="min-height:220px"></d-iframe>
 :::
