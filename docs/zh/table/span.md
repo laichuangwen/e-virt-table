@@ -10,14 +10,16 @@
 
 ::: demo
 
-<d-iframe src="/span/row.html" style="min-height:430px"></d-iframe>
+span/row
+h:430px
 :::
 
 ## 合并列
 
 ::: demo
 
-<d-iframe src="/span/col.html" style="min-height:430px"></d-iframe>
+span/col
+h:430px
 :::
 
 ## 动态合并
@@ -26,5 +28,6 @@
 
 ::: demo
 
-<d-iframe src="/span/dynamic.html" style="min-height:430px"></d-iframe>
+span/dynamic
+h:430px
 :::

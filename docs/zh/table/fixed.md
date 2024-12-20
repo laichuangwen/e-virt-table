@@ -13,7 +13,8 @@
 
 ::: demo
 
-<d-iframe src="/fixed/header.html" style="min-height:350px"></d-iframe>
+fixed/header
+h:350px
 :::
 
 ## 固定表头(最大高度)
@@ -22,7 +23,8 @@
 
 ::: demo
 
-<d-iframe src="/fixed/header1.html" style="min-height:400px"></d-iframe>
+fixed/header1
+h:400px
 :::
 
 ## 固定列
@@ -31,5 +33,6 @@
 
 ::: demo
 
-<d-iframe src="/fixed/left-right.html" style="min-height:220px"></d-iframe>
+fixed/left-right
+h:220px
 :::

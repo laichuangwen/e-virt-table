@@ -25,7 +25,8 @@
   
 ::: demo
 
-<d-iframe src="/validator/base.html" style="min-height:250px"></d-iframe>
+validator/base
+h:250px
 :::
 
 ## 自定义校验器
@@ -35,7 +36,8 @@
 
 ::: demo
 
-<d-iframe src="/validator/custom.html" style="min-height:250px"></d-iframe>
+validator/custom
+h:250px
 :::
 
 ## 常用校验规则

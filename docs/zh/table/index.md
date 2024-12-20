@@ -13,7 +13,8 @@
 
 ::: demo
 
-<d-iframe src="/index/base.html" style="min-height:220px"></d-iframe>
+index/base
+h:220px
 :::
 
 ## 自定义索引
@@ -22,5 +23,6 @@
 
 ::: demo
 
-<d-iframe src="/index/custom.html" style="min-height:220px"></d-iframe>
+index/custom
+h:220px
 :::

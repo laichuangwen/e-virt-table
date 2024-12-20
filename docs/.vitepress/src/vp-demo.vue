@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref,computed } from 'vue';
 import { useClipboard, useToggle } from '@vueuse/core';
 import { ElMessage } from 'element-plus';
 import IconCopy from './icon-copy.vue';
@@ -13,15 +13,22 @@ import SourceCode from './vp-source-code.vue';
 const [sourceVisible, toggleSourceVisible] = useToggle();
 
 const props = defineProps<{
+    width: string;
+    height: string;
     source: string;
     rawSource: string;
+    description: string;
 }>();
-
+const decodedRawSource = computed(() => {
+  return decodeURIComponent(props.rawSource);
+});
 const { copy } = useClipboard({
     source: decodeURIComponent(props.rawSource),
     read: false,
 });
-
+const decodedDescription = computed(() => {
+    return decodeURIComponent(props.description);
+});
 const copyCode = async () => {
     try {
         await copy();
@@ -72,9 +79,13 @@ const goCodepen = () => {
 
 <template>
     <ClientOnly>
+        <div text="sm" m="y-4" v-html="decodedDescription" />
         <div class="example">
             <div class="example-showcase" ref="showcase">
-                <slot />
+                <iframe :srcdoc="decodedRawSource" :style="{
+                    width: props.width,
+                    height: props.height,
+                }"/>
             </div>
             <div class="op-btns">
                 <ElTooltip content="全屏" :show-arrow="false">

@@ -21,19 +21,22 @@
 
 ::: demo
 
-<d-iframe src="/empty/base.html" style="min-height:250px"></d-iframe>
+empty/base
+h:250px
 :::
 
 ## 更改样式
 
 ::: demo
 
-<d-iframe src="/empty/style.html" style="min-height:250px"></d-iframe>
+empty/style
+h:250px
 :::
 
 ## 完全自定义
 
 ::: demo
 
-<d-iframe src="/empty/custom.html" style="min-height:250px"></d-iframe>
+empty/custom
+h:250px
 :::

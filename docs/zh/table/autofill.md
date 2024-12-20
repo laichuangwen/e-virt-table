@@ -19,7 +19,8 @@
 - 选择器默认是禁用
 - 填充默认是禁用
 ::: demo
-<d-iframe src="/autofill/disabled.html" style="min-height:220px"></d-iframe>
+autofill/disabled
+h:220px
 :::
 
 ## 启用
@@ -27,7 +28,8 @@
 - 选择器默认是禁用，如果需要启用设置`config.ENABLE_SELECTOR`为`true`
 - 选择器默认是禁用，如果需要启用设置`config.ENABLE_AUTOFILL`为`true`
 ::: demo
-<d-iframe src="/autofill/enable.html" style="min-height:220px"></d-iframe>
+autofill/enable
+h:220px
 :::
 
 
@@ -40,8 +42,8 @@
 - 设置`config.ENABLE_SELECTOR_ALL_ROWS`为`true`
 - 设置`config.ENABLE_SELECTOR_ALL_COLS`为`false`
 ::: demo
-
-<d-iframe src="/autofill/col.html" style="min-height:220px"></d-iframe>
+autofill/col
+h:220px
 :::
 
 ## 行填充
@@ -54,8 +56,8 @@
 - 设置`config.ENABLE_SELECTOR_ALL_ROWS`为`false`
 - 设置`config.ENABLE_SELECTOR_ALL_COLS`为`true`
 ::: demo
-
-<d-iframe src="/autofill/row.html" style="min-height:220px"></d-iframe>
+autofill/row
+h:220px
 :::
 
 ## 限定范围
@@ -69,6 +71,6 @@
 下面例子限制可编辑区域，注意目前只能支持一个区域，不能跨域区域
 
 ::: demo
-
-<d-iframe src="/autofill/scope.html" style="min-height:220px"></d-iframe>
+autofill/scope
+h:220px
 :::

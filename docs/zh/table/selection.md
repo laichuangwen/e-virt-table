@@ -43,7 +43,8 @@
 
 ::: demo
 
-<d-iframe src="/selection/base.html" style="min-height:220px"></d-iframe>
+selection/base
+h:220px
 :::
 
 ## 有下标的多选
@@ -52,7 +53,8 @@
 
 ::: demo
 
-<d-iframe src="/selection/index.html" style="min-height:220px"></d-iframe>
+selection/index
+h:220px
 :::
 
 ## 通过 rows 设置选中/清空选中
@@ -63,7 +65,8 @@
 
 ::: demo
 
-<d-iframe src="/selection/setting.html" style="min-height:240px"></d-iframe>
+selection/setting
+h:240px
 :::
 
 ## 通过 rowKeys 设置选中/清空选中
@@ -74,7 +77,8 @@
 
 ::: demo
 
-<d-iframe src="/selection/settingRowKeys.html" style="min-height:240px"></d-iframe>
+selection/settingRowKeys
+h:240px
 :::
 
 ## 获取选中
@@ -83,7 +87,8 @@
 
 ::: demo
 
-<d-iframe src="/selection/get.html" style="min-height:240px"></d-iframe>
+selection/get
+h:240px
 :::
 
 ## 禁用
@@ -92,7 +97,8 @@
 
 ::: demo
 
-<d-iframe src="/selection/disabled.html" style="min-height:240px"></d-iframe>
+selection/disabled
+h:240px
 :::
 
 ## 合并单元格多选
@@ -103,5 +109,6 @@
 
 ::: demo
 
-<d-iframe src="/selection/span.html" style="min-height:625px"></d-iframe>
+selection/span
+h:625px
 :::

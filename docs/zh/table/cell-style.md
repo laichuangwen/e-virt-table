@@ -16,7 +16,8 @@
 
 ::: demo
 
-<d-iframe src="/cell-style/header.html" style="min-height:220px"></d-iframe>
+cell-style/header
+h:220px
 :::
 
 ## body样式自定义
@@ -25,7 +26,8 @@
 
 ::: demo
 
-<d-iframe src="/cell-style/body.html" style="min-height:220px"></d-iframe>
+cell-style/body
+h:220px
 :::
 
 ## footer样式自定义
@@ -34,5 +36,6 @@
 
 ::: demo
 
-<d-iframe src="/cell-style/footer.html" style="min-height:320px"></d-iframe>
+cell-style/footer
+h:320px
 :::

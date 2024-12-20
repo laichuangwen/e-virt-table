@@ -23,7 +23,8 @@
 
 ::: demo
 
-<d-iframe src="/footer/base.html" style="min-height:320px"></d-iframe>
+footer/base
+h:320px
 :::
 
 ## 更改行高
@@ -32,7 +33,8 @@
 
 ::: demo
 
-<d-iframe src="/footer/height.html" style="min-height:320px"></d-iframe>
+footer/height
+h:320px
 :::
 
 ## 固定
@@ -40,8 +42,8 @@
 -   `FOOTER_FIXED=true`可固定在底部，默认`true`
 
 ::: demo
-
-<d-iframe src="/footer/fixed.html" style="min-height:320px"></d-iframe>
+footer/fixed
+h:320px
 :::
 
 ## 不固定
@@ -50,7 +52,8 @@
 
 ::: demo
 
-<d-iframe src="/footer/noFixed.html" style="min-height:320px"></d-iframe>
+footer/noFixed
+h:320px
 :::
 
 ## 动态更改 footerData
@@ -59,5 +62,6 @@
 
 ::: demo
 
-<d-iframe src="/footer/loadData.html" style="min-height:320px"></d-iframe>
+footer/loadData
+h:320px
 :::

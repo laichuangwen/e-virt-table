@@ -2,22 +2,28 @@ import { defineConfig } from 'vitepress';
 import { markdownConfig } from './plugins/markdown-plugin';
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-    base: "/e-virt-table/",
+    base: '/e-virt-table/',
+    outDir: './.vitepress/dist',
     appearance: false,
     title: 'e-virt-table',
-    description: '一个canvas实现的数据表格',
+    description:
+        'A powerful data table based on canvas. You can use it as data grid、Microsoft Excel or Google sheets. It supports virtual scroll、cell edit etc.',
     markdown: {
         config: markdownConfig,
     },
     locales: {
-        root: {
+        zh: {
             label: '中文',
             lang: 'zh',
             link: '/zh/intro',
             themeConfig: {
                 // https://vitepress.dev/reference/default-theme-config
-                nav: [{ text: '文档', link: '/zh/intro' }],
-
+                search: {
+                    provider: 'local',
+                },
+                socialLinks: [
+                    { icon: 'github', link: 'https://github.com/laichuangwen/e-virt-table' }, // 替换为您的 GitHub 仓库链接
+                ],
                 sidebar: [
                     {
                         text: '简介',
@@ -32,33 +38,33 @@ export default defineConfig({
                         link: '/zh/api',
                     },
                     {
-                        text: '例子',
+                        text: '表格例子',
                         items: [
-                            { text: '虚拟滚动', link: '/zh/examples/virtualScroll' },
-                            { text: '滚动条', link: '/zh/examples/scroller' },
+                            { text: '虚拟滚动', link: '/zh/table/virtualScroll' },
+                            { text: '滚动条', link: '/zh/table/scroller' },
 
-                            { text: '宽度', link: '/zh/examples/width' },
-                            { text: '高度', link: '/zh/examples/height' },
-                            { text: '固定', link: '/zh/examples/fixed' },
-                            { text: '空数据', link: '/zh/examples/empty' },
-                            { text: '高亮', link: '/zh/examples/highlight' },
-                            { text: '对齐', link: '/zh/examples/align' },
-                            { text: '索引', link: '/zh/examples/index' },
-                            { text: '多选', link: '/zh/examples/selection' },
-                            { text: '树形', link: '/zh/examples/tree' },
-                            { text: '溢出提示', link: '/zh/examples/tooltip' },
-                            { text: '表头', link: '/zh/examples/header' },
-                            { text: 'footer合计', link: '/zh/examples/footer' },
-                            { text: '合并', link: '/zh/examples/span' },
-                            { text: '格式化', link: '/zh/examples/formatter' },
-                            { text: '样式', link: '/zh/examples/cell-style' },
-                            { text: '编辑', link: '/zh/examples/readonly' },
-                            { text: '校验', link: '/zh/examples/validator' },
-                            { text: '选择', link: '/zh/examples/selector' },
-                            { text: '填充', link: '/zh/examples/autofill' },
-                            { text: '键盘事件', link: '/zh/examples/keyboard' },
-                            { text: '历史回退', link: '/zh/examples/history' },
-                            { text: '插槽（覆盖层）', link: '/zh/examples/overlayer' },
+                            { text: '宽度', link: '/zh/table/width' },
+                            { text: '高度', link: '/zh/table/height' },
+                            { text: '固定', link: '/zh/table/fixed' },
+                            { text: '空数据', link: '/zh/table/empty' },
+                            { text: '高亮', link: '/zh/table/highlight' },
+                            { text: '对齐', link: '/zh/table/align' },
+                            { text: '索引', link: '/zh/table/index' },
+                            { text: '多选', link: '/zh/table/selection' },
+                            { text: '树形', link: '/zh/table/tree' },
+                            { text: '溢出提示', link: '/zh/table/tooltip' },
+                            { text: '表头', link: '/zh/table/header' },
+                            { text: 'footer合计', link: '/zh/table/footer' },
+                            { text: '合并', link: '/zh/table/span' },
+                            { text: '格式化', link: '/zh/table/formatter' },
+                            { text: '样式', link: '/zh/table/cell-style' },
+                            { text: '编辑', link: '/zh/table/readonly' },
+                            { text: '校验', link: '/zh/table/validator' },
+                            { text: '选择', link: '/zh/table/selector' },
+                            { text: '填充', link: '/zh/table/autofill' },
+                            { text: '键盘事件', link: '/zh/table/keyboard' },
+                            { text: '历史回退', link: '/zh/table/history' },
+                            { text: '插槽（覆盖层）', link: '/zh/table/overlayer' },
                         ],
                     },
                     {
@@ -87,10 +93,6 @@ export default defineConfig({
             link: '/en/intro',
             themeConfig: {
                 // https://vitepress.dev/reference/default-theme-config
-                nav: [
-                    { text: 'Home', link: '/' },
-                    { text: '文档', link: '/docs' },
-                ],
 
                 sidebar: [
                     {

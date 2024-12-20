@@ -25,7 +25,8 @@
 
 ::: demo
 
-<d-iframe src="/tree/base.html" style="min-height:250px"></d-iframe>
+tree/base
+h:250px
 :::
 
 ## 展开
@@ -34,7 +35,8 @@
 
 ::: demo
 
-<d-iframe src="/tree/expand.html" style="min-height:400px"></d-iframe>
+tree/expand
+h:550px
 :::
 
 ## 指定展开
@@ -45,7 +47,8 @@
 
 ::: demo
 
-<d-iframe src="/tree/key-expand.html" style="min-height:400px"></d-iframe>
+tree/key-expand
+h:550px
 :::
 
 
@@ -56,5 +59,6 @@
 
 ::: demo
 
-<d-iframe src="/tree/lazy.html" style="min-height:400px"></d-iframe>
+tree/lazy
+h:400px
 :::

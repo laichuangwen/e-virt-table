@@ -30,14 +30,16 @@
 
 ::: demo
 
-<d-iframe src="/height/base.html" style="min-height:220px"></d-iframe>
+height/base
+h:220px
 :::
 
 ## 设置总高度
 
 ::: demo
 
-<d-iframe src="/height/set-height.html" style="min-height:445px"></d-iframe>
+height/set-height
+h:445px
 :::
 
 ## 最大总高度
@@ -46,7 +48,8 @@
 
 ::: demo
 
-<d-iframe src="/height/max-height.html" style="min-height:445px"></d-iframe>
+height/max-height
+h:445px
 :::
 
 ## 设置总高度和最大总高度
@@ -55,7 +58,8 @@
 
 ::: demo
 
-<d-iframe src="/height/set-max-height.html" style="min-height:445px"></d-iframe>
+height/set-max-height
+h:445px
 :::
 
 ## ENABLE_OFFSET_HEIGHT
@@ -65,7 +69,8 @@
 
 ::: demo
 
-<d-iframe src="/height/offset-height.html" style="min-height:420px"></d-iframe>
+height/offset-height
+h:420px
 :::
 
 ## `CELL_HEIGHT`设置行高
@@ -74,7 +79,8 @@
 
 ::: demo
 
-<d-iframe src="/height/setting.html" style="min-height:320px"></d-iframe>
+height/setting
+h:320px
 :::
 
 ## `_height`设置行高
@@ -83,5 +89,6 @@
 
 ::: demo
 
-<d-iframe src="/height/data-setting.html" style="min-height:320px"></d-iframe>
+height/data-setting
+h:320px
 :::

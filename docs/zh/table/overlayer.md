@@ -20,5 +20,6 @@
 
 ::: demo
 
-<d-iframe src="/overlayer/base.html" style="min-height:220px"></d-iframe>
+overlayer/base
+h:420px
 :::

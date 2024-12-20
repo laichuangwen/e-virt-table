@@ -16,5 +16,6 @@
 
 ::: demo
 
-<d-iframe src="/scroller/base.html" style="min-height:420px"></d-iframe>
+scroller/base
+h:420px
 :::

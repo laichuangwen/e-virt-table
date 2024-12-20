@@ -30,7 +30,8 @@
 
 ::: demo
 
-<d-iframe src="/selector/disabled.html" style="min-height:220px"></d-iframe>
+selector/disabled
+h:220px
 :::
 
 ## 启用
@@ -40,7 +41,8 @@
 
 ::: demo
 
-<d-iframe src="/selector/enable.html" style="min-height:220px"></d-iframe>
+selector/enable
+h:220px
 :::
 
 ## 单选
@@ -49,7 +51,8 @@
 
 ::: demo
 
-<d-iframe src="/selector/single.html" style="min-height:220px"></d-iframe>
+selector/single
+h:220px
 :::
 
 ## 只选列
@@ -63,8 +66,8 @@
 -   设置`config.ENABLE_SELECTOR_ALL_COLS`为`false`
 
 ::: demo
-
-<d-iframe src="/selector/col.html" style="min-height:220px"></d-iframe>
+selector/col
+h:220px
 :::
 
 ## 只选行
@@ -80,8 +83,8 @@
 
 
 ::: demo
-
-<d-iframe src="/selector/row.html" style="min-height:220px"></d-iframe>
+selector/row
+h:220px
 :::
 
 ## 禁用批量
@@ -94,7 +97,8 @@
 
 ::: demo
 
-<d-iframe src="/selector/batch.html" style="min-height:220px"></d-iframe>
+selector/batch
+h:220px
 :::
 
 ## 限定范围
@@ -109,5 +113,6 @@
 
 ::: demo
 
-<d-iframe src="/selector/scope.html" style="min-height:220px"></d-iframe>
+selector/scope
+h:220px
 :::

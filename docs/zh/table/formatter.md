@@ -18,7 +18,8 @@
 
 ::: demo
 
-<d-iframe src="/formatter/base.html" style="min-height:220px"></d-iframe>
+formatter/base
+h:220px
 :::
 
 ## CELL_FORMATTER_METHOD
@@ -28,5 +29,6 @@
 
 ::: demo
 
-<d-iframe src="/formatter/methods.html" style="min-height:220px"></d-iframe>
+formatter/methods
+h:220px
 :::

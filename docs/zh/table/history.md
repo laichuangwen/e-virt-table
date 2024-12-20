@@ -18,7 +18,8 @@
 
 ::: demo
 
-<d-iframe src="/history/enable.html" style="min-height:220px"></d-iframe>
+history/enable
+h:220px
 :::
 
 ## 禁用
@@ -27,7 +28,8 @@
 
 ::: demo
 
-<d-iframe src="/history/disabled.html" style="min-height:220px"></d-iframe>
+history/disabled
+h:220px
 :::
 
 ## 回退数量
@@ -36,5 +38,6 @@
 
 ::: demo
 
-<d-iframe src="/history/num.html" style="min-height:220px"></d-iframe>
+history/num
+h:220px
 :::
