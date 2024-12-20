@@ -11,15 +11,15 @@
 | HEAD_FONT | 表头字体 | string | — | 12px normal Arial |
 | BODY_FONT | 单元格字体 | string | — | 12px normal Arial |
 | BORDER_COLOR | 区域边框颜色 | string | — | #e1e6eb |
-| WIDTH | 宽度，高度为 0 表示自适应，根据 OFFSET_HEIGHT 调整 | number | — | 0 |
+| WIDTH | 宽度为 0 表示自适应100% | number | — | 0 |
 | RESIZE_MIN_WIDTH | 最小可调整宽度 | number | — | 40 |
-| HEIGHT | 高度，高度为 0 表示自适应，根据 OFFSET_HEIGHT 调整 | number | — | 0 |
+| HEIGHT | 高度，高度为 0 表示自适应 | number | — | 0 |
 | EMPTY_BODY_HEIGHT | 数据为空时表格体的高度 | number | — | 120 |
-| EMPTY_CUSTOM_STYLE | 自定义空数据样式 | CSSStyleDeclaration | — | — |
+| EMPTY_CUSTOM_STYLE | 自定义空数据样式 | ^[object]`CSSProperties` | — | — |
 | EMPTY_TEXT | 空数据文本 | string | — | 暂无数据 |
-| MAX_HEIGHT | 最大高度，高度为 0 表示自适应，根据 OFFSET_HEIGHT 调整 | number | — | 0 |
+| MAX_HEIGHT | 最大高度，高度为 0 表示自适应 | number | — | 1000 |
 | BORDER_RADIUS | 区域边框圆角 | number | — | 8 |
-| ENABLE_OFFSET_HEIGHT | 启动固定底部（不建议使用） | boolean | — | false |
+| ENABLE_OFFSET_HEIGHT | 启动固定底部（目前不稳定不建议使用） | boolean | — | false |
 | OFFSET_HEIGHT | 距离底部的偏移量，0 表示根据窗口自动计算 | number | — | 0 |
 | HEADER_HEIGHT | 表头行高 | number | — | 36 |
 | HEADER_BG_COLOR | 表头背景色 | string | — | #F8FAFF |
@@ -27,8 +27,8 @@
 | HEADER_TEXT_COLOR | 表头文本颜色 | string | — | #1D2129 |
 | LOADING_ICON_SVG | 加载 svg 图标 | string | — | — |
 | LOADING_ICON_COLOR | 加载 svg 图标颜色 | string | — | — |
-| EXPAND_ICON_SVG | 树形展开图标 | string | — | — |
-| SHRINK_ICON_SVG | 树形收缩图标 | string | — | — |
+| EXPAND_ICON_SVG | 树形展开svg 图标 | string | — | — |
+| SHRINK_ICON_SVG | 树形收缩svg 图标 | string | — | — |
 | EXPAND_ICON_COLOR | 展开图标颜色 | string | — | #4E5969 |
 | ERROR_TIP_ICON_COLOR | 错误提示颜色 | string | — | red |
 | ERROR_TIP_ICON_SIZE | 错误提示图标大小 | number | — | 6 |
@@ -56,7 +56,7 @@
 | FOOTER_BG_COLOR | 合计底部背景色 | string | — | #fafafa |
 | FOOTER_FIXED | 合计底部固定 | boolean | — | true |
 | CELL_FOOTER_HEIGHT | 表格 footer 部分的行高 | number | — | 36 |
-| FOOTER_DATA | 表格 footer 数据 | array | —— | [] |
+| FOOTER_DATA | 表格 footer 数据 | ^[array]`any[]` | —— | [] |
 | ENABLE_SELECTOR | 启用选择器 | boolean | — | true |
 | ENABLE_SELECTOR_SINGLE | 启用选择器-选择器单选 | boolean | — | false |
 | ENABLE_EDIT_CLICK_SELECTOR | 启用点击选择器编辑 | boolean | — | true |
@@ -89,20 +89,20 @@
 | TOOLTIP_BG_COLOR | 提示背景颜色 | string | — | #303133 |
 | TOOLTIP_TEXT_COLOR | 提示文本颜色 | string | — | #fff |
 | TOOLTIP_ZINDEX | 提示文本颜色 | number | — | 3000 |
-| TOOLTIP_CUSTOM_STYLE | 提示样式 | CSSStyleDeclaration | — | true |
-| CONTEXT_MENU | 自定义右键菜单 | array | — | `CONTEXT_MENU_ITEM` |
-| HEADER_CELL_STYLE_METHOD | 自定义表头单元格样式 | ^[Function]`({column,colIndex})` | — | — |
-| BODY_CELL_STYLE_METHOD | 自定义 body 单元格样式 | ^[Function]`({row, column, rowIndex, colIndex,value})` | — | — |
-| FOOTER_CELL_STYLE_METHOD | 自定 footer 义单元格样式 | ^[Function]`({row, column, rowIndex, colIndex,value})` | — | — |
-| BODY_CELL_READONLY_METHOD | 自定义只读 | ^[Function]`({row, column, rowIndex, colIndex,value})` | — | — |
-| BODY_CELL_FORMATTER_METHOD | 自定义格式化 | ^[Function]`({row, column, rowIndex, colIndex,value})` | — | — |
-| BODY_CELL_RULES_METHOD | 自定义校验规则 | ^[Function]`({row, column, rowIndex, colIndex,value})` | — | — |
-| BODY_CELL_TYPE_METHOD | 自定义类型 | ^[Function]`({row, column, rowIndex, colIndex,value})` | — | — |
-| BODY_CELL_EDITOR_TYPE_METHOD | 自定义编辑器类型 | ^[Function]`({row, column, rowIndex, colIndex,value})` | — | — |
-| BODY_CELL_RENDER_METHOD | 自定义单元格渲染 | ^[Function]`({row, column, rowIndex, colIndex,headIndex,visibleRows,rows})` | — | — |
-| SPAN_METHOD | 自定义跨列/行渲染 | ^[Function]`({row, column, rowIndex, colIndex,value,visibleLeafColumns,headIndex,headPosition,visibleRows,rows})` | — | — |
-| SELECTABLE_METHOD | 自定义选择禁用 | ^[Function]`({row, rowIndex})` | — | — |
-| EXPAND_LAZY_METHOD | tree 懒加载展开 | ^[Function]`({row, column, rowIndex, colIndex,value})` | — | — |
+| TOOLTIP_CUSTOM_STYLE | 提示样式 | ^[object]`CSSProperties` | — | true |
+| CONTEXT_MENU | 自定义右键菜单 | ^[array]`MenuItem[]` | — | CONTEXT_MENU |
+| HEADER_CELL_STYLE_METHOD | 自定义表头单元格样式 | ^[Function]`({column,colIndex})=>CellStyleOptions` | — | — |
+| BODY_CELL_STYLE_METHOD | 自定义 body 单元格样式 | ^[Function]`({row, column, rowIndex, colIndex,value,isHasChanged})=>CellStyleOptions` | — | — |
+| FOOTER_CELL_STYLE_METHOD | 自定 footer 义单元格样式 | ^[Function]`({row, column, rowIndex, colIndex,value})=>CellStyleOptions` | — | — |
+| BODY_CELL_READONLY_METHOD | 自定义只读 | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean` | — | — |
+| BODY_CELL_FORMATTER_METHOD | 自定义格式化 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string` | — | — |
+| BODY_CELL_RULES_METHOD | 自定义校验规则 | ^[Function]`({row, column, rowIndex, colIndex,value})=>Rules` | — | — |
+| BODY_CELL_TYPE_METHOD | 自定义类型 | ^[Function]`({row, column, rowIndex, colIndex,value})=>Type` | — | — |
+| BODY_CELL_EDITOR_TYPE_METHOD | 自定义编辑器类型 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string` | — | — |
+| BODY_CELL_RENDER_METHOD | 自定义单元格渲染 | ^[Function]`({row, column, rowIndex, colIndex,headIndex,visibleRows,rows})=>string` | — | — |
+| SPAN_METHOD | 自定义跨列/行渲染 | ^[Function]`({row, column, rowIndex, colIndex,value,visibleLeafColumns,headIndex,headPosition,visibleRows,rows})=>SpanType` | — | — |
+| SELECTABLE_METHOD | 自定义选择禁用 | ^[Function]`({row, rowIndex})=>boolean` | — | — |
+| EXPAND_LAZY_METHOD | tree 懒加载展开 | ^[Function]`({row, column, rowIndex, colIndex,value})=>Promise` | — | — |
 | BEFORE_VALUE_CHANGE_METHOD | 数值改变前回调 | ^[Function]`({rowKey, key, oldValue, originalValue,value})` | — | — |
 
 ## Events
@@ -187,13 +187,6 @@
 | getCellValue           | 通过 rowKey 和 key 获取格子值 | (rowKey, key)                                             |
 | destroy                | 销毁                          | —                                                         |
 
-## CONTEXT_MENU_ITEM
-
-| 参数  | 说明                                           | 类型     | 可选值 | 默认值 |
-| ----- | ---------------------------------------------- | -------- | ------ | ------ |
-| value | 选项 key 内置`copy、cut、paste、clearSelected` | string   | —      | —      |
-| label | 选项名称                                       | string   | —      | —      |
-| event | 方法，用内置方法会被覆盖                       | function | —      | —      |
 
 ## Column
 
@@ -232,11 +225,42 @@
 
 -   可参考 [async-validator](https://github.com/yiminghe/async-validator)
 
-## ChangeItem
+## CONTEXT_MENU 默认值
+ 
+```ts
+CONTEXT_MENU: MenuItem[] = [
+        { label: '复制', value: 'copy' },
+        { label: '剪切', value: 'cut' },
+        { label: '粘贴', value: 'paste' },
+        { label: '清空选中内容', value: 'clearSelected' },
+];
+```
 
-| 参数   | 说明   | 类型   |
-| ------ | ------ | ------ |
-| value  | 值     | any    |
-| key    | colKey | string |
-| rowKey | rowKey | string |
+## Typings{#typings}
 
+```ts
+type Type = 'index' | 'selection' | 'index-selection' | 'tree';
+
+type SpanType = {
+    rowspan: number;
+    colspan: number;
+};
+
+type MenuItem = {
+    label: string;
+    value: string | 'copy' | 'paste' | 'cut' | 'clearSelected';
+    event?: Function;
+};
+
+type ChangeItem = {
+    value: any;
+    key: string;
+    rowKey: string;
+};
+
+type CellStyleOptions = {
+    color?: string;
+    backgroundColor?: string;
+};
+
+```
