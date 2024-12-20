@@ -37,7 +37,7 @@ jobs:
               with:
                   node-version: '22'
             - name: Install dependencies
-              run: cd docs && npm ci
+              run: cd docs && npm i
             - name: Build with VitePress
               run: npm run build:docs
             - name: Upload artifact
