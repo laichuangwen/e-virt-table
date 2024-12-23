@@ -160,6 +160,7 @@ export default class Context {
     constructor(containerOptions: containerElementOptions, options: EVirtTableOptions) {
         const { containerElement, stageElement, canvasElement, overlayerElement, editorElement } = containerOptions;
         this.containerElement = containerElement;
+        stageElement.tabIndex = 0; // 设置为可获取焦点
         this.stageElement = stageElement;
         this.canvasElement = canvasElement;
         this.overlayerElement = overlayerElement;
