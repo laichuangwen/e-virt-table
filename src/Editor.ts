@@ -105,6 +105,10 @@ export default class Editor {
         this.inputEl.setAttribute('rows', '1');
         // 监听键盘事件
         this.inputEl.addEventListener('keydown', (e) => {
+            // 如果是在输入中文过程中，不触发
+            if(e.isComposing){
+                return;
+            }
             if (!this.enable) {
                 return;
             }
