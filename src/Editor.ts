@@ -126,6 +126,7 @@ export default class Editor {
 
                 // 设置光标位置到新行
                 this.inputEl.selectionStart = this.inputEl.selectionEnd = cursorPos + 1;
+                this.autoSize();
                 return;
             }
             if (e.code === 'Escape' || e.code === 'Enter') {
@@ -144,8 +145,8 @@ export default class Editor {
         this.ctx.containerElement.appendChild(this.editorEl);
     }
     private autoSize() {
-        let scrollHeight = this.inputEl.scrollHeight;
         this.inputEl.style.height = 'auto'; // 重置高度
+        let scrollHeight = this.inputEl.scrollHeight;
         let maxHeight = this.ctx.body.visibleHeight;
         if (scrollHeight > maxHeight) {
             scrollHeight = maxHeight;
@@ -163,6 +164,8 @@ export default class Editor {
             this.editorEl.style.top = `auto`;
             this.editorEl.style.bottom = `${stageHeight - bottomY}px`;
         }
+        console.log(scrollHeight);
+        
         this.inputEl.style.height = `${scrollHeight}px`; // 设置为内容的高度
     }
     private startEditByInput(cell: Cell) {
