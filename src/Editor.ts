@@ -164,8 +164,6 @@ export default class Editor {
             this.editorEl.style.top = `auto`;
             this.editorEl.style.bottom = `${stageHeight - bottomY}px`;
         }
-        console.log(scrollHeight);
-        
         this.inputEl.style.height = `${scrollHeight}px`; // 设置为内容的高度
     }
     private startEditByInput(cell: Cell) {

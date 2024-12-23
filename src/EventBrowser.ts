@@ -74,8 +74,13 @@ export default class EventBrowser {
         this.ctx.emit('mouseenter', e);
     }
     private handleMouseLeave(e: Event) {
+        // 编辑器弹出的时候，会回调mouseleave，这个时候不应该触发mouseleave事件
+        if(this.ctx.editing){
+            return;
+        }
         this.ctx.isInsideTargetContainer = false;
         this.ctx.emit('mouseleave', e);
+        
     }
     private handleDblclick(e: Event) {
         this.ctx.emit('dblclick', e);
