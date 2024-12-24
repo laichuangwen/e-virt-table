@@ -424,6 +424,7 @@ for (let i = 0; i < 10000; i += 1) {
         purchasePrice: 10.2 + i,
         salePrice: 12.3 + i,
         children: [],
+        _hasChildren: true,
     });
 }
 for (let i = 0; i < 0; i += 1) {

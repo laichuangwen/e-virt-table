@@ -68,8 +68,8 @@ export default class Database {
      */
     private initData(dataList: any[], level: number = 0) {
         dataList.forEach((item, index) => {
-            let hasChildren = false;
-            if (Array.isArray(item.children)) {
+            let hasChildren = item._hasChildren || false;
+            if (Array.isArray(item.children) && item.children.length) {
                 hasChildren = true;
                 this.initData(item.children, level + 1);
             }
