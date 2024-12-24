@@ -366,18 +366,33 @@ export default class Database {
      * @param history
      * @returns
      */
-    batchSetItemValue(list: ChangeItem[], history = false) {
+    async batchSetItemValue(_list: ChangeItem[], history = false) {
         let changeList: HistoryItemData[] = [];
         const rowKeyList: Set<string> = new Set();
+        let list = _list;
+        const { BEFORE_VALUE_CHANGE_METHOD } = this.ctx.config;
+        if (typeof BEFORE_VALUE_CHANGE_METHOD === 'function') {
+            const beforeCellValueChange: BeforeCellValueChangeMethod = BEFORE_VALUE_CHANGE_METHOD;
+            const changeList = _list.map((item) => ({
+                rowKey: item.rowKey,
+                key: item.key,
+                value: item.value,
+                oldValue: this.getItemValue(item.rowKey, item.key),
+                row: this.ctx.database.getRowDataItemForRowKey(item.rowKey),
+            }));
+            const values = await beforeCellValueChange(changeList);
+            list = values;
+        }
         list.forEach((data) => {
             const { value, rowKey, key } = data;
-            const { oldValue, newValue } = this.setItemValue(rowKey, key, value);
+            const oldValue = this.getItemValue(rowKey, key);
+            this.setItemValue(rowKey, key, value);
             rowKeyList.add(rowKey);
             changeList.push({
                 rowKey,
                 key,
                 oldValue,
-                newValue,
+                newValue: value,
             });
         });
         // 触发change事件
@@ -410,7 +425,7 @@ export default class Database {
                 type: 'multiple',
             });
         }
-        return changeList;
+        this.ctx.emit('draw');
     }
     /**
      *设置单一数据
@@ -422,7 +437,7 @@ export default class Database {
      * @param isEditor 是否是编辑器
      * @returns
      */
-    setItemValue(rowKey: string, key: string, _value: any, history = false, reDraw = false, isEditor = false) {
+    async setItemValue(rowKey: string, key: string, _value: any, history = false, reDraw = false, isEditor = false) {
         // 异常情况
         if (!this.rowKeyMap.has(rowKey)) {
             return {};
@@ -446,23 +461,28 @@ export default class Database {
             this.originalDataMap.set(changeKey, oldValue);
         }
         const originalValue = this.originalDataMap.get(changeKey);
-        // 设置改变值
-        const { BEFORE_VALUE_CHANGE_METHOD } = this.ctx.config;
         let value = _value;
-        if (typeof BEFORE_VALUE_CHANGE_METHOD === 'function') {
-            const beforeCellValueChange: BeforeCellValueChangeMethod = BEFORE_VALUE_CHANGE_METHOD;
-            value = beforeCellValueChange({
-                rowKey,
-                key,
-                oldValue,
-                value: _value,
-                originalValue,
-            });
-        }
-        this.changedDataMap.set(changeKey, value);
-        item[key] = value;
         // 是否是否是编辑器进来的
         if (isEditor) {
+            const { BEFORE_VALUE_CHANGE_METHOD } = this.ctx.config;
+            if (typeof BEFORE_VALUE_CHANGE_METHOD === 'function') {
+                const beforeCellValueChange: BeforeCellValueChangeMethod = BEFORE_VALUE_CHANGE_METHOD;
+                const values = await beforeCellValueChange([
+                    {
+                        rowKey,
+                        key,
+                        value: _value,
+                        oldValue: item[key],
+                        row: this.ctx.database.getRowDataItemForRowKey(rowKey),
+                    },
+                ]);
+                if (values && values.length) {
+                    value = values[0].value;
+                }
+            }
+            // 设置改变值
+            this.changedDataMap.set(changeKey, value);
+            item[key] = value;
             const row = this.ctx.database.getRowDataItemForRowKey(rowKey);
             const changeItem: ChangeItem = {
                 rowKey,
@@ -485,6 +505,9 @@ export default class Database {
                 originalValue,
                 row,
             });
+        } else {
+            this.changedDataMap.set(changeKey, value);
+            item[key] = value;
         }
         // 迭代改变值事件,有改变一次值就触发，包括批量的
         if (this.ctx.hasEvent('iterationChange')) {

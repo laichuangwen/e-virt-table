@@ -80,7 +80,6 @@ export default class History {
       // 不需要添加历史记录
       this.ctx.database.batchSetItemValue(data, false);
       this.historyIndex -= 1;
-      this.ctx.emit("draw");
     }
   }
   // 前进
@@ -100,7 +99,6 @@ export default class History {
       );
       // 不需要添加历史记录
       this.ctx.database.batchSetItemValue(data, false);
-      this.ctx.emit("draw");
     }
   }
   // 清空历史

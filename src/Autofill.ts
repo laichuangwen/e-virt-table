@@ -11,7 +11,7 @@ export default class Autofill {
             if (this.ctx.stageElement.style.cursor === 'crosshair') {
                 this.ctx.stageElement.style.cursor = 'default';
             }
-            const {offsetX, offsetY} = this.ctx.getOffset(e);
+            const { offsetX, offsetY } = this.ctx.getOffset(e);
             const { xArr, yArr } = this.ctx.selector;
             const maxX = xArr[1];
             const maxY = yArr[1];
@@ -164,6 +164,9 @@ export default class Autofill {
         if (!changeList.length) {
             return;
         }
+        // 设置选择器为填充位置
+        this.ctx.selector.xArr = this.ctx.autofill.xArr;
+        this.ctx.selector.yArr = this.ctx.autofill.yArr;
         // 批量设置数据，并记录历史
         this.ctx.database.batchSetItemValue(changeList, true);
         let rows: any[] = [];
@@ -171,10 +174,6 @@ export default class Autofill {
             rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
         });
         this.ctx.emit('autofillChange', changeList, rows);
-        // 设置选择器为填充位置
-        this.ctx.selector.xArr = this.ctx.autofill.xArr;
-        this.ctx.selector.yArr = this.ctx.autofill.yArr;
-        this.ctx.emit('draw');
     }
     private mouseenter(cell: Cell) {
         if (['index', 'selection', 'index-selection'].includes(cell.type)) {

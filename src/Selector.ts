@@ -473,7 +473,6 @@ export default class Selector {
             rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
         });
         this.ctx.emit('clearSelectedDataChange', changeList, rows);
-        this.ctx.emit('draw');
         return changeList;
     }
     private paste() {
@@ -537,6 +536,8 @@ export default class Selector {
                     if (!changeList.length) {
                         return;
                     }
+                    // 清除复制线
+                    this.clearCopyLine();
                     // 批量设置数据，并记录历史
                     this.ctx.database.batchSetItemValue(changeList, true);
                     let rows: any[] = [];
@@ -544,9 +545,6 @@ export default class Selector {
                         rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
                     });
                     this.ctx.emit('pasteChange', changeList, rows);
-                    // 清除复制线
-                    this.clearCopyLine();
-                    this.ctx.emit('draw');
                 })
                 .catch((error) => {
                     console.error('获取剪贴板内容失败：', error);

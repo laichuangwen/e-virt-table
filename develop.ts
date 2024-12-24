@@ -551,20 +551,39 @@ const eVirtTable = new EVirtTable(canvas, {
             },
         ],
         // 改变前需要篡改数据
-        BEFORE_VALUE_CHANGE_METHOD: (params) => {
-            const { value, key, oldValue } = params;
-            if (key === 'requiredQuantity') {
-                // 清空的
-                if ([null, '', undefined].includes(value)) {
-                    return value;
-                }
-                // 数字的
-                if (!isNaN(value) && Number(value) < 1000000000) {
-                    return Number(value);
-                }
-                return oldValue;
-            }
-            return value;
+        BEFORE_VALUE_CHANGE_METHOD:  (changeList) => {
+            return changeList;
+            // if(changeList.some((item) => item.key !== 'requiredQuantity')) {
+            //     return changeList.map(item=>{
+            //       item.row.emp_name = '张三111';
+            //     });
+            // }
+            // return new Promise((resolve) => {
+            //     setTimeout(() => {
+            //         const ll = changeList.map((item) => {
+            //             const { value, key, rowKey, oldValue } = item;
+            //             if (key === 'requiredQuantity') {
+            //                 // 清空的
+            //                 if ([null, '', undefined].includes(value)) {
+            //                     return item;
+            //                 }
+            //                 // 数字的
+            //                 if (!isNaN(value) && Number(value) < 1000000000) {
+            //                     return {
+            //                         ...item,
+            //                         value: Number(value),
+            //                     };
+            //                 }
+            //                 return {
+            //                     ...item,
+            //                     value: oldValue,
+            //                 };
+            //             }
+            //             return item;
+            //         });
+            //         resolve(ll);
+            //     }, 1000);
+            // });
         },
         EXPAND_LAZY_METHOD: (params: any) => {
             const i = params.row.id;
