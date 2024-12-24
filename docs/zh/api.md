@@ -220,6 +220,7 @@
 | ---------- | ------ | ------ | ------ | ------ |
 | \_readonly | 行只读 | string | —      | —      |
 | \_height   | 行高度 | string | —      | —      |
+| \_hasChildren   | 是否有子，仅type=tree生效 | boolean | —      | —      |
 
 ## Rule
 
