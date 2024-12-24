@@ -94,14 +94,14 @@
 | HEADER_CELL_STYLE_METHOD | 自定义表头单元格样式 | ^[Function]`({column,colIndex})=>CellStyleOptions` | — | — |
 | BODY_CELL_STYLE_METHOD | 自定义 body 单元格样式 | ^[Function]`({row, column, rowIndex, colIndex,value,isHasChanged})=>CellStyleOptions` | — | — |
 | FOOTER_CELL_STYLE_METHOD | 自定 footer 义单元格样式 | ^[Function]`({row, column, rowIndex, colIndex,value})=>CellStyleOptions` | — | — |
-| BODY_CELL_READONLY_METHOD | 自定义只读 | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean` | — | — |
-| BODY_CELL_FORMATTER_METHOD | 自定义格式化 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string` | — | — |
-| BODY_CELL_RULES_METHOD | 自定义校验规则 | ^[Function]`({row, column, rowIndex, colIndex,value})=>Rules` | — | — |
-| BODY_CELL_TYPE_METHOD | 自定义类型 | ^[Function]`({row, column, rowIndex, colIndex,value})=>Type` | — | — |
-| BODY_CELL_EDITOR_TYPE_METHOD | 自定义编辑器类型 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string` | — | — |
-| BODY_CELL_RENDER_METHOD | 自定义单元格渲染 | ^[Function]`({row, column, rowIndex, colIndex,headIndex,visibleRows,rows})=>string` | — | — |
+| BODY_CELL_READONLY_METHOD | 自定义只读 | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean\|viod` | — | — |
+| BODY_CELL_FORMATTER_METHOD | 自定义格式化 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — | — |
+| BODY_CELL_RULES_METHOD | 自定义校验规则 | ^[Function]`({row, column, rowIndex, colIndex,value})=>Rules\|viod` | — | — |
+| BODY_CELL_TYPE_METHOD | 自定义类型 | ^[Function]`({row, column, rowIndex, colIndex,value})=>Type\|viod` | — | — |
+| BODY_CELL_EDITOR_TYPE_METHOD | 自定义编辑器类型 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — | — |
+| BODY_CELL_RENDER_METHOD | 自定义单元格渲染 | ^[Function]`({row, column, rowIndex, colIndex,headIndex,visibleRows,rows})=>string\|viod` | — | — |
 | SPAN_METHOD | 自定义跨列/行渲染 | ^[Function]`({row, column, rowIndex, colIndex,value,visibleLeafColumns,headIndex,headPosition,visibleRows,rows})=>SpanType` | — | — |
-| SELECTABLE_METHOD | 自定义选择禁用 | ^[Function]`({row, rowIndex})=>boolean` | — | — |
+| SELECTABLE_METHOD | 自定义选择禁用 | ^[Function]`({row, rowIndex})=>boolean\|viod` | — | — |
 | EXPAND_LAZY_METHOD | tree 懒加载展开 | ^[Function]`({row, column, rowIndex, colIndex,value})=>Promise` | — | — |
 | BEFORE_VALUE_CHANGE_METHOD | 数值改变前回调 | ^[Function]`({rowKey, key, oldValue, originalValue,value})` | — | — |
 
