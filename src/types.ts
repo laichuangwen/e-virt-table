@@ -144,21 +144,7 @@ export type CellParams = {
     column: Column;
     value: any;
 };
-export type BeforeCellValueChangeParams = {
-    rowKey: string;
-    key: string;
-    value: any;
-    oldValue: any;
-    row: any;
-};
-export type BeforePasteChangeParams = {
-    rowKey: string;
-    key: string;
-    value: any;
-    oldValue: any;
-    row: any;
-};
-export type BeforeAutofillChangeParams = {
+type BeforeChangeParams = {
     rowKey: string;
     key: string;
     value: any;
@@ -212,11 +198,11 @@ export type SpanMethod = (params: SpanParams) => SpanType | void;
 export type SelectableMethod = (params: SelectableParams) => boolean | void;
 export type ExpandLazyMethod = (params: CellParams) => Promise<any[]>;
 export type BeforeCellValueChangeMethod = (
-    params: BeforeCellValueChangeParams[],
-) => BeforeCellValueChangeParams[] | Promise<BeforeCellValueChangeParams[]>;
+    params: BeforeChangeParams[],
+) => BeforeChangeParams[] | Promise<BeforeChangeParams[]>;
 export type BeforePasteChangeMethod = (
-    params: BeforePasteChangeParams[],
-) => BeforePasteChangeParams[] | Promise<BeforePasteChangeParams[]>;
+    params: BeforeChangeParams[],
+) => BeforeChangeParams[] | Promise<BeforeChangeParams[]>;
 export type BeforeAutofillChangeMethod = (
-    params: BeforeAutofillChangeParams[],
-) => BeforeAutofillChangeParams[] | Promise<BeforeAutofillChangeParams[]>;
+    params: BeforeChangeParams[],
+) => BeforeChangeParams[] | Promise<BeforeChangeParams[]>;
