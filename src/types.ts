@@ -151,6 +151,13 @@ export type BeforeCellValueChangeParams = {
     oldValue: any;
     row: any;
 };
+export type BeforePasteChangeParams = {
+    rowKey: string;
+    key: string;
+    value: any;
+    oldValue: any;
+    row: any;
+};
 export type CellStyleParams = {
     row: any;
     rowIndex: number;
@@ -197,4 +204,9 @@ export type CellHoverIconMethod = (params: CellParams) => string | void;
 export type SpanMethod = (params: SpanParams) => SpanType | void;
 export type SelectableMethod = (params: SelectableParams) => boolean | void;
 export type ExpandLazyMethod = (params: CellParams) => Promise<any[]>;
-export type BeforeCellValueChangeMethod = (params: BeforeCellValueChangeParams[]) => any;
+export type BeforeCellValueChangeMethod = (
+    params: BeforeCellValueChangeParams[],
+) => BeforeCellValueChangeParams[] | Promise<BeforeCellValueChangeParams[]>;
+export type BeforePasteChangeMethod = (
+    params: BeforePasteChangeParams[],
+) => BeforePasteChangeParams[] | Promise<BeforePasteChangeParams[]>;

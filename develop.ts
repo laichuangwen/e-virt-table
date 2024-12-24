@@ -551,7 +551,7 @@ const eVirtTable = new EVirtTable(canvas, {
             },
         ],
         // 改变前需要篡改数据
-        BEFORE_VALUE_CHANGE_METHOD:  (changeList) => {
+        BEFORE_VALUE_CHANGE_METHOD: (changeList) => {
             return changeList;
             // if(changeList.some((item) => item.key !== 'requiredQuantity')) {
             //     return changeList.map(item=>{
@@ -585,6 +585,21 @@ const eVirtTable = new EVirtTable(canvas, {
             //     }, 1000);
             // });
         },
+        // BEFORE_PASTE_CHANGE_METHOD: (changeList) => {
+        //     return new Promise((resolve) => {
+        //         setTimeout(() => {
+        //             console.log('BEFORE_PASTE_CHANGE_METHOD', changeList);
+        //             const ll = changeList.map((item) => {
+        //                 const { value } = item;
+        //                 return {
+        //                     ...item,
+        //                     value: `${value}粘贴`,
+        //                 };
+        //             });
+        //             resolve(ll);
+        //         }, 1000);
+        //     });
+        // },
         EXPAND_LAZY_METHOD: (params: any) => {
             const i = params.row.id;
             return new Promise((resolve) => {

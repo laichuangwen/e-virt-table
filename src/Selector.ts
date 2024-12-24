@@ -1,7 +1,7 @@
 import type Context from './Context';
 import type Cell from './Cell';
 import type CellHeader from './CellHeader';
-import { ChangeItem } from './types';
+import { BeforePasteChangeMethod, ChangeItem } from './types';
 import { throttle, decodeSpreadsheetStr, encodeToSpreadsheetStr } from './util';
 export default class Selector {
     private isCut = false;
@@ -487,7 +487,7 @@ export default class Selector {
             const rowKeyList: Set<string> = new Set();
             navigator.clipboard
                 .readText()
-                .then((val) => {
+                .then(async (val) => {
                     let textArr = decodeSpreadsheetStr(val);
                     let changeList: ChangeItem[] = [];
                     for (let ri = 0; ri <= textArr.length - 1; ri++) {
@@ -535,6 +535,19 @@ export default class Selector {
                     // 没有变化就返回
                     if (!changeList.length) {
                         return;
+                    }
+                    // 剪贴板内容改变前回调
+                    const { BEFORE_PASTE_CHANGE_METHOD } = this.ctx.config;
+                    if (typeof BEFORE_PASTE_CHANGE_METHOD === 'function') {
+                        const beforePasteChangeMethod: BeforePasteChangeMethod = BEFORE_PASTE_CHANGE_METHOD;
+                        const _changeList = changeList.map((item) => ({
+                            rowKey: item.rowKey,
+                            key: item.key,
+                            value: item.value,
+                            oldValue: this.ctx.database.getItemValue(item.rowKey, item.key),
+                            row: this.ctx.database.getRowDataItemForRowKey(item.rowKey),
+                        }));
+                        changeList = await beforePasteChangeMethod(_changeList);
                     }
                     // 清除复制线
                     this.clearCopyLine();
