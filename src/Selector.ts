@@ -418,7 +418,6 @@ export default class Selector {
             return;
         }
         const { value } = this.ctx.getSelectedData();
-
         const text = encodeToSpreadsheetStr(value);
         if (navigator.clipboard) {
             navigator.clipboard
@@ -427,7 +426,11 @@ export default class Selector {
                     // 处理复制线
                     this.ctx.selector.xArrCopy = this.ctx.selector.xArr.slice();
                     this.ctx.selector.yArrCopy = this.ctx.selector.yArr.slice();
-                    this.ctx.emit('setCopy', this.ctx.selector);
+                    this.ctx.emit('copyChange', {
+                        xArr: this.ctx.selector.xArrCopy,
+                        yArr: this.ctx.selector.yArrCopy,
+                        data: value,
+                    });
                     this.ctx.emit('draw');
                 })
                 .catch((error) => console.error('复制失败：', error));
