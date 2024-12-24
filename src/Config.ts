@@ -1,5 +1,6 @@
 import { IconType } from './Icons';
 import {
+    BeforeAutofillChangeMethod,
     BeforeCellValueChangeMethod,
     BeforePasteChangeMethod,
     CellEditorTypeMethod,
@@ -135,6 +136,7 @@ export default class Config {
     EXPAND_LAZY_METHOD?: ExpandLazyMethod;
     BEFORE_VALUE_CHANGE_METHOD?: BeforeCellValueChangeMethod;
     BEFORE_PASTE_CHANGE_METHOD?: BeforePasteChangeMethod;
+    BEFORE_AUTOFILL_CHANGE_METHOD?: BeforeAutofillChangeMethod;
     constructor(config: Partial<Config>) {
         Object.assign(this, config);
     }

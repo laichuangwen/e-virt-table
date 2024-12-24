@@ -119,7 +119,7 @@ export default class Autofill {
     /**
      * 填充数据
      */
-    private autofillData() {
+    private async autofillData() {
         const rowKeyList: Set<string> = new Set();
         const selector = this.ctx.getSelectedData();
         // 存复制赋值的位置,用于剔除填充
@@ -163,6 +163,19 @@ export default class Autofill {
         // 没有变化就返回
         if (!changeList.length) {
             return;
+        }
+        // 填充内容改变前回调
+        const { BEFORE_AUTOFILL_CHANGE_METHOD } = this.ctx.config;
+        if (typeof BEFORE_AUTOFILL_CHANGE_METHOD === 'function') {
+            const beforeAutofillChangeMethod = BEFORE_AUTOFILL_CHANGE_METHOD;
+            const _changeList = changeList.map((item) => ({
+                rowKey: item.rowKey,
+                key: item.key,
+                value: item.value,
+                oldValue: this.ctx.database.getItemValue(item.rowKey, item.key),
+                row: this.ctx.database.getRowDataItemForRowKey(item.rowKey),
+            }));
+            changeList = await beforeAutofillChangeMethod(_changeList);
         }
         // 设置选择器为填充位置
         this.ctx.selector.xArr = this.ctx.autofill.xArr;

@@ -158,6 +158,13 @@ export type BeforePasteChangeParams = {
     oldValue: any;
     row: any;
 };
+export type BeforeAutofillChangeParams = {
+    rowKey: string;
+    key: string;
+    value: any;
+    oldValue: any;
+    row: any;
+};
 export type CellStyleParams = {
     row: any;
     rowIndex: number;
@@ -210,3 +217,6 @@ export type BeforeCellValueChangeMethod = (
 export type BeforePasteChangeMethod = (
     params: BeforePasteChangeParams[],
 ) => BeforePasteChangeParams[] | Promise<BeforePasteChangeParams[]>;
+export type BeforeAutofillChangeMethod = (
+    params: BeforeAutofillChangeParams[],
+) => BeforeAutofillChangeParams[] | Promise<BeforeAutofillChangeParams[]>;

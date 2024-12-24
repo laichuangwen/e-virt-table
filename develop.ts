@@ -600,6 +600,21 @@ const eVirtTable = new EVirtTable(canvas, {
         //         }, 1000);
         //     });
         // },
+        // BEFORE_AUTOFILL_CHANGE_METHOD: (changeList) => {
+        //     return new Promise((resolve) => {
+        //         setTimeout(() => {
+        //             console.log('BEFORE_PASTE_CHANGE_METHOD', changeList);
+        //             const ll = changeList.map((item) => {
+        //                 const { value } = item;
+        //                 return {
+        //                     ...item,
+        //                     value: `${value}填充`,
+        //                 };
+        //             });
+        //             resolve(ll);
+        //         }, 1000);
+        //     });
+        // },
         EXPAND_LAZY_METHOD: (params: any) => {
             const i = params.row.id;
             return new Promise((resolve) => {
