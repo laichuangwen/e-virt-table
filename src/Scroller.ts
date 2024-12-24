@@ -126,6 +126,14 @@ class Scrollbar {
             pointY <= elementY + elementHeight
         );
     }
+    private hasScrollbar(): boolean {
+        if (this.type === 'vertical') {
+            return this.barHeight > 0;
+        } else if (this.type === 'horizontal') {
+            return this.barWidth > 0;
+        }
+        return false;
+    }
 
     private isOnScrollbar(x: number, y: number): boolean {
         return this.isPointInElement(x, y, this.barX, this.barY, this.barWidth, this.barHeight);
@@ -139,7 +147,8 @@ class Scrollbar {
         const deltaY = e.deltaY;
         if (this.type === 'vertical' && e.shiftKey === false) {
             // 只有在滚动条需要滚动时才阻止默认事件
-            if (!((this.scroll === 0 && deltaY < 0) || (this.scroll === this.distance && deltaY > 0))) {
+            const hasScrollbar = this.hasScrollbar();
+            if (hasScrollbar && !((this.scroll === 0 && deltaY < 0) || (this.scroll === this.distance && deltaY > 0))) {
                 e.preventDefault();
             }
             this.scroll = Math.max(0, Math.min(this.scroll + deltaY, this.distance));
