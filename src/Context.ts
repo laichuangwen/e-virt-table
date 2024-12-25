@@ -17,6 +17,8 @@ export type containerElementOptions = {
     canvasElement: HTMLCanvasElement;
     overlayerElement: HTMLDivElement;
     editorElement: HTMLDivElement;
+    emptyElement?: HTMLDivElement;
+    contextMenuElement?: HTMLDivElement;
 };
 export type HeaderOptions = {
     x: number;
@@ -76,6 +78,8 @@ export default class Context {
     canvasElement: HTMLCanvasElement;
     overlayerElement: HTMLDivElement;
     editorElement: HTMLDivElement;
+    emptyElement?: HTMLDivElement;
+    contextMenuElement?: HTMLDivElement;
     stageWidth = 0;
     stageHeight = 0;
     paint: Paint;
@@ -158,13 +162,23 @@ export default class Context {
     config: Config;
 
     constructor(containerOptions: containerElementOptions, options: EVirtTableOptions) {
-        const { containerElement, stageElement, canvasElement, overlayerElement, editorElement } = containerOptions;
+        const {
+            containerElement,
+            stageElement,
+            canvasElement,
+            overlayerElement,
+            editorElement,
+            emptyElement,
+            contextMenuElement,
+        } = containerOptions;
         this.containerElement = containerElement;
         stageElement.tabIndex = 0; // 设置为可获取焦点
         this.stageElement = stageElement;
         this.canvasElement = canvasElement;
         this.overlayerElement = overlayerElement;
         this.editorElement = editorElement;
+        this.emptyElement = emptyElement;
+        this.contextMenuElement = contextMenuElement;
         this.config = new Config(options.config || {});
         this.eventBus = new EventBus();
         this.eventBrowser = new EventBrowser(this);

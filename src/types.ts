@@ -9,6 +9,8 @@ export type EVirtTableOptions = {
     config?: ConfigType;
     overlayerElement?: HTMLDivElement;
     editorElement?: HTMLDivElement;
+    emptyElement?: HTMLDivElement;
+    contextMenuElement?: HTMLDivElement;
 };
 export type EventCallback = (...args: any[]) => void;
 export type ChangeItem = {

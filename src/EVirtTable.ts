@@ -37,8 +37,14 @@ export default class EVirtTable {
     ctx: Context;
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
         this.options = options;
-        const { overlayerElement, editorElement } = options;
-        const containerElement = this.createContainer(target, overlayerElement, editorElement);
+        const { overlayerElement, editorElement, emptyElement, contextMenuElement } = options;
+        const containerElement = this.createContainer(
+            target,
+            overlayerElement,
+            editorElement,
+            emptyElement,
+            contextMenuElement,
+        );
         this.ctx = new Context(containerElement, this.options);
         this.header = new Header(this.ctx);
         this.body = new Body(this.ctx);
@@ -63,6 +69,8 @@ export default class EVirtTable {
         containerElement: HTMLDivElement,
         _overlayerElement?: HTMLDivElement,
         _editorElement?: HTMLDivElement,
+        _emptyElement?: HTMLDivElement,
+        _contextMenuElement?: HTMLDivElement,
     ) {
         containerElement.className = 'e-virt-table-container';
         const stageElement = document.createElement('div');
@@ -73,6 +81,8 @@ export default class EVirtTable {
         overlayerElement.className = 'e-virt-table-overlayer';
         const editorElement = _editorElement || document.createElement('div');
         editorElement.className = 'e-virt-table-editor';
+        const emptyElement = _emptyElement;
+        const contextMenuElement = _contextMenuElement;
         stageElement.appendChild(canvasElement);
         stageElement.appendChild(overlayerElement);
         containerElement.appendChild(stageElement);
@@ -82,6 +92,8 @@ export default class EVirtTable {
             canvasElement,
             overlayerElement,
             editorElement,
+            emptyElement,
+            contextMenuElement,
         };
     }
     draw(ignoreOverlayer = false) {

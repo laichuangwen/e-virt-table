@@ -104,6 +104,8 @@
 | SELECTABLE_METHOD | 自定义选择禁用 | ^[Function]`({row, rowIndex})=>boolean\|viod` | — | — |
 | EXPAND_LAZY_METHOD | tree 懒加载展开 | ^[Function]`({row, column, rowIndex, colIndex,value})=>Promise<any[]>` | — | — |
 | BEFORE_VALUE_CHANGE_METHOD | 数值改变前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
+| BEFORE_PASTE_CHANGE_METHOD | 数值粘贴前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
+| BEFORE_AUTOFILL_CHANGE_METHOD | 数值填充前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
 
 ## Events
 

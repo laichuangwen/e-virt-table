@@ -5,9 +5,16 @@ import Cell from './Cell';
 export default class ContextMenu {
     private ctx: Context;
     private contextMenuEl: HTMLDivElement;
+    private coustom = false;
     constructor(ctx: Context) {
         this.ctx = ctx;
-        this.contextMenuEl = document.createElement('div');
+        if (this.ctx.contextMenuElement) {
+            this.coustom = true;
+            this.contextMenuEl = this.ctx.contextMenuElement;
+        } else {
+            this.coustom = false;
+            this.contextMenuEl = document.createElement('div');
+        }
         this.createContextMenu();
         this.init();
     }
@@ -51,9 +58,10 @@ export default class ContextMenu {
     }
     //创建右键菜单，绑定子项点击事件
     private createContextMenu() {
-        this.contextMenuEl.replaceChildren();
         this.contextMenuEl.className = 'e-virt-table-context-menu';
         this.ctx.containerElement.appendChild(this.contextMenuEl);
+        // 如果是自定义右键菜单，则不创建默认子菜单
+        if(this.coustom) return;
         const { CONTEXT_MENU } = this.ctx.config;
         this.createContextMenuItems(CONTEXT_MENU, (item: MenuItem) => {
             switch (item.value) {
@@ -76,6 +84,7 @@ export default class ContextMenu {
     }
     //创建右键菜单子项元素
     private createContextMenuItems(items: MenuItem[], callback: (e: MenuItem) => void) {
+        this.contextMenuEl.replaceChildren();
         items.forEach((item: MenuItem) => {
             const menuItemEl: HTMLDivElement = document.createElement('div');
             menuItemEl.className = 'e-virt-table-context-menu-item';
