@@ -31,7 +31,6 @@ export default class Config {
     RESIZE_MIN_WIDTH: number = 40;
     HEIGHT: number = 0;
     EMPTY_BODY_HEIGHT: number = 120;
-    EMPTY_CUSTOM = false;
     EMPTY_CUSTOM_STYLE: Partial<CSSStyleDeclaration> = {};
     EMPTY_TEXT = '暂无数据';
     MAX_HEIGHT: number = 1000;

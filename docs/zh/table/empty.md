@@ -6,7 +6,6 @@
 
 | 参数               | 说明             | 类型                           | 可选值 | 默认值   |
 | ------------------ | ---------------- | ------------------------------ | ------ | -------- |
-| EMPTY_CUSTOM       | 是否开启自定义   | boolean                        | —      | false    |
 | EMPTY_CUSTOM_STYLE | 自定义空样式     | ^[object]`CSSStyleDeclaration` | —      | {}       |
 | EMPTY_BODY_HEIGHT  | 空数据 body 高度 | number                         | —      | 120      |
 | EMPTY_TEXT         | 空数据文本       | string                         | —      | 暂无数据 |

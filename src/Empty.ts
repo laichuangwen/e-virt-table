@@ -4,7 +4,7 @@ export default class Tooltip {
     private emptyEl: HTMLDivElement;
     constructor(ctx: Context) {
         this.ctx = ctx;
-        const { EMPTY_TEXT, EMPTY_CUSTOM, EMPTY_CUSTOM_STYLE } = this.ctx.config;
+        const { EMPTY_TEXT, EMPTY_CUSTOM_STYLE } = this.ctx.config;
         if (this.ctx.emptyElement) {
             this.emptyEl = this.ctx.emptyElement;
         } else {
