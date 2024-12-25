@@ -97,10 +97,11 @@ export const markdownConfig = (md) => {
                         `<script src="https://unpkg.com/e-virt-table@${pkg.version}/dist/index.umd.js"></script>`,
                     );
                 }
+                const sourcePath = `/examples/${sourceFile}.html`;
                 if (!source) throw new Error(`Incorrect source file: ${sourceFile}`);
                 return `<Demo source="${encodeURIComponent(
                     highlight(source, 'html'),
-                )}"  height="${height}" width="${width}" description="${encodeURIComponent(
+                )}" path="${sourcePath}"  height="${height}" width="${width}" description="${encodeURIComponent(
                     md.render(description),
                 )}" raw-source="${encodeURIComponent(source)}" >\n`;
             } else {

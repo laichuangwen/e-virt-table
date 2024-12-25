@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>e-virt-table</title>
     </head>
-    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <script src="/examples/index.umd.js"></script>
     <body>
         <div id="e-virt-table"></div>
     </body>
@@ -82,14 +82,28 @@
             columns,
             config: {
                 ENABLE_SELECTOR: true,
-                BEFORE_VALUE_CHANGE_METHOD: ({ value, oldValue }) => {
-                    if (value === null) {
-                        return;
+                BEFORE_VALUE_CHANGE_METHOD: (changeList) => {
+                    console.log(changeList);
+                    // 返回一个Promise类型，那么会等待Promise resolve之后再更新数据
+                    // 只有当所有的数据都是 age 字段的时候，才会触发Promise类型
+                    if (changeList.every((data) => data.key === 'age')) {
+                        return new Promise((resolve) => {
+                            setTimeout(() => {
+                                resolve(
+                                    changeList.map((data) => ({
+                                        ...data,
+                                        value: `${data.value}Promise`,
+                                    })),
+                                );
+                            }, 3000);
+                        });
+                    } else {
+                        // 否则直接返回数据
+                        return changeList.map((data) => ({
+                            ...data,
+                            value: `${data.value}Sync`,
+                        }));
                     }
-                    if (/^-?\d+(\.\d+)?$/.test(value)) {
-                        return Number(value);
-                    }
-                    return oldValue;
                 },
             },
         });

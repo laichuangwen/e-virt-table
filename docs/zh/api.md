@@ -102,8 +102,8 @@
 | BODY_CELL_RENDER_METHOD | 自定义单元格渲染 | ^[Function]`({row, column, rowIndex, colIndex,headIndex,visibleRows,rows})=>string\|viod` | — | — |
 | SPAN_METHOD | 自定义跨列/行渲染 | ^[Function]`({row, column, rowIndex, colIndex,value,visibleLeafColumns,headIndex,headPosition,visibleRows,rows})=>SpanType` | — | — |
 | SELECTABLE_METHOD | 自定义选择禁用 | ^[Function]`({row, rowIndex})=>boolean\|viod` | — | — |
-| EXPAND_LAZY_METHOD | tree 懒加载展开 | ^[Function]`({row, column, rowIndex, colIndex,value})=>Promise` | — | — |
-| BEFORE_VALUE_CHANGE_METHOD | 数值改变前回调 | ^[Function]`({rowKey, key, oldValue, originalValue,value})` | — | — |
+| EXPAND_LAZY_METHOD | tree 懒加载展开 | ^[Function]`({row, column, rowIndex, colIndex,value})=>Promise<any[]>` | — | — |
+| BEFORE_VALUE_CHANGE_METHOD | 数值改变前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
 
 ## Events
 
@@ -258,7 +258,13 @@ type ChangeItem = {
     key: string;
     rowKey: string;
 };
-
+type BeforeChangeParams = {
+    rowKey: string;
+    key: string;
+    value: any;
+    oldValue: any;
+    row: any;
+};
 type CellStyleOptions = {
     color?: string;
     backgroundColor?: string;

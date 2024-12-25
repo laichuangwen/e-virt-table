@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitepress';
 import { markdownConfig } from './plugins/markdown-plugin';
+import middlewaresPlugin from './plugins/middlewares-plugin';
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
     base: '/e-virt-table/',
@@ -10,6 +11,9 @@ export default defineConfig({
         'A powerful data table based on canvas. You can use it as data grid、Microsoft Excel or Google sheets. It supports virtual scroll、cell edit etc.',
     markdown: {
         config: markdownConfig,
+    },
+    vite: {
+        plugins: [middlewaresPlugin()],
     },
     locales: {
         zh: {

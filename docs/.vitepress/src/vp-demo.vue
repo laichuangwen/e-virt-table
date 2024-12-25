@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref,computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useClipboard, useToggle } from '@vueuse/core';
 import { ElMessage } from 'element-plus';
 import IconCopy from './icon-copy.vue';
@@ -9,18 +9,18 @@ import IconTop from './icon-top.vue';
 import IconStart from './icon-start.vue';
 import { ElTooltip, ElIcon, ElCollapseTransition } from 'element-plus';
 import SourceCode from './vp-source-code.vue';
-
 const [sourceVisible, toggleSourceVisible] = useToggle();
 
 const props = defineProps<{
     width: string;
     height: string;
     source: string;
+    path: string;
     rawSource: string;
     description: string;
 }>();
 const decodedRawSource = computed(() => {
-  return decodeURIComponent(props.rawSource);
+    return decodeURIComponent(props.rawSource);
 });
 const { copy } = useClipboard({
     source: decodeURIComponent(props.rawSource),
@@ -28,6 +28,9 @@ const { copy } = useClipboard({
 });
 const decodedDescription = computed(() => {
     return decodeURIComponent(props.description);
+});
+const development = computed(() => {
+    return process.env.NODE_ENV === 'development';
 });
 const copyCode = async () => {
     try {
@@ -82,10 +85,23 @@ const goCodepen = () => {
         <div text="sm" m="y-4" v-html="decodedDescription" />
         <div class="example">
             <div class="example-showcase" ref="showcase">
-                <iframe :srcdoc="decodedRawSource" :style="{
-                    width: props.width,
-                    height: props.height,
-                }"/>
+                <template v-if="development">
+                    <iframe
+                        :src="props.path"
+                        :style="{
+                            width: props.width,
+                            height: props.height,
+                        }"
+                    />
+                </template>
+                <iframe
+                    v-else
+                    :srcdoc="decodedRawSource"
+                    :style="{
+                        width: props.width,
+                        height: props.height,
+                    }"
+                />
             </div>
             <div class="op-btns">
                 <ElTooltip content="全屏" :show-arrow="false">
