@@ -6,6 +6,7 @@ import { throttle, decodeSpreadsheetStr, encodeToSpreadsheetStr } from './util';
 export default class Selector {
     private isCut = false;
     private isMultipleRow = false;
+    private mousedownHeader = false;
     private ctx: Context;
     private adjustPositionX = '';
     private adjustPositionY = '';
@@ -30,7 +31,7 @@ export default class Selector {
                     offsetY < this.ctx.header.visibleHeight + this.ctx.body.visibleHeight;
                 if (this.ctx.selectorMove || this.ctx.autofillMove) {
                     // 如果是body外部就调整位置
-                    if (!isInsideBody) {
+                    if (!isInsideBody && !this.mousedownHeader) {
                         this.startAdjustPosition(e);
                     } else {
                         this.stopAdjustPosition();
@@ -78,6 +79,7 @@ export default class Selector {
             this.click(e.shiftKey);
         });
         this.ctx.on('mouseup', () => {
+            this.mousedownHeader = false;
             // mousedown销毁dom会导致click事件清除
             // 加个setTimeout小延迟一下，使得editor cellClick 判断adjustPositioning正常
             const timer = setTimeout(() => {
@@ -98,6 +100,7 @@ export default class Selector {
             if (this.ctx.isPointer) {
                 return;
             }
+            this.mousedownHeader = true;
             this.selectCols(cell);
         });
         this.ctx.on('keydown', (e) => {
