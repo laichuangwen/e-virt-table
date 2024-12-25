@@ -34,7 +34,6 @@ export default class EventBrowser {
         this.ctx.emit('resize', e);
     }
     private handleMouseDown(e: Event) {
-        e.preventDefault();
         const _e = e as MouseEvent;
         if (_e.button === 0) {
             this.ctx.mousedown = true;
@@ -42,7 +41,6 @@ export default class EventBrowser {
         this.ctx.emit('mousedown', e);
     }
     private handleMousemove(e: Event) {
-        e.preventDefault();
         this.ctx.emit('mousemove', e);
     }
     private handleMouseUp(e: Event) {

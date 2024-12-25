@@ -198,6 +198,7 @@ export default class CellHeader extends BaseCell {
             width: `${this.width}px`,
             height: `${this.height - 2}px`,
             pointerEvents: 'initial',
+            userSelect: 'none',
         };
     }
 }

@@ -582,6 +582,7 @@ export default class Cell extends BaseCell {
             width: `${this.visibleWidth}px`,
             height: `${this.visibleHeight}px`,
             pointerEvents: 'initial',
+            userSelect: 'none',
         };
     }
     draw() {
