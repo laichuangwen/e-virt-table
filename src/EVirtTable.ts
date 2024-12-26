@@ -145,6 +145,9 @@ export default class EVirtTable {
     on(event: string, callback: EventCallback) {
         this.ctx.on(event, callback);
     }
+    emit(event: string, ...args: any[]): void {
+        this.ctx.emit(event, ...args);
+    }
     off(event: string, callback: EventCallback) {
         this.ctx.off(event, callback);
     }
@@ -320,6 +323,9 @@ export default class EVirtTable {
     }
     getCellValueByIndex(rowIndex: number, colIndex: number) {
         return this.ctx.database.getItemValueForRowIndexAndColIndex(rowIndex, colIndex);
+    }
+    contextMenuHide() {
+        this.contextMenu.hide();
     }
     /**
      * 销毁
