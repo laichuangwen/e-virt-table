@@ -171,6 +171,7 @@ type EVirtTableOptions = {
 | loadData               | 加载 body 数据                | Row[]                                                     |
 | loadFooterData         | 加载 footer 数据              | Row[]                                                     |
 | on                     | 监听事件                      | `(event,callback)`配置参考 event                          |
+| emit                   | 发出监听事件                  | `(event,callback)`配置参考 event                          |
 | off                    | 移除监听事件                  | `(event,callback)`配置参考 event                          |
 | filterMethod           | 过滤数据方法                  | FilterMethod                                              |
 | setLoading             | 设置加载方法                  | boolean                                                   |
@@ -204,6 +205,7 @@ type EVirtTableOptions = {
 | toggleAllSelection     | 切换所有行的选中状态          | —                                                         |
 | getPositionForRowIndex | 获取当前行的高度定位          | —                                                         |
 | getCellValue           | 通过 rowKey 和 key 获取格子值 | (rowKey, key)                                             |
+| contextMenuHide        | 隐藏右键菜单                          | —                                                         |
 | destroy                | 销毁                          | —                                                         |
 
 
