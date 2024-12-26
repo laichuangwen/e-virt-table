@@ -13,6 +13,19 @@
 | ENABLE_SELECTOR_SPAN_ROW | 启用选择器-批量跨行选择 | boolean | —      | true   |
 | ENABLE_SELECTOR_ALL_ROWS | 启用选择器-批量选中列   | boolean | —      | true   |
 | ENABLE_SELECTOR_ALL_COLS | 启用选择器-批量选中行   | boolean | —      | true   |
+| BEFORE_AUTOFILL_CHANGE_METHOD | 数值填充前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
+
+## Typings
+
+``` ts
+type BeforeChangeParams = {
+    rowKey: string;
+    key: string;
+    value: any;
+    oldValue: any;
+    row: any;
+};
+```
 
 ## 禁用
 
@@ -29,6 +42,16 @@ h:220px
 - 选择器默认是禁用，如果需要启用设置`config.ENABLE_AUTOFILL`为`true`
 ::: demo
 autofill/enable
+h:220px
+:::
+
+## 数据更改前
+
+- BEFORE_AUTOFILL_CHANGE_METHOD可篡改填充前数据，支持Promise
+  
+::: demo
+
+autofill/before-change
 h:220px
 :::
 

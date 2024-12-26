@@ -83,8 +83,21 @@
             config: {
                 ENABLE_SELECTOR: true,
                 ENABLE_AUTOFILL: true,
-                ENABLE_KEYBOARD: true,
-                ENABLE_HISTORY: true,
+                BEFORE_AUTOFILL_CHANGE_METHOD: (changeList) => {
+                    return new Promise((resolve) => {
+                        setTimeout(() => {
+                            console.log('BEFORE_PASTE_CHANGE_METHOD', changeList);
+                            const ll = changeList.map((item) => {
+                                const { value } = item;
+                                return {
+                                    ...item,
+                                    value: `${value}填充`,
+                                };
+                            });
+                            resolve(ll);
+                        }, 1000);
+                    });
+                },
             },
         });
     </script>

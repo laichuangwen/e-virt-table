@@ -1,6 +1,23 @@
 # API
 
 -   声明 ROW_KEY 则`rowKey`为`rowKey`
+-   
+## EVirtTable
+
+EVirtTable(target: HTMLDivElement, options: EVirtTableOptions)
+
+``` ts
+type EVirtTableOptions = {
+    data: any[];
+    footerData: any[];
+    columns: Column[];
+    config?: ConfigType;
+    overlayerElement?: HTMLDivElement;
+    editorElement?: HTMLDivElement;
+    emptyElement?: HTMLDivElement;
+    contextMenuElement?: HTMLDivElement;
+};
+```
 
 ## Config
 
@@ -201,18 +218,18 @@
 | align | 水平对齐方式 | string | `"left"`, `"center"`, `"right"` | — |
 | verticalAlign | 垂直对齐方式 | string | `"top"`, `"middle"`, `"bottom"` | — |
 | fixed | 是否固定列 | string | `"left"`, `"right"` | — |
-| render | 自定义渲染方法 | Function | — | — |
-| renderFooter | 自定义渲染底部方法 | Function | — | — |
-| renderHeader | 自定义渲染头部方法 | Function | — | — |
-| formatter | 格式化方法 | formatterMethod | — | — |
+| render | 自定义渲染方法 | string\|Function | — | — |
+| renderFooter | 自定义渲染底部方法 | string\|Function | — | — |
+| renderHeader | 自定义渲染头部方法 | string\|Function | — | — |
+| formatter | 格式化方法 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — | — |
+| formatterFooter | 格式化底部方法 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — | — |
 | readonly | 是否只读 | boolean | — | — |
 | children | 子列 | Column[] | — | — |
 | column | 当前列对象 | Column | — | — |
 | overflowTooltipShow | 是否显示溢出提示,自定义 Tooltip 不生效 | boolean | — | — |
 | overflowTooltipWidth | 溢出提示的宽度，自定义 Tooltip 不生效 | number | — | — |
 | overflowTooltipPlacement | 溢出提示的位置，自定义 Tooltip 不生效 | OverflowTooltipPlacement |  ^[string]`top, top-start, top-end, right, right-start, right-end, left, left-start, left-end, bottom, bottom-start, bottom-end` | — |
-| rule | 校验规则 | Rules | — | — |
-| options | 选项列表 | any[] | — | — |
+| rules | 校验规则 | Rules | — | — |
 
 ## RowData
 
@@ -242,6 +259,16 @@ CONTEXT_MENU: MenuItem[] = [
 ## Typings{#typings}
 
 ```ts
+type EVirtTableOptions = {
+    data: any[];
+    footerData: any[];
+    columns: Column[];
+    config?: ConfigType;
+    overlayerElement?: HTMLDivElement;
+    editorElement?: HTMLDivElement;
+    emptyElement?: HTMLDivElement;
+    contextMenuElement?: HTMLDivElement;
+};
 type Type = 'index' | 'selection' | 'index-selection' | 'tree';
 
 type SpanType = {

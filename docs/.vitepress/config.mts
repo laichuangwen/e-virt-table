@@ -67,6 +67,7 @@ export default defineConfig({
                             { text: '选择', link: '/zh/table/selector' },
                             { text: '填充', link: '/zh/table/autofill' },
                             { text: '键盘事件', link: '/zh/table/keyboard' },
+                            { text: '复制&粘贴', link: '/zh/table/paste' },
                             { text: '历史回退', link: '/zh/table/history' },
                             { text: '插槽（覆盖层）', link: '/zh/table/overlayer' },
                         ],

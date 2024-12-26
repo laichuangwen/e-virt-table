@@ -8,8 +8,7 @@
     <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
     <body>
         <button id="load-btn">切换数据</button>
-        <div style="position: relative">
-            <div id="e-virt-table"></div>
+        <div id="e-virt-table">
             <div id="e-virt-table-empty">
                 <p>自定义</p>
             </div>
@@ -83,26 +82,11 @@
             },
         ];
         const target = document.getElementById('e-virt-table');
+        const emptyElement = document.getElementById('e-virt-table-empty');
         const grid = new EVirtTable(target, {
             data,
             columns,
-            config: {
-            },
-        });
-        // 内部也是这样实现的
-        grid.on('emptyChange', ({ type, headerHeight, bodyHeight, footerHeight }) => {
-            const top = headerHeight + (bodyHeight + footerHeight) / 2;
-            const contentStyle = {
-                display: type === 'empty' ? 'block' : 'none',
-                position: 'absolute',
-                fontSize: '14px',
-                color: '#666',
-                left: '50%',
-                top: `${top}px`,
-                transform: 'translate(-50%, -50%)',
-            };
-            const emptyEl = document.getElementById('e-virt-table-empty');
-            Object.assign(emptyEl.style, contentStyle);
+            emptyElement,
         });
         let isEmpty = false;
         document.getElementById('load-btn').addEventListener('click', () => {

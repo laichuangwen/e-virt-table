@@ -6,6 +6,7 @@
         <title>e-virt-table</title>
     </head>
     <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+
     <body>
         <div id="e-virt-table"></div>
     </body>
@@ -46,11 +47,6 @@
         ];
         let columns = [
             {
-                type: 'index',
-                key: 'index',
-                width: 50,
-            },
-            {
                 title: '日期',
                 key: 'date',
             },
@@ -81,10 +77,9 @@
             data,
             columns,
             config: {
-                ENABLE_SELECTOR: true,
-                ENABLE_AUTOFILL: true,
-                ENABLE_KEYBOARD: true,
-                ENABLE_HISTORY: true,
+                ENABLE_SELECTOR: true, // 启用选择器
+                ENABLE_COPY: false, // 禁用复制
+                ENABLE_PASTER: false, // 禁用粘贴
             },
         });
     </script>
