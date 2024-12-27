@@ -243,7 +243,7 @@ type EVirtTableOptions = {
 | \_height   | 行高度 | string | —      | —      |
 | \_hasChildren   | 是否有子，仅type=tree生效 | boolean | —      | —      |
 
-## Rule
+## Rules
 
 -   可参考 [async-validator](https://github.com/yiminghe/async-validator)
 

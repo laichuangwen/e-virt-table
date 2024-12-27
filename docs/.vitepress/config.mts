@@ -68,7 +68,6 @@ export default defineConfig({
                             { text: '填充', link: '/zh/table/autofill' },
                             { text: '键盘', link: '/zh/table/keyboard' },
                             { text: '复制&粘贴', link: '/zh/table/paste' },
-                            { text: '复制&粘贴', link: '/zh/table/paste' },
                             { text: '右键菜单', link: '/zh/table/context-menu' },
                             { text: '历史回退', link: '/zh/table/history' },
                             { text: '插槽（覆盖层）', link: '/zh/table/overlayer' },
