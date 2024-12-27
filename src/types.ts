@@ -2,9 +2,10 @@ import type Cell from './Cell';
 import type CellHeader from './CellHeader';
 import type { RuleItem } from 'async-validator';
 import Config from './Config';
+export type OptionalizeExcept<T, K extends keyof T> = Partial<Omit<T, K>> & Required<Pick<T, K>>;
 export type EVirtTableOptions = {
     data: any[];
-    footerData: any[];
+    footerData?: any[];
     columns: Column[];
     config?: ConfigType;
     overlayerElement?: HTMLDivElement;
@@ -12,6 +13,7 @@ export type EVirtTableOptions = {
     emptyElement?: HTMLDivElement;
     contextMenuElement?: HTMLDivElement;
 };
+
 export type EventCallback = (...args: any[]) => void;
 export type ChangeItem = {
     value: any;
@@ -92,38 +94,38 @@ export type Position = {
     top: number;
     bottom: number;
 };
+
 export interface Column {
-    type: Type;
-    operation: boolean;
-    editorType: string;
-    hoverIconName: string;
-    title: string;
-    width: number;
-    widthFillDisable: boolean;
-    align: Align;
-    verticalAlign: VerticalAlign;
-    fixed: Fixed;
-    level: number;
-    text: string;
-    colspan: number;
-    rowspan: number;
-    sort: number;
     key: string;
-    hide: boolean | Function;
-    render: Function;
-    renderFooter: Function;
-    renderHeader: Function;
-    formatter: FormatterMethod;
-    formatterFooter: FormatterMethod;
-    overflowTooltipShow: boolean;
-    overflowTooltipMaxWidth: number;
-    overflowTooltipPlacement: OverflowTooltipPlacement;
-    required: boolean;
-    readonly: boolean;
-    children: Column[];
-    column: Column;
-    rules: Rules;
-    options: any[];
+    title: string;
+    type?: Type;
+    operation?: boolean;
+    editorType?: string;
+    hoverIconName?: string;
+    width?: number;
+    widthFillDisable?: boolean;
+    align?: Align;
+    verticalAlign?: VerticalAlign;
+    fixed?: Fixed;
+    level?: number;
+    text?: string;
+    colspan?: number;
+    rowspan?: number;
+    sort?: number;
+    hide?: boolean | Function;
+    render?: Function;
+    renderFooter?: Function;
+    renderHeader?: Function;
+    formatter?: FormatterMethod;
+    formatterFooter?: FormatterMethod;
+    overflowTooltipShow?: boolean;
+    overflowTooltipMaxWidth?: number;
+    overflowTooltipPlacement?: OverflowTooltipPlacement;
+    required?: boolean;
+    readonly?: boolean;
+    children?: Column[];
+    column?: Column;
+    rules?: Rules;
 }
 export type OverlayerTooltip = {
     style: any;
@@ -146,36 +148,27 @@ export type CellParams = {
     column: Column;
     value: any;
 };
-type BeforeChangeParams = {
+export type CellHeaderParams = {
+    colIndex: number;
+    column: Column;
+};
+export type BeforeChangeParams = {
     rowKey: string;
     key: string;
     value: any;
     oldValue: any;
     row: any;
 };
-export type CellStyleParams = {
-    row: any;
-    rowIndex: number;
-    colIndex: number;
-    column: Column;
-    value: any;
+export type CellStyleParams = CellParams & {
     isHasChanged?: boolean;
 };
-export type CellHeaderParams = {
-    colIndex?: number;
-    column?: Column;
-};
+
 export type SpanType = {
     rowspan: number;
     colspan: number;
 };
-export type SpanParams = {
-    row: any;
-    rowIndex: number;
-    colIndex: number;
-    column: Column;
+export type SpanParams = CellParams & {
     visibleLeafColumns: Column[];
-    value: any;
     headIndex: number;
     headPosition: Position;
     visibleRows: any[];
