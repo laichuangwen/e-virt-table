@@ -8,15 +8,15 @@ A powerful data table based on canvas. You can use it as data grid、Microsoft E
 
 
 ```shell [npm]
-$ npm install e-virt-table
+npm install e-virt-table
 ```
 or
 ```shell [yarn]
-$ yarn add e-virt-table
+yarn add e-virt-table
 ```
 or
 ```shell [pnpm]
-$ pnpm install e-virt-table
+pnpm install e-virt-table
 ```
 
 ## CDN
