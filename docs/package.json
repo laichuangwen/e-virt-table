@@ -16,15 +16,14 @@
     "@element-plus/icons-vue": "^2.0.6",
     "@types/node": "^18.7.13",
     "@vueuse/core": "^9.1.0",
+    "e-virt-table": "^0.1.18",
     "element-plus": "^2.2.16",
     "escape-html": "^1.0.3",
     "express": "^4.21.2",
     "markdown-it-container": "^3.0.0",
+    "prismjs": "^1.29.0",
     "sass": "^1.54.5",
     "vitepress": "^1.5.0",
     "vue": "^3.4.36"
-  },
-  "dependencies": {
-    "prismjs": "^1.29.0"
   }
 }

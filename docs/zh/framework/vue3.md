@@ -10,4 +10,7 @@ h:220px
 
 > 更多列子和配置请参考例子文档
 
-## 多功能拓展
+## 功能拓展
+<ClientOnly>
+  <EVirtTableVue />
+</ClientOnly>
