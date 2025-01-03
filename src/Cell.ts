@@ -1,4 +1,3 @@
-import type { Rule } from 'async-validator';
 import type {
     Column,
     Fixed,
@@ -15,18 +14,19 @@ import type {
     CellHoverIconMethod,
     CellStyleMethod,
     OverflowTooltipPlacement,
+    Rule,
 } from './types';
 import Context from './Context';
 import BaseCell from './BaseCell';
 export default class Cell extends BaseCell {
     formatter?: FormatterMethod;
     formatterFooter?: FormatterMethod;
-    hoverIconName: string = '';
+    hoverIconName?: string = '';
     operation = false;
     align: Align;
     verticalAlign: VerticalAlign;
     fixed?: Fixed;
-    type: Type;
+    type: Type | '';
     editorType: string;
     cellType: CellType;
     level: number;
@@ -81,22 +81,22 @@ export default class Cell extends BaseCell {
         row: any,
         cellType: CellType = 'body',
     ) {
-        super(ctx, x, y, width, height, column.fixed, cellType);
+        super(ctx, x, y, width, height, cellType, column.fixed);
         this.visibleWidth = this.width;
         this.visibleHeight = this.height;
         this.colIndex = colIndex;
         this.rowIndex = rowIndex;
         this.key = column.key;
-        this.type = column.type || 'text';
+        this.type = column.type || '';
         this.editorType = column.editorType || 'text';
         this.cellType = cellType;
         this.align = column.align || 'center';
         this.verticalAlign = column.verticalAlign || 'middle';
         this.fixed = column.fixed;
-        this.level = column.level;
+        this.level = column.level || 0;
         this.operation = column.operation || false;
         this.column = column;
-        this.rules = column.rules;
+        this.rules = column.rules || {};
         this.row = row;
         this.rowKey =
             this.cellType === 'body'
@@ -608,7 +608,7 @@ export default class Cell extends BaseCell {
         this.drawAutofillPiont();
         this.drawErrorTip();
     }
-    
+
     /**
      * 根据列的索引获取列的宽度
      * @param {Number} colIndex

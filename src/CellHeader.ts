@@ -5,9 +5,9 @@ import BaseCell from './BaseCell';
 export default class CellHeader extends BaseCell {
     align: Align;
     verticalAlign: VerticalAlign = 'middle';
-    fixed: Fixed | undefined;
+    fixed?: Fixed;
     widthFillDisable: boolean;
-    type: Type;
+    type: Type | '';
     operation = false;
     editorType: string;
     level: number;
@@ -22,7 +22,7 @@ export default class CellHeader extends BaseCell {
     column: Column;
     colIndex: number;
     rowKey: string;
-    rules: Rules;
+    rules?: Rules;
     hasChildren: boolean;
     render: Render;
     style: Partial<CSSStyleDeclaration> = {};
@@ -37,7 +37,7 @@ export default class CellHeader extends BaseCell {
     drawImageName = '';
     drawImageSource: HTMLImageElement | undefined;
     constructor(ctx: Context, colIndex: number, x: number, y: number, width: number, height: number, column: Column) {
-        super(ctx, x, y, width, height, column.fixed, 'header');
+        super(ctx, x, y, width, height, 'header', column.fixed);
         this.ctx = ctx;
         this.x = x;
         this.y = y;
@@ -45,21 +45,21 @@ export default class CellHeader extends BaseCell {
         this.height = height;
         this.colIndex = colIndex;
         this.key = column.key;
-        this.type = column.type;
+        this.type = column.type || '';
         this.editorType = column.editorType || 'text';
         this.align = column.align || 'center';
         this.verticalAlign = column.verticalAlign || 'middle';
         this.fixed = column.fixed;
-        this.level = column.level;
+        this.level = column.level || 0;
         this.operation = column.operation || false;
         this.text = column.title;
         this.column = column;
-        this.colspan = column.colspan;
-        this.widthFillDisable = column.widthFillDisable;
-        this.rowspan = column.rowspan;
+        this.colspan = column.colspan || 1;
+        this.widthFillDisable = column.widthFillDisable || false;
+        this.rowspan = column.rowspan || 1;
         this.rules = column.rules;
-        this.readonly = column.readonly;
-        this.required = column.required;
+        this.readonly = column.readonly || false;
+        this.required = column.required || false;
         this.rowKey = generateShortUUID();
         this.hasChildren = (column.children && column.children.length > 0) || false; // 是否有子
         this.render = column.renderHeader;

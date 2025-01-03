@@ -72,7 +72,7 @@ export default class Header {
             this.ctx.stageWidth = Math.floor(this.width + SCROLLER_TRACK_SIZE);
         }
         this.ctx.stageElement.style.width = this.ctx.stageWidth - 0.5 + 'px';
-        this.visibleWidth =  this.ctx.stageWidth - SCROLLER_TRACK_SIZE;
+        this.visibleWidth = this.ctx.stageWidth - SCROLLER_TRACK_SIZE;
 
         // 如果表头宽度小于可视宽度，平均分配
         const overWidth = this.visibleWidth - this.width;
@@ -251,8 +251,8 @@ export default class Header {
         const { HEADER_HEIGHT = 0 } = this.ctx.config;
         for (let i = 0; i < len; i++) {
             const item = arr[i];
-            const height = HEADER_HEIGHT * (item.rowspan || 1);
-            const y = HEADER_HEIGHT * item.level;
+            const height = HEADER_HEIGHT * (item.rowspan || 0);
+            const y = HEADER_HEIGHT * (item.level || 0);
             let width = item.width || 100; // 读取映射宽度
             if (item.children) {
                 // 父级表头的宽度是叶子节点表头的宽度总和

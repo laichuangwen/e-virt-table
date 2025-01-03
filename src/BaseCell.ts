@@ -9,7 +9,7 @@ export default class BaseCell {
     height = 0;
     fixed?: Fixed;
     cellType: CellType;
-    constructor(ctx: Context, x: number, y: number, width: number, height: number, fixed: Fixed, cellType: CellType) {
+    constructor(ctx: Context, x: number, y: number, width: number, height: number, cellType: CellType, fixed?: Fixed) {
         this.ctx = ctx;
         this.x = x;
         this.y = y;

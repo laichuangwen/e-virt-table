@@ -34,8 +34,8 @@ function throttle<T extends (...args: any) => any>(func: T, delay: number): T {
  * @param data
  * @returns
  */
-function getMaxRow(data: Column[]): number {
-    if (data) {
+function getMaxRow(data: Column[] = []): number {
+    if (data.length) {
         return data.map((item) => getMaxRow(item.children) + 1).sort((a, b) => b - a)[0];
     }
     return 0;
@@ -54,9 +54,9 @@ function sortFixed(arr: Column[] = []) {
         }
     });
     return [
-        ...lefts.sort((a, b) => a.sort - b.sort),
-        ...centers.sort((a, b) => a.sort - b.sort),
-        ...right.sort((a, b) => a.sort - b.sort),
+        ...lefts.sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0)),
+        ...centers.sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0)),
+        ...right.sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0)),
     ];
 }
 function calCrossSpan(arr: Column[] = [], maxRow: number = 1, level: number = 0): Column[] {
@@ -70,7 +70,7 @@ function calCrossSpan(arr: Column[] = [], maxRow: number = 1, level: number = 0)
             const children = calCrossSpan(config.children, maxRow - 1, level + 1);
             if (children) {
                 children.forEach((item) => {
-                    colspan += item.colspan;
+                    colspan += item.colspan ?? 0;
                 });
             }
             return {
