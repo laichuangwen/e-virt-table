@@ -55,8 +55,11 @@ export default class Body {
         this.visibleWidth = this.ctx.stageWidth - SCROLLER_TRACK_SIZE;
         // 底部高度
         const footerHeight = this.ctx.footer.height;
-        if (!this.data.length) {
+        if (!this.data.length && !HEIGHT) {
             this.height = EMPTY_BODY_HEIGHT;
+        }else if(!this.data.length && HEIGHT){
+            // 如果有设置高度的情况，空数据时，高度也要保持为设置的高度
+            this.height = HEIGHT- header.height - footerHeight - SCROLLER_TRACK_SIZE;
         }
         const isEmpty = !this.data.length ? 'empty' : 'not-empty';
         this.ctx.emit('emptyChange', {
