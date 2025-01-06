@@ -296,7 +296,7 @@ export default class Editor {
         this.enable = false;
         this.ctx.stageElement.focus();
         this.ctx.editing = false;
-        this.ctx.emit('draw');
+        // this.ctx.emit('draw');
     }
     destroy() {
         this.editorEl?.remove();
