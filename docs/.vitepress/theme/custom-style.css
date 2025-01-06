@@ -9,3 +9,15 @@
 .VPContent.has-sidebar {
   padding-right: 0 !important;
 }
+.vp-tag {
+  display: inline-block;
+  padding: 0 7px;
+  border-radius: 10px;
+  line-height: 18px;
+  white-space: nowrap;
+  
+}
+.vp-tag.required {
+  color: var(--vp-code-link-color);
+  border: 1px solid var(--vp-code-link-color);
+}

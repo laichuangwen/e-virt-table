@@ -213,9 +213,14 @@ type EVirtTableOptions = {
 
 | 参数 | 说明 | 类型 | 可选值 | 默认值 |
 | --- | --- | --- | --- | --- |
-| type | 列的类型 | Type |  ^[string]`index, selection, index-selection,tree` | — |
-| key | 列的唯一标识 | string | — | — |
-| title | 列的标题 | string | — | — |
+| key ^(required)| 列的唯一标识 | string | — | — |
+| title ^(required)| 列的标题 | string | — | — |
+| type| 列的类型 | Type |  ^[string]`index, selection, index-selection,tree` | — |
+| operation | 指定列为操作列	 | boolean | — | false |
+| editorType | 指定列编辑器类型	 | string | — | text |
+| widthFillDisable | 指定当前列不可填充宽度		 | boolean | — | true |
+| hide | 指定列隐藏		 | boolean | — | false |
+| sort | 指定列排序		 | number | — | 0 |
 | width | 列的宽度 | number | — | — |
 | align | 水平对齐方式 | string | `"left"`, `"center"`, `"right"` | — |
 | verticalAlign | 垂直对齐方式 | string | `"top"`, `"middle"`, `"bottom"` | — |
@@ -225,12 +230,12 @@ type EVirtTableOptions = {
 | renderHeader | 自定义渲染头部方法 | string\|Function | — | — |
 | formatter | 格式化方法 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — | — |
 | formatterFooter | 格式化底部方法 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — | — |
-| readonly | 是否只读 | boolean | — | — |
+| readonly | 是否只读 | boolean | — | false |
 | children | 子列 | Column[] | — | — |
 | column | 当前列对象 | Column | — | — |
-| overflowTooltipShow | 是否显示溢出提示,自定义 Tooltip 不生效 | boolean | — | — |
-| overflowTooltipWidth | 溢出提示的宽度，自定义 Tooltip 不生效 | number | — | — |
-| overflowTooltipPlacement | 溢出提示的位置，自定义 Tooltip 不生效 | OverflowTooltipPlacement |  ^[string]`top, top-start, top-end, right, right-start, right-end, left, left-start, left-end, bottom, bottom-start, bottom-end` | — |
+| overflowTooltipShow | 是否显示溢出提示 | boolean | — | — |
+| overflowTooltipMaxWidth | 溢出提示的宽度 | number | — | — |
+| overflowTooltipPlacement | 溢出提示的位置| OverflowTooltipPlacement |  ^[string]`top, top-start, top-end, right, right-start, right-end, left, left-start, left-end, bottom, bottom-start, bottom-end` | — |
 | rules | 校验规则 | Rules | — | — |
 
 ## RowData
