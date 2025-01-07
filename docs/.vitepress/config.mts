@@ -46,7 +46,7 @@ export default defineConfig({
                         items: [
                             { text: '虚拟滚动', link: '/zh/table/virtualScroll' },
                             { text: '滚动条', link: '/zh/table/scroller' },
-
+                            { text: '主题', link: '/zh/table/theme' },
                             { text: '宽度', link: '/zh/table/width' },
                             { text: '高度', link: '/zh/table/height' },
                             { text: '固定', link: '/zh/table/fixed' },
