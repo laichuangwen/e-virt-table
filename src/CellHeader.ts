@@ -15,6 +15,7 @@ export default class CellHeader extends BaseCell {
     displayText: string = '';
     colspan: number;
     rowspan: number;
+    row: any;
     key: string;
     required = false;
     readonly = false;

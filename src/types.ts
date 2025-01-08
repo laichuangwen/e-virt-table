@@ -113,9 +113,9 @@ export interface Column {
     rowspan?: number;
     sort?: number;
     hide?: boolean | Function;
-    render?: Function;
-    renderFooter?: Function;
-    renderHeader?: Function;
+    render?: Function | string;
+    renderFooter?: Function | string;
+    renderHeader?: Function | string;
     formatter?: FormatterMethod;
     formatterFooter?: FormatterMethod;
     overflowTooltipShow?: boolean;
@@ -126,6 +126,7 @@ export interface Column {
     children?: Column[];
     column?: Column;
     rules?: Rules;
+    options?: any;
 }
 export type OverlayerTooltip = {
     style: any;

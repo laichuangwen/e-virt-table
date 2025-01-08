@@ -75,6 +75,7 @@ export default class Selector {
                 this.selectRows(cell);
                 return;
             }
+            e.preventDefault();
             this.isMultipleRow = false;
             this.click(e.shiftKey);
         });
@@ -92,7 +93,7 @@ export default class Selector {
                 this.selectCols(cell);
             }
         });
-        this.ctx.on('cellHeaderMousedown', (cell) => {
+        this.ctx.on('cellHeaderMousedown', (cell, e) => {
             // 如果是选中就不处理，比如chexkbox
             if (this.ctx.stageElement.style.cursor === 'pointer') {
                 return;
@@ -100,6 +101,7 @@ export default class Selector {
             if (this.ctx.isPointer) {
                 return;
             }
+            e.preventDefault();
             this.mousedownHeader = true;
             this.selectCols(cell);
         });

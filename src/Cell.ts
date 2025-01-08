@@ -38,7 +38,7 @@ export default class Cell extends BaseCell {
     colIndex: number;
     rowKey: string;
     row: any;
-    private value: any;
+    value: any;
     render: Render;
     renderFooter: Render;
     style: any = {};

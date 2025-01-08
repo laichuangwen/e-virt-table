@@ -60,6 +60,7 @@ class Scrollbar {
             this.ctx.scrollerMove = true; // 滚动条移动
             this.isFocus = true;
             this.dragStart = this.scroll;
+            e.preventDefault();
         } else if (this.isOnTrack(offsetX, offsetY)) {
             // 点击轨道滚动
             let scroll = 0;

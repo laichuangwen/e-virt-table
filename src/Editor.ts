@@ -182,6 +182,8 @@ export default class Editor {
         if (height > maxHeight) {
             height = maxHeight;
         }
+        // 显示编辑器
+        this.editorEl.style.display = 'inline-block';
         this.editorEl.style.left = `${drawX - 1}px`;
         this.editorEl.style.top = `${drawY - 1}px`;
         this.editorEl.style.bottom = `auto`;
@@ -212,9 +214,8 @@ export default class Editor {
         if (!this.cellTarget) {
             return;
         }
-        this.editorEl.style.left = `${-10000}px`;
-        this.editorEl.style.top = `${-10000}px`;
-        this.editorEl.style.bottom = `atuo`;
+        // 隐藏编辑器
+        this.editorEl.style.display = 'none';
         // 如果是文本编辑器
         if (this.cellTarget.editorType === 'text') {
             const { rowKey, key } = this.cellTarget;

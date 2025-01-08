@@ -100,6 +100,7 @@ export default class Tooltip {
         this.enable = true;
         // 设置最大宽度
         this.contentEl.style.maxWidth = `${cell.overflowTooltipMaxWidth || 500}px`;
+        this.contentEl.style.minWidth = '100px';
         this.contentEl.style.width = '100%';
         this.contentEl.style.display = 'inline-block';
         this.contentEl.style.wordBreak = 'break-all';
