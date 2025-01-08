@@ -106,6 +106,9 @@ export default class Selector {
             this.selectCols(cell);
         });
         this.ctx.on('keydown', (e) => {
+            if(this.ctx.editing){
+                return;
+            }
             // CTRL+C／Command+C
             if ((e.ctrlKey && e.code === 'KeyV') || (e.metaKey && e.code === 'KeyV')) {
                 e.preventDefault();
@@ -152,6 +155,8 @@ export default class Selector {
             }
             if (e.code === 'Delete' || e.code === 'Backspace') {
                 e.preventDefault();
+                console.log('删除');
+                
                 const { xArr, yArr } = this.ctx.selector;
                 this.clearSelectedData(xArr, yArr);
                 return;
