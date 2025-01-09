@@ -101,6 +101,7 @@ export interface Column {
     type?: Type;
     operation?: boolean;
     editorType?: string;
+    editorProps?: any;
     hoverIconName?: string;
     width?: number;
     widthFillDisable?: boolean;
@@ -179,6 +180,10 @@ export type SelectableParams = {
     row: any;
     rowIndex: number;
 };
+export type EditorOptions = {
+    type: string;
+    props: any;
+};
 export type ConfigType = Partial<Config>;
 export type FilterMethod = (rows: any[]) => any[];
 export type FormatterMethod = (params: CellParams) => string | void;
@@ -187,7 +192,7 @@ export type CellHeaderStyleMethod = (params: CellHeaderParams) => CellStyleOptio
 export type CellReadonlyMethod = (params: CellParams) => boolean | void;
 export type CellRulesMethod = (params: CellParams) => Rules | void;
 export type CellTypeMethod = (params: CellParams) => Type | void;
-export type CellEditorTypeMethod = (params: CellParams) => string | void;
+export type CellEditorMethod = (params: CellParams) => EditorOptions | void;
 export type CellRenderMethod = (params: CellParams) => string | void;
 export type CellHoverIconMethod = (params: CellParams) => string | void;
 export type SpanMethod = (params: SpanParams) => SpanType | void;

@@ -3,7 +3,7 @@ import {
     BeforeAutofillChangeMethod,
     BeforeCellValueChangeMethod,
     BeforePasteChangeMethod,
-    CellEditorTypeMethod,
+    CellEditorMethod,
     CellHeaderStyleMethod,
     CellHoverIconMethod,
     CellReadonlyMethod,
@@ -127,7 +127,7 @@ export default class Config {
     BODY_CELL_FORMATTER_METHOD?: FormatterMethod;
     BODY_CELL_RULES_METHOD?: CellRulesMethod;
     BODY_CELL_TYPE_METHOD?: CellTypeMethod;
-    BODY_CELL_EDITOR_TYPE_METHOD?: CellEditorTypeMethod;
+    BODY_CELL_EDITOR_METHOD?: CellEditorMethod;
     BODY_CELL_RENDER_METHOD?: CellRenderMethod;
     BODY_CELL_HOVER_ICON_METHOD?: CellHoverIconMethod;
     SPAN_METHOD?: SpanMethod;

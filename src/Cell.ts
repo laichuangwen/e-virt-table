@@ -9,7 +9,7 @@ import type {
     FormatterMethod,
     CellTypeMethod,
     CellRenderMethod,
-    CellEditorTypeMethod,
+    CellEditorMethod,
     SpanMethod,
     CellHoverIconMethod,
     CellStyleMethod,
@@ -28,6 +28,7 @@ export default class Cell extends BaseCell {
     fixed?: Fixed;
     type: Type | '';
     editorType: string;
+    editorProps: any;
     cellType: CellType;
     level: number;
     colspan = 1;
@@ -89,6 +90,7 @@ export default class Cell extends BaseCell {
         this.key = column.key;
         this.type = column.type || '';
         this.editorType = column.editorType || 'text';
+        this.editorProps = column.editorProps || {};
         this.cellType = cellType;
         this.align = column.align || 'center';
         this.verticalAlign = column.verticalAlign || 'middle';
@@ -133,7 +135,7 @@ export default class Cell extends BaseCell {
         this.updateHoverIcon();
         this.updateSelection();
         this.updateTree();
-        this.updateEditorType();
+        this.updateEditor();
         this.updateRender();
         this.getValidationMessage();
         this.updateContainer();
@@ -185,12 +187,12 @@ export default class Cell extends BaseCell {
             }
         }
     }
-    updateEditorType() {
+    updateEditor() {
         // 更改类型
-        const { BODY_CELL_EDITOR_TYPE_METHOD } = this.ctx.config;
-        if (typeof BODY_CELL_EDITOR_TYPE_METHOD === 'function') {
-            const cellEditorTypeMethod: CellEditorTypeMethod = BODY_CELL_EDITOR_TYPE_METHOD;
-            const editorType = cellEditorTypeMethod({
+        const { BODY_CELL_EDITOR_METHOD } = this.ctx.config;
+        if (typeof BODY_CELL_EDITOR_METHOD === 'function') {
+            const CellEditorMethod: CellEditorMethod = BODY_CELL_EDITOR_METHOD;
+            const editorProps = CellEditorMethod({
                 row: this.row,
                 rowIndex: this.rowIndex,
                 colIndex: this.colIndex,
@@ -198,8 +200,10 @@ export default class Cell extends BaseCell {
                 value: this.getValue(),
             });
             // 可以动态改变类型
-            if (editorType !== undefined) {
-                this.editorType = editorType;
+            if (editorProps !== undefined) {
+                const { type, props={} } = editorProps;
+                this.editorType = type;
+                this.editorProps = props;
             }
         }
     }
