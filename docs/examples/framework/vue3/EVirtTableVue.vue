@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ElDatePicker, ElInputNumber, ElSelectV2, ElCascader, ElTimePicker } from 'element-plus';
 import Cell from 'e-virt-table/dist/lib/Cell';
-import EVirtTable, { Column, ConfigType, OverlayerContainer } from '../../../../src/index';
+import EVirtTable, { Column, ConfigType, OverlayerContainer } from 'e-virt-table';
 import { ref, onMounted, h, nextTick, computed, useAttrs } from 'vue';
 import { EventCallback } from 'e-virt-table/dist/lib/EventBus';
 type EDITOR_TYPE = 'text' | 'select' | 'date' | 'number' | 'time' | 'cascader';
