@@ -87,10 +87,13 @@
                 ENABLE_SELECTOR: true,
                 ENABLE_AUTOFILL: true,
                 // 方法可控制编辑器类型
-                BODY_CELL_EDITOR_TYPE_METHOD: function (params) {
+                BODY_CELL_EDITOR_METHOD: function (params) {
                     const { rowIndex, column, row } = params;
                     if (column.key === 'date' && rowIndex === 1) {
-                        return 'text';
+                        return {
+                            type: 'text',
+                            props: {}, // 传递给编辑器的editorProps属性
+                        };
                     }
                 },
                 BODY_CELL_STYLE_METHOD: ({ rowIndex, column }) => {

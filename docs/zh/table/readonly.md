@@ -6,6 +6,7 @@
 | ---------- | ---------- | ------- | ------ | ------ |
 | readonly   | 控制列只读 | boolean | —      | false  |
 | editorType | 编辑器类型 | sting   | —      | false  |
+| editorProps | 传递给编辑器的属性 | object   | —      | {}  |
 
 ## Row
 
@@ -18,7 +19,7 @@
 | 参数 | 说明 | 类型 | 可选值 | 默认值 |
 | --- | --- | --- | --- | --- |
 | BODY_CELL_READONLY_METHOD | 自定义只读 | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean\|viod` | — | — |
-| BODY_CELL_EDITOR_TYPE_METHOD | 自定义编辑器类型 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — | — |
+| BODY_CELL_EDITOR_METHOD | 自定义编辑器类型 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — | — |
 | BEFORE_VALUE_CHANGE_METHOD | 数值改变前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
 | EDIT_BG_COLOR | 可编辑背景色 | string | — | `rgba(221,170,83,0.1)` |
 
