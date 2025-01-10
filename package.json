@@ -1,10 +1,11 @@
 {
     "name": "e-virt-table",
     "private": false,
-    "version": "0.1.22",
+    "version": "0.1.23",
     "description": "A powerful data table based on canvas. You can use it as data grid、Microsoft Excel or Google sheets. It supports virtual scroll、cell edit etc.",
-    "main": "dist/index.js",
+    "main": "dist/index.cjs.js",
     "module": "dist/index.es.js",
+    "browser": "dist/index.umd.js",
     "types": "dist/lib/index.d.ts",
     "scripts": {
         "dev": "vite",
