@@ -25,3 +25,7 @@ pnpm install e-virt-table
 ```html
 <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
 ```
+
+## 注意
+
+此组件仍在测试中，使用风险自负。如果您发现任何错误或问题，请在 GitHub 上报告，以便我们修复。
