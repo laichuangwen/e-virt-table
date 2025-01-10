@@ -5,6 +5,7 @@ import SourceCode from './vp-source-code.vue';
 import { CaretRight, CaretBottom } from '@element-plus/icons-vue';
 import { ElTooltip, ElIcon, ElMessage } from 'element-plus';
 import IconCopy from './icon-copy.vue';
+import IconTop from './icon-top.vue';
 const [sourceVisible, toggleSourceVisible] = useToggle();
 
 const props = defineProps<{

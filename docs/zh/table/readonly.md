@@ -22,6 +22,7 @@
 | BODY_CELL_EDITOR_METHOD | 自定义编辑器类型 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — | — |
 | BEFORE_VALUE_CHANGE_METHOD | 数值改变前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
 | EDIT_BG_COLOR | 可编辑背景色 | string | — | `rgba(221,170,83,0.1)` |
+| DISABLED | 禁用编辑优先等级最高 | boolean | — | false |
 
 ## Typings
 ``` ts
@@ -48,6 +49,16 @@ type BeforeChangeParams = {
 | change  | 编辑值改变的回调 | 当前改变值数组   |
 
 注意默认只自带文本编辑功能的，也可以拓展根据需求拓展下拉、时间选择等~
+
+
+## 禁用编辑
+-   `DISABLED=true`整个表格不可编辑
+
+::: demo
+
+readonly/disabled
+h:250px
+:::
 
 ## 列只读/编辑
 

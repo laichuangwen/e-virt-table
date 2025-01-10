@@ -7,14 +7,15 @@
     </head>
     <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
     <body>
-        <button id="selection-rows-btn">设置1,3选中</button>
-        <button id="clear-selection-btn">清除选中</button>
+        <label>
+            <input type="checkbox" id="mySwitch" />
+            <span>是否禁用编辑</span>
+        </label>
         <div id="e-virt-table"></div>
     </body>
     <script>
         let data = [
             {
-                id: '1',
                 date: '2016-05-02',
                 name: '王小虎',
                 province: '上海',
@@ -23,7 +24,6 @@
                 zip: 200333,
             },
             {
-                id: '2',
                 date: '2016-05-04',
                 name: '王小虎',
                 province: '上海',
@@ -32,7 +32,6 @@
                 zip: 200333,
             },
             {
-                id: '3',
                 date: '2016-05-01',
                 name: '王小虎',
                 province: '上海',
@@ -41,7 +40,6 @@
                 zip: 200333,
             },
             {
-                id: '4',
                 date: '2016-05-03',
                 name: '王小虎',
                 province: '上海',
@@ -52,41 +50,29 @@
         ];
         let columns = [
             {
-                type: 'selection',
-                key: 'selection',
-                width: 50,
-                readonly: true,
-            },
-            {
                 title: '日期',
                 key: 'date',
-                readonly: true,
             },
             {
                 title: '姓名',
                 key: 'name',
-                readonly: true,
             },
             {
                 title: '省份',
                 key: 'province',
-                readonly: true,
             },
             {
                 title: '市区',
                 key: 'city',
-                readonly: true,
             },
             {
                 title: '地址',
                 key: 'address',
-                readonly: true,
                 width: 200,
             },
             {
                 title: '邮编',
                 key: 'zip',
-                readonly: true,
             },
         ];
         const target = document.getElementById('e-virt-table');
@@ -94,22 +80,19 @@
             data,
             columns,
             config: {
-                ROW_KEY: 'id',
+                DISABLED: false,
             },
         });
-        grid.on('selectionChange', (selection) => {
-            console.log('selectionChange', selection);
+        grid.on('change', (data) => {
+            console.log(data);
         });
-        function setSelectionByRowKeys() {
-            grid.setSelectionByRowKeys(['1', '3'], true);
-        }
-
-        // 按钮点击事件
-        document.getElementById('selection-rows-btn').addEventListener('click', setSelectionByRowKeys);
-        function clearSelection() {
-            grid.clearSelection();
-        }
-        // 按钮点击事件
-        document.getElementById('clear-selection-btn').addEventListener('click', clearSelection);
+        const switchInput = document.getElementById('mySwitch');
+        switchInput.addEventListener('change', function () {
+            if (switchInput.checked) {
+                grid.loadConfig({ DISABLED: true });
+            } else {
+                grid.loadConfig({ DISABLED: false });
+            }
+        });
     </script>
 </html>

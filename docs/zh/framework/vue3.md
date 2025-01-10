@@ -8,8 +8,7 @@ framework/vue3/base
 h:220px
 :::
 
-## 高级拓展
-### 基于vue3和element-plus拓展的可编辑组件
+## 基于vue3和element-plus拓展的可编辑组件
 - 拓展编辑器(支持下拉、日期、时间、tree等)
 - 拓展空数据
 - 拓展覆盖层，支持dom图片等

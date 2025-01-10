@@ -1,7 +1,6 @@
 # API
 
--   声明 ROW_KEY 则`rowKey`为`rowKey`
--   
+-   声明ROW_KEY时对应字段必须为字符串类型
 ## EVirtTable
 
 EVirtTable(target: HTMLDivElement, options: EVirtTableOptions)
