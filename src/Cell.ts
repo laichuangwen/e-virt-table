@@ -663,7 +663,7 @@ export default class Cell extends BaseCell {
         if (this.cellType === 'footer') {
             return;
         }
-        const { SELECT_BORDER_COLOR, ENABLE_AUTOFILL, ENABLE_SELECTOR } = this.ctx.config;
+        const { SELECT_BORDER_COLOR, ENABLE_AUTOFILL, ENABLE_SELECTOR , AUTOFILL_POINT_BORDER_COLOR} = this.ctx.config;
         if (!ENABLE_SELECTOR) {
             return;
         }
@@ -678,7 +678,7 @@ export default class Cell extends BaseCell {
         // 绘制自动填充点
         if (show && colIndex === maxX && rowIndex === maxY) {
             this.ctx.paint.drawRect(drawX + this.width - 6, drawY + this.height - 6, 6, 6, {
-                borderColor: '#fff',
+                borderColor: AUTOFILL_POINT_BORDER_COLOR,
                 fillColor: SELECT_BORDER_COLOR,
             });
         }

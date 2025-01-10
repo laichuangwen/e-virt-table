@@ -811,6 +811,11 @@ export default class Database {
         return true;
     }
     getReadonly(rowKey: string, key: string) {
+        const { DISABLED } = this.ctx.config;
+        // 禁用编辑
+        if (DISABLED) {
+            return true;
+        }
         const row = this.rowKeyMap.get(rowKey);
         const colHeader = this.headerMap.get(key);
         const rowReadonly = row?.readonly;
