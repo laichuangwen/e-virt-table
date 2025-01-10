@@ -24,6 +24,7 @@ type EVirtTableOptions = {
 | --- | --- | --- | --- | --- |
 | CSS_PREFIX | CSS 类名前缀 | string | — | e-virt-table |
 | ROW_KEY | 行的唯一标识键 | string | — | — |
+| DISABLED | 禁止编辑 | boolean | — | false |
 | HEAD_FONT | 表头字体 | string | — | 12px normal Arial |
 | BODY_FONT | 单元格字体 | string | — | 12px normal Arial |
 | BORDER_COLOR | 区域边框颜色 | string | — | #e1e6eb |
@@ -60,6 +61,7 @@ type EVirtTableOptions = {
 | SELECT_AREA_COLOR | 选中区域背景颜色 | string | — | `rgba(82,146,247,0.1)` |
 | SELECT_BG_COLOR | 当前焦点单元格所在行、列的背景色 | string | — | `rgba(82,146,247,0.1)` |
 | EDIT_BG_COLOR | 可编辑背景色 | string | — | `rgba(221,170,83,0.1)` |
+| AUTOFILL_POINT_BORDER_COLOR | 填充点的边框颜色 | string | — | #fff |
 | CHECKBOX_COLOR | 选择框颜色 | string | — | `rgb(82,146,247)` |
 | CHECKBOX_SIZE | 选择框大小 | number | — | 20 |
 | CHECKBOX_CHECK_SVG | 选择框选中图标 | string | — | — |
