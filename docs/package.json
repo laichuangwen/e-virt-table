@@ -17,7 +17,7 @@
     "@faker-js/faker": "^9.3.0",
     "@types/node": "^18.7.13",
     "@vueuse/core": "^9.1.0",
-    "e-virt-table": "^0.1.22",
+    "e-virt-table": "^0.1.23",
     "element-plus": "^2.2.16",
     "escape-html": "^1.0.3",
     "express": "^4.21.2",
