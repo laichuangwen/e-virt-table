@@ -201,7 +201,7 @@ export default class Cell extends BaseCell {
             });
             // 可以动态改变类型
             if (editorProps !== undefined) {
-                const { type, props={} } = editorProps;
+                const { type, props = {} } = editorProps;
                 this.editorType = type;
                 this.editorProps = props;
             }
@@ -274,9 +274,9 @@ export default class Cell extends BaseCell {
             } else {
                 iconOffsetX = level * 8;
             }
+            let iconWidth = 20;
+            let iconHeight = 20;
             if (icon) {
-                let iconWidth = 20;
-                let iconHeight = 20;
                 let iconX = this.drawX + iconOffsetX + CELL_PADDING;
                 let iconY = this.drawY + (this.visibleHeight - iconHeight) / 2;
                 this.ctx.paint.drawImage(icon, iconX, iconY, iconWidth, iconHeight);
@@ -286,10 +286,10 @@ export default class Cell extends BaseCell {
                 this.drawImageHeight = iconHeight;
                 this.drawImageName = iconName;
                 this.drawImageSource = icon;
-                // 更改文本距离
-                this.align = 'left';
-                this.drawTextX = iconOffsetX + this.drawX + iconWidth - 0.5;
             }
+            // 更改文本距离
+            this.align = 'left';
+            this.drawTextX = iconOffsetX + this.drawX + iconWidth - 0.5;
         }
     }
     private updateContainer() {
