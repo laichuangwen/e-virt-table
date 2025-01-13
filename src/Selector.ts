@@ -233,6 +233,8 @@ export default class Selector {
             if (maxY > areaMaxY) {
                 return;
             }
+            // 聚焦，解决iframe键盘事件不触发
+            this.ctx.stageElement.focus();
             this.ctx.selector.xArr = [Math.max(areaMinX, minX), Math.min(areaMaxX, maxX)];
             this.ctx.selector.yArr = [Math.max(areaMinY, minY), Math.min(areaMaxY, maxY)];
             this.ctx.emit('setSelector', this.ctx.selector);
