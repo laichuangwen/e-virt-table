@@ -19,9 +19,9 @@ export default class EventBrowser {
         this.bind(this.ctx.stageElement, 'wheel', this.handleWheel.bind(this));
         this.bind(this.ctx.stageElement, 'contextmenu', this.handleContextMenu.bind(this));
         this.bind(this.ctx.stageElement, 'mousedown', this.handleMouseDown.bind(this));
-        this.bind(this.ctx.stageElement, 'mouseenter', this.handleMouseEnter.bind(this));
-        this.bind(this.ctx.stageElement, 'mouseleave', this.handleMouseLeave.bind(this));
         this.bind(this.ctx.stageElement, 'dblclick', this.handleDblclick.bind(this));
+        this.bind(this.ctx.stageElement, 'mouseover', this.handleMouseover.bind(this));
+        this.bind(this.ctx.stageElement, 'mouseout', this.handleMouseout.bind(this));
     }
     destroy() {
         this.eventTasks.forEach((fn, event) => {
@@ -67,18 +67,11 @@ export default class EventBrowser {
     private handleContextMenu(e: Event) {
         this.ctx.emit('contextMenu', e);
     }
-    private handleMouseEnter(e: Event) {
+    private handleMouseover(e: Event) {
         this.ctx.isInsideTargetContainer = true;
-        this.ctx.emit('mouseenter', e);
     }
-    private handleMouseLeave(e: Event) {
-        // 编辑器弹出的时候，会回调mouseleave，这个时候不应该触发mouseleave事件
-        if(this.ctx.editing){
-            return;
-        }
+    private handleMouseout(e: Event) {
         this.ctx.isInsideTargetContainer = false;
-        this.ctx.emit('mouseleave', e);
-        
     }
     private handleDblclick(e: Event) {
         this.ctx.emit('dblclick', e);
