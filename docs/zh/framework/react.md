@@ -5,7 +5,7 @@
 ::: demo
 
 framework/react/base
-h:220px
+h:320px
 :::
 
 > 更多列子和配置请参考

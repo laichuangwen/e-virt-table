@@ -30,7 +30,7 @@ type BeforeChangeParams = {
 - 启用粘贴`ENABLE_PASTER`，默认true
 ::: demo
 paste/disabled
-h:220px
+h:320px
 :::
 
 ## 启用复制&粘贴
@@ -41,7 +41,7 @@ h:220px
 - 启用粘贴`ENABLE_PASTER`，默认true
 ::: demo
 paste/enable
-h:220px
+h:320px
 :::
 
 
@@ -52,5 +52,5 @@ h:220px
 
 ::: demo
 paste/before-change
-h:220px
+h:320px
 :::

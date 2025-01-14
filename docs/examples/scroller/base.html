@@ -1,126 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>e-virt-table</title>
-  </head>
-  <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
-  <body>
-    <button id="scrollerX">滚动到x=5000</button>
-    <button id="scrollerY">滚动到y=5000</button>
-    <button id="scrollerXY">滚动到x=5000,y=10000</button>
-    <button id="scrollerColkey">滚动到key=gc_500</button>
-    <button id="scrollerColIndex">滚动到colIndex=500</button>
-    <button id="scrollerRowKey">滚动到RowKey=500</button>
-    <button id="scrollerRowIndex">滚动到RowIndex=400</button>
-    <div id="e-virt-table"></div>
-  </body>
-  <script>
-    function gcData(c = 1000, r = 1000) {
-      let columns = [
-        {
-          type: "index",
-          key: "index",
-          width: 100,
-          readonly: true,
-        },
-        {
-          title: "日期",
-          key: "date",
-          readonly: true,
-        },
-        {
-          title: "姓名",
-          key: "name",
-          readonly: true,
-        },
-        {
-          title: "省份",
-          key: "province",
-          readonly: true,
-        },
-        {
-          title: "市区",
-          key: "city",
-          readonly: true,
-        },
-        {
-          title: "地址",
-          key: "address",
-          width: 200,
-          readonly: true,
-        },
-        {
-          title: "邮编",
-          key: "zip",
-          readonly: true,
-        },
-      ];
-      let gcData = {};
-      for (let i = 0; i < c; i += 1) {
-        columns.push({
-          id: i,
-          title: `表头${i}`,
-          key: `gc_${i}`,
-          readonly: true,
-        });
-        gcData[`gc_${i}`] = `数据${i}`;
-      }
-      let data = [];
-      _gcData = {
-        date: "2016-05-02",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1518 弄",
-        zip: 200333,
-        ...gcData,
-      };
-      for (let i = 0; i < r; i += 1) {
-        data.push(JSON.parse(JSON.stringify(_gcData)));
-      }
-      return {
-        columns,
-        data,
-      };
-    }
-    const { columns, data } = gcData(1000, 1000);
-    const target = document.getElementById("e-virt-table");
-    const grid = new EVirtTable(target, {
-      data,
-      columns,
-      config: {
-        HEIGHT: 350,
-        ROW_KEY: "id",
-      },
-    });
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <button id="scrollerX">Scroll to x=5000</button>
+        <button id="scrollerY">Scroll to =5000</button>
+        <button id="scrollerXY">Scroll to x=5000,y=10000</button>
+        <button id="scrollerColkey">Scroll to key=gc_500</button>
+        <button id="scrollerColIndex">Scroll to colIndex=500</button>
+        <button id="scrollerRowKey">Scroll to RowKey=500</button>
+        <button id="scrollerRowIndex">Scroll to RowIndex=400</button>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        function generateData(c = 1000, r = 1000) {
+            let columns = [
+                {
+                    type: 'index',
+                    key: 'index',
+                    width: 70,
+                },
+                {
+                    title: 'Date',
+                    key: 'date',
+                },
+                {
+                    title: 'Name',
+                    key: 'name',
+                },
+                {
+                    title: 'State',
+                    key: 'state',
+                },
+                {
+                    title: 'City',
+                    key: 'city',
+                },
+                {
+                    title: 'Address',
+                    key: 'address',
+                    width: 200,
+                },
+                {
+                    title: 'Zip',
+                    key: 'zip',
+                },
+            ];
+            let gcData = {};
+            for (let i = 0; i < c; i += 1) {
+                columns.push({
+                    title: `Header_${i}`,
+                    key: `gc_${i}`,
+                });
+                gcData[`gc_${i}`] = `data_${i}`;
+            }
+            let data = [];
+            let _gcData = {
+                date: '2016-05-02',
+                name: 'John',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+                ...gcData,
+            };
+            for (let i = 0; i < r; i += 1) {
+                data.push(JSON.parse(JSON.stringify(_gcData)));
+            }
 
-    // 按钮点击事件
-    document.getElementById("scrollerX").addEventListener("click", () => {
-      grid.scrollXTo(5000);
-    });
-    document.getElementById("scrollerY").addEventListener("click", () => {
-      grid.scrollYTo(5000);
-    });
-    document.getElementById("scrollerXY").addEventListener("click", () => {
-      grid.scrollTo(5000, 10000);
-    });
-    document.getElementById("scrollerColkey").addEventListener("click", () => {
-      grid.scrollToColkey("gc_500");
-    });
-    document
-      .getElementById("scrollerColIndex")
-      .addEventListener("click", () => {
-        grid.scrollToColIndex(500);
-      });
-    document.getElementById("scrollerRowKey").addEventListener("click", () => {
-      grid.scrollToRowIndex(500);
-    });
-    document
-      .getElementById("scrollerRowIndex")
-      .addEventListener("click", () => {
-        grid.scrollToRowIndex(400);
-      });
-  </script>
+            return {
+                columns,
+                data,
+            };
+        }
+
+        const { columns, data } = generateData(1000, 1000);
+        const target = document.getElementById('e-virt-table');
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                HEIGHT: 350,
+                ROW_KEY: 'id',
+            },
+        });
+        document.getElementById('scrollerX').addEventListener('click', () => {
+            grid.scrollXTo(5000);
+        });
+        document.getElementById('scrollerY').addEventListener('click', () => {
+            grid.scrollYTo(5000);
+        });
+        document.getElementById('scrollerXY').addEventListener('click', () => {
+            grid.scrollTo(5000, 10000);
+        });
+        document.getElementById('scrollerColkey').addEventListener('click', () => {
+            grid.scrollToColkey('gc_500');
+        });
+        document.getElementById('scrollerColIndex').addEventListener('click', () => {
+            grid.scrollToColIndex(500);
+        });
+        document.getElementById('scrollerRowKey').addEventListener('click', () => {
+            grid.scrollToRowIndex(500);
+        });
+        document.getElementById('scrollerRowIndex').addEventListener('click', () => {
+            grid.scrollToRowIndex(400);
+        });
+    </script>
 </html>

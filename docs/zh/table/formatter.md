@@ -10,7 +10,7 @@
 
 | 方法名称              | 说明           | 参数                                              |
 | --------------------- | -------------- | ------------------------------------------------- |
-| CELL_FORMATTER_METHOD | 格式化方法更改（单元格格式化） | `({row, column,rowIndex,colIndex,value})=>string` |
+| BODY_CELL_FORMATTER_METHOD | 格式化方法更改（单元格格式化,formatter优先等级比较高） | `({row, column,rowIndex,colIndex,value})=>string` |
 
 ## formatter
 
@@ -19,16 +19,16 @@
 ::: demo
 
 formatter/base
-h:220px
+h:320px
 :::
 
-## CELL_FORMATTER_METHOD
+## BODY_CELL_FORMATTER_METHOD
 
 -   精确到单元格格式化
--   注意 formatter 优先等级比 CELL_FORMATTER_METHOD 高
+-   注意 formatter 优先等级比 BODY_CELL_FORMATTER_METHOD 高
 
 ::: demo
 
 formatter/methods
-h:220px
+h:320px
 :::

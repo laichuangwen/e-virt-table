@@ -1,139 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>e-virt-table</title>
-  </head>
-  <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
-  <body>
-    <div id="e-virt-table"></div>
-  </body>
-  <script>
-    let data = [
-      {
-        date: "2016-05-02",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        num: 10,
-      },
-      {
-        date: "2016-05-04",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        num: 10,
-      },
-      {
-        date: "2016-05-01",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        num: 10,
-      },
-      {
-        date: "2016-05-03",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        num: 10,
-      },
-      {
-        date: "2016-05-03",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        num: 10,
-      },
-      {
-        date: "2016-05-03",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        num: 10,
-      },
-      {
-        date: "2016-05-03",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        num: 10,
-      },
-      {
-        date: "2016-05-03",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        num: 10,
-      },
-      {
-        date: "2016-05-03",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        num: 10,
-      },
-      {
-        date: "2016-05-03",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        num: 10,
-      },
-      {
-        date: "2016-05-03",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        num: 10,
-      },
-    ];
-    let columns = [
-      {
-        title: "日期",
-        key: "date",
-        readonly: true,
-      },
-      {
-        title: "姓名",
-        key: "name",
-        readonly: true,
-      },
-      {
-        title: "省份",
-        key: "province",
-        readonly: true,
-      },
-      {
-        title: "市区",
-        key: "city",
-        readonly: true,
-      },
-      {
-        title: "数值",
-        key: "num",
-        readonly: true,
-      },
-    ];
-    const sum = data.reduce((prev, cur) => prev + cur.num, 0);
-    const target = document.getElementById("e-virt-table");
-    const evirtTable = new EVirtTable(target, {
-      data,
-      columns,
-      config: {
-        HEIGHT:250,
-        FOOTER_FIXED: true,
-      },
-      footerData: [
-        {
-          date: "合计",
-          name: "N/A",
-          province: "N/A",
-          city: "N/A",
-          num: sum,
-        },
-      ],
-    });
-  </script>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        let data = [
+            {
+                date: '2016-05-03',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+                num: 100,
+            },
+            {
+                date: '2016-05-02',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+                num: 100,
+            },
+            {
+                date: '2016-05-04',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+                num: 100,
+            },
+            {
+                date: '2016-05-01',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+                num: 100,
+            },
+            {
+                date: '2016-05-08',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+                num: 100,
+            },
+        ];
+        let columns = [
+            {
+                title: 'Date',
+                key: 'date',
+                readonly: true,
+            },
+            {
+                title: 'Name',
+                key: 'name',
+                readonly: true,
+            },
+            {
+                title: 'State',
+                key: 'state',
+                readonly: true,
+            },
+            {
+                title: 'City',
+                key: 'city',
+                readonly: true,
+            },
+            {
+                title: 'number',
+                key: 'num',
+                readonly: true,
+            },
+        ];
+        const sum = data.reduce((prev, cur) => prev + cur.num, 0);
+        const target = document.getElementById('e-virt-table');
+        const evirtTable = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                HEIGHT: 250,
+                FOOTER_FIXED: true,
+            },
+            footerData: [
+                {
+                    date: 'sum',
+                    name: 'N/A',
+                    state: 'N/A',
+                    city: 'N/A',
+                    num: sum,
+                },
+            ],
+        });
+    </script>
 </html>

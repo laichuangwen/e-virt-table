@@ -19,7 +19,7 @@
 ::: demo
 
 history/enable
-h:220px
+h:320px
 :::
 
 ## 禁用
@@ -29,7 +29,7 @@ h:220px
 ::: demo
 
 history/disabled
-h:220px
+h:320px
 :::
 
 ## 回退数量
@@ -39,5 +39,5 @@ h:220px
 ::: demo
 
 history/num
-h:220px
+h:320px
 :::

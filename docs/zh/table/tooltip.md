@@ -24,7 +24,7 @@
 ::: demo
 
 tooltip/base
-h:220px
+h:320px
 :::
 
 ## 自定义样式
@@ -32,5 +32,5 @@ h:220px
 ::: demo
 
 tooltip/style
-h:220px
+h:320px
 :::

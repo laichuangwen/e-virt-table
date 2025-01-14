@@ -26,7 +26,7 @@
 ::: demo
 
 validator/base
-h:250px
+h:350px
 :::
 
 ## 自定义校验器
@@ -37,11 +37,11 @@ h:250px
 ::: demo
 
 validator/custom
-h:250px
+h:350px
 :::
 
 ## 常用校验规则
-
+> 更多 rules 高级用法可参考  [async-validator](https://github.com/yiminghe/async-validator)
 1. 必填
 
 ```js

@@ -36,7 +36,7 @@ h:250px
 ::: demo
 
 tree/expand
-h:550px
+h:500px
 :::
 
 ## 指定展开

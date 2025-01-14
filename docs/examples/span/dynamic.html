@@ -1,233 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>e-virt-table</title>
-  </head>
-  <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
-  <body>
-    <div id="e-virt-table"></div>
-  </body>
-  <script>
-    let data = [
-      {
-        id: 1,
-        date: "2016-05-01",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1519 弄",
-        zip: 200333,
-      },
-      {
-        id: 2,
-        date: "2016-05-02",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1518 弄",
-        zip: 200333,
-      },
-      {
-        id: 3,
-        date: "2016-05-02",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1518 弄",
-        zip: 200333,
-      },
-      {
-        id: 4,
-        date: "2016-05-02",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1518 弄",
-        zip: 200333,
-      },
-      {
-        id: 5,
-        date: "2016-05-02",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1518 弄",
-        zip: 200333,
-      },
-      {
-        id: 6,
-        date: "2016-05-03",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1516 弄",
-        zip: 200333,
-      },
-      {
-        id: 7,
-        date: "2016-05-03",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1516 弄",
-        zip: 200333,
-      },
-      {
-        id: 8,
-        date: "2016-05-04",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1517 弄",
-        zip: 200333,
-      },
-      {
-        id: 9,
-        date: "2016-05-04",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1517 弄",
-        zip: 200333,
-      },
-      {
-        id: 10,
-        date: "2016-05-04",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1517 弄",
-        zip: 200333,
-      },
-    ];
-    // 合并50行数据,看虚拟滚动错位
-    for (let i = 0; i < 10; i++) {
-      data.push({
-        id: 10 + i,
-        date: "2016-05-05",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1517 弄",
-        zip: 200333,
-      });
-    }
-    let columns = [
-      {
-        title: "日期",
-        key: "date",
-      },
-      {
-        title: "姓名",
-        key: "name",
-      },
-      {
-        title: "数值1",
-        key: "num1",
-      },
-      {
-        title: "数值2",
-        key: "num2",
-      },
-      {
-        title: "数值3",
-        key: "num3",
-      },
-      {
-        title: "数值4",
-        key: "num4",
-      },
-    ];
-    const target = document.getElementById("e-virt-table");
-    // 获取合并单元格的spanArr,针对行数据相同key合并
-    const getSpanArrByRow = function (list, key) {
-      let contactDot = 0;
-      const spanArr = [];
-      list.forEach((item, index) => {
-        if (index === 0) {
-          spanArr.push(1);
-        } else {
-          if (item[key] === list[index - 1][key]) {
-            spanArr[contactDot] += 1;
-            spanArr.push(0);
-          } else {
-            spanArr.push(1);
-            contactDot = index;
-          }
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        let data = [
+            {
+                id: '1',
+                date: '2016-05-01',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                id: '2',
+                date: '2016-05-02',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                id: '3',
+                date: '2016-05-02',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                id: '4',
+                date: '2016-05-02',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                id: '5',
+                date: '2016-05-02',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                id: '6',
+                date: '2016-05-03',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                id: '7',
+                date: '2016-05-03',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                id: '8',
+                date: '2016-05-04',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                id: '9',
+                date: '2016-05-04',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                id: '10',
+                date: '2016-05-04',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+        ];
+        // 合并50行数据,看虚拟滚动错位
+        for (let i = 0; i < 10; i++) {
+            data.push({
+                id: `${10 + i}`,
+                date: '2016-05-05',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            });
         }
-      });
-      return spanArr;
-    };
-    const getSpanObjByColumn = (row, columns) => {
-      let keyPre = "";
-      let keyDot = "";
-      const spanObj = {};
-      columns.forEach((item, index) => {
-        if (index === 0) {
-          keyPre = item.key;
-          keyDot = item.key;
-          spanObj[item.key] = 1;
-        } else {
-          // eslint-disable-next-line no-undef
-          if (row[item.key] === row[keyPre]) {
-            spanObj[item.key] = 0;
-            spanObj[keyDot] += 1;
-          } else {
-            spanObj[item.key] = 1;
-            keyPre = item.key;
-            keyDot = item.key;
-          }
-        }
-      });
-      return spanObj;
-    };
-    const mergeRowCell = function (data, key) {
-      // 合并单元格
-      const { visibleRows, rowIndex, headIndex } = data;
-      const spanArr = getSpanArrByRow(visibleRows, key);
-      if (spanArr[rowIndex - headIndex] === 0) {
-        return {
-          rowspan: 0,
-          colspan: 0,
+        let columns = [
+            {
+                title: 'Date',
+                key: 'date',
+            },
+            {
+                title: 'Name',
+                key: 'name',
+            },
+            {
+                title: 'number1',
+                key: 'num1',
+            },
+            {
+                title: 'number2',
+                key: 'num2',
+            },
+            {
+                title: 'number3',
+                key: 'num3',
+            },
+            {
+                title: 'number4',
+                key: 'num4',
+            },
+        ];
+        const target = document.getElementById('e-virt-table');
+        // 获取合并单元格的spanArr,针对行数据相同key合并
+        const getSpanArrByRow = function (list, key) {
+            let contactDot = 0;
+            const spanArr = [];
+            list.forEach((item, index) => {
+                if (index === 0) {
+                    spanArr.push(1);
+                } else {
+                    if (item[key] === list[index - 1][key]) {
+                        spanArr[contactDot] += 1;
+                        spanArr.push(0);
+                    } else {
+                        spanArr.push(1);
+                        contactDot = index;
+                    }
+                }
+            });
+            return spanArr;
         };
-      }
-      return {
-        rowspan: spanArr[rowIndex - headIndex],
-        colspan: 1,
-      };
-    };
-    const grid = new EVirtTable(target, {
-      data,
-      columns,
-      config: {
-        HEIGHT: 400,
-        ENABLE_SELECTOR: true,
-        ENABLE_AUTOFILL: true,
-        ENABLE_HISTORY: true,
-        SPAN_METHOD: (params) => {
-          const { colIndex, rowIndex, column, row, visibleLeafColumns } =
-            params;
-          if (column.key === "date") {
-            // 合并行单元格
-            return mergeRowCell(params, "date");
-          }
-          if (colIndex > 1) {
-            const spanObj = getSpanObjByColumn(row, visibleLeafColumns);
-            if (spanObj[column.key] === 0) {
-              return {
-                rowspan: 0,
-                colspan: 0,
-              };
+        const getSpanObjByColumn = (row, columns) => {
+            let keyPre = '';
+            let keyDot = '';
+            const spanObj = {};
+            columns.forEach((item, index) => {
+                if (index === 0) {
+                    keyPre = item.key;
+                    keyDot = item.key;
+                    spanObj[item.key] = 1;
+                } else {
+                    // eslint-disable-next-line no-undef
+                    if (row[item.key] === row[keyPre]) {
+                        spanObj[item.key] = 0;
+                        spanObj[keyDot] += 1;
+                    } else {
+                        spanObj[item.key] = 1;
+                        keyPre = item.key;
+                        keyDot = item.key;
+                    }
+                }
+            });
+            return spanObj;
+        };
+        const mergeRowCell = function (data, key) {
+            // 合并单元格
+            const { visibleRows, rowIndex, headIndex } = data;
+            const spanArr = getSpanArrByRow(visibleRows, key);
+            if (spanArr[rowIndex - headIndex] === 0) {
+                return {
+                    rowspan: 0,
+                    colspan: 0,
+                };
             }
             return {
-              rowspan: 1,
-              colspan: spanObj[column.key],
+                rowspan: spanArr[rowIndex - headIndex],
+                colspan: 1,
             };
-          }
-        },
-      },
-    });
-  </script>
+        };
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                HEIGHT: 400,
+                ENABLE_SELECTOR: true,
+                ENABLE_AUTOFILL: true,
+                ENABLE_HISTORY: true,
+                SPAN_METHOD: (params) => {
+                    const { colIndex, rowIndex, column, row, visibleLeafColumns } = params;
+                    if (column.key === 'date') {
+                        // 合并行单元格
+                        return mergeRowCell(params, 'date');
+                    }
+                    if (colIndex > 1) {
+                        const spanObj = getSpanObjByColumn(row, visibleLeafColumns);
+                        if (spanObj[column.key] === 0) {
+                            return {
+                                rowspan: 0,
+                                colspan: 0,
+                            };
+                        }
+                        return {
+                            rowspan: 1,
+                            colspan: spanObj[column.key],
+                        };
+                    }
+                },
+            },
+        });
+    </script>
 </html>

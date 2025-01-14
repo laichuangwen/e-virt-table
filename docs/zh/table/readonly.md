@@ -57,7 +57,7 @@ type BeforeChangeParams = {
 ::: demo
 
 readonly/disabled
-h:250px
+h:350px
 :::
 
 ## 列只读/编辑
@@ -68,7 +68,7 @@ h:250px
 ::: demo
 
 readonly/column
-h:220px
+h:350px
 :::
 
 ## 行只读/编辑
@@ -79,7 +79,7 @@ h:220px
 ::: demo
 
 readonly/row
-h:220px
+h:350px
 :::
 
 ## 方法控制只读/编辑
@@ -90,20 +90,19 @@ h:220px
 ::: demo
 
 readonly/method
-h:220px
+h:350px
 :::
 
 ## 拓展编辑器（时间选择....等）
 
 -   组件内部默认只有文本编辑
 -   利用`editorType`、两个`startEdit`、`doneEdit`事件回调及`setItemValueByEditor`更新数据方法可实现拓展任意编辑器
--   内部建议传递`editorElement`
 
 下面例子是拓展了一个时间选择器的 demo，其他拓展可参考这个例子
 
 ::: demo
 readonly/date
-h:220px
+h:350px
 :::
 
 ## 方法控制编辑器类型
@@ -115,17 +114,16 @@ h:220px
 ::: demo
 
 readonly/editType-method
-h:220px
+h:350px
 :::
 
 ## 更改编辑后的值
 
 - 注意和formatter的区别，BEFORE_VALUE_CHANGE_METHOD更改的是赋值。
 
-从下面的例子可以年龄是数字类型，只有输入数字类型才更改值
 
 ::: demo
 
 readonly/value-change
-h:220px
+h:350px
 :::

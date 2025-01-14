@@ -17,7 +17,7 @@
 ::: demo
 
 cell-style/header
-h:220px
+h:320px
 :::
 
 ## body样式自定义
@@ -27,7 +27,7 @@ h:220px
 ::: demo
 
 cell-style/body
-h:220px
+h:320px
 :::
 
 ## footer样式自定义
@@ -37,5 +37,5 @@ h:220px
 ::: demo
 
 cell-style/footer
-h:320px
+h:360px
 :::

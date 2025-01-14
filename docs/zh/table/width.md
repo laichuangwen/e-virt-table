@@ -30,7 +30,7 @@
 ::: demo
 
 width/width
-h:220px
+h:320px
 :::
 
 ## 动态总宽度
@@ -40,7 +40,7 @@ h:220px
 ::: demo
 
 width/width-dynamic
-h:220px
+h:320px
 :::
 
 2. 列`widthFillDisable`为 false 超过会被平均填充，最小 100
@@ -48,7 +48,7 @@ h:220px
 ::: demo
 
 width/width-dynamic1
-h:220px
+h:320px
 :::
 
 ## 默认列宽度
@@ -58,7 +58,7 @@ h:220px
 ::: demo
 
 width/base
-h:220px
+h:320px
 :::
 
 ## 设置列宽度
@@ -66,7 +66,7 @@ h:220px
 ::: demo
 
 width/setting
-h:220px
+h:320px
 :::
 
 ## 可调整列宽度
@@ -77,5 +77,5 @@ h:220px
 ::: demo
 
 width/resize
-h:220px
+h:320px
 :::

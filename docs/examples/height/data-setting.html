@@ -1,90 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>e-virt-table</title>
-  </head>
-  <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
-  <body>
-    <div id="e-virt-table"></div>
-  </body>
-  <script>
-    let data = [
-      {
-        date: "2016-05-02",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1518 弄",
-        zip: 200333,
-      },
-      {
-        date: "2016-05-04",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1517 弄",
-        zip: 200333,
-        _height: 80, // 设置body行高
-      },
-      {
-        date: "2016-05-01",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1519 弄",
-        zip: 200333,
-      },
-      {
-        date: "2016-05-03",
-        name: "王小虎",
-        province: "上海",
-        city: "普陀区",
-        address: "上海市普陀区金沙江路 1516 弄",
-        zip: 200333,
-      },
-    ];
-    let columns = [
-      {
-        title: "日期",
-        key: "date",
-        readonly: true,
-      },
-      {
-        title: "姓名",
-        key: "name",
-        readonly: true,
-      },
-      {
-        title: "省份",
-        key: "province",
-        readonly: true,
-      },
-      {
-        title: "市区",
-        key: "city",
-        readonly: true,
-      },
-      {
-        title: "地址",
-        key: "address",
-        readonly: true,
-        width: 200,
-      },
-      {
-        title: "邮编",
-        key: "zip",
-        readonly: true,
-      },
-    ];
-    const target = document.getElementById("e-virt-table");
-    const grid = new EVirtTable(target, {
-      data,
-      columns,
-      config: {
-        HEADER_HEIGHT: 50, // 设置表头行高
-      },
-    });
-  </script>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        let data = [
+            {
+                date: '2016-05-03',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-02',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-04',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-01',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-08',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-06',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-07',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+        ];
+        let columns = [
+            {
+                title: 'Date',
+                key: 'date',
+                readonly: true,
+            },
+            {
+                title: 'Name',
+                key: 'name',
+                readonly: true,
+            },
+            {
+                title: 'State',
+                key: 'state',
+                readonly: true,
+            },
+            {
+                title: 'City',
+                key: 'city',
+                readonly: true,
+            },
+            {
+                title: 'Address',
+                key: 'address',
+                readonly: true,
+                width: 200,
+            },
+            {
+                title: 'Zip',
+                key: 'zip',
+                readonly: true,
+            },
+        ];
+        const target = document.getElementById('e-virt-table');
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                HEADER_HEIGHT: 50, // 设置表头行高
+            },
+        });
+    </script>
 </html>

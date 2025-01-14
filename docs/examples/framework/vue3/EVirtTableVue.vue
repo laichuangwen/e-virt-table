@@ -2,7 +2,7 @@
 import { ElDatePicker, ElInputNumber, ElSelectV2, ElCascader, ElTimePicker } from 'element-plus';
 import Cell from 'e-virt-table/dist/lib/Cell';
 import EVirtTable, { Column, ConfigType, OverlayerContainer } from 'e-virt-table';
-import { ref, onMounted, h, nextTick, computed, useAttrs } from 'vue';
+import { ref, onMounted, h, nextTick, computed, useAttrs, watch } from 'vue';
 import { EventCallback } from 'e-virt-table/dist/lib/EventBus';
 type EDITOR_TYPE = 'text' | 'select' | 'date' | 'number' | 'time' | 'cascader';
 const emit = defineEmits<{
@@ -13,14 +13,17 @@ const props = defineProps({
     columns: {
         type: Array as () => Column[],
         required: true,
+        default: () => [],
     },
     data: {
         type: Array as () => any[],
         required: true,
+        default: () => [],
     },
     footerData: {
         type: Array as () => any[],
         required: false,
+        default: () => [],
     },
     config: {
         type: Object as () => ConfigType,
@@ -31,6 +34,25 @@ const props = defineProps({
         default: false,
     },
 });
+// watch(
+//     props.data,
+//     (newValue) => {
+//         eVirtTable?.loadData(newValue);
+//     },
+// );
+watch(
+    () => props.columns,
+    (newValue) => {
+        eVirtTable?.loadColumns(newValue);
+    },
+    { deep: true },
+);
+// watch(
+//     props.footerData,
+//     (newValue) => {
+//         eVirtTable?.loadFooterData(newValue);
+//     },
+// );
 let eVirtTable: EVirtTable | null = null;
 const attrs = useAttrs();
 const eVirtTableRef = ref(null);

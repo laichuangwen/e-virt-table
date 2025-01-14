@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { faker, tr } from '@faker-js/faker';
 import dayjs from 'dayjs';
-import { Column, ConfigType } from 'e-virt-table';
+import EVirtTable, { Column, ConfigType } from 'e-virt-table';
 import EVirtTableVue from './EVirtTableVue.vue';
+import { ref } from 'vue';
 const editorTypes = ['text', 'select', 'date'];
-const columns: Column[] = [
+let columns = ref<Column[]>([
     {
         type: 'index',
         key: 'index',
@@ -122,7 +123,7 @@ const columns: Column[] = [
         key: 'time',
         editorType: 'time',
     },
-];
+]);
 const users = faker.helpers.multiple(
     () => {
         return {
@@ -132,11 +133,11 @@ const users = faker.helpers.multiple(
             customType: editorTypes[faker.number.int({ min: 0, max: editorTypes.length - 1 })], // 生成随机编辑器类型
             select: faker.person.sex(), // 生成随机性别
             number: faker.number.int({ min: 24, max: 66 }), // 生成随机性别
-            date: dayjs(faker.date.recent()).format('YYYY-MM-DD'), // 生成随机日期
-            years: dayjs(faker.date.anytime()).format('YYYY'), // 生成随机日期
-            month: dayjs(faker.date.anytime()).format('YYYY-MM'), // 生成随机日期
-            week: dayjs(faker.date.anytime()).format('ww'), // 生成随机日期
-            time: dayjs(faker.date.anytime()).format('HH:mm:ss'), // 生成随机日期
+            date: dayjs(faker.date.recent()).format('YYYY-MM-DD'), // 生成随机Date
+            years: dayjs(faker.date.anytime()).format('YYYY'), // 生成随机Date
+            month: dayjs(faker.date.anytime()).format('YYYY-MM'), // 生成随机Date
+            week: dayjs(faker.date.anytime()).format('ww'), // 生成随机Date
+            time: dayjs(faker.date.anytime()).format('HH:mm:ss'), // 生成随机Date
             cascader: faker.number.int({ min: 1, max: 4 }), // 生成随机部门
         };
     },
@@ -185,23 +186,50 @@ const config: ConfigType = {
 function change(data) {
     console.log(data);
 }
+let evirtTable: EVirtTable | null = null;
+function ready(grid: EVirtTable) {
+    evirtTable = grid;
+}
+const disabled = ref(true);
+function setDisabled(value) {
+    evirtTable?.loadConfig({
+        ...config,
+        DISABLED: !value,
+    });
+}
+setTimeout(() => {
+    columns.value = columns.value.map((column) => {
+        if (column.key === 'custom') {
+            return {
+                ...column,
+                readonly: true,
+            };
+        }
+        return column;
+    });
+}, 1000);
 </script>
 <template>
-    <EVirtTableVue :columns="columns" :data="users" :config="config" @change="change">
-        <template #avatar="{ row }">
-            <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center">
-                <el-avatar :src="row.avatar" style="width: 20px; height: 20px" />
-            </div>
-        </template>
-        <template #image="{ row }">
-            <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center">
-                <el-image
-                    :src="row.image"
-                    preview-teleported
-                    :preview-src-list="[row.image]"
-                    style="width: 20px; height: 20px"
-                />
-            </div>
-        </template>
-    </EVirtTableVue>
+    <div>
+        <div>
+            <el-switch v-model="disabled" inline-prompt active-text="编辑" inactive-text="只读" @change="setDisabled" />
+        </div>
+        <EVirtTableVue @ready="ready" :columns="columns" :data="users" :config="config" @change="change">
+            <template #avatar="{ row }">
+                <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center">
+                    <el-avatar :src="row.avatar" style="width: 20px; height: 20px" />
+                </div>
+            </template>
+            <template #image="{ row }">
+                <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center">
+                    <el-image
+                        :src="row.image"
+                        preview-teleported
+                        :preview-src-list="[row.image]"
+                        style="width: 20px; height: 20px"
+                    />
+                </div>
+            </template>
+        </EVirtTableVue>
+    </div>
 </template>

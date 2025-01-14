@@ -15,7 +15,7 @@
 ::: demo
 
 align/horizontal
-h:220px
+h:320px
 :::
 
 ## 垂直对齐
@@ -26,5 +26,5 @@ h:220px
 ::: demo
 
 align/vertical
-h:280px
+h:420px
 :::

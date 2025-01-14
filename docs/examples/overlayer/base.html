@@ -29,7 +29,7 @@
                     width: 100,
                 },
                 {
-                    title: '日期',
+                    title: 'Date',
                     key: 'date',
                     renderHeader: (pEl, cell) => {
                         const cellEl = document.createElement('div');
@@ -66,48 +66,48 @@
                         cellEl.style.justifyContent = 'center';
                         cellEl.style.alignItems = 'center';
 
-                        cellEl.innerHTML = '底部';
+                        cellEl.innerHTML = 'footer';
                         pEl.appendChild(cellEl);
                     },
                 },
                 {
-                    title: '姓名',
+                    title: 'Name',
                     key: 'name',
                 },
                 {
-                    title: '省份',
-                    key: 'province',
+                    title: 'State',
+                    key: 'state',
                 },
                 {
-                    title: '市区',
+                    title: 'City',
                     key: 'city',
                 },
                 {
-                    title: '地址',
+                    title: 'Address',
                     key: 'address',
                     width: 200,
                 },
                 {
-                    title: '邮编',
+                    title: 'Zip',
                     key: 'zip',
                 },
             ];
             let gcData = {};
             for (let i = 0; i < c; i += 1) {
                 columns.push({
-                    title: `表头${i}`,
+                    title: `header_${i}`,
                     key: `gc_${i}`,
                 });
-                gcData[`gc_${i}`] = `数据${i}`;
+                gcData[`gc_${i}`] = `data_${i}`;
             }
             let data = [];
             _gcData = {
                 date: '2016-05-02',
-                name: '王小虎',
-                province: '上海',
-                city: '普陀区',
-                address: '上海市普陀区金沙江路 1518 弄',
-                zip: 200333,
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
                 ...gcData,
             };
             for (let i = 0; i < r; i += 1) {
@@ -126,7 +126,7 @@
             columns,
             footerData: [
                 {
-                    index: '合计',
+                    index: 'sum',
                 },
             ],
             config: {

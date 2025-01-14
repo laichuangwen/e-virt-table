@@ -16,7 +16,7 @@
 ::: demo
 
 header/level
-h:285px
+h:400px
 :::
 
 ## 自定义样式
@@ -24,5 +24,5 @@ h:285px
 ::: demo
 
 header/base
-h:335px
+h:450px
 :::

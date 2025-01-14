@@ -10,66 +10,67 @@
         <div id="e-virt-table"></div>
     </body>
     <script>
-        function gcData(c = 1000, r = 1000) {
+        function generateData(c = 1000, r = 1000) {
             let columns = [
                 {
                     type: 'index',
                     key: 'index',
-                    width: 100,
+                    width: 70,
                 },
                 {
-                    title: '日期',
+                    title: 'Date',
                     key: 'date',
                 },
                 {
-                    title: '姓名',
+                    title: 'Name',
                     key: 'name',
                 },
                 {
-                    title: '省份',
-                    key: 'province',
+                    title: 'State',
+                    key: 'state',
                 },
                 {
-                    title: '市区',
+                    title: 'City',
                     key: 'city',
                 },
                 {
-                    title: '地址',
+                    title: 'Address',
                     key: 'address',
                     width: 200,
                 },
                 {
-                    title: '邮编',
+                    title: 'Zip',
                     key: 'zip',
                 },
             ];
             let gcData = {};
             for (let i = 0; i < c; i += 1) {
                 columns.push({
-                    title: `表头${i}`,
+                    title: `Header_${i}`,
                     key: `gc_${i}`,
                 });
-                gcData[`gc_${i}`] = `数据${i}`;
+                gcData[`gc_${i}`] = `data_${i}`;
             }
             let data = [];
-            _gcData = {
+            let _gcData = {
                 date: '2016-05-02',
-                name: '王小虎',
-                province: '上海',
-                city: '普陀区',
-                address: '上海市普陀区金沙江路 1518 弄',
-                zip: 200333,
+                name: 'John',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
                 ...gcData,
             };
             for (let i = 0; i < r; i += 1) {
                 data.push(JSON.parse(JSON.stringify(_gcData)));
             }
+
             return {
                 columns,
                 data,
             };
         }
-        const { columns, data } = gcData(1000, 1000);
+        const { columns, data } = generateData(1000, 1000);
         const target = document.getElementById('e-virt-table');
         const grid = new EVirtTable(target, {
             data,

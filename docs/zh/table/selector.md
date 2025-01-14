@@ -31,7 +31,7 @@
 ::: demo
 
 selector/disabled
-h:220px
+h:320px
 :::
 
 ## 启用
@@ -42,7 +42,7 @@ h:220px
 ::: demo
 
 selector/enable
-h:220px
+h:320px
 :::
 
 ## 单选
@@ -52,7 +52,7 @@ h:220px
 ::: demo
 
 selector/single
-h:220px
+h:320px
 :::
 
 ## 只选列
@@ -67,7 +67,7 @@ h:220px
 
 ::: demo
 selector/col
-h:220px
+h:320px
 :::
 
 ## 只选行
@@ -84,7 +84,7 @@ h:220px
 
 ::: demo
 selector/row
-h:220px
+h:320px
 :::
 
 ## 禁用批量
@@ -98,7 +98,7 @@ h:220px
 ::: demo
 
 selector/batch
-h:220px
+h:320px
 :::
 
 ## 限定范围
@@ -114,5 +114,5 @@ h:220px
 ::: demo
 
 selector/scope
-h:220px
+h:320px
 :::

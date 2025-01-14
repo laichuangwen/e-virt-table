@@ -53,7 +53,7 @@ export default defineConfig({
                             { text: '空数据', link: '/zh/table/empty' },
                             { text: '高亮', link: '/zh/table/highlight' },
                             { text: '对齐', link: '/zh/table/align' },
-                            { text: '索引', link: '/zh/table/index' },
+                            { text: '索引', link: '/zh/table/row-index' },
                             { text: '多选', link: '/zh/table/selection' },
                             { text: '树形', link: '/zh/table/tree' },
                             { text: '溢出提示', link: '/zh/table/tooltip' },

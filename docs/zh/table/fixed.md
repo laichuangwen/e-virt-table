@@ -34,5 +34,5 @@ h:400px
 ::: demo
 
 fixed/left-right
-h:220px
+h:320px
 :::

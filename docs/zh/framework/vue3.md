@@ -5,7 +5,7 @@
 ::: demo
 
 framework/vue3/base
-h:220px
+h:320px
 :::
 
 ## 基于vue3和element-plus拓展的可编辑组件

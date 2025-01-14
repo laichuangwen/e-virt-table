@@ -44,7 +44,7 @@
 ::: demo
 
 selection/base
-h:220px
+h:320px
 :::
 
 ## 有下标的多选
@@ -54,7 +54,7 @@ h:220px
 ::: demo
 
 selection/index
-h:220px
+h:320px
 :::
 
 ## 通过 rows 设置选中/清空选中
@@ -66,7 +66,7 @@ h:220px
 ::: demo
 
 selection/setting
-h:240px
+h:350px
 :::
 
 ## 通过 rowKeys 设置选中/清空选中
@@ -78,7 +78,7 @@ h:240px
 ::: demo
 
 selection/settingRowKeys
-h:240px
+h:350px
 :::
 
 ## 获取选中
@@ -88,7 +88,7 @@ h:240px
 ::: demo
 
 selection/get
-h:240px
+h:350px
 :::
 
 ## 禁用
@@ -98,7 +98,7 @@ h:240px
 ::: demo
 
 selection/disabled
-h:240px
+h:350px
 :::
 
 ## 合并单元格多选
