@@ -1,22 +1,22 @@
-# 插槽（覆盖层）
+# Slots (Overlay)
 
--   在表格上方覆盖元素实现自定义插槽组件功能
+-   Implement custom slot component functionality by overlaying elements on top of the table
 
 ## Config
 
-| 参数               | 说明                  | 类型 | 可选值 | 默认值 |
-| ------------------ | --------------------- | ---- | ------ | ------ |
-| CELL_RENDER_METHOD | 自定义格子类型 render | —    | —      |        |
+| Parameter          | Description               | Type | Default |
+| ------------------ | ------------------------- | ---- | ------- |
+| CELL_RENDER_METHOD | Custom cell type render   | —    |         |
 
 ## Events
 
-| 事件名称        | 说明       | 回调参数               |
-| --------------- | ---------- | ---------------------- |
-| overlayerChange | 覆盖层回调 | `({type,views,style})` |
+| Event Name        | Description   | Callback Parameters       |
+| ----------------- | ------------- | ------------------------- |
+| overlayerChange   | Overlay callback | `({type, views, style})` |
 
-## 启用
+## Enable
 
--   利用`overlayerChange`对 header、body、footer 进行动态插入元素
+-   Use `overlayerChange` to dynamically insert elements into the header, body, and footer
 
 ::: demo
 

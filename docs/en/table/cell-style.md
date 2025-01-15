@@ -1,18 +1,16 @@
-# 样式
+# Style
 
 ## Config
 
-| 方法名称                 | 说明            | 参数                                                                 |
-| ------------------------ | --------------- | -------------------------------------------------------------------- |
-| HEADER_CELL_STYLE_METHOD | header 格子样式 | `({column,colIndex})=>({color,backgroundColor})`                     |
-| BODY_CELL_STYLE_METHOD   | body 格子样式   | `({row, column,rowIndex,colIndex,value})=>({color,backgroundColor})` |
-| FOOTER_CELL_STYLE_METHOD | footer 格子样式 | `({row, column,rowIndex,colIndex,value})=>({color,backgroundColor})` |
+| Name                     | Description       | Parameters                                                           |
+| ------------------------ | ----------------- | -------------------------------------------------------------------- |
+| HEADER_CELL_STYLE_METHOD | Header cell style | `({column,colIndex})=>({color,backgroundColor})`                     |
+| BODY_CELL_STYLE_METHOD   | Body cell style   | `({row, column,rowIndex,colIndex,value})=>({color,backgroundColor})` |
+| FOOTER_CELL_STYLE_METHOD | Footer cell style | `({row, column,rowIndex,colIndex,value})=>({color,backgroundColor})` |
 
+## Header Style
 
-
-## header样式自定义
-
--   只支持 color 和 backgroundColor
+-   Only supports color and backgroundColor
 
 ::: demo
 
@@ -20,9 +18,9 @@ cell-style/header
 h:320px
 :::
 
-## body样式自定义
+## Body Style
 
--   只支持 color 和 backgroundColor
+-   Only supports color and backgroundColor
 
 ::: demo
 
@@ -30,9 +28,9 @@ cell-style/body
 h:320px
 :::
 
-## footer样式自定义
+## Footer Style
 
--   只支持 color 和 backgroundColor
+-   Only supports color and backgroundColor
 
 ::: demo
 

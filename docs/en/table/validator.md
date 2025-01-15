@@ -1,27 +1,27 @@
-# 单元格校验
+# Validation
 
 ## Column
 
--   更多 rules 高级用法可参考 [async-validator](https://github.com/yiminghe/async-validator)。
+-   For more advanced usage of rules, refer to [async-validator](https://github.com/yiminghe/async-validator).
 
-| 参数  | 说明           | 类型   | 可选值 | 默认值 |
-| ----- | -------------- | ------ | ------ | ------ |
-| rules | 列数据校验规则 | object | —      | —      |
+| Parameter | Description             | Type   | Default |
+| --------- | ----------------------- | ------ | ------- |
+| rules     | Column validation rules | object | —       |
 
 ## Config
 
-| 参数 | 说明 | 类型 | 可选值 | 默认值 |
-| --- | --- | --- | --- | --- |
-| BODY_CELL_RULES_METHOD| 自定义校验规则 | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean` | — | — |
+| Parameter              | Description             | Type                                                            | Default |
+| ---------------------- | ----------------------- | --------------------------------------------------------------- | ------- |
+| BODY_CELL_RULES_METHOD | Custom validation rules | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean` | —       |
 
 ## Events
 
-| 事件名称  | 说明         | 回调参数 |
-| --------- | ------------ | -------- |
-| validateChangedData  | 更改值后全部校验通过后的回调 | 当前改变值数组   |
+| Name                | Description                         | Callback Parameters |
+| ------------------- | ----------------------------------- | ------------------- |
+| validateChangedData | Callback after all validations pass | Array[]             |
 
-## 校验器
-- 注意validateChangedData事件，全部校验通过后才会回调更改的结果
+## Validator
+- Note the validateChangedData event, which will only callback the changed results after all validations pass
   
 ::: demo
 
@@ -29,10 +29,10 @@ validator/base
 h:350px
 :::
 
-## 自定义校验器
+## Custom Validator
 
--   `BODY_CELL_RULES_METHOD` 可自定义 cell 校验规则
--   email的rowIndex= 0,1不校验不必填
+-   `BODY_CELL_RULES_METHOD` can customize cell validation rules
+-   Email validation is not required for rowIndex= 0,1
 
 ::: demo
 
@@ -40,54 +40,54 @@ validator/custom
 h:350px
 :::
 
-## 常用校验规则
-> 更多 rules 高级用法可参考  [async-validator](https://github.com/yiminghe/async-validator)
-1. 必填
+## Common Validation Rules
+> For more advanced usage of rules, refer to [async-validator](https://github.com/yiminghe/async-validator)
+1. Required
 
 ```js
-[{ required: true, message: '请输入' }];
+[{ required: true, message: 'Please enter' }];
 ```
 
-2. 金额
+2. Amount
 
 ```js
 [
     {
         required: true,
-        message: '请输入金额',
+        message: 'Please enter an amount',
     },
     {
         pattern: /^(([1-9]{1}\d*)|(0{1}))(\.\d{1,2})?$/,
-        message: '请输入合法的金额数字，最多两位小数',
+        message: 'Please enter a valid amount, up to two decimal places',
     },
 ];
 ```
 
-3. 正整数
+3. Positive Integer
 
 ```js
 [
     {
         required: true,
-        message: '请输入',
+        message: 'Please enter',
     },
     {
         pattern: /^(?:[1-9]\d*)$/,
-        message: '请输入正整数',
+        message: 'Please enter a positive integer',
     },
 ];
 ```
 
-4. 自定义校验规则
+4. Custom Validation Rules
 
 ```js
 [
     {
         validator(rule, value, callback) {
             if (!value) {
-                callback('请输入');
+                callback('Please enter');
             } else if (value.length > 20) {
-                callback('字段长度必须小于20个字符哦！');
+                callback('Field length must be less than 20 characters!');
             } else {
                 callback();
             }

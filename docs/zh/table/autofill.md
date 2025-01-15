@@ -4,15 +4,15 @@
 
 ## Config
 
-| 参数                     | 说明                    | 类型    | 可选值 | 默认值 |
-| ------------------------ | ----------------------- | ------- | ------ | ------ |
-| ENABLE_SELECTOR          | 启用选择器              | boolean | —      | false   |
-| ENABLE_AUTOFILL          | 启用填充器              | boolean | —      | false   |
-| ENABLE_SELECTOR_SINGLE   | 启用选择器-选择器单选   | boolean | —      | false  |
-| ENABLE_SELECTOR_SPAN_COL | 启用选择器-批量跨列选择 | boolean | —      | true   |
-| ENABLE_SELECTOR_SPAN_ROW | 启用选择器-批量跨行选择 | boolean | —      | true   |
-| ENABLE_SELECTOR_ALL_ROWS | 启用选择器-批量选中列   | boolean | —      | true   |
-| ENABLE_SELECTOR_ALL_COLS | 启用选择器-批量选中行   | boolean | —      | true   |
+| 参数                     | 说明                    | 类型     | 默认值 |
+| ------------------------ | ----------------------- | -------  | ------ |
+| ENABLE_SELECTOR          | 启用选择器              | boolean     | false   |
+| ENABLE_AUTOFILL          | 启用填充器              | boolean      | false   |
+| ENABLE_SELECTOR_SINGLE   | 启用选择器-选择器单选   | boolean      | false  |
+| ENABLE_SELECTOR_SPAN_COL | 启用选择器-批量跨列选择 | boolean      | true   |
+| ENABLE_SELECTOR_SPAN_ROW | 启用选择器-批量跨行选择 | boolean       | true   |
+| ENABLE_SELECTOR_ALL_ROWS | 启用选择器-批量选中列   | boolean    | true   |
+| ENABLE_SELECTOR_ALL_COLS | 启用选择器-批量选中行   | boolean      | true   |
 | BEFORE_AUTOFILL_CHANGE_METHOD | 数值填充前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
 
 ## Typings

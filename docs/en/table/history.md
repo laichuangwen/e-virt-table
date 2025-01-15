@@ -1,20 +1,20 @@
-# 回滚历史
+# History
 
 ## Config
 
-| 参数           | 说明       | 类型    | 可选值 | 默认值 |
-| -------------- | ---------- | ------- | ------ | ------ |
-| ENABLE_HISTORY | 启用历史   | boolean | —      | true   |
-| HISTORY_NUM    | 历史栈数量 | number  | —      | 50     |
+| Parameter       | Description       | Type    | Default |
+| --------------- | ----------------- | ------- | ------------- |
+| ENABLE_HISTORY  | Enable History    | boolean | true          |
+| HISTORY_NUM     | History Stack Size| number  | 50            |
 
-注意：
+Note:
 
--   历史回退会触发`change`事件
--   回滚历史会记录上次更改数据的滚动条位置
+-   History rollback will trigger the `change` event.
+-   Rollback history will record the scrollbar position of the last data change.
 
-## 启用
+## Enable
 
--   `config.ENABLE_HISTORY`为`true`,默认是开开启的
+-   `config.ENABLE_HISTORY` is `true` by default.
 
 ::: demo
 
@@ -22,9 +22,9 @@ history/enable
 h:320px
 :::
 
-## 禁用
+## Disable
 
--   `config.ENABLE_HISTORY`为`false`
+-   `config.ENABLE_HISTORY` is `false`.
 
 ::: demo
 
@@ -32,9 +32,9 @@ history/disabled
 h:320px
 :::
 
-## 回退数量
+## Rollback Count
 
--   `config.HISTORY_NUM`为`3`回退 3 次
+-   `config.HISTORY_NUM` is `3` to rollback 3 times.
 
 ::: demo
 

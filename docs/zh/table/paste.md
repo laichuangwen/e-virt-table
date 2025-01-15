@@ -4,11 +4,11 @@
 
 ## Config
 
-| 参数                     | 说明                    | 类型    | 可选值 | 默认值 |
-| ------------------------ | ----------------------- | ------- | ------ | ------ |
-| ENABLE_COPY | 启用复制 | boolean | — | true |
-| ENABLE_PASTER | 启用粘贴 | boolean | — | true |
-| BEFORE_PASTE_CHANGE_METHOD | 粘贴前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
+| 参数                     | 说明                    | 类型     | 默认值 |
+| ------------------------ | ----------------------- | -------  | ------ |
+| ENABLE_COPY | 启用复制 | boolean  | true |
+| ENABLE_PASTER | 启用粘贴 | boolean  | true |
+| BEFORE_PASTE_CHANGE_METHOD | 粘贴前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — |
 
 ## Typings
 

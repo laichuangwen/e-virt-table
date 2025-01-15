@@ -1,30 +1,30 @@
-# 右键菜单
+# Context Menu
 
 ## Config
 
-| 参数                | 说明         | 类型    | 可选值 | 默认值 |
-| ------------------- | ------------ | ------- | ------ | ------ |
-| ENABLE_CONTEXT_MENU | 启用右键菜单 | boolean | —      | false  |
+| Parameter           | Description       | Type    | Default |
+| ------------------- | ----------------- | ------- | ------- |
+| ENABLE_CONTEXT_MENU | Enable context menu | boolean | false   |
 
 ## Methods
 
-| 方法名称        | 说明         | 参数 |
-| --------------- | ------------ | ---- |
-| contextMenuHide | 隐藏右键菜单 | —    |
-| emit            | 发出监听事件 | —    |
+| Method Name     | Description       | Parameters |
+| --------------- | ----------------- | ---------- |
+| contextMenuHide | Hide context menu | —          |
+| emit            | Emit event        | —          |
 
-### 内置操作方法
+### Built-in Methods
 
--   复制 `contextMenuCopy`
--   粘贴 `contextMenuPaste`
--   剪切 `contextMenuCut`
--   清空 `contextMenuClearSelected`
+-   Copy `contextMenuCopy`
+-   Paste `contextMenuPaste`
+-   Cut `contextMenuCut`
+-   Clear `contextMenuClearSelected`
 
-使用方式 emit('contextMenuCopy')
+Usage: emit('contextMenuCopy')
 
-## 启用
+## Enable
 
--   `ENABLE_CONTEXT_MENU`默认是 false
+-   `ENABLE_CONTEXT_MENU` is false by default
 
 ::: demo
 
@@ -32,9 +32,9 @@ context-menu/enable
 h:320px
 :::
 
-## 自定义右键
+## Custom Context Menu
 
--   构造函数传递 contextMenuElement
+-   Pass contextMenuElement to the constructor
 
 ::: demo
 

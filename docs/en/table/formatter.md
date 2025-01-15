@@ -14,8 +14,6 @@
 
 ## Column formatter
 
--   Only for column properties
-
 ::: demo
 
 formatter/base
@@ -24,7 +22,7 @@ h:320px
 
 ## BODY_CELL_FORMATTER_METHOD
 
--   Precise cell formatting
+-   cell formatter
 -   Note that formatter has a higher priority than BODY_CELL_FORMATTER_METHOD
 
 ::: demo

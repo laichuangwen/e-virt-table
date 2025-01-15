@@ -1,6 +1,6 @@
-# vue3 例子
+# Vue3 Examples
 
-## 基础
+## Basics
 
 ::: demo
 
@@ -8,21 +8,21 @@ framework/vue3/base
 h:320px
 :::
 
-## 基于vue3和element-plus拓展的可编辑组件
-- 拓展编辑器(支持下拉、日期、时间、tree等)
-- 拓展空数据
-- 拓展覆盖层，支持dom图片等
-- 支持不同格子有不同编辑器
+## Editable Components Based on Vue3 and Element Plus
+- Extended editor (supports dropdown, date, time, tree, etc.)
+- Extended empty data
+- Extended overlay, supports DOM images, etc.
+- Supports different editors for different cells
 
-### 封装组件EVirtTableVue
+### Encapsulated Component EVirtTableVue
 
-::: code 组件源码
+::: code Component Source Code
 
 framework/vue3/EVirtTableVue.vue
 :::
-### 拓展编辑器例子
+### Extended Editor Example
 
-::: code 例子源码
+::: code Example Source Code
 
 framework/vue3/EVirtTableDemo.vue
 :::

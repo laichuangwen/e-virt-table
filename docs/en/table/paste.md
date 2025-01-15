@@ -1,14 +1,14 @@
-# 单元格复制粘贴
+# Copy and Paste
 
-粘贴需要启动选择器和键盘
+Pasting requires enabling the selector and keyboard
 
 ## Config
 
-| 参数                     | 说明                    | 类型    | 可选值 | 默认值 |
-| ------------------------ | ----------------------- | ------- | ------ | ------ |
-| ENABLE_COPY | 启用复制 | boolean | — | true |
-| ENABLE_PASTER | 启用粘贴 | boolean | — | true |
-| BEFORE_PASTE_CHANGE_METHOD | 粘贴前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
+| Parameter                     | Description                    | Type     | Default Value |
+| ------------------------ | ----------------------- | -------  | ------ |
+| ENABLE_COPY | Enable Copy | boolean  | true |
+| ENABLE_PASTER | Enable Paste | boolean  | true |
+| BEFORE_PASTE_CHANGE_METHOD | Callback before paste | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — |
 
 ## Typings
 
@@ -22,33 +22,31 @@ type BeforeChangeParams = {
 };
 ```
 
-## 禁用复制&粘贴
+## Disable
 
-- 启用选择器
-- 启用键盘`ENABLE_KEYBOARD`,默认true
-- 启用复制`ENABLE_COPY`，默认true
-- 启用粘贴`ENABLE_PASTER`，默认true
+- Enable selector
+- Enable keyboard `ENABLE_KEYBOARD`, default true
+- Enable copy `ENABLE_COPY`, default true
+- Enable paste `ENABLE_PASTER`, default true
 ::: demo
 paste/disabled
 h:320px
 :::
 
-## 启用复制&粘贴
+## Enable
 
-- 启用选择器
-- 启用键盘`ENABLE_KEYBOARD`,默认true
-- 启用复制`ENABLE_COPY`，默认true
-- 启用粘贴`ENABLE_PASTER`，默认true
+- Enable selector
+- Enable keyboard `ENABLE_KEYBOARD`, default true
+- Enable copy `ENABLE_COPY`, default true
+- Enable paste `ENABLE_PASTER`, default true
 ::: demo
 paste/enable
 h:320px
 :::
 
+## Before Paste Data Change
 
-## 粘贴数据更改前
-
-- BEFORE_AUTOFILL_CHANGE_METHOD可篡改粘贴数据，支持Promise
-
+- BEFORE_AUTOFILL_CHANGE_METHOD can modify paste data, supports Promise
 
 ::: demo
 paste/before-change

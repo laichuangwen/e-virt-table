@@ -1,4 +1,4 @@
-# vue2 例子
+# vue2 Example
 
 ::: demo
 
@@ -6,6 +6,6 @@ framework/vue2/base
 h:320px
 :::
 
-> 更多列子和配置请参考
-> - 例子文档
-> - [基于vue3和element-plus拓展的可编辑组件](/zh/framework/vue3.html#基于vue3和element-plus拓展的可编辑组件)
+> For more examples and configurations, please refer to
+> - Example documentation
+> - [Editable component based on vue3 and element-plus extension](/en/framework/vue3.html#editable-components-based-on-vue-3-and-element-plus)
