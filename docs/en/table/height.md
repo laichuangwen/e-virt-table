@@ -14,8 +14,7 @@
 | HEIGHT               | Height (0 means auto fit)              | number  | 0       |
 | MAX_HEIGHT           | Maximum height, (0 means auto fit)     | number  | 1000    |
 | CELL_HEIGHT          | Default row height for body cells      | number  | 32      |
-| ENABLE_OFFSET_HEIGHT | Enable fixed footer                    | boolean | false   |
-| OFFSET_HEIGHT        | Bottom offset (0 means auto-calculate) | number  | 0       |
+| ENABLE_RESIZE_ROW | Enable row height adjustment | boolean | — | true |
 
 ## Events
 
@@ -79,4 +78,13 @@ h:320px
 
 height/data-setting
 h:400px
+:::
+
+## Disable Row Height Adjustment
+- By default, row height adjustment is enabled
+
+::: demo
+
+height/resize
+h:350px
 :::

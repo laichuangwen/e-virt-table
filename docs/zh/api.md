@@ -36,8 +36,6 @@ type EVirtTableOptions = {
 | EMPTY_TEXT | 空数据文本 | string | — | 暂无数据 |
 | MAX_HEIGHT | 最大高度，高度为 0 表示自适应 | number | — | 1000 |
 | BORDER_RADIUS | 区域边框圆角 | number | — | 8 |
-| ENABLE_OFFSET_HEIGHT | 启动固定底部（目前不稳定不建议使用） | boolean | — | false |
-| OFFSET_HEIGHT | 距离底部的偏移量，0 表示根据窗口自动计算 | number | — | 0 |
 | HEADER_HEIGHT | 表头行高 | number | — | 36 |
 | HEADER_BG_COLOR | 表头背景色 | string | — | #F8FAFF |
 | BODY_BG_COLOR | body 背景色 | string | — | #F8FAFF |

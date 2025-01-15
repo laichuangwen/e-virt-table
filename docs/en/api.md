@@ -36,8 +36,6 @@ type EVirtTableOptions = {
 | EMPTY_TEXT | Text for empty data | string | — | No data |
 | MAX_HEIGHT | Maximum height (0 means auto fit) | number | — | 1000 |
 | BORDER_RADIUS | Border radius | number | — | 8 |
-| ENABLE_OFFSET_HEIGHT | Enable fixed footer | boolean | — | false |
-| OFFSET_HEIGHT | Bottom offset (0 means auto-calculate) | number | — | 0 |
 | HEADER_HEIGHT | Row height of the header | number | — | 36 |
 | HEADER_BG_COLOR | Header background color | string | — | #F8FAFF |
 | BODY_BG_COLOR | Body background color | string | — | #F8FAFF |

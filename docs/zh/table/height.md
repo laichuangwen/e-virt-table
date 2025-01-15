@@ -14,6 +14,7 @@
 | HEIGHT               | 高度，为 0 表示自适应                                       | number  | —      | 0      |
 | MAX_HEIGHT           | 最大高度，为 0 表示自适应高度根据 HEIGHT                    | number  | —      | 1000   |
 | CELL_HEIGHT          | body 单元格默认行高                                         | number  | —      | 32     |
+| ENABLE_RESIZE_ROW | 启用调整行高 | boolean | — | true |
 
 ## Events
 
@@ -78,4 +79,13 @@ h:320px
 
 height/data-setting
 h:320px
+:::
+
+## 禁用调整行高
+- 默认是开启调整行高的
+
+::: demo
+
+height/resize
+h:350px
 :::
