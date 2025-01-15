@@ -106,7 +106,7 @@ export default class Selector {
             this.selectCols(cell);
         });
         this.ctx.on('keydown', (e) => {
-            if(this.ctx.editing){
+            if (this.ctx.editing) {
                 return;
             }
             // CTRL+C／Command+C
@@ -156,7 +156,7 @@ export default class Selector {
             if (e.code === 'Delete' || e.code === 'Backspace') {
                 e.preventDefault();
                 console.log('删除');
-                
+
                 const { xArr, yArr } = this.ctx.selector;
                 this.clearSelectedData(xArr, yArr);
                 return;
@@ -235,6 +235,11 @@ export default class Selector {
             }
             // 聚焦，解决iframe键盘事件不触发
             this.ctx.stageElement.focus();
+            if (minX === maxX && minY === maxY) {
+                this.ctx.selectOnlyOne = true;
+            } else {
+                this.ctx.selectOnlyOne = false;
+            }
             this.ctx.selector.xArr = [Math.max(areaMinX, minX), Math.min(areaMaxX, maxX)];
             this.ctx.selector.yArr = [Math.max(areaMinY, minY), Math.min(areaMaxY, maxY)];
             this.ctx.emit('setSelector', this.ctx.selector);

@@ -82,9 +82,17 @@ export default class Editor {
             // 调整位置会触发重绘可能会导致cellClick事件不能触发，调整位置时需要赋值cellTarget
             this.cellTarget = cell;
         });
+        this.ctx.on('mouseup', () => {
+            if (!this.ctx.selectOnlyOne) {
+                this.cellTarget = null;
+            }
+        });
         this.ctx.on('cellClick', (cell) => {
             // 如果是调整边界位置，不进入编辑模式
             if (this.ctx.adjustPositioning) {
+                return;
+            }
+            if (!this.ctx.selectOnlyOne) {
                 return;
             }
             if (cell.rowKey === this.cellTarget?.rowKey && cell.key === this.cellTarget?.key) {
@@ -106,7 +114,7 @@ export default class Editor {
         // 监听键盘事件
         this.inputEl.addEventListener('keydown', (e) => {
             // 如果是在输入中文过程中，不触发
-            if(e.isComposing){
+            if (e.isComposing) {
                 return;
             }
             if (!this.enable) {
