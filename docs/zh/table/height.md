@@ -14,8 +14,6 @@
 | HEIGHT               | 高度，为 0 表示自适应                                       | number  | —      | 0      |
 | MAX_HEIGHT           | 最大高度，为 0 表示自适应高度根据 HEIGHT                    | number  | —      | 1000   |
 | CELL_HEIGHT          | body 单元格默认行高                                         | number  | —      | 32     |
-| ENABLE_OFFSET_HEIGHT | 启用自适应调整，内部根据屏幕计算大小，与 OFFSET_HEIGHT 配合使用 | boolean | —      | false  |
-| OFFSET_HEIGHT        | 表格顶部距离屏幕底部的偏移量                                | number  | —      | 0      |
 
 ## Events
 
@@ -60,17 +58,6 @@ h:445px
 
 height/set-max-height
 h:445px
-:::
-
-## ENABLE_OFFSET_HEIGHT
-
-- 根据屏幕大小自适应（全屏看效果）
-- `OFFSET_HEIGHT`可调整偏移底部多少px
-
-::: demo
-
-height/offset-height
-h:420px
 :::
 
 ## `CELL_HEIGHT`设置行高

@@ -2,9 +2,9 @@
 
 ## Config
 
-| 参数 | 说明 | 类型 | 可选值 | 默认值 |
-| --- | --- | --- | --- | --- |
-| SPAN_METHOD | 自定义跨列/行渲染 | ^[Function]`({row, column, rowIndex, colIndex,value,visibleLeafColumns,headIndex,headPosition,visibleRows,rows})=>{rowspan,colspan}` | — | — |
+| 参数 | 说明 | 类型  | 默认值 |
+| --- | --- | ---  | --- |
+| SPAN_METHOD | 自定义跨列/行渲染 | ^[Function]`({row, column, rowIndex, colIndex,value,visibleLeafColumns,headIndex,headPosition,visibleRows,rows})=>{rowspan,colspan}`  | — |
 
 ## 合并行
 

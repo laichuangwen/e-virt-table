@@ -19,7 +19,6 @@ export default defineConfig({
         zh: {
             label: '中文',
             lang: 'zh',
-            link: '/zh/intro',
             themeConfig: {
                 // https://vitepress.dev/reference/default-theme-config
                 search: {
@@ -57,7 +56,7 @@ export default defineConfig({
                             { text: '多选', link: '/zh/table/selection' },
                             { text: '树形', link: '/zh/table/tree' },
                             { text: '溢出提示', link: '/zh/table/tooltip' },
-                            { text: '表头', link: '/zh/table/header' },
+                            { text: '多级表头', link: '/zh/table/header' },
                             { text: 'footer合计', link: '/zh/table/footer' },
                             { text: '合并', link: '/zh/table/span' },
                             { text: '格式化', link: '/zh/table/formatter' },
@@ -96,7 +95,6 @@ export default defineConfig({
         en: {
             label: 'English',
             lang: 'en',
-            link: '/en/intro',
             themeConfig: {
                 // https://vitepress.dev/reference/default-theme-config
 
@@ -108,6 +106,50 @@ export default defineConfig({
                     {
                         text: 'Quick Start',
                         link: '/en/start',
+                    },
+                    {
+                        text: 'API',
+                        link: '/en/api',
+                    },
+                    {
+                        text: 'Table',
+                        items: [
+                            { text: 'Virtual Scroll', link: '/en/table/virtualScroll' },
+                            { text: 'Scrollbar', link: '/en/table/scroller' },
+                            { text: 'Theme', link: '/en/table/theme' },
+                            { text: 'Width', link: '/en/table/width' },
+                            { text: 'Height', link: '/en/table/height' },
+                            { text: 'Fixed', link: '/en/table/fixed' },
+                            { text: 'Empty', link: '/en/table/empty' },
+                            { text: 'Highlight', link: '/en/table/highlight' },
+                            { text: 'Align', link: '/en/table/align' },
+                            { text: 'Row Index', link: '/en/table/row-index' },
+                            { text: 'Selection', link: '/en/table/selection' },
+                            { text: 'Tree', link: '/en/table/tree' },
+                            { text: 'Overflow Tooltip', link: '/en/table/tooltip' },
+                            { text: 'Header Grouping', link: '/en/table/header' },
+                            { text: 'Footer', link: '/en/table/footer' },
+                            { text: 'Merge', link: '/en/table/span' },
+                            { text: 'Formatter', link: '/en/table/formatter' },
+                            { text: 'Cell Style', link: '/en/table/cell-style' },
+                            { text: 'Edit', link: '/en/table/readonly' },
+                            { text: 'Validation', link: '/en/table/validator' },
+                            { text: 'Selector', link: '/en/table/selector' },
+                            { text: 'Autofill', link: '/en/table/autofill' },
+                            { text: 'Keyboard', link: '/en/table/keyboard' },
+                            { text: 'Copy & Paste', link: '/en/table/paste' },
+                            { text: 'Context Menu', link: '/en/table/context-menu' },
+                            { text: 'History', link: '/en/table/history' },
+                            { text: 'Slot (Overlay)', link: '/en/table/overlayer' },
+                        ],
+                    },
+                    {
+                        text: 'Framework',
+                        items: [
+                            { text: 'Vue2', link: '/en/framework/vue2' },
+                            { text: 'Vue3', link: '/en/framework/vue3' },
+                            { text: 'React', link: '/en/framework/react' },
+                        ],
                     },
                 ],
 

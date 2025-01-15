@@ -5,16 +5,16 @@
 
 ## Config
 
-| 参数               | 说明                   | 类型    | 可选值 | 默认值  |
-| ------------------ | ---------------------- | ------- | ------ | ------- |
-| FOOTER_BG_COLOR    | 合计底部背景色         | string  | —      | #fafafa |
-| FOOTER_FIXED       | 合计底部固定           | boolean | —      | true    |
-| CELL_FOOTER_HEIGHT | 表格 footer 部分的行高 | number  | —      | 36      |
+| 参数               | 说明                   | 类型    | 默认值  |
+| ------------------ | ---------------------- | ------- | ------- |
+| FOOTER_BG_COLOR    | 合计底部背景色         | string  | #fafafa |
+| FOOTER_FIXED       | 合计底部固定           | boolean | true    |
+| CELL_FOOTER_HEIGHT | 表格 footer 部分的行高 | number  | 36      |
 
 ## Methods
 
-| 方法名称       | 说明             | 参数 |
-| -------------- | ---------------- | ---- |
+| 方法名称       | 说明             | 参数    |
+| -------------- | ---------------- | ------- |
 | loadFooterData | 更新 footer 数据 | `row[]` |
 
 ## 初始化合计

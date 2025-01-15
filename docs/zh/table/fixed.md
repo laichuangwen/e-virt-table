@@ -2,28 +2,29 @@
 
 ## Column
 
-| 参数             | 说明                   | 类型    | 可选值              | 默认值 |
-| ---------------- | ---------------------- | ------- | ------------------- | ------ |
-| fixed            | 是否固定列             | string  | `"left"`, `"right"` | 100    |
+| 参数  | 说明       | 类型                | 默认值 |
+| ----- | ---------- | ------------------- | ------ |
+| fixed | 是否固定列 | `"left"`, `"right"` | 100    |
 
 
 ## 固定表头
 
-- `config.HEIGHT`高度，高度为 0 表示自适应
+- `config.HEIGHT`高度，设置高度表示固定表头
 
 ::: demo
 
-fixed/header
+fixed/fixed-header
+h:400px
 h:350px
 :::
 
-## 固定表头(最大高度)
+## 不固定表头
 
-- `config.MAX_HEIGHT`高度，高度为 0 表示自适应
+- `config.MAX_HEIGHT` 和`config.HEIGHT`为0，表示不固定表头
 
 ::: demo
 
-fixed/header1
+fixed/no-fixed-header
 h:400px
 :::
 

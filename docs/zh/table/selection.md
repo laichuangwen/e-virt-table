@@ -4,16 +4,16 @@
 
 -   type= `selection`或`index-selection`开启
 
-| 参数 | 说明     | 类型   | 可选值                                 | 默认值 |
-| ---- | -------- | ------ | -------------------------------------- | ------ |
-| type | 选择类型 | string | `index,selection,index-selection,tree` | —      |
+| 参数 | 说明     | 类型                                   | 默认值 |
+| ---- | -------- | -------------------------------------- | ------ |
+| type | 选择类型 | `index,selection,index-selection,tree` | —      |
 
 ## Config
 
-| 参数 | 说明 | 类型 | 可选值 | 默认值 |
-| --- | --- | --- | --- | --- |
-| SELECTABLE_METHOD | 自定义选择禁用 | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean` | — | — |
-| CHECKBOX_KEY | 选择 key | string | — | — |
+| 参数              | 说明           | 类型                                                            | 默认值 |
+| ----------------- | -------------- | --------------------------------------------------------------- | ------ |
+| SELECTABLE_METHOD | 自定义选择禁用 | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean` | —      |
+| CHECKBOX_KEY      | 选择 key       | string                                                          | —      |
 
 ## Methods
 

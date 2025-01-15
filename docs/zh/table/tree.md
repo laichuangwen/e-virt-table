@@ -7,17 +7,17 @@
 
 -   type= `tree`开启
 
-| 参数 | 说明     | 类型   | 可选值                                 | 默认值 |
-| ---- | -------- | ------ | -------------------------------------- | ------ |
-| type | 选择类型 | string | `index,selection,index-selection,tree` | —      |
+| 参数 | 说明     | 类型                                   | 默认值 |
+| ---- | -------- | -------------------------------------- | ------ |
+| type | 选择类型 | `index,selection,index-selection,tree` | —      |
 
 ## Config
 
-| 参数               | 说明           | 类型                                                            | 可选值 | 默认值 |
-| ------------------ | -------------- | --------------------------------------------------------------- | ------ | ------ |
-| DEFAULT_EXPAND_ALL | 默认展开全部   | boolean                                                         | —      | false  |
-| EXPAND_LAZY        | 是否开启懒加载 | boolean                                                         | —      | false  |
-| EXPAND_LAZY_METHOD | 自定义选择禁用 | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean` | —      | —      |
+| 参数               | 说明           | 类型                                                            | 默认值 |
+| ------------------ | -------------- | --------------------------------------------------------------- | ------ |
+| DEFAULT_EXPAND_ALL | 默认展开全部   | boolean                                                         | false  |
+| EXPAND_LAZY        | 是否开启懒加载 | boolean                                                         | false  |
+| EXPAND_LAZY_METHOD | 自定义选择禁用 | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean` | —      |
 
 ## 收起
 
