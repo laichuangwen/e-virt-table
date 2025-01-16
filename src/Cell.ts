@@ -14,7 +14,7 @@ import type {
     CellHoverIconMethod,
     CellStyleMethod,
     OverflowTooltipPlacement,
-    Rule,
+    Rules,
 } from './types';
 import Context from './Context';
 import BaseCell from './BaseCell';
@@ -43,7 +43,7 @@ export default class Cell extends BaseCell {
     render: Render;
     renderFooter: Render;
     style: any = {};
-    rules: Rule = {};
+    rules: Rules = [];
     message: string = '';
     text: string = '';
     displayText: string = '';
@@ -98,7 +98,7 @@ export default class Cell extends BaseCell {
         this.level = column.level || 0;
         this.operation = column.operation || false;
         this.column = column;
-        this.rules = column.rules || {};
+        this.rules = column.rules || [];
         this.row = row;
         this.rowKey =
             this.cellType === 'body'
@@ -119,7 +119,7 @@ export default class Cell extends BaseCell {
         const errors = this.ctx.database.getValidationError(this.rowKey, this.key);
         if (Array.isArray(errors) && errors.length) {
             const [err] = errors;
-            this.message = err.message;
+            this.message = err.message || '';
         }
         return this.message;
     }
@@ -663,7 +663,7 @@ export default class Cell extends BaseCell {
         if (this.cellType === 'footer') {
             return;
         }
-        const { SELECT_BORDER_COLOR, ENABLE_AUTOFILL, ENABLE_SELECTOR , AUTOFILL_POINT_BORDER_COLOR} = this.ctx.config;
+        const { SELECT_BORDER_COLOR, ENABLE_AUTOFILL, ENABLE_SELECTOR, AUTOFILL_POINT_BORDER_COLOR } = this.ctx.config;
         if (!ENABLE_SELECTOR) {
             return;
         }

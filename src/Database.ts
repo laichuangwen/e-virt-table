@@ -8,10 +8,10 @@ import type {
     Column,
     FilterMethod,
     Position,
-    Rules,
     SelectableMethod,
     EVirtTableOptions,
     BeforeCellValueChangeMethod,
+    Descriptor,
 } from './types';
 import { generateShortUUID } from './util';
 import { HistoryItemData } from './History';
@@ -21,14 +21,14 @@ export default class Database {
     private data: any[];
     private columns: Column[];
     private footerData: any[] = [];
-    private rowKeyMap = new Map();
-    private colIndexKeyMap = new Map();
-    private headerMap = new Map();
-    private rowIndexRowKeyMap = new Map();
-    private checkboxKeyMap = new Map();
-    private originalDataMap = new Map();
-    private changedDataMap = new Map();
-    private validationErrorMap = new Map();
+    private rowKeyMap = new Map<string, any>();
+    private colIndexKeyMap = new Map<number, string>();
+    private headerMap = new Map<string, CellHeader>();
+    private rowIndexRowKeyMap = new Map<number, string>();
+    private checkboxKeyMap = new Map<string, string[]>();
+    private originalDataMap = new Map<string, any>();
+    private changedDataMap = new Map<string, any>();
+    private validationErrorMap = new Map<string, ValidateError[]>();
     private itemRowKeyMap = new WeakMap();
     private bufferData: any[] = [];
     private sumHeight = 0;
@@ -88,7 +88,7 @@ export default class Database {
             if (CHECKBOX_KEY) {
                 const checkboxKey = item[CHECKBOX_KEY];
                 if (this.checkboxKeyMap.has(checkboxKey)) {
-                    const checkboxKeys = this.checkboxKeyMap.get(checkboxKey);
+                    const checkboxKeys = this.checkboxKeyMap.get(checkboxKey) || [];
                     checkboxKeys.push(rowKey);
                     this.checkboxKeyMap.set(checkboxKey, checkboxKeys);
                 } else {
@@ -118,6 +118,9 @@ export default class Database {
      */
     setRowHeight(rowIndex: number, height: number) {
         const rowKey = this.rowIndexRowKeyMap.get(rowIndex);
+        if (rowKey === undefined) {
+            return;
+        }
         const row = this.rowKeyMap.get(rowKey);
         row.height = height;
         row.item._height = height;
@@ -316,7 +319,7 @@ export default class Database {
      * @returns
      */
     getRowKeyForRowIndex(rowIndex: number) {
-        return this.rowIndexRowKeyMap.get(rowIndex);
+        return this.rowIndexRowKeyMap.get(rowIndex) || '';
     }
     getRowKeyByItem(item: any) {
         return this.itemRowKeyMap.get(item);
@@ -337,6 +340,9 @@ export default class Database {
         }
         const rowKey = this.rowIndexRowKeyMap.get(rowIndex);
         const key = this.colIndexKeyMap.get(colIndex);
+        if (rowKey === undefined || key === undefined) {
+            return null;
+        }
         return {
             rowKey,
             key,
@@ -572,7 +578,7 @@ export default class Database {
             const { item } = this.rowKeyMap.get(rowKey);
             const checkboxKey = item[CHECKBOX_KEY];
             if (this.checkboxKeyMap.has(checkboxKey)) {
-                const rowKeys = this.checkboxKeyMap.get(checkboxKey);
+                const rowKeys = this.checkboxKeyMap.get(checkboxKey) || [];
                 rowKeys.forEach((rowKey: string) => {
                     const row = this.rowKeyMap.get(rowKey);
                     row.check = check;
@@ -822,7 +828,7 @@ export default class Database {
         const colReadonly = colHeader?.readonly;
         const { BODY_CELL_READONLY_METHOD } = this.ctx.config;
         // 自定义只读
-        if (typeof BODY_CELL_READONLY_METHOD === 'function') {
+        if (typeof BODY_CELL_READONLY_METHOD === 'function' && colHeader) {
             const cellReadonlyMethod: CellReadonlyMethod = BODY_CELL_READONLY_METHOD;
             const readonly = cellReadonlyMethod({
                 row: row.item,
@@ -848,6 +854,9 @@ export default class Database {
             const row = this.rowKeyMap.get(rowKey);
             const colHeader = this.headerMap.get(key);
             const { BODY_CELL_RULES_METHOD } = this.ctx.config;
+            if (colHeader === undefined) {
+                return resolve([]);
+            }
             const column = colHeader.column;
             let rules = column.rules;
             // 自定义只读
@@ -865,10 +874,10 @@ export default class Database {
                 }
             }
             if (rules) {
-                let descriptor: Rules = {};
+                let descriptor: Descriptor = {};
                 let data: any = {};
                 data[key] = this.getItemValue(rowKey, key);
-                if (Array.isArray(rules) && rules.length) {
+                if (Array.isArray(rules)) {
                     const _rules = rules.map((item) => {
                         return {
                             ...item,

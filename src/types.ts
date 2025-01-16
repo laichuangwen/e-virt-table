@@ -74,21 +74,20 @@ export type ContextmenuItem = {
     render: Function;
 };
 export type Render = Function | string | undefined;
-export interface KRuleItem extends RuleItem {
+export interface Rule extends RuleItem {
     column?: Column;
     row?: any; // 这里可以定义更具体的类型，根据你的需求
     rowIndex?: number;
     colIndex?: number;
 }
-export type Rule = KRuleItem | KRuleItem[];
+export type Rules = Rule | Rule[];
+export type Descriptor = Record<string, Rules>;
 export type ValidateItemError = {
     rowIndex: number;
     key: string;
     message: string;
 };
-export type Rules = {
-    [x: string]: Rule;
-};
+
 export type Position = {
     height: number;
     top: number;

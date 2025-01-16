@@ -450,9 +450,9 @@ export default class Selector {
                     });
                     this.ctx.emit('draw');
                 })
-                .catch((error) => console.error('复制失败：', error));
+                .catch((error) => console.error('Copy Failure:', error));
         } else {
-            console.error('当前浏览器不支持Clipboard API');
+            console.error('current browser does not support the Clipboard API');
         }
     }
     private clearSelectedData(xArr: number[], yArr: number[], ignoreSet = false) {
@@ -497,7 +497,7 @@ export default class Selector {
     }
     private paste() {
         if (!navigator.clipboard) {
-            console.error('当前浏览器不支持Clipboard API');
+            console.error('current browser does not support the Clipboard API');
             return;
         }
         const { ENABLE_PASTER } = this.ctx.config;
@@ -508,7 +508,11 @@ export default class Selector {
             navigator.clipboard
                 .readText()
                 .then(async (val) => {
+                    console.log(typeof val);
+                    
                     let textArr = decodeSpreadsheetStr(val);
+                    console.log(textArr);
+                    
                     let changeList: ChangeItem[] = [];
                     for (let ri = 0; ri <= textArr.length - 1; ri++) {
                         const len = textArr[ri].length;
@@ -580,7 +584,7 @@ export default class Selector {
                     this.ctx.emit('pasteChange', changeList, rows);
                 })
                 .catch((error) => {
-                    console.error('获取剪贴板内容失败：', error);
+                    console.error('Failed to get the clipboard content:', error);
                 });
         }
     }
