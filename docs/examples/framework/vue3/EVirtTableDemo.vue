@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { faker, tr } from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
 import dayjs from 'dayjs';
 import EVirtTable, { Column, ConfigType } from 'e-virt-table';
 import EVirtTableVue from './EVirtTableVue.vue';
@@ -12,8 +12,10 @@ let columns = ref<Column[]>([
         width: 60,
         title: '',
         operation: true,
+        fixed: 'left',
     },
     {
+        type: 'tree',
         title: 'name',
         key: 'name',
         readonly: true,
@@ -31,6 +33,14 @@ let columns = ref<Column[]>([
         readonly: true,
         overflowTooltipShow: false,
         render: 'image',
+    },
+    {
+        title: 'email',
+        key: 'email',
+        rules: [
+            { required: true, message: 'Please input' },
+            { type: 'email', message: 'Please input a valid email address' },
+        ],
     },
     {
         title: 'customType',
@@ -81,6 +91,7 @@ let columns = ref<Column[]>([
         key: 'number',
         editorType: 'number',
         align: 'right',
+        rules: [{ required: false, type: 'number', message: 'Please input' }],
     },
     {
         title: 'years',
@@ -127,18 +138,20 @@ let columns = ref<Column[]>([
 const users = faker.helpers.multiple(
     () => {
         return {
-            name: faker.person.fullName(), // 生成随机名字
-            avatar: faker.image.avatar(), // 生成随机头像
-            image: faker.image.url(), // 生成随机头像
-            customType: editorTypes[faker.number.int({ min: 0, max: editorTypes.length - 1 })], // 生成随机编辑器类型
-            select: faker.person.sex(), // 生成随机性别
-            number: faker.number.int({ min: 24, max: 66 }), // 生成随机性别
-            date: dayjs(faker.date.recent()).format('YYYY-MM-DD'), // 生成随机Date
-            years: dayjs(faker.date.anytime()).format('YYYY'), // 生成随机Date
-            month: dayjs(faker.date.anytime()).format('YYYY-MM'), // 生成随机Date
-            week: dayjs(faker.date.anytime()).format('ww'), // 生成随机Date
-            time: dayjs(faker.date.anytime()).format('HH:mm:ss'), // 生成随机Date
-            cascader: faker.number.int({ min: 1, max: 4 }), // 生成随机部门
+            uuid: faker.string.uuid(),
+            name: faker.person.fullName(),
+            avatar: faker.image.avatar(),
+            image: faker.image.url(),
+            customType: editorTypes[faker.number.int({ min: 0, max: editorTypes.length - 1 })],
+            select: faker.person.sex(),
+            number: faker.number.int({ min: 24, max: 66 }),
+            date: dayjs(faker.date.recent()).format('YYYY-MM-DD'),
+            years: dayjs(faker.date.anytime()).format('YYYY'),
+            month: dayjs(faker.date.anytime()).format('YYYY-MM'),
+            week: dayjs(faker.date.anytime()).format('ww'),
+            time: dayjs(faker.date.anytime()).format('HH:mm:ss'),
+            cascader: faker.number.int({ min: 1, max: 4 }),
+            email: faker.internet.email(),
         };
     },
     {
@@ -152,6 +165,20 @@ const config: ConfigType = {
     ENABLE_KEYBOARD: true,
     ENABLE_CONTEXT_MENU: true,
     HEIGHT: 500,
+    BEFORE_VALUE_CHANGE_METHOD: (changeList) => {
+        // 数字类型需要特殊处理，粘贴的内容可能不是数字或字符串的数字
+        return changeList.map((item) => {
+            if (item.key === 'number') {
+                if (/^-?\d+(\.\d+)?$/.test(item.value)) {
+                    return {
+                        ...item,
+                        value: Number(item.value),
+                    };
+                }
+            }
+            return item;
+        });
+    },
     BODY_CELL_EDITOR_METHOD: ({ column, row }) => {
         if (column.key === 'custom') {
             if (row.customType === 'select') {
@@ -160,14 +187,8 @@ const config: ConfigType = {
                     props: {
                         filterable: true,
                         options: [
-                            {
-                                label: '行编辑器',
-                                value: '行编辑器',
-                            },
-                            {
-                                label: '行编辑器1',
-                                value: '行编辑器1',
-                            },
+                            { label: 'male', value: 'male' },
+                            { label: 'female', value: 'female' },
                         ],
                     },
                 };
@@ -197,22 +218,17 @@ function setDisabled(value) {
         DISABLED: !value,
     });
 }
-setTimeout(() => {
-    columns.value = columns.value.map((column) => {
-        if (column.key === 'custom') {
-            return {
-                ...column,
-                readonly: true,
-            };
-        }
-        return column;
-    });
-}, 1000);
 </script>
 <template>
     <div>
-        <div>
-            <el-switch v-model="disabled" inline-prompt active-text="编辑" inactive-text="只读" @change="setDisabled" />
+        <div style="margin-bottom: 8px">
+            <el-switch
+                v-model="disabled"
+                inline-prompt
+                active-text="editable"
+                inactive-text="readonly"
+                @change="setDisabled"
+            />
         </div>
         <EVirtTableVue @ready="ready" :columns="columns" :data="users" :config="config" @change="change">
             <template #avatar="{ row }">

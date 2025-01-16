@@ -1,7 +1,8 @@
 import EVirtTable from './src/EVirtTable';
+import { Column } from './src/types';
 
 const canvas = document.getElementById('e-virt-table') as HTMLDivElement;
-const columns: any[] = [
+const columns: Column[] = [
     // {
     //   title: "序号",
     //   key: "index",
@@ -26,7 +27,6 @@ const columns: any[] = [
         title: '工号',
         key: 'emp_no',
         // operation: true,
-        slotName: 'emp_no',
         readonly: true,
         type: 'tree',
         fixed: 'left',
@@ -36,7 +36,6 @@ const columns: any[] = [
     {
         title: '姓名',
         key: 'emp_name',
-        type: 'contenteditable',
         width: 100,
         sort: 7,
         fixed: 'left',
@@ -159,7 +158,6 @@ const columns: any[] = [
     {
         title: '岗位',
         key: 'job_name',
-        size: 'small',
         // fixed: 'left',
         width: 200,
         align: 'left',
@@ -167,17 +165,15 @@ const columns: any[] = [
             {
                 title: '姓名1',
                 key: 'emp_name1',
-                type: 'text',
                 align: 'left',
                 fixed: 'left',
                 children: [
                     {
                         title: '姓名11',
                         key: 'emp_name11',
-                        type: 'text',
                         readonly: false,
                         width: 200,
-                        rule: {
+                        rules: {
                             validator(rule: any, value: any, callback: any) {
                                 if (!value) {
                                     callback('请输入岗位');
@@ -187,25 +183,21 @@ const columns: any[] = [
                                     callback();
                                 }
                             },
-                            immediate: true,
                         },
                     },
                     {
                         title: '姓名22',
                         key: 'emp_name22',
-                        type: 'text',
                         children: [
                             {
                                 title: '姓名221',
                                 key: 'emp_name221',
-                                type: 'text',
                                 align: 'left',
                                 width: 200,
                             },
                             {
                                 title: '姓名222',
                                 key: 'emp_name222',
-                                type: 'text',
                             },
                         ],
                     },
@@ -214,7 +206,6 @@ const columns: any[] = [
             {
                 title: '姓名2',
                 key: 'emp_name2',
-                type: 'text',
             },
         ],
     },
@@ -222,7 +213,6 @@ const columns: any[] = [
         title: '手机号',
         key: 'phone',
         fixed: 'right',
-        type: 'phone',
         readonly: false,
         formatterFooter: ({ value }) => {
             return `合：${value}`;
@@ -262,17 +252,14 @@ const columns: any[] = [
     },
     {
         title: '计薪月份',
-        size: 'small',
         // fixed: "right",
         key: 'salary_month',
-        type: 'month',
         align: 'right',
         sort: 4,
         width: 200,
     },
     {
         title: '出生日期',
-        size: 'small',
         key: 'birthday',
         editorType: 'date',
         sort: 2,
@@ -285,7 +272,7 @@ const columns: any[] = [
         width: 250,
         fixed: 'right',
         overflowTooltipShow: true,
-        overflowTooltipWidth: 200,
+        overflowTooltipMaxWidth: 200,
         overflowTooltipPlacement: 'top',
         rules: {
             required: true,
@@ -310,9 +297,7 @@ const columns: any[] = [
     },
     {
         title: '请假开始时间',
-        size: 'small',
         key: 'start_dt',
-        type: 'datetime',
     },
     {
         title: '物料编码',
@@ -329,7 +314,6 @@ const columns: any[] = [
     {
         title: '数量',
         key: 'requiredQuantity',
-        type: 'number',
         align: 'right',
     },
     { title: '单位', key: 'unit' },
@@ -338,49 +322,44 @@ const columns: any[] = [
     { title: '户籍城市', key: 'household_city' },
     { title: '户籍地址', key: 'household_address' },
     { title: '民族', key: 'nation' },
-    { title: '工作地址', size: 'small', key: 'work_address' },
+    { title: '工作地址', key: 'work_address' },
     {
         title: '工作邮箱',
-        size: 'small',
         key: 'work_email',
         // rule: {
         //   required: true, message: '请输入邮箱地址'
         // },
     },
-    { title: '个人邮箱', size: 'small', key: 'email' },
+    { title: '个人邮箱', key: 'email' },
     {
         title: '工龄',
         key: 'work_age',
     },
     { title: '司龄', key: 'company_age' },
-    { title: '合同公司', size: 'small', key: 'contract_company' },
+    { title: '合同公司', key: 'contract_company' },
     { title: 'qq号', key: 'qq' },
     { title: '年龄', key: 'age' },
     { title: '品牌', key: 'brandName' },
     { title: '商品名称', key: 'goodsName' },
-    { title: '规格型号', key: 'sn', slotName: 'sn' },
-    { title: '客户备注', key: 'customerRemarks', size: 'small' },
+    { title: '规格型号', key: 'sn' },
+    { title: '客户备注', key: 'customerRemarks' },
     {
         title: '采购价(元)',
         key: 'purchasePrice',
-        type: 'number',
     },
     {
         title: '销售价(元)',
         key: 'salePrice',
-        type: 'number',
         readonly: true,
-        slotName: 'salePrice',
     },
     {
         title: '操作',
         key: 'hander',
         fixed: 'right',
-        slotName: 'hander',
     },
 ];
 let data: any[] = [];
-for (let i = 0; i < 10000; i += 1) {
+for (let i = 0; i < 800; i += 1) {
     data.push({
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
         id: i,
@@ -534,6 +513,7 @@ const eVirtTable = new EVirtTable(canvas, {
         ENABLE_OFFSET_HEIGHT: false,
         HIGHLIGHT_SELECTED_ROW: true,
         HIGHLIGHT_HOVER_ROW: true,
+        FOOTER_FIXED: true,
         OFFSET_HEIGHT: 16,
         // SELECTOR_AREA_MAX_X_OFFSET: 1,
         // SELECTOR_AREA_MAX_Y_OFFSET: 1,
