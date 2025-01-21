@@ -28,6 +28,7 @@ export default class Body {
         const {
             canvasElement,
             header,
+            footer,
             database,
             config: {
                 FOOTER_FIXED,
@@ -37,13 +38,18 @@ export default class Body {
                 MAX_HEIGHT = 0,
                 ENABLE_OFFSET_HEIGHT = 0,
                 OFFSET_HEIGHT = 0,
+                FOOTER_POSITION,
             },
         } = this.ctx;
         if (!header.width) {
             return;
         }
         this.x = 0;
-        this.y = header.height; //更新body的y轴位置
+        if (FOOTER_POSITION === 'top' && FOOTER_FIXED) {
+            this.y = header.height + footer.height; //更新body的y轴位置
+        } else {
+            this.y = header.height;
+        }
         const { data, sumHeight } = database.getData();
         // 更新高度
         this.height = sumHeight;
@@ -57,9 +63,9 @@ export default class Body {
         const footerHeight = this.ctx.footer.height;
         if (!this.data.length && !HEIGHT) {
             this.height = EMPTY_BODY_HEIGHT;
-        }else if(!this.data.length && HEIGHT){
+        } else if (!this.data.length && HEIGHT) {
             // 如果有设置高度的情况，空数据时，高度也要保持为设置的高度
-            this.height = HEIGHT- header.height - footerHeight - SCROLLER_TRACK_SIZE;
+            this.height = HEIGHT - header.height - footerHeight - SCROLLER_TRACK_SIZE;
         }
         const isEmpty = !this.data.length ? 'empty' : 'not-empty';
         this.ctx.emit('emptyChange', {

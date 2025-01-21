@@ -21,11 +21,17 @@ export default class Overlayer {
         const header = this.getHeader();
         const body = this.getBody();
         const footer = this.getFooter();
-        let views = [header, body, footer];
+        let views: OverlayerWrapper[] = [];
         // 不是固定底部的时候，不用加入footer，因为footer是在body的下面的
-        const { FOOTER_FIXED } = this.ctx.config;
+        const { FOOTER_FIXED, FOOTER_POSITION } = this.ctx.config;
         if (!FOOTER_FIXED) {
             views = [header, body];
+        } else {
+            if (FOOTER_POSITION === 'top') {
+                views = [header, footer, body];
+            } else {
+                views = [header, body, footer];
+            }
         }
         return {
             views,

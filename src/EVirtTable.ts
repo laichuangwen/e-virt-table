@@ -47,8 +47,8 @@ export default class EVirtTable {
         );
         this.ctx = new Context(containerElement, this.options);
         this.header = new Header(this.ctx);
-        this.body = new Body(this.ctx);
         this.footer = new Footer(this.ctx);
+        this.body = new Body(this.ctx);
         this.scroller = new Scroller(this.ctx);
         this.selector = new Selector(this.ctx);
         this.autofill = new Autofill(this.ctx);

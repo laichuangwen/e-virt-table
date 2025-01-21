@@ -13,6 +13,7 @@ import {
     CellTypeMethod,
     ConfigType,
     ExpandLazyMethod,
+    FooterPosition,
     FormatterMethod,
     MenuItem,
     SelectableMethod,
@@ -78,6 +79,7 @@ export default class Config {
     ERROR_TIP_COLOR = '#ED3F14';
     FOOTER_BG_COLOR = '#fafafa';
     FOOTER_FIXED = true;
+    FOOTER_POSITION: FooterPosition = 'bottom';
     CELL_FOOTER_HEIGHT = 36;
     ENABLE_SELECTOR = false;
     ENABLE_EDIT_SINGLE_CLICK = false; // 启用单点击立马编辑

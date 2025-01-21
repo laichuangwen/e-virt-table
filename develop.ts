@@ -514,6 +514,7 @@ const eVirtTable = new EVirtTable(canvas, {
         HIGHLIGHT_SELECTED_ROW: true,
         HIGHLIGHT_HOVER_ROW: true,
         FOOTER_FIXED: true,
+        FOOTER_POSITION: 'top',
         OFFSET_HEIGHT: 16,
         // SELECTOR_AREA_MAX_X_OFFSET: 1,
         // SELECTOR_AREA_MAX_Y_OFFSET: 1,
