@@ -48,6 +48,7 @@ export type TypeCheckbox =
     | 'checkbox-hover'
     | 'checkbox-indeterminate';
 export type CellType = 'header' | 'body' | 'footer';
+export type FooterPosition = 'top' | 'bottom';
 export type RowType = CellType;
 export type MenuItem = {
     label: string;

@@ -259,7 +259,10 @@ export default class Context {
         }
         // y边界处理
         let scrollY = Math.floor(y);
-        const scrollMaxY = this.body.height - this.body.visibleHeight - this.footer.height;
+        let scrollMaxY = this.body.height - this.body.visibleHeight;
+        if (!this.config.FOOTER_FIXED) {
+            scrollMaxY = this.body.height + this.footer.height - this.body.visibleHeight;
+        }
         if (scrollY < 0) {
             scrollY = 0;
         } else if (scrollY > scrollMaxY) {
