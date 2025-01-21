@@ -155,8 +155,6 @@ export default class Selector {
             }
             if (e.code === 'Delete' || e.code === 'Backspace') {
                 e.preventDefault();
-                console.log('删除');
-
                 const { xArr, yArr } = this.ctx.selector;
                 this.clearSelectedData(xArr, yArr);
                 return;
@@ -508,11 +506,7 @@ export default class Selector {
             navigator.clipboard
                 .readText()
                 .then(async (val) => {
-                    console.log(typeof val);
-
                     let textArr = decodeSpreadsheetStr(val);
-                    console.log(textArr);
-
                     let changeList: ChangeItem[] = [];
                     for (let ri = 0; ri <= textArr.length - 1; ri++) {
                         const len = textArr[ri].length;
@@ -770,17 +764,18 @@ export default class Selector {
         const diffLeft = fixedLeftWidth - focusCell.drawX + 1;
         const diffRight = focusCell.drawX + focusCell.width - (stageWidth - fixedRightWidth) + 1;
         let diffTop = header.height - focusCell.drawY;
-        if(FOOTER_POSITION === 'top') {
-            diffTop = header.height + footer.height - focusCell.drawY;
-        }
         // 格子大于可视高度就取可视高度，防止上下跳动
         let cellheight = focusCell.height;
         if (cellheight > body.visibleHeight) {
             cellheight = body.visibleHeight;
         }
         let footerHeight = 0;
-        if (FOOTER_FIXED && FOOTER_POSITION === 'bottom') {
-            footerHeight = footer.visibleHeight;
+        if (FOOTER_FIXED) {
+            if (FOOTER_POSITION === 'top') {
+                diffTop = header.height + footer.height - focusCell.drawY;
+            } else {
+                footerHeight = footer.visibleHeight;
+            }
         }
         const diffBottom = focusCell.drawY + cellheight - (stageHeight - footerHeight - SCROLLER_TRACK_SIZE);
         let _scrollX = scrollX;
