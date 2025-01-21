@@ -5,11 +5,12 @@
 
 ## Config
 
-| 参数               | 说明                   | 类型    | 默认值  |
-| ------------------ | ---------------------- | ------- | ------- |
-| FOOTER_BG_COLOR    | 合计底部背景色         | string  | #fafafa |
-| FOOTER_FIXED       | 合计底部固定           | boolean | true    |
-| CELL_FOOTER_HEIGHT | 表格 footer 部分的行高 | number  | 36      |
+| 参数               | 说明                   | 类型            | 默认值   |
+| ------------------ | ---------------------- | --------------- | -------- |
+| FOOTER_BG_COLOR    | 合计底部背景色         | string          | #fafafa  |
+| FOOTER_FIXED       | 合计底部固定           | boolean         | true     |
+| FOOTER_POSITION    | 合计底部位置           | `top`、`bottom` | `bottom` |
+| CELL_FOOTER_HEIGHT | 表格 footer 部分的行高 | number          | 36       |
 
 ## Methods
 
@@ -43,6 +44,16 @@ h:320px
 
 ::: demo
 footer/fixed
+h:320px
+:::
+
+## 固定表头底部
+
+-   `FOOTER_FIXED=true`可固定在底部，默认`true`
+-   `FOOTER_POSITION=top`可固定在表头底部
+
+::: demo
+footer/position
 h:320px
 :::
 

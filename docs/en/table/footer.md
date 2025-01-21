@@ -46,6 +46,16 @@ footer/fixed
 h:320px
 :::
 
+## Fixed Footer at Header Bottom
+
+-   `FOOTER_FIXED=true` can be fixed at the bottom, default is `true`.
+-   `FOOTER_POSITION=top` can be fixed at the bottom of the header.
+
+::: demo
+footer/position
+h:320px
+:::
+
 ## Not Fixed
 
 -   `FOOTER_FIXED=false` places it after the body.
