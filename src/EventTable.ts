@@ -305,6 +305,9 @@ export default class EventTable {
         return false;
     }
     private handleBodyEvent(x: number, y: number, renderRows: Row[], callback: Function, visible = false) {
+        if(!this.isInsideBody(y)){
+            return;
+        }
         for (const row of renderRows) {
             // 优先处理固定列
             const cells = row.fixedCells.concat(row.noFixedCells);
@@ -332,6 +335,9 @@ export default class EventTable {
                 return; // 找到后直接返回
             }
         }
+    }
+    private isInsideBody(y: number) {
+        return y > this.ctx.body.y && y < this.ctx.body.y + this.ctx.body.visibleHeight;
     }
     destroy() {
         this.resizeObserver.unobserve(this.ctx.stageElement);
