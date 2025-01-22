@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <style>
+        .view:fullscreen {
+            background-color: white;
+        }
+        .content {
+            position: relative;
+        }
+    </style>
+    <body>
+        <div style="margin-bottom: 8px">
+            <input id="search-text" placeholder="name" type="text" />
+            <button id="search">search</button>
+            <button id="ascending">Number ascending</button>
+            <button id="descending">Number descending</button>
+        </div>
+        <div class="content">
+            <div id="e-virt-table"></div>
+        </div>
+    </body>
+    <script>
+        function generateData(c = 1000, r = 1000) {
+            let columns = [
+                {
+                    type: 'index',
+                    key: 'index',
+                    width: 70,
+                },
+                {
+                    title: 'Number',
+                    key: 'number',
+                },
+                {
+                    title: 'Name',
+                    key: 'name',
+                },
+                {
+                    title: 'State',
+                    key: 'state',
+                },
+                {
+                    title: 'City',
+                    key: 'city',
+                },
+                {
+                    title: 'Address',
+                    key: 'address',
+                    width: 200,
+                },
+                {
+                    title: 'Zip',
+                    key: 'zip',
+                },
+            ];
+            let gcData = {};
+            for (let i = 0; i < c; i += 1) {
+                columns.push({
+                    title: `Header_${i}`,
+                    key: `gc_${i}`,
+                });
+                gcData[`gc_${i}`] = `data_${i}`;
+            }
+            let data = [];
+            let _gcData = {
+                name: 'John',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+                ...gcData,
+            };
+            for (let i = 0; i < r; i += 1) {
+                _gcData.name = `name_${i}`;
+                _gcData.number = Math.floor(Math.random() * 1000) + 1;
+                data.push(JSON.parse(JSON.stringify(_gcData)));
+            }
+
+            return {
+                columns,
+                data,
+            };
+        }
+        const { columns, data } = generateData(1000, 1000);
+        const target = document.getElementById('e-virt-table');
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                ENABLE_SELECTOR: true,
+                ENABLE_AUTOFILL: true,
+                ENABLE_OFFSET_HEIGHT: true,
+                OFFSET_HEIGHT: 24,
+            },
+        });
+        document.getElementById('search')?.addEventListener('click', () => {
+            const text = document.getElementById('search-text');
+            grid.filterMethod((list) => {
+                return list.filter((item) => item.name.includes(text?.value));
+            });
+        });
+        document.getElementById('ascending')?.addEventListener('click', () => {
+            grid.filterMethod((list) => {
+                return list.sort((a, b) => a.number - b.number);
+            });
+        });
+        document.getElementById('descending')?.addEventListener('click', () => {
+            grid.filterMethod((list) => {
+                return list.sort((a, b) => b.number - a.number);
+            });
+        });
+    </script>
+</html>

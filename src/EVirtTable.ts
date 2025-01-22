@@ -155,6 +155,7 @@ export default class EVirtTable {
         this.ctx.setScrollY(0);
         this.ctx.setScrollX(0);
         this.ctx.database.init();
+        this.header.init();
         this.ctx.database.setFilterMethod(func);
         this.ctx.emit('draw');
     }

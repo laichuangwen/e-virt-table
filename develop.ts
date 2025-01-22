@@ -10,29 +10,30 @@ const columns: Column[] = [
     //   fixed: "left",
     //   width: 50,
     // },
-    // {
-    //     key: 'selection',
-    //     type: 'selection',
-    //     fixed: 'left',
-    //     width: 50,
-    //     widthFillDisable: true,
-    // },
+    {
+        title: '',
+        key: 'selection',
+        type: 'selection',
+        fixed: 'left',
+        width: 50,
+        widthFillDisable: true,
+    },
     // {
     //   key: "selection",
     //   type: "index-selection",
     //   width: 100,
     //   fixed: "left",
     // },
-    {
-        title: '工号',
-        key: 'emp_no',
-        // operation: true,
-        readonly: true,
-        type: 'tree',
-        fixed: 'left',
-        sort: 4,
-        // hide: () => 3 > 2,
-    },
+    // {
+    //     title: '工号',
+    //     key: 'emp_no',
+    //     // operation: true,
+    //     readonly: true,
+    //     type: 'tree',
+    //     fixed: 'left',
+    //     sort: 4,
+    //     // hide: () => 3 > 2,
+    // },
     {
         title: '姓名',
         key: 'emp_name',
@@ -502,8 +503,8 @@ const eVirtTable = new EVirtTable(canvas, {
         ],
         // DISABLED: true,
         HEIGHT: 500,
-        CHECKBOX_KEY: 'emp_name',
-        ROW_KEY: 'emp_no',
+        // CHECKBOX_KEY: 'emp_name',
+        // ROW_KEY: 'emp_no',
         CELL_HEIGHT: 36,
         SELECTOR_AREA_MIN_X: 0,
         ENABLE_AUTOFILL: true,
@@ -514,7 +515,7 @@ const eVirtTable = new EVirtTable(canvas, {
         HIGHLIGHT_SELECTED_ROW: true,
         HIGHLIGHT_HOVER_ROW: true,
         FOOTER_FIXED: true,
-        FOOTER_POSITION: 'top',
+        FOOTER_POSITION: 'bottom',
         OFFSET_HEIGHT: 16,
         // SELECTOR_AREA_MAX_X_OFFSET: 1,
         // SELECTOR_AREA_MAX_Y_OFFSET: 1,
@@ -638,15 +639,15 @@ const eVirtTable = new EVirtTable(canvas, {
             }
         },
         SPAN_METHOD: (params) => {
-            const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;
-            if (column.key === 'emp_name') {
-                // 合并行单元格
-                return mergeRowCell(params, 'emp_name');
-            }
-            if (column.key === 'selection') {
-                // 合并行单元格
-                return mergeRowCell(params, 'emp_name');
-            }
+            // const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;
+            // if (column.key === 'emp_name') {
+            //     // 合并行单元格
+            //     return mergeRowCell(params, 'emp_name');
+            // }
+            // if (column.key === 'selection') {
+            //     // 合并行单元格
+            //     return mergeRowCell(params, 'emp_name');
+            // }
             // // 合并动态列单元格
             // if (colIndex > 4) {
             //   const spanObj = getSpanObjByColumn(row, visibleLeafColumns);
@@ -741,6 +742,9 @@ if (dateEl) {
         eVirtTable.setItemValueByEditor(rowKey, key, newValue, true, true);
     });
 }
+eVirtTable.on('selectionChange', (rowkeys) => {
+    console.log('selectionChange', rowkeys);
+});
 eVirtTable.on('expandChange', (rowkeys) => {
     console.log('expandChange', rowkeys);
 });
@@ -753,6 +757,12 @@ document.getElementById('instantiation')?.addEventListener('click', () => {
 document.getElementById('validator')?.addEventListener('click', () => {
     eVirtTable.validate(true).then(() => {
         console.log('校验通过');
+    });
+});
+document.getElementById('search')?.addEventListener('click', () => {
+    const text = document.getElementById('search-text') as HTMLInputElement;
+    eVirtTable.filterMethod((list) => {
+        return list.filter((item) => item.emp_name.includes(text?.value));
     });
 });
 document.getElementById('setValidator')?.addEventListener('click', () => {
