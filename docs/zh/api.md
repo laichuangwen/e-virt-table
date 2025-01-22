@@ -128,8 +128,9 @@ type EVirtTableOptions = {
 
 | 事件名称 | 说明 | 回调参数 |
 | --- | --- | --- |
-| change | `最重要的方法之一`，数据改变回调包括复制填充等 | `{rowKey,key,value,row}` |
-| validateChangedData | `最重要的方法之一`，数据改变回调包括复制填充等，只有数据全部通过校验才会回调 | `{rowKey,key,value,row}` |
+| change | `常用方法之一`，数据改变回调包括复制填充等 | `{rowKey,key,value,row}` |
+| selectionChange    | `常用方法之一`选择改变回调      | `rows`   |
+| validateChangedData | `常用方法之一`，数据改变回调包括复制填充等，只有数据全部通过校验才会回调 | `{rowKey,key,value,row}` |
 | autofillChange | 填充回调 | `{rowKey,key,value,row}` |
 | editChange | 编辑回调 | `{rowKey,key,value,row}` |
 | iterationChange | 每改变一个值的回调 | `{rowKey,key,value,row,oldValue,originalValue}` |
@@ -209,7 +210,7 @@ type EVirtTableOptions = {
 | destroy                | 销毁                          | —                                                         |
 
 
-
+## Column
 | 参数 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | key ^(required)| 列的唯一标识 | string | — |
@@ -237,7 +238,7 @@ type EVirtTableOptions = {
 | overflowTooltipPlacement | 溢出提示的位置|  ^[string]`top, top-start, top-end, right, right-start, right-end, left, left-start, left-end, bottom, bottom-start, bottom-end` | — |
 | rules | 校验规则 | Rules | — |
 
-## RowData
+## Row
 
 -   隐藏字段配置
 

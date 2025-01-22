@@ -127,8 +127,9 @@ type EVirtTableOptions = {
 
 | Name  | Description | Type |
 | --- | --- | --- |
-| change | One of the most important methods, callback for data changes including copy and fill | `{rowKey, key, value, row}` |
-| validateChangedData | One of the most important methods, callback for data changes including copy and fill, only called when all data passes validation | `{rowKey, key, value, row}` |
+| change | Data change callback including copy and autofill | `{rowKey, key, value, row}` |
+| selectionChange | Selection change callback | `rows` |
+| validateChangedData | Data change callback including copy and autofill, only called when all data passes validation | `{rowKey, key, value, row}` |
 | autofillChange | Callback for autofill | `{rowKey, key, value, row}` |
 | editChange | Callback for edit | `{rowKey, key, value, row}` |
 | iterationChange | Callback for each value change | `{rowKey, key, value, row, oldValue, originalValue}` |
@@ -235,7 +236,7 @@ type EVirtTableOptions = {
 | overflowTooltipPlacement | Placement of overflow tooltip | OverflowTooltipPlacement |  ^[string]`top, top-start, top-end, right, right-start, right-end, left, left-start, left-end, bottom, bottom-start, bottom-end` | — |
 | rules | Validation rules | Rules | — | — |
 
-## RowData
+## Row
 
 -   Hidden field configuration
 
