@@ -187,7 +187,10 @@ export default class Autofill {
                 oldValue: this.ctx.database.getItemValue(item.rowKey, item.key),
                 row: this.ctx.database.getRowDataItemForRowKey(item.rowKey),
             }));
-            changeList = await beforeAutofillChangeMethod(_changeList);
+            changeList = await beforeAutofillChangeMethod(_changeList, xArr, yArr);
+            if (changeList && !changeList.length) {
+                return;
+            }
         }
         // 设置选择器为填充位置
         this.ctx.selector.xArr = this.ctx.autofill.xArr;

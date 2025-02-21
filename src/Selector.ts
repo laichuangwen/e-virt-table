@@ -578,10 +578,10 @@ export default class Selector {
                 .readText()
                 .then(async (val) => {
                     let textArr = decodeSpreadsheetStr(val);
+                    const _xArr = [colIndex, colIndex + textArr[0].length - 1];
+                    const _yArr = [rowIndex, rowIndex + textArr.length - 1];
                     // 启用合并时禁用粘贴填充
                     if (this.ctx.config.ENABLE_MERGE_DISABLED_PASTER) {
-                        const _xArr = [colIndex, colIndex + textArr[0].length - 1];
-                        const _yArr = [rowIndex, rowIndex + textArr.length - 1];
                         if (this.ctx.database.hasMergeCell(_xArr, _yArr)) {
                             const err: ErrorType = {
                                 code: 'MERGE_DISABLED_PASTER',
@@ -650,7 +650,10 @@ export default class Selector {
                             oldValue: this.ctx.database.getItemValue(item.rowKey, item.key),
                             row: this.ctx.database.getRowDataItemForRowKey(item.rowKey),
                         }));
-                        changeList = await beforePasteChangeMethod(_changeList);
+                        changeList = await beforePasteChangeMethod(_changeList, _xArr, _yArr);
+                        if (changeList && !changeList.length) {
+                            return;
+                        }
                     }
                     // 清除复制线
                     this.clearCopyLine();

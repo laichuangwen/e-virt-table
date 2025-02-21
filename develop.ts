@@ -42,25 +42,25 @@ const columns: Column[] = [
         sort: 7,
         fixed: 'left',
         align: 'left',
-        editorType: 'none',
+        // editorType: 'none',
         verticalAlign: 'middle',
         // hide: true,
-        render: (pEl, cell) => {
-            const cellEl = document.createElement('div');
-            cellEl.addEventListener('click', () => {
-                console.log('点击了姓名');
-            });
-            cellEl.style.width = '100%';
-            cellEl.style.height = '100%';
-            cellEl.style.opacity = '0.5';
-            cellEl.style.backgroundColor = 'cyan';
-            cellEl.style.display = 'flex';
-            cellEl.style.justifyContent = 'center';
-            cellEl.style.alignItems = 'center';
+        // render: (pEl, cell) => {
+        //     const cellEl = document.createElement('div');
+        //     cellEl.addEventListener('click', () => {
+        //         console.log('点击了姓名');
+        //     });
+        //     cellEl.style.width = '100%';
+        //     cellEl.style.height = '100%';
+        //     cellEl.style.opacity = '0.5';
+        //     cellEl.style.backgroundColor = 'cyan';
+        //     cellEl.style.display = 'flex';
+        //     cellEl.style.justifyContent = 'center';
+        //     cellEl.style.alignItems = 'center';
 
-            cellEl.innerHTML = cell.text;
-            pEl.appendChild(cellEl);
-        },
+        //     cellEl.innerHTML = cell.text;
+        //     pEl.appendChild(cellEl);
+        // },
         // render: "emp_name",
     },
     // {
@@ -455,7 +455,7 @@ const eVirtTable = new EVirtTable(canvas, {
         // ROW_KEY: 'emp_no',
         CELL_HEIGHT: 36,
         SELECTOR_AREA_MIN_X: 0,
-        ENABLE_AUTOFILL: false,
+        ENABLE_AUTOFILL: true,
         ENABLE_SELECTOR: true,
         ENABLE_KEYBOARD: true,
         ENABLE_HISTORY: true,
@@ -469,6 +469,7 @@ const eVirtTable = new EVirtTable(canvas, {
         FOOTER_FIXED: true,
         ENABLE_COPY: true,
         ENABLE_PASTER: true,
+
         FOOTER_POSITION: 'bottom',
         OFFSET_HEIGHT: 16,
         // SELECTOR_AREA_MAX_X_OFFSET: 1,
@@ -522,36 +523,36 @@ const eVirtTable = new EVirtTable(canvas, {
             //     }, 1000);
             // });
         },
-        // BEFORE_PASTE_CHANGE_METHOD: (changeList) => {
-        //     return new Promise((resolve) => {
-        //         setTimeout(() => {
-        //             console.log('BEFORE_PASTE_CHANGE_METHOD', changeList);
-        //             const ll = changeList.map((item) => {
-        //                 const { value } = item;
-        //                 return {
-        //                     ...item,
-        //                     value: `${value}粘贴`,
-        //                 };
-        //             });
-        //             resolve(ll);
-        //         }, 1000);
-        //     });
-        // },
-        // BEFORE_AUTOFILL_CHANGE_METHOD: (changeList) => {
-        //     return new Promise((resolve) => {
-        //         setTimeout(() => {
-        //             console.log('BEFORE_PASTE_CHANGE_METHOD', changeList);
-        //             const ll = changeList.map((item) => {
-        //                 const { value } = item;
-        //                 return {
-        //                     ...item,
-        //                     value: `${value}填充`,
-        //                 };
-        //             });
-        //             resolve(ll);
-        //         }, 1000);
-        //     });
-        // },
+        BEFORE_PASTE_CHANGE_METHOD: (changeList, xArr, yArr) => {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    console.log('BEFORE_PASTE_CHANGE_METHOD', changeList);
+                    const ll = changeList.map((item) => {
+                        const { value } = item;
+                        return {
+                            ...item,
+                            value: `${value}粘贴`,
+                        };
+                    });
+                    resolve(ll);
+                }, 1000);
+            });
+        },
+        BEFORE_AUTOFILL_CHANGE_METHOD: (changeList) => {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    console.log('BEFORE_PASTE_CHANGE_METHOD', changeList);
+                    const ll = changeList.map((item) => {
+                        const { value } = item;
+                        return {
+                            ...item,
+                            value: `${value}填充`,
+                        };
+                    });
+                    resolve(ll);
+                }, 1000);
+            });
+        },
         EXPAND_LAZY_METHOD: (params: any) => {
             const i = params.row.id;
             return new Promise((resolve) => {

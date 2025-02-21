@@ -154,7 +154,7 @@ export type CellHeaderParams = {
     colIndex: number;
     column: Column;
 };
-export type BeforeChangeParams = {
+export type BeforeChangeItem = {
     rowKey: string;
     key: string;
     value: any;
@@ -218,11 +218,15 @@ export type SpanMethod = (params: SpanParams) => SpanType | void;
 export type SelectableMethod = (params: SelectableParams) => boolean | void;
 export type ExpandLazyMethod = (params: CellParams) => Promise<any[]>;
 export type BeforeCellValueChangeMethod = (
-    params: BeforeChangeParams[],
-) => BeforeChangeParams[] | Promise<BeforeChangeParams[]>;
+    params: BeforeChangeItem[],
+) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
 export type BeforePasteChangeMethod = (
-    params: BeforeChangeParams[],
-) => BeforeChangeParams[] | Promise<BeforeChangeParams[]>;
+    params: BeforeChangeItem[],
+    xArr: number[],
+    yArr: number[],
+) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
 export type BeforeAutofillChangeMethod = (
-    params: BeforeChangeParams[],
-) => BeforeChangeParams[] | Promise<BeforeChangeParams[]>;
+    params: BeforeChangeItem[],
+    xArr: number[],
+    yArr: number[],
+) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
