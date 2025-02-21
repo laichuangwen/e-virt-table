@@ -1,5 +1,6 @@
 import EVirtTable from './src/EVirtTable';
 import { Column } from './src/types';
+import { mergeColCell, mergeRowCell } from './src/util';
 
 const canvas = document.getElementById('e-virt-table') as HTMLDivElement;
 const columns: Column[] = [
@@ -43,7 +44,7 @@ const columns: Column[] = [
         align: 'left',
         verticalAlign: 'middle',
         // hide: true,
-        renderFooter: (pEl, cell) => {
+        render: (pEl, cell) => {
             const cellEl = document.createElement('div');
             cellEl.style.width = '100%';
             cellEl.style.height = '100%';
@@ -366,10 +367,11 @@ for (let i = 0; i < 800; i += 1) {
         id: i,
         // _readonly: true,
         emp_img: 'https://devtest-oss-r.bananain.cn/wechat-mall/2024/08/27/1724754260406/20240827-182345.jpg',
-        emp_name: `张三${i % 30 ? 1 : 0}`,
-        emp_name11: `11张三${i}`,
-        emp_name22: `22张三${i}`,
-        emp_name2: `2张三${i}`,
+        emp_name: `张三${i % 5 ? 1 : 0}`,
+        emp_name11: `张三${i % 5 ? 1 : 0}`,
+        emp_name221: `张三${i % 5 ? 1 : 0}`,
+        emp_name222: `张三${i % 5 ? 1 : 0}`,
+        emp_name2: `张三${i % 5 ? 1 : 0}`,
         emp_no: i,
         dep_name: ['zhinan', 'shejiyuanze', 'yizhi'],
         job_name: i === 5 ? '产品经理测试很长的名字' : `产品经理${i}`,
@@ -415,64 +417,6 @@ for (let i = 0; i < 0; i += 1) {
         align: 'right',
     });
 }
-// 获取合并单元格的spanArr,针对行数据相同key合并
-const getSpanArrByRow = (list: any, key: string) => {
-    let contactDot = 0;
-    const spanArr: number[] = [];
-    list.forEach((item: any, index: number) => {
-        if (index === 0) {
-            spanArr.push(1);
-        } else {
-            if (item[key] === list[index - 1][key]) {
-                spanArr[contactDot] += 1;
-                spanArr.push(0);
-            } else {
-                spanArr.push(1);
-                contactDot = index;
-            }
-        }
-    });
-    return spanArr;
-};
-const getSpanObjByColumn = (row: any, columns: any) => {
-    let keyPre = '';
-    let keyDot = '';
-    const spanObj: any = {};
-    columns.forEach((item: any, index: number) => {
-        if (index === 0) {
-            keyPre = item.key;
-            keyDot = item.key;
-            spanObj[item.key] = 1;
-        } else {
-            // eslint-disable-next-line no-undef
-            if (row[item.key] === row[keyPre]) {
-                spanObj[item.key] = 0;
-                spanObj[keyDot] += 1;
-            } else {
-                spanObj[item.key] = 1;
-                keyPre = item.key;
-                keyDot = item.key;
-            }
-        }
-    });
-    return spanObj;
-};
-// 合并行单元格
-const mergeRowCell = (data: any, key: string) => {
-    // 合并单元格
-    const { visibleRows, rowIndex, headIndex } = data;
-    const spanArr = getSpanArrByRow(visibleRows, key);
-    if (spanArr[rowIndex - headIndex] === 0) {
-        return {
-            rowspan: 0,
-            colspan: 0,
-        };
-    }
-    return {
-        rowspan: spanArr[rowIndex - headIndex],
-        colspan: 1,
-    };
-};
 const overlayerEl = document.getElementById('e-virt-table-overlayer') as HTMLDivElement;
 const editorEl = document.getElementById('e-virt-table-editor') as HTMLDivElement;
 const eVirtTable = new EVirtTable(canvas, {
@@ -502,19 +446,25 @@ const eVirtTable = new EVirtTable(canvas, {
             },
         ],
         // DISABLED: true,
-        HEIGHT: 500,
+        // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
         // ROW_KEY: 'emp_no',
         CELL_HEIGHT: 36,
         SELECTOR_AREA_MIN_X: 0,
-        ENABLE_AUTOFILL: true,
+        ENABLE_AUTOFILL: false,
         ENABLE_SELECTOR: true,
         ENABLE_KEYBOARD: true,
         ENABLE_HISTORY: true,
-        ENABLE_OFFSET_HEIGHT: false,
-        HIGHLIGHT_SELECTED_ROW: true,
-        HIGHLIGHT_HOVER_ROW: true,
+        ENABLE_OFFSET_HEIGHT: true,
+        HIGHLIGHT_SELECTED_ROW: false,
+        HIGHLIGHT_HOVER_ROW: false,
+        ENABLE_MERGE_CELL_LINK: true,
+        ENABLE_EDIT_SINGLE_CLICK: false,
+        ENABLE_MERGE_DISABLED_AUTOFILL: false,
+        ENABLE_MERGE_DISABLED_PASTER: false,
         FOOTER_FIXED: true,
+        ENABLE_COPY: true,
+        ENABLE_PASTER: true,
         FOOTER_POSITION: 'bottom',
         OFFSET_HEIGHT: 16,
         // SELECTOR_AREA_MAX_X_OFFSET: 1,
@@ -639,11 +589,28 @@ const eVirtTable = new EVirtTable(canvas, {
             }
         },
         SPAN_METHOD: (params) => {
-            // const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;
-            // if (column.key === 'emp_name') {
-            //     // 合并行单元格
-            //     return mergeRowCell(params, 'emp_name');
-            // }
+            const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;
+            if (
+                [
+                    'unit',
+                    'work_type',
+                    'household_city',
+                    'household_address',
+                    'requiredQuantity',
+                    'work_status',
+                    'materialNo',
+                ].includes(column.key)
+            ) {
+                // 合并行单元格
+                return mergeRowCell(params, column.key, ['emp_name', column.key]);
+            }
+            if (column.key === 'emp_name') {
+                // 合并行单元格
+                return mergeRowCell(params, 'emp_name', ['emp_name']);
+            }
+            if (['emp_name221', 'emp_name222', 'emp_name2'].includes(column.key)) {
+                return mergeColCell(params, ['emp_name221', 'emp_name222', 'emp_name2']);
+            }
             // if (column.key === 'selection') {
             //     // 合并行单元格
             //     return mergeRowCell(params, 'emp_name');
@@ -726,7 +693,7 @@ if (dateEl) {
     });
     eVirtTable.on('change', (value) => {
         console.log(value);
-        console.log(eVirtTable.hasValidationError());
+        // console.log(eVirtTable.hasValidationError());
     });
     dateEl.addEventListener('change', function (event) {
         if (!event.target) {

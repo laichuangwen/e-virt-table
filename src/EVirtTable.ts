@@ -169,7 +169,7 @@ export default class EVirtTable {
         this.ctx.database.batchSetItemValue(list, history);
     }
     setItemValueByEditor(rowKey: string, key: string, value: any, history = true, reDraw = true) {
-        this.ctx.database.setItemValue(rowKey, key, value, history, reDraw, true);
+        this.ctx.setItemValueByEditor(rowKey, key, value, history, reDraw);
         this.editor.doneEdit();
     }
     doLayout() {

@@ -95,6 +95,9 @@ export default class Config {
     ENABLE_SELECTOR_SPAN_ROW = true;
     ENABLE_SELECTOR_ALL_ROWS = true;
     ENABLE_SELECTOR_ALL_COLS = true;
+    ENABLE_MERGE_CELL_LINK = false; // 启用合并选择器关联
+    ENABLE_MERGE_DISABLED_PASTER = false; // 启用合并禁用粘贴
+    ENABLE_MERGE_DISABLED_AUTOFILL = false; // 启用合并禁用填充
     ENABLE_AUTOFILL = false;
     ENABLE_CONTEXT_MENU = false;
     ENABLE_COPY = true;

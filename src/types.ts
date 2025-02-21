@@ -168,6 +168,14 @@ export type CellStyleParams = CellParams & {
 export type SpanType = {
     rowspan: number;
     colspan: number;
+    relationRowKeys?: string[];
+    relationColKeys?: string[];
+    mergeRow?: boolean;
+    mergeCol?: boolean;
+};
+export type ErrorType = {
+    code: string;
+    message: string;
 };
 export type SpanParams = CellParams & {
     visibleLeafColumns: Column[];
@@ -175,6 +183,17 @@ export type SpanParams = CellParams & {
     headPosition: Position;
     visibleRows: any[];
     rows: any[];
+};
+export type SpanInfo = {
+    xArr: number[];
+    yArr: number[];
+    rowspan: number;
+    colspan: number;
+    height: number;
+    width: number;
+    offsetTop: number;
+    offsetLeft: number;
+    dataList: ChangeItem[];
 };
 export type SelectableParams = {
     row: any;

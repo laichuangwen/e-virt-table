@@ -12,9 +12,11 @@ import type {
     EVirtTableOptions,
     BeforeCellValueChangeMethod,
     Descriptor,
+    SpanInfo,
 } from './types';
 import { generateShortUUID } from './util';
 import { HistoryItemData } from './History';
+import Cell from './Cell';
 export default class Database {
     private loading = false;
     private ctx: Context;
@@ -311,6 +313,10 @@ export default class Database {
      * @returns
      */
     getRowForRowKey(rowKey: string) {
+        return this.rowKeyMap.get(rowKey);
+    }
+    getRowForRowIndex(rowIndex: number) {
+        const rowKey = this.getRowKeyForRowIndex(rowIndex);
         return this.rowKeyMap.get(rowKey);
     }
     /**
@@ -741,6 +747,25 @@ export default class Database {
             this.colIndexKeyMap.set(column.colIndex, column.key);
         });
     }
+    getColumnByColIndex(colIndex: number) {
+        const key = this.colIndexKeyMap.get(colIndex);
+        if (key && this.headerMap.has(key)) {
+            return this.headerMap.get(key)?.column;
+        }
+        return undefined;
+    }
+    getColIndexForKey(key: string) {
+        if (key && this.headerMap.has(key)) {
+            return this.headerMap.get(key)?.colIndex;
+        }
+    }
+    getColHeaderByIndex(colIndex: number) {
+        const key = this.colIndexKeyMap.get(colIndex);
+        if (key && this.headerMap.has(key)) {
+            return this.headerMap.get(key);
+        }
+        return undefined;
+    }
     /**
      * 获取以改变数据
      */
@@ -931,6 +956,175 @@ export default class Database {
         }
         return sumHeight;
     }
+    getSpanInfo(cell: Cell): SpanInfo {
+        const {
+            rowIndex,
+            key,
+            rowKey,
+            row,
+            value,
+            colIndex,
+            relationRowKeys,
+            relationColKeys,
+            rowspan,
+            height,
+            width,
+            colspan,
+            mergeRow,
+            mergeCol,
+        } = cell;
+        if (rowspan === 1 && colspan === 1) {
+            return {
+                xArr: [colIndex, colIndex],
+                yArr: [rowIndex, rowIndex],
+                rowspan,
+                colspan,
+                height,
+                width,
+                offsetTop: 0,
+                offsetLeft: 0,
+                dataList: [
+                    {
+                        rowKey,
+                        key,
+                        row,
+                        value,
+                    },
+                ],
+            };
+        }
+        let topIndex = rowIndex;
+        let bottomIndex = rowIndex;
+        let leftIndex = colIndex;
+        let rightIndex = colIndex;
+        let dataList: ChangeItem[] = [];
+        let offsetTop = 0;
+        let offsetLeft = 0;
+        let mergeHeight = 0;
+        let mergeWidth = 0;
+        // 列合并的
+        if (rowspan !== 1 && mergeRow) {
+            mergeWidth = width;
+            const curValue = relationRowKeys.reduce((acc, key) => {
+                const value = this.getItemValue(rowKey, key) ?? '';
+                return `${acc}${value}`;
+            }, '');
+            // 先查找向上的相同值，根据关联值查询
+            for (let i = rowIndex - 1; i >= 0; i--) {
+                const _rowKey = this.rowIndexRowKeyMap.get(i) || '';
+                const pValue = relationRowKeys.reduce((acc, key) => {
+                    const value = this.getItemValue(_rowKey, key) ?? '';
+                    return `${acc}${value}`;
+                }, '');
+                if (curValue === pValue) {
+                    topIndex = i;
+                } else {
+                    break;
+                }
+            }
+
+            // 再查找向下的相同值，根据关联值查询
+            for (let i = rowIndex; i < this.ctx.maxRowIndex; i++) {
+                const _rowKey = this.rowIndexRowKeyMap.get(i) || '';
+                const pValue = relationRowKeys.reduce((acc, key) => {
+                    const value = this.getItemValue(_rowKey, key) ?? '';
+                    return `${acc}${value}`;
+                }, '');
+                if (curValue === pValue) {
+                    bottomIndex = i;
+                } else {
+                    break;
+                }
+            }
+            for (let i = topIndex; i < rowIndex; i++) {
+                const { height } = this.positions[i];
+                offsetTop += height;
+            }
+            for (let i = topIndex; i <= bottomIndex; i++) {
+                const { height } = this.positions[i];
+                // 合并高度
+                mergeHeight += height;
+
+                // 根据下标查找rowkey
+                const _rowKey = this.rowIndexRowKeyMap.get(i) || '';
+                const { item } = this.rowKeyMap.get(_rowKey);
+                const value = this.getItemValue(_rowKey, key);
+                // 需要改变值
+                dataList.push({
+                    rowKey: _rowKey,
+                    key,
+                    value,
+                    row: item,
+                });
+            }
+        }
+        // 行合并的
+        if (colspan !== 1 && mergeCol) {
+            mergeHeight = height;
+            // 向左
+            for (let i = colIndex - 1; i >= 0; i--) {
+                const column = this.getColumnByColIndex(i);
+                if (!column) {
+                    break;
+                }
+                const curValue = this.getItemValue(rowKey, key);
+                const pValue = this.getItemValue(rowKey, column.key);
+                if (curValue === pValue && relationColKeys.includes(column.key)) {
+                    leftIndex = i;
+                } else {
+                    break;
+                }
+            }
+            // 向右
+            for (let i = colIndex; i < this.ctx.maxColIndex; i++) {
+                const column = this.getColumnByColIndex(i);
+                if (!column) {
+                    break;
+                }
+                const curValue = this.getItemValue(rowKey, key);
+                const pValue = this.getItemValue(rowKey, column.key);
+                if (curValue === pValue && relationColKeys.includes(column.key)) {
+                    rightIndex = i;
+                } else {
+                    break;
+                }
+            }
+            for (let i = leftIndex; i < colIndex; i++) {
+                const column = this.getColumnByColIndex(i);
+                if (!column) {
+                    break;
+                }
+                // 合并宽度
+                offsetLeft += column.width || 100;
+            }
+            for (let i = leftIndex; i <= rightIndex; i++) {
+                const column = this.getColumnByColIndex(i);
+                if (!column) {
+                    break;
+                }
+                // 合并宽度
+                mergeWidth += column.width || 100;
+                // 需要改变值
+                dataList.push({
+                    rowKey,
+                    key: column.key,
+                    value: this.getItemValue(rowKey, column.key),
+                    row,
+                });
+            }
+        }
+        return {
+            xArr: [leftIndex, rightIndex],
+            yArr: [topIndex, bottomIndex],
+            rowspan,
+            colspan,
+            height: mergeHeight,
+            width: mergeWidth,
+            offsetTop,
+            offsetLeft,
+            dataList,
+        };
+    }
     setLoading(loading: boolean) {
         this.loading = loading;
         this.ctx.emit('loadingChange', loading);
@@ -961,5 +1155,28 @@ export default class Database {
     getValidationError(rowKey: string, key: string) {
         const _key = `${rowKey}\u200b_${key}`;
         return this.validationErrorMap.get(_key) || [];
+    }
+    // 获取虚拟单元格
+    getVirtualBodyCell(rowIndex: number, colIndex: number) {
+        const column = this.getColumnByColIndex(colIndex);
+        const row = this.getRowForRowIndex(rowIndex);
+        if (!column || !row) {
+            return;
+        }
+        const cell = new Cell(this.ctx, rowIndex, colIndex, 0, 0, 0, 0, column, row, 'body');
+        return cell;
+    }
+    hasMergeCell(xArr: number[], yArr: number[]) {
+        let hasMergeCell = false;
+        for (let i = yArr[0]; i <= yArr[1]; i++) {
+            for (let j = xArr[0]; j <= xArr[1]; j++) {
+                const cell = this.getVirtualBodyCell(i, j);
+                if (cell && (cell.mergeRow || cell.mergeCol)) {
+                    hasMergeCell = true;
+                    break;
+                }
+            }
+        }
+        return hasMergeCell;
     }
 }

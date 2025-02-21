@@ -1,5 +1,6 @@
 import type Context from './Context';
 import type Cell from './Cell';
+import { ErrorType } from './types';
 export default class Autofill {
     private ctx: Context;
     constructor(ctx: Context) {
@@ -136,7 +137,18 @@ export default class Autofill {
         const yStep = value.length;
         const xArr = this.ctx.autofill.xArr;
         const yArr = this.ctx.autofill.yArr;
-
+        // 启用合并时禁用填充
+        if (this.ctx.config.ENABLE_MERGE_DISABLED_AUTOFILL) {
+            if (this.ctx.database.hasMergeCell(xArr, yArr)) {
+                const err: ErrorType = {
+                    code: 'MERGE_DISABLED_AUTOFILL',
+                    message: 'The merged cell is disabled for autofill',
+                };
+                this.ctx.emit('error', err);
+                alert(err.message);
+                return;
+            }
+        }
         let changeList = [];
         for (let ri = 0; ri <= yArr[1] - yArr[0]; ri++) {
             for (let ci = 0; ci <= xArr[1] - xArr[0]; ci++) {
@@ -181,7 +193,7 @@ export default class Autofill {
         this.ctx.selector.xArr = this.ctx.autofill.xArr;
         this.ctx.selector.yArr = this.ctx.autofill.yArr;
         // 批量设置数据，并记录历史
-        this.ctx.database.batchSetItemValue(changeList, true);
+        this.ctx.batchSetItemValueByEditor(changeList, true);
         let rows: any[] = [];
         rowKeyList.forEach((rowKey) => {
             rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));

@@ -1,7 +1,7 @@
 import type Context from './Context';
 import type Cell from './Cell';
 import type CellHeader from './CellHeader';
-import { BeforePasteChangeMethod, ChangeItem } from './types';
+import { BeforePasteChangeMethod, ChangeItem, ErrorType } from './types';
 import { throttle, decodeSpreadsheetStr, encodeToSpreadsheetStr } from './util';
 export default class Selector {
     private isCut = false;
@@ -78,6 +78,7 @@ export default class Selector {
             e.preventDefault();
             this.isMultipleRow = false;
             this.click(e.shiftKey);
+            this.ctx.emit('selectorClick', cell);
         });
         this.ctx.on('mouseup', () => {
             this.mousedownHeader = false;
@@ -233,10 +234,16 @@ export default class Selector {
             }
             // 聚焦，解决iframe键盘事件不触发
             this.ctx.stageElement.focus();
-            if (minX === maxX && minY === maxY) {
-                this.ctx.selectOnlyOne = true;
-            } else {
-                this.ctx.selectOnlyOne = false;
+            // 启用合并单元格关联
+            if (this.ctx.config.ENABLE_MERGE_CELL_LINK) {
+                const adjustMerge = this.adjustMergeCellsSelector(_xArr, _yArr);
+                // 合并单元格时，调整选择器的位置
+                minY = adjustMerge.yArr[0];
+                maxY = adjustMerge.yArr[1];
+                minX = adjustMerge.xArr[0];
+                maxX = adjustMerge.xArr[1];
+                // 只有一个合并单元格时
+                this.ctx.onlyMergeCell = adjustMerge.onlyMergeCell;
             }
             this.ctx.selector.xArr = [Math.max(areaMinX, minX), Math.min(areaMaxX, maxX)];
             this.ctx.selector.yArr = [Math.max(areaMinY, minY), Math.min(areaMaxY, maxY)];
@@ -244,7 +251,71 @@ export default class Selector {
             this.ctx.emit('drawView');
         }
     }
-
+    private adjustMergeCellsSelector(xArr: number[], yArr: number[]) {
+        const [minY, maxY] = yArr;
+        const [minX, maxX] = xArr;
+        let topBottomCells: Cell[] = [];
+        let leftRightCells: Cell[] = [];
+        // 遍历选择中的单元格
+        for (let ri = 0; ri <= yArr[1] - yArr[0]; ri++) {
+            for (let ci = 0; ci <= xArr[1] - xArr[0]; ci++) {
+                const rowIndex = ri + yArr[0];
+                const colIndex = ci + xArr[0];
+                const cell = this.ctx.database.getVirtualBodyCell(rowIndex, colIndex);
+                if (cell) {
+                    // 顶部和底部的单元格
+                    if (rowIndex === minY || rowIndex === maxY) {
+                        topBottomCells.push(cell);
+                    }
+                    // 左右的单元格
+                    if (colIndex === minX || colIndex === maxX) {
+                        leftRightCells.push(cell);
+                    }
+                }
+            }
+        }
+        const topBottomBoundary = topBottomCells.reduce(
+            (prev, cell) => {
+                const { yArr } = cell.getSpanInfo();
+                const [topIndex, bottomIndex] = yArr;
+                prev.minY = Math.min(prev.minY, topIndex);
+                prev.maxY = Math.max(prev.maxY, bottomIndex);
+                return prev;
+            },
+            {
+                minY,
+                maxY,
+            },
+        );
+        const leftRightBoundary = leftRightCells.reduce(
+            (prev, cell) => {
+                const { xArr } = cell.getSpanInfo();
+                const [leftIndex, rightIndex] = xArr;
+                prev.minX = Math.min(prev.minX, leftIndex);
+                prev.maxX = Math.max(prev.maxX, rightIndex);
+                return prev;
+            },
+            {
+                minX,
+                maxX,
+            },
+        );
+        const _xArr = [leftRightBoundary.minX, leftRightBoundary.maxX];
+        const _yArr = [topBottomBoundary.minY, topBottomBoundary.maxY];
+        let onlyMergeCell = false;
+        // Check if the selected area is a single merged cell
+        if (leftRightBoundary.minX !== leftRightBoundary.maxX || topBottomBoundary.minY !== topBottomBoundary.maxY) {
+            const selectorStr = JSON.stringify(_xArr) + JSON.stringify(_yArr);
+            const spanInfo = this.ctx.focusCell?.getSpanInfo();
+            const spanStr = spanInfo && JSON.stringify(spanInfo.xArr) + JSON.stringify(spanInfo.yArr);
+            onlyMergeCell = spanStr === selectorStr;
+        }
+        return {
+            xArr: _xArr,
+            yArr: _yArr,
+            onlyMergeCell,
+        };
+    }
     private selectCols(cell: CellHeader) {
         // 启用单选就不能批量选中
         if (this.ctx.config.ENABLE_SELECTOR_SINGLE) {
@@ -507,6 +578,20 @@ export default class Selector {
                 .readText()
                 .then(async (val) => {
                     let textArr = decodeSpreadsheetStr(val);
+                    // 启用合并时禁用粘贴填充
+                    if (this.ctx.config.ENABLE_MERGE_DISABLED_PASTER) {
+                        const _xArr = [colIndex, colIndex + textArr[0].length - 1];
+                        const _yArr = [rowIndex, rowIndex + textArr.length - 1];
+                        if (this.ctx.database.hasMergeCell(_xArr, _yArr)) {
+                            const err: ErrorType = {
+                                code: 'MERGE_DISABLED_PASTER',
+                                message: 'The merged cell is disabled for pasting',
+                            };
+                            this.ctx.emit('error', err);
+                            alert(err.message);
+                            return;
+                        }
+                    }
                     let changeList: ChangeItem[] = [];
                     for (let ri = 0; ri <= textArr.length - 1; ri++) {
                         const len = textArr[ri].length;
@@ -570,7 +655,7 @@ export default class Selector {
                     // 清除复制线
                     this.clearCopyLine();
                     // 批量设置数据，并记录历史
-                    this.ctx.database.batchSetItemValue(changeList, true);
+                    this.ctx.batchSetItemValueByEditor(changeList, true);
                     let rows: any[] = [];
                     rowKeyList.forEach((rowKey) => {
                         rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
