@@ -42,10 +42,14 @@ const columns: Column[] = [
         sort: 7,
         fixed: 'left',
         align: 'left',
+        editorType: 'none',
         verticalAlign: 'middle',
         // hide: true,
         render: (pEl, cell) => {
             const cellEl = document.createElement('div');
+            cellEl.addEventListener('click', () => {
+                console.log('点击了姓名');
+            });
             cellEl.style.width = '100%';
             cellEl.style.height = '100%';
             cellEl.style.opacity = '0.5';

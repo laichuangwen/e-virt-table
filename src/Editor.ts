@@ -83,7 +83,11 @@ export default class Editor {
             // 调整位置会触发重绘可能会导致cellClick事件不能触发，调整位置时需要赋值cellTarget
             this.cellTarget = cell;
         });
-        this.ctx.on('cellClick', (cell) => {
+        this.ctx.on('cellClick', (cell: Cell) => {
+            // 没有编辑器的情况下不进入编辑模式
+            if (cell.editorType === 'none') {
+                return;
+            }
             // 如果是调整边界位置，不进入编辑模式
             if (this.ctx.adjustPositioning) {
                 return;
