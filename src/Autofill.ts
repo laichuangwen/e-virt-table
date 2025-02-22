@@ -176,6 +176,9 @@ export default class Autofill {
         if (!changeList.length) {
             return;
         }
+        // 设置选择器为填充位置
+        this.ctx.selector.xArr = this.ctx.autofill.xArr;
+        this.ctx.selector.yArr = this.ctx.autofill.yArr;
         // 填充内容改变前回调
         const { BEFORE_AUTOFILL_CHANGE_METHOD } = this.ctx.config;
         if (typeof BEFORE_AUTOFILL_CHANGE_METHOD === 'function') {
@@ -192,9 +195,6 @@ export default class Autofill {
                 return;
             }
         }
-        // 设置选择器为填充位置
-        this.ctx.selector.xArr = this.ctx.autofill.xArr;
-        this.ctx.selector.yArr = this.ctx.autofill.yArr;
         // 批量设置数据，并记录历史
         this.ctx.batchSetItemValueByEditor(changeList, true);
         let rows: any[] = [];

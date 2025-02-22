@@ -96,6 +96,7 @@ export default class Context {
     adjustPositioning = false; // 调整位置中
     editing = false; // 编辑中
     onlyMergeCell = false; // 只有合并单元格
+    selectOnlyOne = false; // 只选择一个
     scrollY = 0;
     scrollX = 0;
     fixedLeftWidth = 0;

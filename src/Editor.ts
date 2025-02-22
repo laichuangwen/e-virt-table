@@ -100,8 +100,11 @@ export default class Editor {
                     this.startEdit();
                     return;
                 }
-                this.startEdit();
-                return;
+                // 只有一个的情况下才进入编辑模式
+                if (this.ctx.selectOnlyOne) {
+                    this.startEdit();
+                    return;
+                }
             }
             this.selectorArrStr = selectorArrStr;
             this.doneEdit();

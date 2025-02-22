@@ -245,6 +245,11 @@ export default class Selector {
                 // 只有一个合并单元格时
                 this.ctx.onlyMergeCell = adjustMerge.onlyMergeCell;
             }
+            if (minX === maxX && minY === maxY) {
+                this.ctx.selectOnlyOne = true;
+            } else {
+                this.ctx.selectOnlyOne = false;
+            }
             this.ctx.selector.xArr = [Math.max(areaMinX, minX), Math.min(areaMaxX, maxX)];
             this.ctx.selector.yArr = [Math.max(areaMinY, minY), Math.min(areaMaxY, maxY)];
             this.ctx.emit('setSelector', this.ctx.selector);
