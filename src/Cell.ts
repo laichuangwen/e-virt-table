@@ -772,6 +772,9 @@ export default class Cell extends BaseCell {
         if (!this.message) {
             return;
         }
+        if (this.rowspan === 0 || this.colspan === 0) {
+            return;
+        }
         const { ERROR_TIP_ICON_SIZE, ERROR_TIP_COLOR } = this.ctx.config;
         const { width } = this;
         const x = this.drawX;
