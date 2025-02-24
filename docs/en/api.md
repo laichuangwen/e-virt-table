@@ -85,6 +85,9 @@ type EVirtTableOptions = {
 | ENABLE_SELECTOR_SPAN_ROW | Enable selector for batch row selection | boolean | — | true |
 | ENABLE_SELECTOR_ALL_ROWS | Enable selector for all rows | boolean | — | true |
 | ENABLE_SELECTOR_ALL_COLS | Enable selector for all columns | boolean | — | true |
+| ENABLE_MERGE_CELL_LINK | Enable merge cell link | boolean | false |
+| ENABLE_MERGE_DISABLED_PASTER | Enable merge disabled paste, error information in error callback | boolean | false |
+| ENABLE_MERGE_DISABLED_AUTOFILL | Enable merge disabled autofill, error information in error callback | boolean | false |
 | ENABLE_AUTOFILL | Enable autofill | boolean | — | true |
 | ENABLE_CONTEXT_MENU | Enable context menu | boolean | — | true |
 | ENABLE_COPY | Enable copy | boolean | — | true |
@@ -122,6 +125,9 @@ type EVirtTableOptions = {
 | BEFORE_VALUE_CHANGE_METHOD | Callback before value change | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — | — |
 | BEFORE_PASTE_DATA_METHOD | Callback before paste change | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — | — |
 | BEFORE_AUTOFILL_DATA_METHOD | Callback before autofill change | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — | — |
+| BEFORE_SET_SELECTOR_METHOD | Callback before setting selector | ^[Function]`(BeforeSetSelectorParams[])=>BeforeSetSelectorParams[]>` | — |
+| BEFORE_SET_AUTOFILL_METHOD | Callback before setting autofill | ^[Function]`(BeforeSetAutofillParams[])=>BeforeSetAutofillParams[]>` | — |
+| BEFORE_COPY_METHOD | Callback before copying data | ^[Function]`(BeforeCopyParams[])=>BeforeCopyParams[]>` | — |
 
 ## Events
 
@@ -161,6 +167,7 @@ type EVirtTableOptions = {
 | mousedown | Callback for mouse down | — |
 | mousemove | Callback for mouse move | — |
 | keydown | Callback for key down | — |
+| error | Error callback | — |
 
 ## Methods
 
@@ -204,6 +211,7 @@ type EVirtTableOptions = {
 | toggleAllSelection     | Toggle selection for all rows | —                                                         |
 | getPositionForRowIndex | Get position for row index    | —                                                         |
 | getCellValue           | Get cell value by rowKey and key | (rowKey, key)                                           |
+| getUtils               | Get utility methods, such as built-in merge row and column methods | —                     
 | contextMenuHide        | Hide context menu             | —                                                         |
 | destroy                | Destroy                       | —                                                         |
 
@@ -298,6 +306,22 @@ type BeforeChangeItem = {
     value: any;
     oldValue: any;
     row: any;
+};
+type BeforeSetSelectorParams = {
+    focusCell?: Cell;
+    xArr: number[];
+    yArr: number[];
+};
+type BeforeSetAutofillParams = {
+    focusCell?: Cell;
+    xArr: number[];
+    yArr: number[];
+};
+type BeforeCopyParams = {
+    focusCell?: Cell;
+    data: any;
+    xArr: number[];
+    yArr: number[];
 };
 type CellStyleOptions = {
     color?: string;
