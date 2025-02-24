@@ -101,7 +101,11 @@ export default class Editor {
                     return;
                 }
                 // 只有一个的情况下才进入编辑模式
-                if (this.ctx.selectOnlyOne) {
+                if (
+                    this.ctx.selectOnlyOne &&
+                    cell.rowKey === this.cellTarget.rowKey &&
+                    cell.key === this.cellTarget.key
+                ) {
                     this.startEdit();
                     return;
                 }
@@ -117,9 +121,7 @@ export default class Editor {
                     return;
                 }
                 // 只有一个的情况下才进入编辑模式
-                const [minX, maxX] = xArr;
-                const [minY, maxY] = yArr;
-                if (minX === maxX && minY === maxY) {
+                if (this.ctx.selectOnlyOne) {
                     this.startEdit();
                 }
             }
