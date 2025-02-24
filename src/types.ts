@@ -161,6 +161,16 @@ export type BeforeChangeItem = {
     oldValue: any;
     row: any;
 };
+export type BeforeSetSelectorParams = {
+    focusCell?: Cell;
+    xArr: number[];
+    yArr: number[];
+};
+export type BeforeAutofillParams = {
+    focusCell?: Cell;
+    xArr: number[];
+    yArr: number[];
+};
 export type CellStyleParams = CellParams & {
     isHasChanged?: boolean;
 };
@@ -230,3 +240,5 @@ export type BeforeAutofillChangeMethod = (
     xArr: number[],
     yArr: number[],
 ) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
+
+export type BeforeSetSelectorMethod = (params: BeforeSetSelectorParams) => BeforeSetSelectorParams;

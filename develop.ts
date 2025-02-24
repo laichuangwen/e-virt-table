@@ -1,5 +1,5 @@
 import EVirtTable from './src/EVirtTable';
-import { Column } from './src/types';
+import { BeforeSetSelectorParams, Column } from './src/types';
 import { mergeColCell, mergeRowCell } from './src/util';
 
 const canvas = document.getElementById('e-virt-table') as HTMLDivElement;
@@ -488,6 +488,20 @@ const eVirtTable = new EVirtTable(canvas, {
                 },
             },
         ],
+        BEFORE_SET_SELECTOR_METHOD: (params: BeforeSetSelectorParams) => {
+            const { focusCell, xArr, yArr } = params;
+            if (focusCell && focusCell.key === 'emp_name') {
+                const [minX, maxX] = xArr;
+                return {
+                    ...params,
+                    xArr: [focusCell.colIndex, focusCell.colIndex],
+                    yArr,
+                };
+            }
+            return {
+                ...params,
+            };
+        },
         // 改变前需要篡改数据
         BEFORE_VALUE_CHANGE_METHOD: (changeList) => {
             return changeList;

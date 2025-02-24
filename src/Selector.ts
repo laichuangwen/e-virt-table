@@ -1,7 +1,7 @@
 import type Context from './Context';
 import type Cell from './Cell';
 import type CellHeader from './CellHeader';
-import { BeforePasteChangeMethod, ChangeItem, ErrorType } from './types';
+import { BeforePasteChangeMethod, BeforeSetSelectorMethod, ChangeItem, ErrorType } from './types';
 import { throttle, decodeSpreadsheetStr, encodeToSpreadsheetStr } from './util';
 export default class Selector {
     private isCut = false;
@@ -250,8 +250,24 @@ export default class Selector {
             } else {
                 this.ctx.selectOnlyOne = false;
             }
-            this.ctx.selector.xArr = [Math.max(areaMinX, minX), Math.min(areaMaxX, maxX)];
-            this.ctx.selector.yArr = [Math.max(areaMinY, minY), Math.min(areaMaxY, maxY)];
+            _xArr = [Math.max(areaMinX, minX), Math.min(areaMaxX, maxX)];
+            _yArr = [Math.max(areaMinY, minY), Math.min(areaMaxY, maxY)];
+            // 调整选择器的位置前回调
+            const { BEFORE_SET_SELECTOR_METHOD } = this.ctx.config;
+            if (typeof BEFORE_SET_SELECTOR_METHOD === 'function') {
+                const beforeSetSelectorMethod: BeforeSetSelectorMethod = BEFORE_SET_SELECTOR_METHOD;
+                const res = beforeSetSelectorMethod({
+                    focusCell: this.ctx.focusCell,
+                    xArr: _xArr,
+                    yArr: _yArr,
+                });
+                if (res) {
+                    _xArr = res.xArr;
+                    _yArr = res.yArr;
+                }
+            }
+            this.ctx.selector.xArr = _xArr;
+            this.ctx.selector.yArr = _yArr;
             this.ctx.emit('setSelector', this.ctx.selector);
             this.ctx.emit('drawView');
         }
