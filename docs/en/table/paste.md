@@ -8,12 +8,12 @@ Pasting requires enabling the selector and keyboard
 | ------------------------ | ----------------------- | -------  | ------ |
 | ENABLE_COPY | Enable Copy | boolean  | true |
 | ENABLE_PASTER | Enable Paste | boolean  | true |
-| BEFORE_PASTE_DATA_METHOD | Callback before paste | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — |
+| BEFORE_PASTE_DATA_METHOD | Callback before paste | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — |
 
 ## Typings
 
 ``` ts
-type BeforeChangeParams = {
+type BeforeChangeItem = {
     rowKey: string;
     key: string;
     value: any;

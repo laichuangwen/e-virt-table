@@ -8,12 +8,12 @@
 | ------------------------ | ----------------------- | -------  | ------ |
 | ENABLE_COPY | 启用复制 | boolean  | true |
 | ENABLE_PASTER | 启用粘贴 | boolean  | true |
-| BEFORE_PASTE_DATA_METHOD | 粘贴前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — |
+| BEFORE_PASTE_DATA_METHOD | 粘贴前回调 | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — |
 
 ## Typings
 
 ``` ts
-type BeforeChangeParams = {
+type BeforeChangeItem = {
     rowKey: string;
     key: string;
     value: any;

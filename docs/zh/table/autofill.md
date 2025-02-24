@@ -13,12 +13,12 @@
 | ENABLE_SELECTOR_SPAN_ROW | 启用选择器-批量跨行选择 | boolean       | true   |
 | ENABLE_SELECTOR_ALL_ROWS | 启用选择器-批量选中列   | boolean    | true   |
 | ENABLE_SELECTOR_ALL_COLS | 启用选择器-批量选中行   | boolean      | true   |
-| BEFORE_AUTOFILL_DATA_METHOD | 数值填充前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
+| BEFORE_AUTOFILL_DATA_METHOD | 数值填充前回调 | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — | — |
 
 ## Typings
 
 ``` ts
-type BeforeChangeParams = {
+type BeforeChangeItem = {
     rowKey: string;
     key: string;
     value: any;

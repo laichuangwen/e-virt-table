@@ -13,12 +13,12 @@ Autofill relies on the selector, so enabling autofill also requires enabling the
 | ENABLE_SELECTOR_SPAN_ROW | Enable span row selector | boolean  | true   |
 | ENABLE_SELECTOR_ALL_ROWS | Enable select all rows  | boolean  | true   |
 | ENABLE_SELECTOR_ALL_COLS | Enable select all columns | boolean | true   |
-| BEFORE_AUTOFILL_DATA_METHOD | Callback before autofill change | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
+| BEFORE_AUTOFILL_DATA_METHOD | Callback before autofill change | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — | — |
 
 ## Typings
 
 ``` ts
-type BeforeChangeParams = {
+type BeforeChangeItem = {
     rowKey: string;
     key: string;
     value: any;
