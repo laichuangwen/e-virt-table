@@ -209,6 +209,71 @@ export default class Context {
             this.database.setItemValue(rowKey, key, value, history, reDraw, true);
         }
     }
+    adjustMergeCells(xArr: number[], yArr: number[]) {
+        const [minY, maxY] = yArr;
+        const [minX, maxX] = xArr;
+        let topBottomCells: Cell[] = [];
+        let leftRightCells: Cell[] = [];
+        // 遍历选择中的单元格
+        for (let ri = 0; ri <= yArr[1] - yArr[0]; ri++) {
+            for (let ci = 0; ci <= xArr[1] - xArr[0]; ci++) {
+                const rowIndex = ri + yArr[0];
+                const colIndex = ci + xArr[0];
+                const cell = this.database.getVirtualBodyCell(rowIndex, colIndex);
+                if (cell) {
+                    // 顶部和底部的单元格
+                    if (rowIndex === minY || rowIndex === maxY) {
+                        topBottomCells.push(cell);
+                    }
+                    // 左右的单元格
+                    if (colIndex === minX || colIndex === maxX) {
+                        leftRightCells.push(cell);
+                    }
+                }
+            }
+        }
+        const topBottomBoundary = topBottomCells.reduce(
+            (prev, cell) => {
+                const { yArr } = cell.getSpanInfo();
+                const [topIndex, bottomIndex] = yArr;
+                prev.minY = Math.min(prev.minY, topIndex);
+                prev.maxY = Math.max(prev.maxY, bottomIndex);
+                return prev;
+            },
+            {
+                minY,
+                maxY,
+            },
+        );
+        const leftRightBoundary = leftRightCells.reduce(
+            (prev, cell) => {
+                const { xArr } = cell.getSpanInfo();
+                const [leftIndex, rightIndex] = xArr;
+                prev.minX = Math.min(prev.minX, leftIndex);
+                prev.maxX = Math.max(prev.maxX, rightIndex);
+                return prev;
+            },
+            {
+                minX,
+                maxX,
+            },
+        );
+        const _xArr = [leftRightBoundary.minX, leftRightBoundary.maxX];
+        const _yArr = [topBottomBoundary.minY, topBottomBoundary.maxY];
+        let onlyMergeCell = false;
+        // Check if the selected area is a single merged cell
+        if (leftRightBoundary.minX !== leftRightBoundary.maxX || topBottomBoundary.minY !== topBottomBoundary.maxY) {
+            const selectorStr = JSON.stringify(_xArr) + JSON.stringify(_yArr);
+            const spanInfo = this.focusCell?.getSpanInfo();
+            const spanStr = spanInfo && JSON.stringify(spanInfo.xArr) + JSON.stringify(spanInfo.yArr);
+            onlyMergeCell = spanStr === selectorStr;
+        }
+        return {
+            xArr: _xArr,
+            yArr: _yArr,
+            onlyMergeCell,
+        };
+    }
     batchSetItemValueByEditor(_list: ChangeItem[], history?: boolean) {
         // 启用合并单元格关联
         if (this.config.ENABLE_MERGE_CELL_LINK) {

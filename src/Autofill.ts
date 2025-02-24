@@ -111,8 +111,21 @@ export default class Autofill {
             if (minY < areaMinY) {
                 return;
             }
-            this.ctx.autofill.xArr = [Math.max(areaMinX, minX), Math.min(areaMaxX, maxX)];
-            this.ctx.autofill.yArr = [Math.max(areaMinY, minY), Math.min(areaMaxY, maxY)];
+            // 启用合并单元格关联
+            if (this.ctx.config.ENABLE_MERGE_CELL_LINK) {
+                const adjustMerge = this.ctx.adjustMergeCells(_xArr, _yArr);
+                // 合并单元格时，调整选择器的位置
+                minY = adjustMerge.yArr[0];
+                maxY = adjustMerge.yArr[1];
+                minX = adjustMerge.xArr[0];
+                maxX = adjustMerge.xArr[1];
+                // 只有一个合并单元格时
+                this.ctx.onlyMergeCell = adjustMerge.onlyMergeCell;
+            }
+            _xArr = [Math.max(areaMinX, minX), Math.min(areaMaxX, maxX)];
+            _yArr = [Math.max(areaMinY, minY), Math.min(areaMaxY, maxY)];
+            this.ctx.autofill.xArr = _xArr;
+            this.ctx.autofill.yArr = _yArr;
             this.ctx.emit('setAutofill', this.ctx.autofill);
             this.ctx.emit('draw');
         }
