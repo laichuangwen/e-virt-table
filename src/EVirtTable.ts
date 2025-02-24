@@ -20,6 +20,7 @@ import Editor from './Editor';
 import Empty from './Empty';
 import Overlayer from './Overlayer';
 import ContextMenu from './ContextMenu';
+import { mergeColCell, mergeRowCell, getSpanArrByRow, getSpanObjByColumn } from './util';
 import './style.css';
 export default class EVirtTable {
     private options: EVirtTableOptions;
@@ -327,6 +328,14 @@ export default class EVirtTable {
     }
     contextMenuHide() {
         this.contextMenu.hide();
+    }
+    getUtils() {
+        return {
+            mergeColCell,
+            mergeRowCell,
+            getSpanArrByRow,
+            getSpanObjByColumn,
+        };
     }
     /**
      * 销毁

@@ -1,6 +1,6 @@
 import EVirtTable from './src/EVirtTable';
 import { BeforeCopyParams, BeforeSetSelectorParams, Column } from './src/types';
-import { mergeColCell, mergeRowCell } from './src/util';
+// import { mergeColCell, mergeRowCell } from './src/util';
 
 const canvas = document.getElementById('e-virt-table') as HTMLDivElement;
 const columns: Column[] = [
@@ -641,6 +641,10 @@ const eVirtTable = new EVirtTable(canvas, {
             }
         },
         SPAN_METHOD: (params) => {
+            const {
+                mergeColCell,
+                mergeRowCell,
+            } = eVirtTable.getUtils();
             const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;
             if (
                 [
