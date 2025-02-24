@@ -230,12 +230,12 @@ export type ExpandLazyMethod = (params: CellParams) => Promise<any[]>;
 export type BeforeCellValueChangeMethod = (
     params: BeforeChangeItem[],
 ) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
-export type BeforePasteChangeMethod = (
+export type BeforePasteDataMethod = (
     params: BeforeChangeItem[],
     xArr: number[],
     yArr: number[],
 ) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
-export type BeforeAutofillChangeMethod = (
+export type BeforeAutofillDataMethod = (
     params: BeforeChangeItem[],
     xArr: number[],
     yArr: number[],

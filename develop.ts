@@ -551,10 +551,10 @@ const eVirtTable = new EVirtTable(canvas, {
             //     }, 1000);
             // });
         },
-        BEFORE_PASTE_CHANGE_METHOD: (changeList, xArr, yArr) => {
+        BEFORE_PASTE_DATA_METHOD: (changeList, xArr, yArr) => {
             return new Promise((resolve) => {
                 setTimeout(() => {
-                    console.log('BEFORE_PASTE_CHANGE_METHOD', changeList);
+                    console.log('BEFORE_PASTE_DATA_METHOD', changeList);
                     const ll = changeList.map((item) => {
                         const { value } = item;
                         return {
@@ -566,10 +566,10 @@ const eVirtTable = new EVirtTable(canvas, {
                 }, 1000);
             });
         },
-        BEFORE_AUTOFILL_CHANGE_METHOD: (changeList) => {
+        BEFORE_AUTOFILL_DATA_METHOD: (changeList) => {
             return new Promise((resolve) => {
                 setTimeout(() => {
-                    console.log('BEFORE_PASTE_CHANGE_METHOD', changeList);
+                    console.log('BEFORE_PASTE_DATA_METHOD', changeList);
                     const ll = changeList.map((item) => {
                         const { value } = item;
                         return {

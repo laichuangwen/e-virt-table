@@ -1,7 +1,7 @@
 import type Context from './Context';
 import type Cell from './Cell';
 import type CellHeader from './CellHeader';
-import { BeforePasteChangeMethod, BeforeSetSelectorMethod, ChangeItem, ErrorType } from './types';
+import { BeforePasteDataMethod, BeforeSetSelectorMethod, ChangeItem, ErrorType } from './types';
 import { throttle, decodeSpreadsheetStr, encodeToSpreadsheetStr } from './util';
 export default class Selector {
     private isCut = false;
@@ -596,9 +596,9 @@ export default class Selector {
                         return;
                     }
                     // 剪贴板内容改变前回调
-                    const { BEFORE_PASTE_CHANGE_METHOD } = this.ctx.config;
-                    if (typeof BEFORE_PASTE_CHANGE_METHOD === 'function') {
-                        const beforePasteChangeMethod: BeforePasteChangeMethod = BEFORE_PASTE_CHANGE_METHOD;
+                    const { BEFORE_PASTE_DATA_METHOD } = this.ctx.config;
+                    if (typeof BEFORE_PASTE_DATA_METHOD === 'function') {
+                        const beforePasteDataMethod: BeforePasteDataMethod = BEFORE_PASTE_DATA_METHOD;
                         const _changeList = changeList.map((item) => ({
                             rowKey: item.rowKey,
                             key: item.key,
@@ -606,7 +606,7 @@ export default class Selector {
                             oldValue: this.ctx.database.getItemValue(item.rowKey, item.key),
                             row: this.ctx.database.getRowDataItemForRowKey(item.rowKey),
                         }));
-                        changeList = await beforePasteChangeMethod(_changeList, _xArr, _yArr);
+                        changeList = await beforePasteDataMethod(_changeList, _xArr, _yArr);
                         if (changeList && !changeList.length) {
                             return;
                         }

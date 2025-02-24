@@ -106,10 +106,10 @@
             columns,
             config: {
                 ENABLE_SELECTOR: true,
-                BEFORE_PASTE_CHANGE_METHOD: (changeList) => {
+                BEFORE_PASTE_DATA_METHOD: (changeList) => {
                     return new Promise((resolve) => {
                         setTimeout(() => {
-                            console.log('BEFORE_PASTE_CHANGE_METHOD', changeList);
+                            console.log('BEFORE_PASTE_DATA_METHOD', changeList);
                             const ll = changeList.map((item) => {
                                 const { value } = item;
                                 return {

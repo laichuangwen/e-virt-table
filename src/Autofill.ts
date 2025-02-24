@@ -207,9 +207,9 @@ export default class Autofill {
         this.ctx.selector.xArr = this.ctx.autofill.xArr;
         this.ctx.selector.yArr = this.ctx.autofill.yArr;
         // 填充内容改变前回调
-        const { BEFORE_AUTOFILL_CHANGE_METHOD } = this.ctx.config;
-        if (typeof BEFORE_AUTOFILL_CHANGE_METHOD === 'function') {
-            const beforeAutofillChangeMethod = BEFORE_AUTOFILL_CHANGE_METHOD;
+        const { BEFORE_AUTOFILL_DATA_METHOD } = this.ctx.config;
+        if (typeof BEFORE_AUTOFILL_DATA_METHOD === 'function') {
+            const beforeAutofillDataMethod = BEFORE_AUTOFILL_DATA_METHOD;
             const _changeList = changeList.map((item) => ({
                 rowKey: item.rowKey,
                 key: item.key,
@@ -217,7 +217,7 @@ export default class Autofill {
                 oldValue: this.ctx.database.getItemValue(item.rowKey, item.key),
                 row: this.ctx.database.getRowDataItemForRowKey(item.rowKey),
             }));
-            changeList = await beforeAutofillChangeMethod(_changeList, xArr, yArr);
+            changeList = await beforeAutofillDataMethod(_changeList, xArr, yArr);
             if (changeList && !changeList.length) {
                 return;
             }

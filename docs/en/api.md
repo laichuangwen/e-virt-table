@@ -120,8 +120,8 @@ type EVirtTableOptions = {
 | SELECTABLE_METHOD | Custom selectable method | ^[Function]`({row, rowIndex})=>boolean\|void` | — | — |
 | EXPAND_LAZY_METHOD | Tree lazy load expand method | ^[Function]`({row, column, rowIndex, colIndex,value})=>Promise<any[]>` | — | — |
 | BEFORE_VALUE_CHANGE_METHOD | Callback before value change | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
-| BEFORE_PASTE_CHANGE_METHOD | Callback before paste change | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
-| BEFORE_AUTOFILL_CHANGE_METHOD | Callback before autofill change | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
+| BEFORE_PASTE_DATA_METHOD | Callback before paste change | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
+| BEFORE_AUTOFILL_DATA_METHOD | Callback before autofill change | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
 
 ## Events
 

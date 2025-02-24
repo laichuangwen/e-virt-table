@@ -1,8 +1,8 @@
 import { IconType } from './Icons';
 import {
-    BeforeAutofillChangeMethod,
+    BeforeAutofillDataMethod,
     BeforeCellValueChangeMethod,
-    BeforePasteChangeMethod,
+    BeforePasteDataMethod,
     BeforeSetAutofillMethod,
     BeforeSetSelectorMethod,
     CellEditorMethod,
@@ -142,8 +142,8 @@ export default class Config {
     SELECTABLE_METHOD?: SelectableMethod;
     EXPAND_LAZY_METHOD?: ExpandLazyMethod;
     BEFORE_VALUE_CHANGE_METHOD?: BeforeCellValueChangeMethod;
-    BEFORE_PASTE_CHANGE_METHOD?: BeforePasteChangeMethod;
-    BEFORE_AUTOFILL_CHANGE_METHOD?: BeforeAutofillChangeMethod;
+    BEFORE_PASTE_DATA_METHOD?: BeforePasteDataMethod;
+    BEFORE_AUTOFILL_DATA_METHOD?: BeforeAutofillDataMethod;
     BEFORE_SET_SELECTOR_METHOD?: BeforeSetSelectorMethod;
     BEFORE_SET_AUTOFILL_METHOD?: BeforeSetAutofillMethod;
     constructor(config: Partial<Config>) {

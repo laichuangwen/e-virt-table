@@ -13,7 +13,7 @@ Autofill relies on the selector, so enabling autofill also requires enabling the
 | ENABLE_SELECTOR_SPAN_ROW | Enable span row selector | boolean  | true   |
 | ENABLE_SELECTOR_ALL_ROWS | Enable select all rows  | boolean  | true   |
 | ENABLE_SELECTOR_ALL_COLS | Enable select all columns | boolean | true   |
-| BEFORE_AUTOFILL_CHANGE_METHOD | Callback before autofill change | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
+| BEFORE_AUTOFILL_DATA_METHOD | Callback before autofill change | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
 
 ## Typings
 
@@ -47,7 +47,7 @@ h:320px
 
 ## Before Data Change
 
-- BEFORE_AUTOFILL_CHANGE_METHOD can modify data before autofill, supports Promise
+- BEFORE_AUTOFILL_DATA_METHOD can modify data before autofill, supports Promise
   
 ::: demo
 autofill/before-change
