@@ -171,8 +171,11 @@ export default class Autofill {
                     code: 'MERGE_DISABLED_AUTOFILL',
                     message: 'The merged cell is disabled for autofill',
                 };
-                this.ctx.emit('error', err);
-                alert(err.message);
+                if (this.ctx.hasEvent('error')) {
+                    this.ctx.emit('error', err);
+                } else {
+                    alert(err.message);
+                }
                 return;
             }
         }

@@ -92,6 +92,10 @@ export default class Editor {
             if (this.ctx.adjustPositioning) {
                 return;
             }
+            // 不在区域内
+            if (!this.isInSelectorRange(cell.rowIndex, cell.colIndex)) {
+                return;
+            }
             const { xArr, yArr } = this.ctx.selector;
             const selectorArrStr = JSON.stringify(xArr) + JSON.stringify(yArr);
             if (this.selectorArrStr === selectorArrStr && this.cellTarget) {
@@ -127,7 +131,24 @@ export default class Editor {
             }
         });
     }
-
+    private isInSelectorRange(rowIndex: number, colIndex: number) {
+        const { xArr, yArr } = this.ctx.selector;
+        const [minX, maxX] = xArr;
+        const [minY, maxY] = yArr;
+        if (colIndex < minX) {
+            return false;
+        }
+        if (colIndex > maxX) {
+            return false;
+        }
+        if (rowIndex < minY) {
+            return false;
+        }
+        if (rowIndex > maxY) {
+            return false;
+        }
+        return true;
+    }
     private initTextEditor() {
         // 初始化文本编辑器
         this.inputEl = document.createElement('textarea');
