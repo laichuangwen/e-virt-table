@@ -166,7 +166,7 @@ export type BeforeSetSelectorParams = {
     xArr: number[];
     yArr: number[];
 };
-export type BeforeAutofillParams = {
+export type BeforeSetAutofillParams = {
     focusCell?: Cell;
     xArr: number[];
     yArr: number[];
@@ -242,3 +242,4 @@ export type BeforeAutofillChangeMethod = (
 ) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
 
 export type BeforeSetSelectorMethod = (params: BeforeSetSelectorParams) => BeforeSetSelectorParams;
+export type BeforeSetAutofillMethod = (params: BeforeSetAutofillParams) => BeforeSetAutofillParams;

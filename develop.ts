@@ -502,6 +502,20 @@ const eVirtTable = new EVirtTable(canvas, {
                 ...params,
             };
         },
+        BEFORE_SET_AUTOFILL_METHOD: (params: BeforeSetSelectorParams) => {
+            const { focusCell, xArr, yArr } = params;
+            if (focusCell && focusCell.key === 'emp_name') {
+                const [minX, maxX] = xArr;
+                return {
+                    ...params,
+                    xArr: [focusCell.colIndex, focusCell.colIndex],
+                    yArr,
+                };
+            }
+            return {
+                ...params,
+            };
+        },
         // 改变前需要篡改数据
         BEFORE_VALUE_CHANGE_METHOD: (changeList) => {
             return changeList;

@@ -1,6 +1,6 @@
 import type Context from './Context';
 import type Cell from './Cell';
-import { ErrorType } from './types';
+import { BeforeSetAutofillMethod, ErrorType } from './types';
 export default class Autofill {
     private ctx: Context;
     constructor(ctx: Context) {
@@ -124,6 +124,20 @@ export default class Autofill {
             }
             _xArr = [Math.max(areaMinX, minX), Math.min(areaMaxX, maxX)];
             _yArr = [Math.max(areaMinY, minY), Math.min(areaMaxY, maxY)];
+            // 调整选择器的位置前回调
+            const { BEFORE_SET_AUTOFILL_METHOD } = this.ctx.config;
+            if (typeof BEFORE_SET_AUTOFILL_METHOD === 'function') {
+                const beforeSetAutofillMethod: BeforeSetAutofillMethod = BEFORE_SET_AUTOFILL_METHOD;
+                const res = beforeSetAutofillMethod({
+                    focusCell: this.ctx.focusCell,
+                    xArr: _xArr,
+                    yArr: _yArr,
+                });
+                if (res) {
+                    _xArr = res.xArr;
+                    _yArr = res.yArr;
+                }
+            }
             this.ctx.autofill.xArr = _xArr;
             this.ctx.autofill.yArr = _yArr;
             this.ctx.emit('setAutofill', this.ctx.autofill);

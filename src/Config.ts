@@ -3,6 +3,7 @@ import {
     BeforeAutofillChangeMethod,
     BeforeCellValueChangeMethod,
     BeforePasteChangeMethod,
+    BeforeSetAutofillMethod,
     BeforeSetSelectorMethod,
     CellEditorMethod,
     CellHeaderStyleMethod,
@@ -144,6 +145,7 @@ export default class Config {
     BEFORE_PASTE_CHANGE_METHOD?: BeforePasteChangeMethod;
     BEFORE_AUTOFILL_CHANGE_METHOD?: BeforeAutofillChangeMethod;
     BEFORE_SET_SELECTOR_METHOD?: BeforeSetSelectorMethod;
+    BEFORE_SET_AUTOFILL_METHOD?: BeforeSetAutofillMethod;
     constructor(config: Partial<Config>) {
         Object.assign(this, config);
     }
