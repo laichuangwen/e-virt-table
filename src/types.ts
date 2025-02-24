@@ -171,6 +171,12 @@ export type BeforeSetAutofillParams = {
     xArr: number[];
     yArr: number[];
 };
+export type BeforeCopyParams = {
+    focusCell?: Cell;
+    data: any;
+    xArr: number[];
+    yArr: number[];
+};
 export type CellStyleParams = CellParams & {
     isHasChanged?: boolean;
 };
@@ -243,3 +249,4 @@ export type BeforeAutofillDataMethod = (
 
 export type BeforeSetSelectorMethod = (params: BeforeSetSelectorParams) => BeforeSetSelectorParams;
 export type BeforeSetAutofillMethod = (params: BeforeSetAutofillParams) => BeforeSetAutofillParams;
+export type BeforeCopyMethod = (params: BeforeCopyParams) => BeforeCopyParams;

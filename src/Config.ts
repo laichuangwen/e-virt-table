@@ -2,6 +2,7 @@ import { IconType } from './Icons';
 import {
     BeforeAutofillDataMethod,
     BeforeCellValueChangeMethod,
+    BeforeCopyMethod,
     BeforePasteDataMethod,
     BeforeSetAutofillMethod,
     BeforeSetSelectorMethod,
@@ -146,6 +147,7 @@ export default class Config {
     BEFORE_AUTOFILL_DATA_METHOD?: BeforeAutofillDataMethod;
     BEFORE_SET_SELECTOR_METHOD?: BeforeSetSelectorMethod;
     BEFORE_SET_AUTOFILL_METHOD?: BeforeSetAutofillMethod;
+    BEFORE_COPY_METHOD?: BeforeCopyMethod;
     constructor(config: Partial<Config>) {
         Object.assign(this, config);
     }

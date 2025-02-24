@@ -1,5 +1,5 @@
 import EVirtTable from './src/EVirtTable';
-import { BeforeSetSelectorParams, Column } from './src/types';
+import { BeforeCopyParams, BeforeSetSelectorParams, Column } from './src/types';
 import { mergeColCell, mergeRowCell } from './src/util';
 
 const canvas = document.getElementById('e-virt-table') as HTMLDivElement;
@@ -488,6 +488,25 @@ const eVirtTable = new EVirtTable(canvas, {
                 },
             },
         ],
+        BEFORE_COPY_METHOD: (params: BeforeCopyParams) => {
+            const { focusCell, xArr, yArr, data } = params;
+            if (focusCell && focusCell.key === 'emp_name') {
+                console.error('不能复制emp_name');
+                return {
+                    ...params,
+                    data: [], // 设置复制内容为空
+                };
+            }
+            if (focusCell && focusCell.key === 'emp_name11') {
+                console.log(data);
+
+                return {
+                    ...params,
+                    data: [],
+                };
+            }
+            return params;
+        },
         BEFORE_SET_SELECTOR_METHOD: (params: BeforeSetSelectorParams) => {
             const { focusCell, xArr, yArr } = params;
             if (focusCell && focusCell.key === 'emp_name') {

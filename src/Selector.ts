@@ -1,7 +1,7 @@
 import type Context from './Context';
 import type Cell from './Cell';
 import type CellHeader from './CellHeader';
-import { BeforePasteDataMethod, BeforeSetSelectorMethod, ChangeItem, ErrorType } from './types';
+import { BeforePasteDataMethod, BeforeSetSelectorMethod, ChangeItem, ErrorType, BeforeCopyMethod } from './types';
 import { throttle, decodeSpreadsheetStr, encodeToSpreadsheetStr } from './util';
 export default class Selector {
     private isCut = false;
@@ -459,7 +459,26 @@ export default class Selector {
         if (!this.ctx.config.ENABLE_COPY) {
             return;
         }
-        const { value } = this.ctx.getSelectedData();
+        let { value, xArr, yArr } = this.ctx.getSelectedData();
+        // 复制前回调
+        const { BEFORE_COPY_METHOD } = this.ctx.config;
+        if (typeof BEFORE_COPY_METHOD === 'function') {
+            const beforeCopyMethod: BeforeCopyMethod = BEFORE_COPY_METHOD;
+            const res = beforeCopyMethod({
+                focusCell: this.ctx.focusCell,
+                data: value,
+                xArr,
+                yArr,
+            });
+            if (!res) {
+                return;
+            }
+            // 清空复制内容时
+            if (Array.isArray(res.data) && !res.data.length) {
+                return;
+            }
+            value = res.data;
+        }
         const text = encodeToSpreadsheetStr(value);
         if (navigator.clipboard) {
             navigator.clipboard
