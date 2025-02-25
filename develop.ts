@@ -464,8 +464,6 @@ const eVirtTable = new EVirtTable(canvas, {
         HIGHLIGHT_HOVER_ROW: false,
         ENABLE_MERGE_CELL_LINK: true,
         ENABLE_EDIT_SINGLE_CLICK: false,
-        ENABLE_MERGE_DISABLED_AUTOFILL: false,
-        ENABLE_MERGE_DISABLED_PASTER: false,
         FOOTER_FIXED: true,
         ENABLE_COPY: true,
         ENABLE_PASTER: true,

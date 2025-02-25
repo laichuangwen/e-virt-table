@@ -637,8 +637,6 @@ export default class Selector {
                 .readText()
                 .then(async (val) => {
                     let textArr = decodeSpreadsheetStr(val);
-                    console.log('textArr', textArr);
-
                     const _xArr = [colIndex, colIndex + textArr[0].length - 1];
                     const _yArr = [rowIndex, rowIndex + textArr.length - 1];
                     // textArr只有一个
