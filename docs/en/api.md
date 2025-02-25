@@ -86,8 +86,6 @@ type EVirtTableOptions = {
 | ENABLE_SELECTOR_ALL_ROWS | Enable selector for all rows | boolean | — | true |
 | ENABLE_SELECTOR_ALL_COLS | Enable selector for all columns | boolean | — | true |
 | ENABLE_MERGE_CELL_LINK | Enable merge cell link | boolean | false |
-| ENABLE_MERGE_DISABLED_PASTER | Enable merge disabled paste, error information in error callback | boolean | false |
-| ENABLE_MERGE_DISABLED_AUTOFILL | Enable merge disabled autofill, error information in error callback | boolean | false |
 | ENABLE_AUTOFILL | Enable autofill | boolean | — | true |
 | ENABLE_CONTEXT_MENU | Enable context menu | boolean | — | true |
 | ENABLE_COPY | Enable copy | boolean | — | true |

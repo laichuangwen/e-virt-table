@@ -6,8 +6,6 @@
 | --- | --- | ---  | --- |
 | SPAN_METHOD | 自定义跨列/行渲染 | ^[Function]`({row, column, rowIndex, colIndex,value,visibleLeafColumns,headIndex,headPosition,visibleRows,rows})=>{rowspan,colspan}`  | — |
 | ENABLE_MERGE_CELL_LINK | 启用合并选择器关联 | boolean | false |
-| ENABLE_MERGE_DISABLED_PASTER | 启用合并禁用粘贴,错误信息在error回调中 | boolean | false |
-| ENABLE_MERGE_DISABLED_AUTOFILL | 启用合并禁用填充,错误信息在error回调中 | boolean | false |
 
 ## 合并行
 

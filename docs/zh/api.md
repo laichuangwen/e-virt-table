@@ -87,8 +87,6 @@ type EVirtTableOptions = {
 | ENABLE_SELECTOR_ALL_ROWS | 启用选择器-批量选中列 | boolean | true |
 | ENABLE_SELECTOR_ALL_COLS | 启用选择器-批量选中行 | boolean | true |
 | ENABLE_MERGE_CELL_LINK | 启用合并选择器关联 | boolean | false |
-| ENABLE_MERGE_DISABLED_PASTER | 启用合并禁用粘贴,错误信息在error回调中 | boolean | false |
-| ENABLE_MERGE_DISABLED_AUTOFILL | 启用合并禁用填充,错误信息在error回调中 | boolean | false |
 | ENABLE_AUTOFILL | 启用填充 | boolean | true |
 | ENABLE_CONTEXT_MENU | 启用右键 | boolean | true |
 | ENABLE_COPY | 启用复制 | boolean | true |
@@ -213,7 +211,7 @@ type EVirtTableOptions = {
 | toggleAllSelection     | 切换所有行的选中状态          | —                                                         |
 | getPositionForRowIndex | 获取当前行的高度定位          | —                                                         |
 | getCellValue           | 通过 rowKey 和 key 获取格子值 | (rowKey, key)                                             |
-| getUtils               | 获取工具类方法，如内置合并行列方法                  | —                                                         |
+| getUtils               | 获取工具类方法，如内置合并行列方法                  | —                                     |
 | contextMenuHide        | 隐藏右键菜单                  | —                                                         |
 | destroy                | 销毁                          | —                                                         |
 
