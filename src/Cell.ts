@@ -15,6 +15,7 @@ import type {
     CellStyleMethod,
     OverflowTooltipPlacement,
     Rules,
+    SpanInfo,
 } from './types';
 import Context from './Context';
 import BaseCell from './BaseCell';
@@ -33,6 +34,10 @@ export default class Cell extends BaseCell {
     level: number;
     colspan = 1;
     rowspan = 1;
+    mergeRow = false;
+    mergeCol = false;
+    relationRowKeys: string[] = []; // 合并单元格关联key
+    relationColKeys: string[] = []; // 合并单元格关联key
     key: string;
     column: Column;
     rowIndex: number;
@@ -115,6 +120,10 @@ export default class Cell extends BaseCell {
         this.formatterFooter = column.formatterFooter;
         this.update();
     }
+    setWidthHeight(width: number, height: number) {
+        this.width = width;
+        this.height = height;
+    }
     getValidationMessage() {
         const errors = this.ctx.database.getValidationError(this.rowKey, this.key);
         if (Array.isArray(errors) && errors.length) {
@@ -150,23 +159,53 @@ export default class Cell extends BaseCell {
         const { SPAN_METHOD } = this.ctx.config;
         if (typeof SPAN_METHOD === 'function') {
             const spanMethod: SpanMethod = SPAN_METHOD;
-            const { colspan = 1, rowspan = 1 } =
-                spanMethod({
-                    row: this.row,
-                    rowIndex: this.rowIndex,
-                    colIndex: this.colIndex,
-                    column: this.column,
-                    value: this.getValue(),
-                    headIndex: this.ctx.body.headIndex,
-                    headPosition: this.ctx.database.getPositionForRowIndex(this.ctx.body.headIndex),
-                    visibleRows: this.ctx.body.visibleRows,
-                    visibleLeafColumns: this.ctx.header.visibleLeafColumns,
-                    rows: this.ctx.body.data,
-                }) || {};
+            const {
+                colspan = 1,
+                rowspan = 1,
+                relationRowKeys,
+                relationColKeys,
+                mergeRow = false,
+                mergeCol = false,
+            } = spanMethod({
+                row: this.row,
+                rowIndex: this.rowIndex,
+                colIndex: this.colIndex,
+                column: this.column,
+                value: this.getValue(),
+                headIndex: this.ctx.body.headIndex,
+                headPosition: this.ctx.database.getPositionForRowIndex(this.ctx.body.headIndex),
+                visibleRows: this.ctx.body.visibleRows,
+                visibleLeafColumns: this.ctx.header.visibleLeafColumns,
+                rows: this.ctx.body.data,
+            }) || {};
+            if (Array.isArray(relationRowKeys) && relationRowKeys.length > 0) {
+                this.relationRowKeys = relationRowKeys;
+            } else {
+                this.relationRowKeys = [this.key];
+            }
+            if (Array.isArray(relationColKeys) && relationColKeys.length > 0) {
+                this.relationColKeys = relationColKeys;
+            } else {
+                this.relationColKeys = [this.key];
+            }
+            this.mergeCol = mergeCol;
+            this.mergeRow = mergeRow;
             this.colspan = colspan;
             this.rowspan = rowspan;
             this.visibleWidth = this.getWidthByColIndexColSpan(this.colIndex, this.colspan);
             this.visibleHeight = this.ctx.database.getHeightByRowIndexRowSpan(this.rowIndex, this.rowspan);
+        }
+    }
+    updateSpanInfo() {
+        // 列合并单元格
+        if (this.mergeRow || this.mergeCol) {
+            const spanInfo = this.getSpanInfo();
+            this.height = spanInfo.height;
+            this.width = spanInfo.width;
+            this.drawX = this.getDrawX();
+            this.drawY = this.getDrawY();
+            this.drawY -= spanInfo.offsetTop;
+            this.drawX -= spanInfo.offsetLeft;
         }
     }
     updateType() {
@@ -468,7 +507,10 @@ export default class Cell extends BaseCell {
             }
         }
     }
-
+    // 过去跨度配置
+    getSpanInfo(): SpanInfo {
+        return this.ctx.database.getSpanInfo(this);
+    }
     /**
      * 获取显示文本
      * @returns
@@ -559,6 +601,10 @@ export default class Cell extends BaseCell {
     }
     getValue() {
         return this.ctx.database.getItemValue(this.rowKey, this.key);
+    }
+    // 拓展格子可设置数据
+    setValue(value: any) {
+        this.ctx.setItemValueByEditor(this.rowKey, this.key, value);
     }
     /**
      * 获取样式
@@ -726,6 +772,9 @@ export default class Cell extends BaseCell {
         }
         // 没有错误消息
         if (!this.message) {
+            return;
+        }
+        if (this.rowspan === 0 || this.colspan === 0) {
             return;
         }
         const { ERROR_TIP_ICON_SIZE, ERROR_TIP_COLOR } = this.ctx.config;

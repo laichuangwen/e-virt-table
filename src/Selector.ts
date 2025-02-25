@@ -1,7 +1,7 @@
 import type Context from './Context';
 import type Cell from './Cell';
 import type CellHeader from './CellHeader';
-import { BeforePasteChangeMethod, ChangeItem } from './types';
+import { BeforePasteDataMethod, BeforeSetSelectorMethod, ChangeItem, ErrorType, BeforeCopyMethod } from './types';
 import { throttle, decodeSpreadsheetStr, encodeToSpreadsheetStr } from './util';
 export default class Selector {
     private isCut = false;
@@ -78,6 +78,7 @@ export default class Selector {
             e.preventDefault();
             this.isMultipleRow = false;
             this.click(e.shiftKey);
+            this.ctx.emit('selectorClick', cell);
         });
         this.ctx.on('mouseup', () => {
             this.mousedownHeader = false;
@@ -233,18 +234,110 @@ export default class Selector {
             }
             // 聚焦，解决iframe键盘事件不触发
             this.ctx.stageElement.focus();
+            // 启用合并单元格关联
+            if (this.ctx.config.ENABLE_MERGE_CELL_LINK) {
+                const adjustMerge = this.adjustMergeCells(_xArr, _yArr);
+                // 合并单元格时，调整选择器的位置
+                minY = adjustMerge.yArr[0];
+                maxY = adjustMerge.yArr[1];
+                minX = adjustMerge.xArr[0];
+                maxX = adjustMerge.xArr[1];
+                // 只有一个合并单元格时
+                this.ctx.onlyMergeCell = adjustMerge.onlyMergeCell;
+            }
             if (minX === maxX && minY === maxY) {
                 this.ctx.selectOnlyOne = true;
             } else {
                 this.ctx.selectOnlyOne = false;
             }
-            this.ctx.selector.xArr = [Math.max(areaMinX, minX), Math.min(areaMaxX, maxX)];
-            this.ctx.selector.yArr = [Math.max(areaMinY, minY), Math.min(areaMaxY, maxY)];
+            _xArr = [Math.max(areaMinX, minX), Math.min(areaMaxX, maxX)];
+            _yArr = [Math.max(areaMinY, minY), Math.min(areaMaxY, maxY)];
+            // 调整选择器的位置前回调
+            const { BEFORE_SET_SELECTOR_METHOD } = this.ctx.config;
+            if (typeof BEFORE_SET_SELECTOR_METHOD === 'function') {
+                const beforeSetSelectorMethod: BeforeSetSelectorMethod = BEFORE_SET_SELECTOR_METHOD;
+                const res = beforeSetSelectorMethod({
+                    focusCell: this.ctx.focusCell,
+                    xArr: _xArr,
+                    yArr: _yArr,
+                });
+                if (!res) {
+                    return;
+                }
+                _xArr = res.xArr;
+                _yArr = res.yArr;
+            }
+            this.ctx.selector.xArr = _xArr;
+            this.ctx.selector.yArr = _yArr;
             this.ctx.emit('setSelector', this.ctx.selector);
             this.ctx.emit('drawView');
         }
     }
-
+    private adjustMergeCells(xArr: number[], yArr: number[]) {
+        const [minY, maxY] = yArr;
+        const [minX, maxX] = xArr;
+        let topBottomCells: Cell[] = [];
+        let leftRightCells: Cell[] = [];
+        // 遍历选择中的单元格
+        for (let ri = 0; ri <= yArr[1] - yArr[0]; ri++) {
+            for (let ci = 0; ci <= xArr[1] - xArr[0]; ci++) {
+                const rowIndex = ri + yArr[0];
+                const colIndex = ci + xArr[0];
+                const cell = this.ctx.database.getVirtualBodyCell(rowIndex, colIndex);
+                if (cell) {
+                    // 顶部和底部的单元格
+                    if (rowIndex === minY || rowIndex === maxY) {
+                        topBottomCells.push(cell);
+                    }
+                    // 左右的单元格
+                    if (colIndex === minX || colIndex === maxX) {
+                        leftRightCells.push(cell);
+                    }
+                }
+            }
+        }
+        const topBottomBoundary = topBottomCells.reduce(
+            (prev, cell) => {
+                const { yArr } = cell.getSpanInfo();
+                const [topIndex, bottomIndex] = yArr;
+                prev.minY = Math.min(prev.minY, topIndex);
+                prev.maxY = Math.max(prev.maxY, bottomIndex);
+                return prev;
+            },
+            {
+                minY,
+                maxY,
+            },
+        );
+        const leftRightBoundary = leftRightCells.reduce(
+            (prev, cell) => {
+                const { xArr } = cell.getSpanInfo();
+                const [leftIndex, rightIndex] = xArr;
+                prev.minX = Math.min(prev.minX, leftIndex);
+                prev.maxX = Math.max(prev.maxX, rightIndex);
+                return prev;
+            },
+            {
+                minX,
+                maxX,
+            },
+        );
+        const _xArr = [leftRightBoundary.minX, leftRightBoundary.maxX];
+        const _yArr = [topBottomBoundary.minY, topBottomBoundary.maxY];
+        let onlyMergeCell = false;
+        // Check if the selected area is a single merged cell
+        if (leftRightBoundary.minX !== leftRightBoundary.maxX || topBottomBoundary.minY !== topBottomBoundary.maxY) {
+            const selectorStr = JSON.stringify(_xArr) + JSON.stringify(_yArr);
+            const spanInfo = this.ctx.focusCell?.getSpanInfo();
+            const spanStr = spanInfo && JSON.stringify(spanInfo.xArr) + JSON.stringify(spanInfo.yArr);
+            onlyMergeCell = spanStr === selectorStr;
+        }
+        return {
+            xArr: _xArr,
+            yArr: _yArr,
+            onlyMergeCell,
+        };
+    }
     private selectCols(cell: CellHeader) {
         // 启用单选就不能批量选中
         if (this.ctx.config.ENABLE_SELECTOR_SINGLE) {
@@ -432,7 +525,41 @@ export default class Selector {
         if (!this.ctx.config.ENABLE_COPY) {
             return;
         }
-        const { value } = this.ctx.getSelectedData();
+        let { value, xArr, yArr } = this.ctx.getSelectedData();
+        if (this.ctx.config.ENABLE_MERGE_CELL_LINK && this.ctx.database.hasMergeCell(xArr, yArr)) {
+            if (this.ctx.onlyMergeCell && this.ctx.focusCell) {
+                const cell = this.ctx.focusCell;
+                value = [[cell.getValue()]];
+                xArr = [cell.colIndex, cell.colIndex];
+                yArr = [cell.rowIndex, cell.rowIndex];
+            } else {
+                const err: ErrorType = {
+                    code: 'ERR_MERGED_CELLS_COPY',
+                    message: 'Merged cells cannot span copy data',
+                };
+                if (this.ctx.hasEvent('error')) {
+                    this.ctx.emit('error', err);
+                } else {
+                    alert(err.message);
+                }
+                return;
+            }
+        }
+        // 复制前回调
+        const { BEFORE_COPY_METHOD } = this.ctx.config;
+        if (typeof BEFORE_COPY_METHOD === 'function') {
+            const beforeCopyMethod: BeforeCopyMethod = BEFORE_COPY_METHOD;
+            const res = beforeCopyMethod({
+                focusCell: this.ctx.focusCell,
+                data: value,
+                xArr,
+                yArr,
+            });
+            if (!res) {
+                return;
+            }
+            value = res.data;
+        }
         const text = encodeToSpreadsheetStr(value);
         if (navigator.clipboard) {
             navigator.clipboard
@@ -507,6 +634,27 @@ export default class Selector {
                 .readText()
                 .then(async (val) => {
                     let textArr = decodeSpreadsheetStr(val);
+                    const _xArr = [colIndex, colIndex + textArr[0].length - 1];
+                    const _yArr = [rowIndex, rowIndex + textArr.length - 1];
+                    // textArr只有一个
+                    const isOneData = textArr.length === 1 && textArr[0].length === 1;
+                    // 启用合并时禁用粘贴填充
+                    if (
+                        this.ctx.config.ENABLE_MERGE_CELL_LINK &&
+                        this.ctx.database.hasMergeCell(_xArr, _yArr) &&
+                        !isOneData
+                    ) {
+                        const err: ErrorType = {
+                            code: 'ERR_MERGED_CELLS_PASTE',
+                            message: 'Merged cells cannot span paste data',
+                        };
+                        if (this.ctx.hasEvent('error')) {
+                            this.ctx.emit('error', err);
+                        } else {
+                            alert(err.message);
+                        }
+                        return;
+                    }
                     let changeList: ChangeItem[] = [];
                     for (let ri = 0; ri <= textArr.length - 1; ri++) {
                         const len = textArr[ri].length;
@@ -555,9 +703,9 @@ export default class Selector {
                         return;
                     }
                     // 剪贴板内容改变前回调
-                    const { BEFORE_PASTE_CHANGE_METHOD } = this.ctx.config;
-                    if (typeof BEFORE_PASTE_CHANGE_METHOD === 'function') {
-                        const beforePasteChangeMethod: BeforePasteChangeMethod = BEFORE_PASTE_CHANGE_METHOD;
+                    const { BEFORE_PASTE_DATA_METHOD } = this.ctx.config;
+                    if (typeof BEFORE_PASTE_DATA_METHOD === 'function') {
+                        const beforePasteDataMethod: BeforePasteDataMethod = BEFORE_PASTE_DATA_METHOD;
                         const _changeList = changeList.map((item) => ({
                             rowKey: item.rowKey,
                             key: item.key,
@@ -565,12 +713,15 @@ export default class Selector {
                             oldValue: this.ctx.database.getItemValue(item.rowKey, item.key),
                             row: this.ctx.database.getRowDataItemForRowKey(item.rowKey),
                         }));
-                        changeList = await beforePasteChangeMethod(_changeList);
+                        changeList = await beforePasteDataMethod(_changeList, _xArr, _yArr);
+                        if (changeList && !changeList.length) {
+                            return;
+                        }
                     }
                     // 清除复制线
                     this.clearCopyLine();
                     // 批量设置数据，并记录历史
-                    this.ctx.database.batchSetItemValue(changeList, true);
+                    this.ctx.batchSetItemValueByEditor(changeList, true);
                     let rows: any[] = [];
                     rowKeyList.forEach((rowKey) => {
                         rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
@@ -755,35 +906,40 @@ export default class Selector {
             body,
             scrollX,
             scrollY,
-            config: { SCROLLER_TRACK_SIZE, FOOTER_FIXED, FOOTER_POSITION },
+            config: { SCROLLER_TRACK_SIZE, FOOTER_FIXED, FOOTER_POSITION, ENABLE_MERGE_CELL_LINK },
         } = this.ctx;
         if (!focusCell) {
             return;
         }
+        // 处理合并的单元格的移动
+        if (ENABLE_MERGE_CELL_LINK && this.ctx.onlyMergeCell) {
+            focusCell.updateSpanInfo();
+        }
+        const { drawX, drawY, width, height, fixed } = focusCell;
         // 加1补选中框的边框,且可以移动滚动，以为getCell是获取渲染的cell
-        const diffLeft = fixedLeftWidth - focusCell.drawX + 1;
-        const diffRight = focusCell.drawX + focusCell.width - (stageWidth - fixedRightWidth) + 1;
-        let diffTop = header.height - focusCell.drawY;
+        const diffLeft = fixedLeftWidth - drawX + 1;
+        const diffRight = focusCell.drawX + width - (stageWidth - fixedRightWidth) + 1;
+        let diffTop = header.height - drawY;
         // 格子大于可视高度就取可视高度，防止上下跳动
-        let cellheight = focusCell.height;
+        let cellheight = height;
         if (cellheight > body.visibleHeight) {
             cellheight = body.visibleHeight;
         }
         let footerHeight = 0;
         if (FOOTER_FIXED) {
             if (FOOTER_POSITION === 'top') {
-                diffTop = header.height + footer.height - focusCell.drawY;
+                diffTop = header.height + footer.height - drawY;
             } else {
                 footerHeight = footer.visibleHeight;
             }
         }
-        const diffBottom = focusCell.drawY + cellheight - (stageHeight - footerHeight - SCROLLER_TRACK_SIZE);
+        const diffBottom = drawY + cellheight - (stageHeight - footerHeight - SCROLLER_TRACK_SIZE);
         let _scrollX = scrollX;
         let _scrollY = scrollY;
         // fixed禁用左右横向移动
-        if (diffRight > 0 && !focusCell.fixed) {
+        if (diffRight > 0 && !fixed) {
             _scrollX = Math.floor(scrollX + diffRight);
-        } else if (diffLeft > 0 && !focusCell.fixed) {
+        } else if (diffLeft > 0 && !fixed) {
             _scrollX = Math.floor(scrollX - diffLeft);
         }
         if (diffTop > 0) {

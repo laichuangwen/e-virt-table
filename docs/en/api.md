@@ -85,6 +85,7 @@ type EVirtTableOptions = {
 | ENABLE_SELECTOR_SPAN_ROW | Enable selector for batch row selection | boolean | — | true |
 | ENABLE_SELECTOR_ALL_ROWS | Enable selector for all rows | boolean | — | true |
 | ENABLE_SELECTOR_ALL_COLS | Enable selector for all columns | boolean | — | true |
+| ENABLE_MERGE_CELL_LINK | Enable merge cell data association | boolean | — | false |
 | ENABLE_AUTOFILL | Enable autofill | boolean | — | true |
 | ENABLE_CONTEXT_MENU | Enable context menu | boolean | — | true |
 | ENABLE_COPY | Enable copy | boolean | — | true |
@@ -119,9 +120,12 @@ type EVirtTableOptions = {
 | SPAN_METHOD | Custom span method for column/row rendering | ^[Function]`({row, column, rowIndex, colIndex,value,visibleLeafColumns,headIndex,headPosition,visibleRows,rows})=>SpanType` | — | — |
 | SELECTABLE_METHOD | Custom selectable method | ^[Function]`({row, rowIndex})=>boolean\|void` | — | — |
 | EXPAND_LAZY_METHOD | Tree lazy load expand method | ^[Function]`({row, column, rowIndex, colIndex,value})=>Promise<any[]>` | — | — |
-| BEFORE_VALUE_CHANGE_METHOD | Callback before value change | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
-| BEFORE_PASTE_CHANGE_METHOD | Callback before paste change | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
-| BEFORE_AUTOFILL_CHANGE_METHOD | Callback before autofill change | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — | — |
+| BEFORE_VALUE_CHANGE_METHOD | Callback before value change | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — | — |
+| BEFORE_PASTE_DATA_METHOD | Callback before paste change | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — | — |
+| BEFORE_AUTOFILL_DATA_METHOD | Callback before autofill change | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — | — |
+| BEFORE_SET_SELECTOR_METHOD | Callback before setting selector | ^[Function]`(BeforeSetSelectorParams)=>BeforeSetSelectorParams\|viod` | — |
+| BEFORE_SET_AUTOFILL_METHOD | Callback before setting autofill | ^[Function]`(BeforeSetAutofillParams)=>BeforeSetAutofillParams\|viod` | — |
+| BEFORE_COPY_METHOD | Callback before copying data | ^[Function]`(BeforeCopyParams)=>BeforeCopyParams\|viod` | — |
 
 ## Events
 
@@ -161,6 +165,7 @@ type EVirtTableOptions = {
 | mousedown | Callback for mouse down | — |
 | mousemove | Callback for mouse move | — |
 | keydown | Callback for key down | — |
+| error | Error callback | — |
 
 ## Methods
 
@@ -204,6 +209,7 @@ type EVirtTableOptions = {
 | toggleAllSelection     | Toggle selection for all rows | —                                                         |
 | getPositionForRowIndex | Get position for row index    | —                                                         |
 | getCellValue           | Get cell value by rowKey and key | (rowKey, key)                                           |
+| getUtils               | Get utility methods, such as built-in merge row and column methods | —                     
 | contextMenuHide        | Hide context menu             | —                                                         |
 | destroy                | Destroy                       | —                                                         |
 
@@ -292,12 +298,28 @@ type ChangeItem = {
     key: string;
     rowKey: string;
 };
-type BeforeChangeParams = {
+type BeforeChangeItem = {
     rowKey: string;
     key: string;
     value: any;
     oldValue: any;
     row: any;
+};
+type BeforeSetSelectorParams = {
+    focusCell?: Cell;
+    xArr: number[];
+    yArr: number[];
+};
+type BeforeSetAutofillParams = {
+    focusCell?: Cell;
+    xArr: number[];
+    yArr: number[];
+};
+type BeforeCopyParams = {
+    focusCell?: Cell;
+    data: any;
+    xArr: number[];
+    yArr: number[];
 };
 type CellStyleOptions = {
     color?: string;

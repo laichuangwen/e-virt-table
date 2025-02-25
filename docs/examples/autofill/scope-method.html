@@ -18,6 +18,7 @@
                 city: 'Los Angeles',
                 address: 'No. 189, Grove St, Los Angeles',
                 zip: 'CA 90036',
+                _readonly: true,
             },
             {
                 date: '2016-05-02',
@@ -66,6 +67,7 @@
                 city: 'Los Angeles',
                 address: 'No. 189, Grove St, Los Angeles',
                 zip: 'CA 90036',
+                _readonly: true,
             },
         ];
         let columns = [
@@ -73,10 +75,7 @@
                 type: 'index',
                 key: 'index',
                 width: 50,
-            },
-            {
-                title: 'Date',
-                key: 'date',
+                operation: true, // enable operation
             },
             {
                 title: 'Name',
@@ -94,10 +93,12 @@
                 title: 'Address',
                 key: 'address',
                 width: 200,
+                readonly: true,
             },
             {
                 title: 'Zip',
                 key: 'zip',
+                readonly: true,
             },
         ];
         const target = document.getElementById('e-virt-table');
@@ -107,20 +108,21 @@
             config: {
                 ENABLE_SELECTOR: true,
                 ENABLE_AUTOFILL: true,
-                BEFORE_AUTOFILL_DATA_METHOD: (changeList) => {
-                    return new Promise((resolve) => {
-                        setTimeout(() => {
-                            console.log('BEFORE_PASTE_DATA_METHOD', changeList);
-                            const ll = changeList.map((item) => {
-                                const { value } = item;
-                                return {
-                                    ...item,
-                                    value: `${value}_autofill`,
-                                };
-                            });
-                            resolve(ll);
-                        }, 1000);
-                    });
+                BEFORE_SET_AUTOFILL_METHOD: (scope) => {
+                    const { focusCell, xArr, yArr } = scope;
+                    let [minX, maxX] = xArr;
+                    let [minY, maxY] = yArr;
+                    if (minX < 1 || maxX > columns.length - 3 || minY < 1 || maxY > data.length - 2) {
+                        console.error('只能选择Name、State、City列');
+                        return;
+                    }
+                    // 只能选择一列
+                    if (focusCell) {
+                        return {
+                            ...scope,
+                            xArr: [focusCell.colIndex, focusCell.colIndex],
+                        };
+                    }
                 },
             },
         });

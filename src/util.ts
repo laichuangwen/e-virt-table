@@ -1,4 +1,4 @@
-import { Column } from './types';
+import { Column, SpanParams } from './types';
 
 function generateShortUUID(): string {
     return 'xxxxxxxxxxxxxxxxxx'.replace(/[x]/g, function (c) {
@@ -244,6 +244,93 @@ function encodeToSpreadsheetStr(arr: string[][]) {
 
     return str;
 }
+// 获取合并单元格的spanArr,针对行数据相同key合并
+function getSpanArrByRow(list: any, key: string, relationRowKeys: string[] = []) {
+    let contactDot = 0;
+    const spanArr: number[] = [];
+    list.forEach((item: any, index: number) => {
+        if (index === 0) {
+            spanArr.push(1);
+        } else {
+            const curValue = relationRowKeys.reduce((acc, key) => `${acc}${item[key] ?? ''}`, '') || item[key];
+            const pValue =
+                relationRowKeys.reduce((acc, key) => `${acc}${list[index - 1][key] ?? ''}`, '') || list[index - 1][key];
+            if (curValue === pValue) {
+                spanArr[contactDot] += 1;
+                spanArr.push(0);
+            } else {
+                spanArr.push(1);
+                contactDot = index;
+            }
+        }
+    });
+    return spanArr;
+}
+function getSpanObjByColumn(row: any, columns: any) {
+    let keyPre = '';
+    let keyDot = '';
+    const spanObj: any = {};
+    columns.forEach((item: any, index: number) => {
+        if (index === 0) {
+            keyPre = item.key;
+            keyDot = item.key;
+            spanObj[item.key] = 1;
+        } else {
+            // eslint-disable-next-line no-undef
+            if (row[item.key] === row[keyPre]) {
+                spanObj[item.key] = 0;
+                spanObj[keyDot] += 1;
+            } else {
+                spanObj[item.key] = 1;
+                keyPre = item.key;
+                keyDot = item.key;
+            }
+        }
+    });
+    return spanObj;
+}
+// 合并行单元格
+function mergeRowCell(params: SpanParams, mergeRowkey: string, relationRowKeys: string[] = []) {
+    // 合并单元格
+    const { visibleRows, rowIndex, headIndex } = params;
+    const spanArr = getSpanArrByRow(visibleRows, mergeRowkey, relationRowKeys);
+    if (spanArr[rowIndex - headIndex] === 0) {
+        return {
+            rowspan: 0,
+            colspan: 0,
+            relationRowKeys,
+            mergeRow: true,
+        };
+    }
+    return {
+        rowspan: spanArr[rowIndex - headIndex],
+        colspan: 1,
+        relationRowKeys,
+        mergeRow: true,
+    };
+}
+function mergeColCell(params: SpanParams, mergeColKeys: string[] = []) {
+    const { column, row, visibleLeafColumns } = params;
+    const columns = visibleLeafColumns.filter((item) => mergeColKeys.includes(item.key));
+    // 合并动态列单元格
+    if (mergeColKeys.includes(column.key)) {
+        const spanObj = getSpanObjByColumn(row, columns);
+        if (spanObj[column.key] === 0) {
+            return {
+                rowspan: 0,
+                colspan: 0,
+                relationColKeys: mergeColKeys,
+                mergeCol: true,
+            };
+        }
+        return {
+            rowspan: 1,
+            colspan: spanObj[column.key],
+            relationColKeys: mergeColKeys,
+            mergeCol: true,
+        };
+    }
+}
 export {
     debounce,
     throttle,
@@ -254,4 +341,8 @@ export {
     getMaxRow,
     decodeSpreadsheetStr,
     encodeToSpreadsheetStr,
+    mergeRowCell,
+    mergeColCell,
+    getSpanArrByRow,
+    getSpanObjByColumn,
 };

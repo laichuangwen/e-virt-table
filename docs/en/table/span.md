@@ -31,3 +31,24 @@ h:430px
 span/dynamic
 h:430px
 :::
+
+## Tool-based Merge Method
+> Note: This tool can only merge columns or rows individually. For more flexible scenarios, please refer to the examples above to implement your own solution.
+- The following example demonstrates multi-level row and column merging using the tool.
+
+::: demo
+
+span/tool
+h:430px
+:::
+
+## Merge Data Association
+> The above tool example merges data without association, you can compare the differences.
+- When merging data with association, if the data in the merged cells changes, it will automatically update the data in other related cells.
+- When merging data with association, be aware that copying, pasting, and filling cells may cause error prompts. If you do not want to use the system's default prompt box, you can listen to the `error` event for custom handling.
+
+::: demo
+
+span/relation
+h:430px
+:::

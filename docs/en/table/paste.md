@@ -8,12 +8,12 @@ Pasting requires enabling the selector and keyboard
 | ------------------------ | ----------------------- | -------  | ------ |
 | ENABLE_COPY | Enable Copy | boolean  | true |
 | ENABLE_PASTER | Enable Paste | boolean  | true |
-| BEFORE_PASTE_CHANGE_METHOD | Callback before paste | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — |
+| BEFORE_PASTE_DATA_METHOD | Callback before paste | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — |
 
 ## Typings
 
 ``` ts
-type BeforeChangeParams = {
+type BeforeChangeItem = {
     rowKey: string;
     key: string;
     value: any;
@@ -46,9 +46,18 @@ h:320px
 
 ## Before Paste Data Change
 
-- BEFORE_AUTOFILL_CHANGE_METHOD can modify paste data, supports Promise
+- BEFORE_AUTOFILL_DATA_METHOD can modify paste data, supports Promise
 
 ::: demo
 paste/before-change
+h:320px
+:::
+
+## Before Copy Data Change
+
+- BEFORE_COPY_METHOD
+
+::: demo
+paste/before-copy
 h:320px
 :::

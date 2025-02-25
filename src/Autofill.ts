@@ -1,5 +1,6 @@
 import type Context from './Context';
 import type Cell from './Cell';
+import { BeforeSetAutofillMethod, ErrorType } from './types';
 export default class Autofill {
     private ctx: Context;
     constructor(ctx: Context) {
@@ -110,8 +111,25 @@ export default class Autofill {
             if (minY < areaMinY) {
                 return;
             }
-            this.ctx.autofill.xArr = [Math.max(areaMinX, minX), Math.min(areaMaxX, maxX)];
-            this.ctx.autofill.yArr = [Math.max(areaMinY, minY), Math.min(areaMaxY, maxY)];
+            _xArr = [Math.max(areaMinX, minX), Math.min(areaMaxX, maxX)];
+            _yArr = [Math.max(areaMinY, minY), Math.min(areaMaxY, maxY)];
+            // 调整选择器的位置前回调
+            const { BEFORE_SET_AUTOFILL_METHOD } = this.ctx.config;
+            if (typeof BEFORE_SET_AUTOFILL_METHOD === 'function') {
+                const beforeSetAutofillMethod: BeforeSetAutofillMethod = BEFORE_SET_AUTOFILL_METHOD;
+                const res = beforeSetAutofillMethod({
+                    focusCell: this.ctx.focusCell,
+                    xArr: _xArr,
+                    yArr: _yArr,
+                });
+                if (!res) {
+                    return;
+                }
+                _xArr = res.xArr;
+                _yArr = res.yArr;
+            }
+            this.ctx.autofill.xArr = _xArr;
+            this.ctx.autofill.yArr = _yArr;
             this.ctx.emit('setAutofill', this.ctx.autofill);
             this.ctx.emit('draw');
         }
@@ -136,7 +154,20 @@ export default class Autofill {
         const yStep = value.length;
         const xArr = this.ctx.autofill.xArr;
         const yArr = this.ctx.autofill.yArr;
-
+        const isOneValue = xStep === 1 && yStep === 1;
+        // 禁用跨越填充
+        if (this.ctx.config.ENABLE_MERGE_CELL_LINK && this.ctx.database.hasMergeCell(xArr, yArr) && !isOneValue) {
+            const err: ErrorType = {
+                code: 'ERR_MERGED_CELLS_AUTOFILL',
+                message: 'Merged cells cannot span autofill data',
+            };
+            if (this.ctx.hasEvent('error')) {
+                this.ctx.emit('error', err);
+            } else {
+                alert(err.message);
+            }
+            return;
+        }
         let changeList = [];
         for (let ri = 0; ri <= yArr[1] - yArr[0]; ri++) {
             for (let ci = 0; ci <= xArr[1] - xArr[0]; ci++) {
@@ -164,10 +195,13 @@ export default class Autofill {
         if (!changeList.length) {
             return;
         }
+        // 设置选择器为填充位置
+        this.ctx.selector.xArr = this.ctx.autofill.xArr;
+        this.ctx.selector.yArr = this.ctx.autofill.yArr;
         // 填充内容改变前回调
-        const { BEFORE_AUTOFILL_CHANGE_METHOD } = this.ctx.config;
-        if (typeof BEFORE_AUTOFILL_CHANGE_METHOD === 'function') {
-            const beforeAutofillChangeMethod = BEFORE_AUTOFILL_CHANGE_METHOD;
+        const { BEFORE_AUTOFILL_DATA_METHOD } = this.ctx.config;
+        if (typeof BEFORE_AUTOFILL_DATA_METHOD === 'function') {
+            const beforeAutofillDataMethod = BEFORE_AUTOFILL_DATA_METHOD;
             const _changeList = changeList.map((item) => ({
                 rowKey: item.rowKey,
                 key: item.key,
@@ -175,13 +209,13 @@ export default class Autofill {
                 oldValue: this.ctx.database.getItemValue(item.rowKey, item.key),
                 row: this.ctx.database.getRowDataItemForRowKey(item.rowKey),
             }));
-            changeList = await beforeAutofillChangeMethod(_changeList);
+            changeList = await beforeAutofillDataMethod(_changeList, xArr, yArr);
+            if (changeList && !changeList.length) {
+                return;
+            }
         }
-        // 设置选择器为填充位置
-        this.ctx.selector.xArr = this.ctx.autofill.xArr;
-        this.ctx.selector.yArr = this.ctx.autofill.yArr;
         // 批量设置数据，并记录历史
-        this.ctx.database.batchSetItemValue(changeList, true);
+        this.ctx.batchSetItemValueByEditor(changeList, true);
         let rows: any[] = [];
         rowKeyList.forEach((rowKey) => {
             rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));

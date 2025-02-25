@@ -1,8 +1,11 @@
 import { IconType } from './Icons';
 import {
-    BeforeAutofillChangeMethod,
+    BeforeAutofillDataMethod,
     BeforeCellValueChangeMethod,
-    BeforePasteChangeMethod,
+    BeforeCopyMethod,
+    BeforePasteDataMethod,
+    BeforeSetAutofillMethod,
+    BeforeSetSelectorMethod,
     CellEditorMethod,
     CellHeaderStyleMethod,
     CellHoverIconMethod,
@@ -95,6 +98,7 @@ export default class Config {
     ENABLE_SELECTOR_SPAN_ROW = true;
     ENABLE_SELECTOR_ALL_ROWS = true;
     ENABLE_SELECTOR_ALL_COLS = true;
+    ENABLE_MERGE_CELL_LINK = false; // 启用合并选择器关联
     ENABLE_AUTOFILL = false;
     ENABLE_CONTEXT_MENU = false;
     ENABLE_COPY = true;
@@ -137,8 +141,11 @@ export default class Config {
     SELECTABLE_METHOD?: SelectableMethod;
     EXPAND_LAZY_METHOD?: ExpandLazyMethod;
     BEFORE_VALUE_CHANGE_METHOD?: BeforeCellValueChangeMethod;
-    BEFORE_PASTE_CHANGE_METHOD?: BeforePasteChangeMethod;
-    BEFORE_AUTOFILL_CHANGE_METHOD?: BeforeAutofillChangeMethod;
+    BEFORE_PASTE_DATA_METHOD?: BeforePasteDataMethod;
+    BEFORE_AUTOFILL_DATA_METHOD?: BeforeAutofillDataMethod;
+    BEFORE_SET_SELECTOR_METHOD?: BeforeSetSelectorMethod;
+    BEFORE_SET_AUTOFILL_METHOD?: BeforeSetAutofillMethod;
+    BEFORE_COPY_METHOD?: BeforeCopyMethod;
     constructor(config: Partial<Config>) {
         Object.assign(this, config);
     }

@@ -1,5 +1,6 @@
 import EVirtTable from './src/EVirtTable';
-import { Column } from './src/types';
+import { BeforeCopyParams, BeforeSetSelectorParams, Column } from './src/types';
+// import { mergeColCell, mergeRowCell } from './src/util';
 
 const canvas = document.getElementById('e-virt-table') as HTMLDivElement;
 const columns: Column[] = [
@@ -41,21 +42,25 @@ const columns: Column[] = [
         sort: 7,
         fixed: 'left',
         align: 'left',
+        // editorType: 'none',
         verticalAlign: 'middle',
         // hide: true,
-        renderFooter: (pEl, cell) => {
-            const cellEl = document.createElement('div');
-            cellEl.style.width = '100%';
-            cellEl.style.height = '100%';
-            cellEl.style.opacity = '0.5';
-            cellEl.style.backgroundColor = 'cyan';
-            cellEl.style.display = 'flex';
-            cellEl.style.justifyContent = 'center';
-            cellEl.style.alignItems = 'center';
+        // render: (pEl, cell) => {
+        //     const cellEl = document.createElement('div');
+        //     cellEl.addEventListener('click', () => {
+        //         console.log('点击了姓名');
+        //     });
+        //     cellEl.style.width = '100%';
+        //     cellEl.style.height = '100%';
+        //     cellEl.style.opacity = '0.5';
+        //     cellEl.style.backgroundColor = 'cyan';
+        //     cellEl.style.display = 'flex';
+        //     cellEl.style.justifyContent = 'center';
+        //     cellEl.style.alignItems = 'center';
 
-            cellEl.innerHTML = cell.text;
-            pEl.appendChild(cellEl);
-        },
+        //     cellEl.innerHTML = cell.text;
+        //     pEl.appendChild(cellEl);
+        // },
         // render: "emp_name",
     },
     // {
@@ -366,10 +371,11 @@ for (let i = 0; i < 800; i += 1) {
         id: i,
         // _readonly: true,
         emp_img: 'https://devtest-oss-r.bananain.cn/wechat-mall/2024/08/27/1724754260406/20240827-182345.jpg',
-        emp_name: `张三${i % 30 ? 1 : 0}`,
-        emp_name11: `11张三${i}`,
-        emp_name22: `22张三${i}`,
-        emp_name2: `2张三${i}`,
+        emp_name: `张三${i % 5 ? 1 : 0}`,
+        emp_name11: `张三${i % 5 ? 1 : 0}`,
+        emp_name221: `张三${i % 5 ? 1 : 0}`,
+        emp_name222: `张三${i % 5 ? 1 : 0}`,
+        emp_name2: `张三${i % 5 ? 1 : 0}`,
         emp_no: i,
         dep_name: ['zhinan', 'shejiyuanze', 'yizhi'],
         job_name: i === 5 ? '产品经理测试很长的名字' : `产品经理${i}`,
@@ -415,64 +421,6 @@ for (let i = 0; i < 0; i += 1) {
         align: 'right',
     });
 }
-// 获取合并单元格的spanArr,针对行数据相同key合并
-const getSpanArrByRow = (list: any, key: string) => {
-    let contactDot = 0;
-    const spanArr: number[] = [];
-    list.forEach((item: any, index: number) => {
-        if (index === 0) {
-            spanArr.push(1);
-        } else {
-            if (item[key] === list[index - 1][key]) {
-                spanArr[contactDot] += 1;
-                spanArr.push(0);
-            } else {
-                spanArr.push(1);
-                contactDot = index;
-            }
-        }
-    });
-    return spanArr;
-};
-const getSpanObjByColumn = (row: any, columns: any) => {
-    let keyPre = '';
-    let keyDot = '';
-    const spanObj: any = {};
-    columns.forEach((item: any, index: number) => {
-        if (index === 0) {
-            keyPre = item.key;
-            keyDot = item.key;
-            spanObj[item.key] = 1;
-        } else {
-            // eslint-disable-next-line no-undef
-            if (row[item.key] === row[keyPre]) {
-                spanObj[item.key] = 0;
-                spanObj[keyDot] += 1;
-            } else {
-                spanObj[item.key] = 1;
-                keyPre = item.key;
-                keyDot = item.key;
-            }
-        }
-    });
-    return spanObj;
-};
-// 合并行单元格
-const mergeRowCell = (data: any, key: string) => {
-    // 合并单元格
-    const { visibleRows, rowIndex, headIndex } = data;
-    const spanArr = getSpanArrByRow(visibleRows, key);
-    if (spanArr[rowIndex - headIndex] === 0) {
-        return {
-            rowspan: 0,
-            colspan: 0,
-        };
-    }
-    return {
-        rowspan: spanArr[rowIndex - headIndex],
-        colspan: 1,
-    };
-};
 const overlayerEl = document.getElementById('e-virt-table-overlayer') as HTMLDivElement;
 const editorEl = document.getElementById('e-virt-table-editor') as HTMLDivElement;
 const eVirtTable = new EVirtTable(canvas, {
@@ -502,7 +450,7 @@ const eVirtTable = new EVirtTable(canvas, {
             },
         ],
         // DISABLED: true,
-        HEIGHT: 500,
+        // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
         // ROW_KEY: 'emp_no',
         CELL_HEIGHT: 36,
@@ -511,10 +459,15 @@ const eVirtTable = new EVirtTable(canvas, {
         ENABLE_SELECTOR: true,
         ENABLE_KEYBOARD: true,
         ENABLE_HISTORY: true,
-        ENABLE_OFFSET_HEIGHT: false,
-        HIGHLIGHT_SELECTED_ROW: true,
-        HIGHLIGHT_HOVER_ROW: true,
+        ENABLE_OFFSET_HEIGHT: true,
+        HIGHLIGHT_SELECTED_ROW: false,
+        HIGHLIGHT_HOVER_ROW: false,
+        ENABLE_MERGE_CELL_LINK: true,
+        ENABLE_EDIT_SINGLE_CLICK: false,
         FOOTER_FIXED: true,
+        ENABLE_COPY: true,
+        ENABLE_PASTER: true,
+
         FOOTER_POSITION: 'bottom',
         OFFSET_HEIGHT: 16,
         // SELECTOR_AREA_MAX_X_OFFSET: 1,
@@ -533,6 +486,53 @@ const eVirtTable = new EVirtTable(canvas, {
                 },
             },
         ],
+        // BEFORE_COPY_METHOD: (params: BeforeCopyParams) => {
+        //     const { focusCell, xArr, yArr, data } = params;
+        //     if (focusCell && focusCell.key === 'emp_name') {
+        //         console.error('不能复制emp_name');
+        //         return {
+        //             ...params,
+        //             data: [], // 设置复制内容为空
+        //         };
+        //     }
+        //     if (focusCell && focusCell.key === 'emp_name11') {
+        //         console.log(data);
+
+        //         return {
+        //             ...params,
+        //             data: [],
+        //         };
+        //     }
+        //     return params;
+        // },
+        // BEFORE_SET_SELECTOR_METHOD: (params: BeforeSetSelectorParams) => {
+        //     const { focusCell, xArr, yArr } = params;
+        //     if (focusCell && focusCell.key === 'emp_name') {
+        //         const [minX, maxX] = xArr;
+        //         return {
+        //             ...params,
+        //             xArr: [focusCell.colIndex, focusCell.colIndex],
+        //             yArr,
+        //         };
+        //     }
+        //     return {
+        //         ...params,
+        //     };
+        // },
+        // BEFORE_SET_AUTOFILL_METHOD: (params: BeforeSetSelectorParams) => {
+        //     const { focusCell, xArr, yArr } = params;
+        //     if (focusCell && focusCell.key === 'emp_name') {
+        //         const [minX, maxX] = xArr;
+        //         return {
+        //             ...params,
+        //             xArr: [focusCell.colIndex, focusCell.colIndex],
+        //             yArr,
+        //         };
+        //     }
+        //     return {
+        //         ...params,
+        //     };
+        // },
         // 改变前需要篡改数据
         BEFORE_VALUE_CHANGE_METHOD: (changeList) => {
             return changeList;
@@ -568,36 +568,36 @@ const eVirtTable = new EVirtTable(canvas, {
             //     }, 1000);
             // });
         },
-        // BEFORE_PASTE_CHANGE_METHOD: (changeList) => {
-        //     return new Promise((resolve) => {
-        //         setTimeout(() => {
-        //             console.log('BEFORE_PASTE_CHANGE_METHOD', changeList);
-        //             const ll = changeList.map((item) => {
-        //                 const { value } = item;
-        //                 return {
-        //                     ...item,
-        //                     value: `${value}粘贴`,
-        //                 };
-        //             });
-        //             resolve(ll);
-        //         }, 1000);
-        //     });
-        // },
-        // BEFORE_AUTOFILL_CHANGE_METHOD: (changeList) => {
-        //     return new Promise((resolve) => {
-        //         setTimeout(() => {
-        //             console.log('BEFORE_PASTE_CHANGE_METHOD', changeList);
-        //             const ll = changeList.map((item) => {
-        //                 const { value } = item;
-        //                 return {
-        //                     ...item,
-        //                     value: `${value}填充`,
-        //                 };
-        //             });
-        //             resolve(ll);
-        //         }, 1000);
-        //     });
-        // },
+        BEFORE_PASTE_DATA_METHOD: (changeList, xArr, yArr) => {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    console.log('BEFORE_PASTE_DATA_METHOD', changeList);
+                    const ll = changeList.map((item) => {
+                        const { value } = item;
+                        return {
+                            ...item,
+                            value: `${value}粘贴`,
+                        };
+                    });
+                    resolve(ll);
+                }, 1000);
+            });
+        },
+        BEFORE_AUTOFILL_DATA_METHOD: (changeList) => {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    console.log('BEFORE_PASTE_DATA_METHOD', changeList);
+                    const ll = changeList.map((item) => {
+                        const { value } = item;
+                        return {
+                            ...item,
+                            value: `${value}填充`,
+                        };
+                    });
+                    resolve(ll);
+                }, 1000);
+            });
+        },
         EXPAND_LAZY_METHOD: (params: any) => {
             const i = params.row.id;
             return new Promise((resolve) => {
@@ -639,11 +639,32 @@ const eVirtTable = new EVirtTable(canvas, {
             }
         },
         SPAN_METHOD: (params) => {
-            // const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;
-            // if (column.key === 'emp_name') {
-            //     // 合并行单元格
-            //     return mergeRowCell(params, 'emp_name');
-            // }
+            const {
+                mergeColCell,
+                mergeRowCell,
+            } = eVirtTable.getUtils();
+            const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;
+            if (
+                [
+                    'unit',
+                    'work_type',
+                    'household_city',
+                    'household_address',
+                    'requiredQuantity',
+                    'work_status',
+                    'materialNo',
+                ].includes(column.key)
+            ) {
+                // 合并行单元格
+                return mergeRowCell(params, column.key, ['emp_name', column.key]);
+            }
+            if (column.key === 'emp_name') {
+                // 合并行单元格
+                return mergeRowCell(params, 'emp_name', ['emp_name']);
+            }
+            if (['emp_name221', 'emp_name222', 'emp_name2'].includes(column.key)) {
+                return mergeColCell(params, ['emp_name221', 'emp_name222', 'emp_name2']);
+            }
             // if (column.key === 'selection') {
             //     // 合并行单元格
             //     return mergeRowCell(params, 'emp_name');
@@ -665,6 +686,9 @@ const eVirtTable = new EVirtTable(canvas, {
         },
     },
 });
+// eVirtTable.on('error', (error) => {
+//     console.error(error);
+// })
 eVirtTable.on('overlayerChange', (container) => {
     if (!overlayerEl) {
         return;
@@ -726,7 +750,7 @@ if (dateEl) {
     });
     eVirtTable.on('change', (value) => {
         console.log(value);
-        console.log(eVirtTable.hasValidationError());
+        // console.log(eVirtTable.hasValidationError());
     });
     dateEl.addEventListener('change', function (event) {
         if (!event.target) {

@@ -114,3 +114,12 @@ The example below limits the editable area. Note that currently only one area is
 selector/scope
 h:320px
 :::
+
+## Method scoping
+- BEFORE_SET_SELECTOR_METHOD
+
+::: demo
+
+selector/scope-method
+h:320px
+:::

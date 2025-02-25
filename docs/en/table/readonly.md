@@ -20,13 +20,13 @@
 | ----------------------------- | -------------------- | ----- | ------- |
 | BODY_CELL_READONLY_METHOD     | Custom readonly      | ^[Function]`({row, column, rowIndex, colIndex, value})=>boolean\|void` | — |
 | BODY_CELL_EDITOR_METHOD       | Custom editor type   | ^[Function]`({row, column, rowIndex, colIndex, value})=>string\|void`  | — |
-| BEFORE_VALUE_CHANGE_METHOD    | Callback before value change | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>`  | — |
+| BEFORE_VALUE_CHANGE_METHOD    | Callback before value change | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>`  | — |
 | EDIT_BG_COLOR                 | Editable background color | string  | `rgba(221,170,83,0.1)` |
 | DISABLED                      | Highest priority to disable editing | boolean  | false |
 
 ## Typings
 ```ts
-type BeforeChangeParams = {
+type BeforeChangeItem = {
     rowKey: string;
     key: string;
     value: any;

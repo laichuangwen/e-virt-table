@@ -154,12 +154,28 @@ export type CellHeaderParams = {
     colIndex: number;
     column: Column;
 };
-export type BeforeChangeParams = {
+export type BeforeChangeItem = {
     rowKey: string;
     key: string;
     value: any;
     oldValue: any;
     row: any;
+};
+export type BeforeSetSelectorParams = {
+    focusCell?: Cell;
+    xArr: number[];
+    yArr: number[];
+};
+export type BeforeSetAutofillParams = {
+    focusCell?: Cell;
+    xArr: number[];
+    yArr: number[];
+};
+export type BeforeCopyParams = {
+    focusCell?: Cell;
+    data: any;
+    xArr: number[];
+    yArr: number[];
 };
 export type CellStyleParams = CellParams & {
     isHasChanged?: boolean;
@@ -168,6 +184,14 @@ export type CellStyleParams = CellParams & {
 export type SpanType = {
     rowspan: number;
     colspan: number;
+    relationRowKeys?: string[];
+    relationColKeys?: string[];
+    mergeRow?: boolean;
+    mergeCol?: boolean;
+};
+export type ErrorType = {
+    code: string;
+    message: string;
 };
 export type SpanParams = CellParams & {
     visibleLeafColumns: Column[];
@@ -175,6 +199,17 @@ export type SpanParams = CellParams & {
     headPosition: Position;
     visibleRows: any[];
     rows: any[];
+};
+export type SpanInfo = {
+    xArr: number[];
+    yArr: number[];
+    rowspan: number;
+    colspan: number;
+    height: number;
+    width: number;
+    offsetTop: number;
+    offsetLeft: number;
+    dataList: ChangeItem[];
 };
 export type SelectableParams = {
     row: any;
@@ -199,11 +234,19 @@ export type SpanMethod = (params: SpanParams) => SpanType | void;
 export type SelectableMethod = (params: SelectableParams) => boolean | void;
 export type ExpandLazyMethod = (params: CellParams) => Promise<any[]>;
 export type BeforeCellValueChangeMethod = (
-    params: BeforeChangeParams[],
-) => BeforeChangeParams[] | Promise<BeforeChangeParams[]>;
-export type BeforePasteChangeMethod = (
-    params: BeforeChangeParams[],
-) => BeforeChangeParams[] | Promise<BeforeChangeParams[]>;
-export type BeforeAutofillChangeMethod = (
-    params: BeforeChangeParams[],
-) => BeforeChangeParams[] | Promise<BeforeChangeParams[]>;
+    changeList: BeforeChangeItem[],
+) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
+export type BeforePasteDataMethod = (
+    changeList: BeforeChangeItem[],
+    xArr: number[],
+    yArr: number[],
+) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
+export type BeforeAutofillDataMethod = (
+    changeList: BeforeChangeItem[],
+    xArr: number[],
+    yArr: number[],
+) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
+
+export type BeforeSetSelectorMethod = (params: BeforeSetSelectorParams) => BeforeSetSelectorParams | undefined;
+export type BeforeSetAutofillMethod = (params: BeforeSetAutofillParams) => BeforeSetAutofillParams | undefined;
+export type BeforeCopyMethod = (params: BeforeCopyParams) => BeforeCopyParams | undefined;

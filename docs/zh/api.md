@@ -86,6 +86,7 @@ type EVirtTableOptions = {
 | ENABLE_SELECTOR_SPAN_ROW | 启用选择器-批量跨行选择 | boolean | true |
 | ENABLE_SELECTOR_ALL_ROWS | 启用选择器-批量选中列 | boolean | true |
 | ENABLE_SELECTOR_ALL_COLS | 启用选择器-批量选中行 | boolean | true |
+| ENABLE_MERGE_CELL_LINK | 启用合并格子数据关联 | boolean | false |
 | ENABLE_AUTOFILL | 启用填充 | boolean | true |
 | ENABLE_CONTEXT_MENU | 启用右键 | boolean | true |
 | ENABLE_COPY | 启用复制 | boolean | true |
@@ -120,9 +121,12 @@ type EVirtTableOptions = {
 | SPAN_METHOD | 自定义跨列/行渲染 | ^[Function]`({row, column, rowIndex, colIndex,value,visibleLeafColumns,headIndex,headPosition,visibleRows,rows})=>SpanType` | — |
 | SELECTABLE_METHOD | 自定义选择禁用 | ^[Function]`({row, rowIndex})=>boolean\|viod` | — |
 | EXPAND_LAZY_METHOD | tree 懒加载展开 | ^[Function]`({row, column, rowIndex, colIndex,value})=>Promise<any[]>` | — |
-| BEFORE_VALUE_CHANGE_METHOD | 数值改变前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — |
-| BEFORE_PASTE_CHANGE_METHOD | 数值粘贴前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — |
-| BEFORE_AUTOFILL_CHANGE_METHOD | 数值填充前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — |
+| BEFORE_VALUE_CHANGE_METHOD | 数值改变前回调 | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — |
+| BEFORE_PASTE_DATA_METHOD | 数值粘贴前回调 | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — |
+| BEFORE_AUTOFILL_DATA_METHOD | 数值填充前回调 | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — |
+| BEFORE_SET_SELECTOR_METHOD | 设置选择器前回调 | ^[Function]`(BeforeSetSelectorParams)=>BeforeSetSelectorParams\|viod` | — |
+| BEFORE_SET_AUTOFILL_METHOD | 设置填充器前回调 | ^[Function]`(BeforeSetAutofillParams)=>BeforeSetAutofillParams\|viod` | — |
+| BEFORE_COPY_METHOD | 数据复制前回调 | ^[Function]`(BeforeCopyParams)=>BeforeCopyParams\|viod` | — |
 
 ## Events
 
@@ -162,6 +166,7 @@ type EVirtTableOptions = {
 | mousedown | mousedown回调 | — |
 | mousemove | mousemove回调 | — |
 | keydown | keydown回调 | — |
+| error | error回调 | — |
 
 ## Methods
 
@@ -206,7 +211,8 @@ type EVirtTableOptions = {
 | toggleAllSelection     | 切换所有行的选中状态          | —                                                         |
 | getPositionForRowIndex | 获取当前行的高度定位          | —                                                         |
 | getCellValue           | 通过 rowKey 和 key 获取格子值 | (rowKey, key)                                             |
-| contextMenuHide        | 隐藏右键菜单                          | —                                                         |
+| getUtils               | 获取工具类方法，如内置合并行列方法                  | —                                     |
+| contextMenuHide        | 隐藏右键菜单                  | —                                                         |
 | destroy                | 销毁                          | —                                                         |
 
 
@@ -294,12 +300,28 @@ type ChangeItem = {
     key: string;
     rowKey: string;
 };
-type BeforeChangeParams = {
+type BeforeChangeItem = {
     rowKey: string;
     key: string;
     value: any;
     oldValue: any;
     row: any;
+};
+type BeforeSetSelectorParams = {
+    focusCell?: Cell;
+    xArr: number[];
+    yArr: number[];
+};
+type BeforeSetAutofillParams = {
+    focusCell?: Cell;
+    xArr: number[];
+    yArr: number[];
+};
+type BeforeCopyParams = {
+    focusCell?: Cell;
+    data: any;
+    xArr: number[];
+    yArr: number[];
 };
 type CellStyleOptions = {
     color?: string;

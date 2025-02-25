@@ -4,7 +4,7 @@ import EventBrowser from './EventBrowser';
 import EventBus, { EventCallback } from './EventBus';
 import Paint from './Paint';
 import Config from './Config';
-import { Column, EVirtTableOptions } from './types';
+import { ChangeItem, Column, EVirtTableOptions } from './types';
 import Icons from './Icons';
 import CellHeader from './CellHeader';
 import Row from './Row';
@@ -93,9 +93,10 @@ export default class Context {
     scrollerFocus = false; // 滚动条focus中
     autofillMove = false; // 自动填充移动中
     selectorMove = false; // 选择器移动中
-    selectOnlyOne = false; // 只选择一个单元格
     adjustPositioning = false; // 调整位置中
     editing = false; // 编辑中
+    onlyMergeCell = false; // 只有合并单元格
+    selectOnlyOne = false; // 只选择一个
     scrollY = 0;
     scrollX = 0;
     fixedLeftWidth = 0;
@@ -191,6 +192,52 @@ export default class Context {
     }
     setConfig(config: Config) {
         this.config = new Config(config);
+    }
+    setItemValueByEditor(rowKey: string, key: string, value: any, history = true, reDraw = true) {
+        // 启用合并单元格关联
+        if (this.config.ENABLE_MERGE_CELL_LINK) {
+            const rowIndex = this.database.getRowIndexForRowKey(rowKey);
+            const colIndex = this.database.getColIndexForKey(key);
+            if (rowIndex === undefined || colIndex === undefined) return;
+            const cell = this.database.getVirtualBodyCell(rowIndex, colIndex);
+            if (cell) {
+                const { dataList } = cell.getSpanInfo();
+                const data = dataList.map((item: any) => ({ ...item, value }));
+                this.database.batchSetItemValue(data, history);
+            }
+        } else {
+            this.database.setItemValue(rowKey, key, value, history, reDraw, true);
+        }
+    }
+
+    batchSetItemValueByEditor(_list: ChangeItem[], history?: boolean) {
+        // 启用合并单元格关联
+        if (this.config.ENABLE_MERGE_CELL_LINK) {
+            const list: ChangeItem[] = [];
+            _list.forEach((item) => {
+                const rowIndex = this.database.getRowIndexForRowKey(item.rowKey);
+                const colIndex = this.database.getColIndexForKey(item.key);
+                if (rowIndex === undefined || colIndex === undefined) return;
+                const cell = this.database.getVirtualBodyCell(rowIndex, colIndex);
+                if (cell) {
+                    const { dataList } = cell.getSpanInfo();
+                    const data = dataList.map((list: any) => ({ ...list, value: item.value }));
+                    list.push(...data);
+                }
+            });
+            // 去重
+            // const uniqueData = list.reduce((acc, curr) => {
+            //     // 检查组合的 rowKey 和 key 是否已存在
+            //     const exists = acc.some((item) => item.rowKey === curr.rowKey && item.key === curr.key);
+            //     if (!exists) {
+            //         acc.push(curr); // 如果不存在，则添加到结果数组中
+            //     }
+            //     return acc;
+            // }, [] as typeof list);
+            this.database.batchSetItemValue(list, history);
+        } else {
+            this.database.batchSetItemValue(_list, history);
+        }
     }
     setFocusCell(cell: Cell) {
         if (this.focusCell === cell) return;

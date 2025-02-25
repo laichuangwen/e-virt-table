@@ -106,21 +106,14 @@
             columns,
             config: {
                 ENABLE_SELECTOR: true,
-                ENABLE_AUTOFILL: true,
-                BEFORE_AUTOFILL_DATA_METHOD: (changeList) => {
-                    return new Promise((resolve) => {
-                        setTimeout(() => {
-                            console.log('BEFORE_PASTE_DATA_METHOD', changeList);
-                            const ll = changeList.map((item) => {
-                                const { value } = item;
-                                return {
-                                    ...item,
-                                    value: `${value}_autofill`,
-                                };
-                            });
-                            resolve(ll);
-                        }, 1000);
-                    });
+                BEFORE_COPY_METHOD: (params) => {
+                    const { focusCell, xArr, yArr, data } = params;
+                    const [minX, maxX] = xArr;
+                    if (minX < 2) {
+                        alert('不能复制Date列');
+                        return;
+                    }
+                    return params;
                 },
             },
         });

@@ -8,12 +8,12 @@
 | ------------------------ | ----------------------- | -------  | ------ |
 | ENABLE_COPY | 启用复制 | boolean  | true |
 | ENABLE_PASTER | 启用粘贴 | boolean  | true |
-| BEFORE_PASTE_CHANGE_METHOD | 粘贴前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>` | — |
-
+| BEFORE_PASTE_DATA_METHOD | 粘贴前回调 | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — |
+| BEFORE_COPY_METHOD | 数据复制前回调 | ^[Function]`(BeforeCopyParams)=>BeforeCopyParams\|viod` | — |
 ## Typings
 
 ``` ts
-type BeforeChangeParams = {
+type BeforeChangeItem = {
     rowKey: string;
     key: string;
     value: any;
@@ -47,10 +47,19 @@ h:320px
 
 ## 粘贴数据更改前
 
-- BEFORE_AUTOFILL_CHANGE_METHOD可篡改粘贴数据，支持Promise
+- BEFORE_AUTOFILL_DATA_METHOD可篡改粘贴数据，支持Promise
 
 
 ::: demo
 paste/before-change
+h:320px
+:::
+
+## 复制数据更改前
+
+- BEFORE_COPY_METHOD
+
+::: demo
+paste/before-copy
 h:320px
 :::

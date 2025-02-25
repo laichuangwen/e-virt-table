@@ -20,13 +20,13 @@
 | --- | --- | ---  | --- |
 | BODY_CELL_READONLY_METHOD | 自定义只读 | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean\|viod` | — |
 | BODY_CELL_EDITOR_METHOD | 自定义编辑器类型 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod`  | — |
-| BEFORE_VALUE_CHANGE_METHOD | 数值改变前回调 | ^[Function]`(BeforeChangeParams[])=>BeforeChangeParams[]\|Promise<BeforeChangeParams[]>`  | — |
+| BEFORE_VALUE_CHANGE_METHOD | 数值改变前回调 | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>`  | — |
 | EDIT_BG_COLOR | 可编辑背景色 | string  | `rgba(221,170,83,0.1)` |
 | DISABLED | 禁止编辑优先等级最高 | boolean  | false |
 
 ## Typings
 ``` ts
-type BeforeChangeParams = {
+type BeforeChangeItem = {
     rowKey: string;
     key: string;
     value: any;
