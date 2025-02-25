@@ -1024,7 +1024,7 @@ export default class Database {
             }
 
             // 再查找向下的相同值，根据关联值查询
-            for (let i = rowIndex; i < this.ctx.maxRowIndex; i++) {
+            for (let i = rowIndex; i <= this.ctx.maxRowIndex; i++) {
                 const _rowKey = this.rowIndexRowKeyMap.get(i) || '';
                 const pValue = relationRowKeys.reduce((acc, key) => {
                     const value = this.getItemValue(_rowKey, key) ?? '';
@@ -1076,7 +1076,7 @@ export default class Database {
                 }
             }
             // 向右
-            for (let i = colIndex; i < this.ctx.maxColIndex; i++) {
+            for (let i = colIndex; i <= this.ctx.maxColIndex; i++) {
                 const column = this.getColumnByColIndex(i);
                 if (!column) {
                     break;
@@ -1122,7 +1122,7 @@ export default class Database {
             width: mergeWidth,
             offsetTop,
             offsetLeft,
-            dataList
+            dataList,
         };
     }
     setLoading(loading: boolean) {
