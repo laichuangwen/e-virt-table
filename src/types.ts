@@ -234,15 +234,15 @@ export type SpanMethod = (params: SpanParams) => SpanType | void;
 export type SelectableMethod = (params: SelectableParams) => boolean | void;
 export type ExpandLazyMethod = (params: CellParams) => Promise<any[]>;
 export type BeforeCellValueChangeMethod = (
-    params: BeforeChangeItem[],
+    changeList: BeforeChangeItem[],
 ) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
 export type BeforePasteDataMethod = (
-    params: BeforeChangeItem[],
+    changeList: BeforeChangeItem[],
     xArr: number[],
     yArr: number[],
 ) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
 export type BeforeAutofillDataMethod = (
-    params: BeforeChangeItem[],
+    changeList: BeforeChangeItem[],
     xArr: number[],
     yArr: number[],
 ) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
