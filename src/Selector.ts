@@ -236,7 +236,7 @@ export default class Selector {
             this.ctx.stageElement.focus();
             // 启用合并单元格关联
             if (this.ctx.config.ENABLE_MERGE_CELL_LINK) {
-                const adjustMerge = this.ctx.adjustMergeCells(_xArr, _yArr);
+                const adjustMerge = this.adjustMergeCells(_xArr, _yArr);
                 // 合并单元格时，调整选择器的位置
                 minY = adjustMerge.yArr[0];
                 maxY = adjustMerge.yArr[1];
@@ -271,6 +271,71 @@ export default class Selector {
             this.ctx.emit('setSelector', this.ctx.selector);
             this.ctx.emit('drawView');
         }
+    }
+    private adjustMergeCells(xArr: number[], yArr: number[]) {
+        const [minY, maxY] = yArr;
+        const [minX, maxX] = xArr;
+        let topBottomCells: Cell[] = [];
+        let leftRightCells: Cell[] = [];
+        // 遍历选择中的单元格
+        for (let ri = 0; ri <= yArr[1] - yArr[0]; ri++) {
+            for (let ci = 0; ci <= xArr[1] - xArr[0]; ci++) {
+                const rowIndex = ri + yArr[0];
+                const colIndex = ci + xArr[0];
+                const cell = this.ctx.database.getVirtualBodyCell(rowIndex, colIndex);
+                if (cell) {
+                    // 顶部和底部的单元格
+                    if (rowIndex === minY || rowIndex === maxY) {
+                        topBottomCells.push(cell);
+                    }
+                    // 左右的单元格
+                    if (colIndex === minX || colIndex === maxX) {
+                        leftRightCells.push(cell);
+                    }
+                }
+            }
+        }
+        const topBottomBoundary = topBottomCells.reduce(
+            (prev, cell) => {
+                const { yArr } = cell.getSpanInfo();
+                const [topIndex, bottomIndex] = yArr;
+                prev.minY = Math.min(prev.minY, topIndex);
+                prev.maxY = Math.max(prev.maxY, bottomIndex);
+                return prev;
+            },
+            {
+                minY,
+                maxY,
+            },
+        );
+        const leftRightBoundary = leftRightCells.reduce(
+            (prev, cell) => {
+                const { xArr } = cell.getSpanInfo();
+                const [leftIndex, rightIndex] = xArr;
+                prev.minX = Math.min(prev.minX, leftIndex);
+                prev.maxX = Math.max(prev.maxX, rightIndex);
+                return prev;
+            },
+            {
+                minX,
+                maxX,
+            },
+        );
+        const _xArr = [leftRightBoundary.minX, leftRightBoundary.maxX];
+        const _yArr = [topBottomBoundary.minY, topBottomBoundary.maxY];
+        let onlyMergeCell = false;
+        // Check if the selected area is a single merged cell
+        if (leftRightBoundary.minX !== leftRightBoundary.maxX || topBottomBoundary.minY !== topBottomBoundary.maxY) {
+            const selectorStr = JSON.stringify(_xArr) + JSON.stringify(_yArr);
+            const spanInfo = this.ctx.focusCell?.getSpanInfo();
+            const spanStr = spanInfo && JSON.stringify(spanInfo.xArr) + JSON.stringify(spanInfo.yArr);
+            onlyMergeCell = spanStr === selectorStr;
+        }
+        return {
+            xArr: _xArr,
+            yArr: _yArr,
+            onlyMergeCell,
+        };
     }
     private selectCols(cell: CellHeader) {
         // 启用单选就不能批量选中
@@ -460,6 +525,25 @@ export default class Selector {
             return;
         }
         let { value, xArr, yArr } = this.ctx.getSelectedData();
+        if (this.ctx.config.ENABLE_MERGE_CELL_LINK && this.ctx.database.hasMergeCell(xArr, yArr)) {
+            if (this.ctx.onlyMergeCell && this.ctx.focusCell) {
+                const cell = this.ctx.focusCell;
+                value = [[cell.getValue()]];
+                xArr = [cell.colIndex, cell.colIndex];
+                yArr = [cell.rowIndex, cell.rowIndex];
+            } else {
+                const err: ErrorType = {
+                    code: 'ERR_MERGED_CELLS_COPY',
+                    message: 'Merged cells cannot be copied across',
+                };
+                if (this.ctx.hasEvent('error')) {
+                    this.ctx.emit('error', err);
+                } else {
+                    alert(err.message);
+                }
+                return;
+            }
+        }
         // 复制前回调
         const { BEFORE_COPY_METHOD } = this.ctx.config;
         if (typeof BEFORE_COPY_METHOD === 'function') {
@@ -559,8 +643,8 @@ export default class Selector {
                     if (this.ctx.config.ENABLE_MERGE_DISABLED_PASTER) {
                         if (this.ctx.database.hasMergeCell(_xArr, _yArr)) {
                             const err: ErrorType = {
-                                code: 'MERGE_DISABLED_PASTER',
-                                message: 'The merged cell is disabled for pasting',
+                                code: 'ERR_MERGED_CELLS_PASTE',
+                                message: 'Merged cells cannot be pasted across',
                             };
                             if (this.ctx.hasEvent('error')) {
                                 this.ctx.emit('error', err);
