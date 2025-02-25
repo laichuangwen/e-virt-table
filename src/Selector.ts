@@ -534,7 +534,7 @@ export default class Selector {
             } else {
                 const err: ErrorType = {
                     code: 'ERR_MERGED_CELLS_COPY',
-                    message: 'Merged cells cannot be copied across',
+                    message: 'Merged cells cannot span copy data',
                 };
                 if (this.ctx.hasEvent('error')) {
                     this.ctx.emit('error', err);
@@ -637,22 +637,28 @@ export default class Selector {
                 .readText()
                 .then(async (val) => {
                     let textArr = decodeSpreadsheetStr(val);
+                    console.log('textArr', textArr);
+
                     const _xArr = [colIndex, colIndex + textArr[0].length - 1];
                     const _yArr = [rowIndex, rowIndex + textArr.length - 1];
+                    // textArr只有一个
+                    const isOneData = textArr.length === 1 && textArr[0].length === 1;
                     // 启用合并时禁用粘贴填充
-                    if (this.ctx.config.ENABLE_MERGE_DISABLED_PASTER) {
-                        if (this.ctx.database.hasMergeCell(_xArr, _yArr)) {
-                            const err: ErrorType = {
-                                code: 'ERR_MERGED_CELLS_PASTE',
-                                message: 'Merged cells cannot be pasted across',
-                            };
-                            if (this.ctx.hasEvent('error')) {
-                                this.ctx.emit('error', err);
-                            } else {
-                                alert(err.message);
-                            }
-                            return;
+                    if (
+                        this.ctx.config.ENABLE_MERGE_CELL_LINK &&
+                        this.ctx.database.hasMergeCell(_xArr, _yArr) &&
+                        !isOneData
+                    ) {
+                        const err: ErrorType = {
+                            code: 'ERR_MERGED_CELLS_PASTE',
+                            message: 'Merged cells cannot span paste data',
+                        };
+                        if (this.ctx.hasEvent('error')) {
+                            this.ctx.emit('error', err);
+                        } else {
+                            alert(err.message);
                         }
+                        return;
                     }
                     let changeList: ChangeItem[] = [];
                     for (let ri = 0; ri <= textArr.length - 1; ri++) {

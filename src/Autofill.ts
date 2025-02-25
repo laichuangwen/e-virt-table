@@ -153,20 +153,19 @@ export default class Autofill {
         const yStep = value.length;
         const xArr = this.ctx.autofill.xArr;
         const yArr = this.ctx.autofill.yArr;
-        // 启用合并时禁用填充
-        if (this.ctx.config.ENABLE_MERGE_DISABLED_AUTOFILL) {
-            if (this.ctx.database.hasMergeCell(xArr, yArr)) {
-                const err: ErrorType = {
-                    code: 'MERGE_DISABLED_AUTOFILL',
-                    message: 'The merged cell is disabled for autofill',
-                };
-                if (this.ctx.hasEvent('error')) {
-                    this.ctx.emit('error', err);
-                } else {
-                    alert(err.message);
-                }
-                return;
+        const isOneValue = xStep === 1 && yStep === 1;
+        // 禁用跨越填充
+        if (this.ctx.config.ENABLE_MERGE_CELL_LINK && this.ctx.database.hasMergeCell(xArr, yArr) && !isOneValue) {
+            const err: ErrorType = {
+                code: 'ERR_MERGED_CELLS_AUTOFILL',
+                message: 'Merged cells cannot span autofill data',
+            };
+            if (this.ctx.hasEvent('error')) {
+                this.ctx.emit('error', err);
+            } else {
+                alert(err.message);
             }
+            return;
         }
         let changeList = [];
         for (let ri = 0; ri <= yArr[1] - yArr[0]; ri++) {
