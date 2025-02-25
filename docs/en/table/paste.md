@@ -52,3 +52,12 @@ h:320px
 paste/before-change
 h:320px
 :::
+
+## Before Copy Data Change
+
+- BEFORE_COPY_METHOD
+
+::: demo
+paste/before-copy
+h:320px
+:::

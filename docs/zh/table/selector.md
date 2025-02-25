@@ -22,6 +22,7 @@
 | SELECTOR_AREA_MIN_Y        | 选择器Y最小范围                        | number  | 0      |
 | SELECTOR_AREA_MAX_Y        | 选择器Y最大范围, 0默认 rowMax          | number  | 0      |
 | SELECTOR_AREA_MAX_Y_OFFSET | 选择器Y最大范围, 0默认 rowMax - offset | number  | 0      |
+| BEFORE_SET_SELECTOR_METHOD | 设置选择器前回调 | ^[Function]`(BeforeSetSelectorParams)=>BeforeSetSelectorParams\|viod` | — |
 
 
 ## 禁用
@@ -114,5 +115,15 @@ h:320px
 ::: demo
 
 selector/scope
+h:320px
+:::
+
+
+## 方法限定范围
+- BEFORE_SET_SELECTOR_METHOD
+
+::: demo
+
+selector/scope-method
 h:320px
 :::

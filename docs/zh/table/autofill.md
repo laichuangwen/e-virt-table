@@ -14,6 +14,7 @@
 | ENABLE_SELECTOR_ALL_ROWS | 启用选择器-批量选中列   | boolean    | true   |
 | ENABLE_SELECTOR_ALL_COLS | 启用选择器-批量选中行   | boolean      | true   |
 | BEFORE_AUTOFILL_DATA_METHOD | 数值填充前回调 | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — | — |
+| BEFORE_SET_AUTOFILL_METHOD | 设置填充器前回调 | ^[Function]`(BeforeSetAutofillParams)=>BeforeSetAutofillParams\|viod` | — |
 
 ## Typings
 
@@ -95,5 +96,14 @@ h:320px
 
 ::: demo
 autofill/scope
+h:320px
+:::
+
+## 方法限定范围
+- BEFORE_SET_AUTOFILL_METHOD
+
+::: demo
+
+autofill/scope-method
 h:320px
 :::

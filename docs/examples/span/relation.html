@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        let data = [
+            {
+                id: 1,
+                date: '2016-05-01',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036', // Los Angeles zip code
+                zip1: 'CA 90036', // Los Angeles zip code
+            },
+            {
+                id: 2,
+                date: '2016-05-02',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036', // Los Angeles zip code
+                zip1: 'CA 90036', // Los Angeles zip code
+            },
+            {
+                id: 3,
+                date: '2016-05-02',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 190, Grove St, Los Angeles',
+                zip: 'CA 90036', // Los Angeles zip code
+                zip1: 'CA 90036', // Los Angeles zip code
+            },
+            {
+                id: 4,
+                date: '2016-05-02',
+                name: 'Tom',
+                state: 'California',
+                city: 'San Francisco',
+                address: 'No. 189, Grove St, San Francisco',
+                zip: 'CA 94105', // San Francisco zip code
+                zip1: 'CA 94105', // San Francisco zip code
+            },
+            {
+                id: 5,
+                date: '2016-05-02',
+                name: 'Tom1',
+                state: 'California',
+                city: 'San Francisco',
+                address: 'No. 189, Grove St, San Francisco',
+                zip: 'CA 94105', // San Francisco zip code
+                zip1: 'CA 94105', // San Francisco zip code
+            },
+            {
+                id: 6,
+                date: '2016-05-03',
+                name: 'Tom1',
+                state: 'California',
+                city: 'San Francisco',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 94105', // San Francisco zip code
+                zip1: 'CA 94105', // San Francisco zip code
+            },
+            {
+                id: 7,
+                date: '2016-05-03',
+                name: 'Tom1',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036', // Los Angeles zip code
+                zip1: 'CA 90036', // Los Angeles zip code
+            },
+            {
+                id: 8,
+                date: '2016-05-04',
+                name: 'Tom1',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036', // Los Angeles zip code
+                zip1: 'CA 90036', // Los Angeles zip code
+            },
+            {
+                id: 9,
+                date: '2016-05-04',
+                name: 'Tom2',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036', // Los Angeles zip code
+                zip1: 'CA 90036', // Los Angeles zip code
+            },
+            {
+                id: 10,
+                date: '2016-05-04',
+                name: 'Tom2',
+                state: 'California',
+                city: 'San Diego',
+                address: 'No. 189, Grove St, San Diego',
+                zip: 'CA 92101', // San Diego zip code
+                zip1: 'CA 92101', // San Diego zip code
+            },
+        ];
+        let columns = [
+            {
+                title: 'Name',
+                key: 'name',
+                readonly: false,
+            },
+            {
+                title: 'State',
+                key: 'state',
+                readonly: false,
+            },
+            {
+                title: 'City',
+                key: 'city',
+                readonly: false,
+            },
+            {
+                title: 'Address',
+                key: 'address',
+                readonly: false,
+                width: 200,
+            },
+            {
+                title: 'Date',
+                key: 'date',
+                readonly: false,
+            },
+            {
+                title: 'Zip',
+                key: 'zip',
+                readonly: false,
+            },
+            {
+                title: 'Zip1',
+                key: 'zip1',
+                readonly: false,
+            },
+        ];
+        const target = document.getElementById('e-virt-table');
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                HEIGHT: 400,
+                ENABLE_SELECTOR: true,
+                ENABLE_MERGE_CELL_LINK: true,
+                ENABLE_HISTORY: true,
+                SPAN_METHOD: (params) => {
+                    const { mergeRowCell, mergeColCell } = grid.getUtils();
+                    const { row, column, rowIndex, columnIndex } = params;
+                    if (column.key === 'state') {
+                        return mergeRowCell(params, 'state');
+                    }
+                    if (column.key === 'city') {
+                        // 第三个参数为关联key,内部会根据这个key进行合并进行数据对比
+                        return mergeRowCell(params, 'city', ['state', 'city']);
+                    }
+                    if (column.key === 'address') {
+                        // 第三个参数为关联key,内部会根据这个key进行合并进行数据对比
+                        return mergeRowCell(params, 'address', ['state', 'city', 'address']);
+                    }
+                    if (column.key === 'date') {
+                        // 第三个参数为关联key,内部会根据这个key进行合并进行数据对比
+                        return mergeRowCell(params, 'date', ['state', 'city', 'address', 'date']);
+                    }
+                    if (['zip', 'zip1'].includes(column.key)) {
+                        return mergeColCell(params, ['zip', 'zip1']);
+                    }
+                },
+            },
+        });
+    </script>
+</html>

@@ -96,3 +96,12 @@ The following example limits the editable area. Note that currently only one are
 autofill/scope
 h:320px
 :::
+
+## Method scoping
+- BEFORE_SET_AUTOFILL_METHOD
+
+::: demo
+
+autofill/scope-method
+h:320px
+:::

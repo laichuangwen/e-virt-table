@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        let data = [
+            {
+                date: '2016-05-03',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+                _readonly: true,
+            },
+            {
+                date: '2016-05-02',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-04',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-01',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-08',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-06',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-07',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+                _readonly: true,
+            },
+        ];
+        let columns = [
+            {
+                type: 'index',
+                key: 'index',
+                width: 50,
+                operation: true, // enable operation
+            },
+            {
+                title: 'Name',
+                key: 'name',
+            },
+            {
+                title: 'State',
+                key: 'state',
+            },
+            {
+                title: 'City',
+                key: 'city',
+            },
+            {
+                title: 'Address',
+                key: 'address',
+                width: 200,
+                readonly: true,
+            },
+            {
+                title: 'Zip',
+                key: 'zip',
+                readonly: true,
+            },
+        ];
+        const target = document.getElementById('e-virt-table');
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                ENABLE_SELECTOR: true,
+                ENABLE_AUTOFILL: true,
+                BEFORE_SET_AUTOFILL_METHOD: (scope) => {
+                    const { focusCell, xArr, yArr } = scope;
+                    let [minX, maxX] = xArr;
+                    let [minY, maxY] = yArr;
+                    if (minX < 1 || maxX > columns.length - 3 || minY < 1 || maxY > data.length - 2) {
+                        console.error('只能选择Name、State、City列');
+                        return;
+                    }
+                    // 只能选择一列
+                    if (focusCell) {
+                        return {
+                            ...scope,
+                            xArr: [focusCell.colIndex, focusCell.colIndex],
+                        };
+                    }
+                },
+            },
+        });
+    </script>
+</html>

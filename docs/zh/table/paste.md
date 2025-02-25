@@ -9,7 +9,7 @@
 | ENABLE_COPY | 启用复制 | boolean  | true |
 | ENABLE_PASTER | 启用粘贴 | boolean  | true |
 | BEFORE_PASTE_DATA_METHOD | 粘贴前回调 | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — |
-
+| BEFORE_COPY_METHOD | 数据复制前回调 | ^[Function]`(BeforeCopyParams)=>BeforeCopyParams\|viod` | — |
 ## Typings
 
 ``` ts
@@ -52,5 +52,14 @@ h:320px
 
 ::: demo
 paste/before-change
+h:320px
+:::
+
+## 复制数据更改前
+
+- BEFORE_COPY_METHOD
+
+::: demo
+paste/before-copy
 h:320px
 :::

@@ -86,7 +86,7 @@ type EVirtTableOptions = {
 | ENABLE_SELECTOR_SPAN_ROW | 启用选择器-批量跨行选择 | boolean | true |
 | ENABLE_SELECTOR_ALL_ROWS | 启用选择器-批量选中列 | boolean | true |
 | ENABLE_SELECTOR_ALL_COLS | 启用选择器-批量选中行 | boolean | true |
-| ENABLE_MERGE_CELL_LINK | 启用合并选择器关联 | boolean | false |
+| ENABLE_MERGE_CELL_LINK | 启用合并格子数据关联 | boolean | false |
 | ENABLE_AUTOFILL | 启用填充 | boolean | true |
 | ENABLE_CONTEXT_MENU | 启用右键 | boolean | true |
 | ENABLE_COPY | 启用复制 | boolean | true |
@@ -124,9 +124,9 @@ type EVirtTableOptions = {
 | BEFORE_VALUE_CHANGE_METHOD | 数值改变前回调 | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — |
 | BEFORE_PASTE_DATA_METHOD | 数值粘贴前回调 | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — |
 | BEFORE_AUTOFILL_DATA_METHOD | 数值填充前回调 | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — |
-| BEFORE_SET_SELECTOR_METHOD | 设置选择器前回调 | ^[Function]`(BeforeSetSelectorParams[])=>BeforeSetSelectorParams[]>` | — |
-| BEFORE_SET_AUTOFILL_METHOD | 设置填充器前回调 | ^[Function]`(BeforeSetAutofillParams[])=>BeforeSetAutofillParams[]>` | — |
-| BEFORE_COPY_METHOD | 数据复制前回调 | ^[Function]`(BeforeCopyParams[])=>BeforeCopyParams[]>` | — |
+| BEFORE_SET_SELECTOR_METHOD | 设置选择器前回调 | ^[Function]`(BeforeSetSelectorParams)=>BeforeSetSelectorParams\|viod` | — |
+| BEFORE_SET_AUTOFILL_METHOD | 设置填充器前回调 | ^[Function]`(BeforeSetAutofillParams)=>BeforeSetAutofillParams\|viod` | — |
+| BEFORE_COPY_METHOD | 数据复制前回调 | ^[Function]`(BeforeCopyParams)=>BeforeCopyParams\|viod` | — |
 
 ## Events
 
