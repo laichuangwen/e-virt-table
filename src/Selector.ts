@@ -261,10 +261,11 @@ export default class Selector {
                     xArr: _xArr,
                     yArr: _yArr,
                 });
-                if (res) {
-                    _xArr = res.xArr;
-                    _yArr = res.yArr;
+                if (!res) {
+                    return;
                 }
+                _xArr = res.xArr;
+                _yArr = res.yArr;
             }
             this.ctx.selector.xArr = _xArr;
             this.ctx.selector.yArr = _yArr;
@@ -555,10 +556,6 @@ export default class Selector {
                 yArr,
             });
             if (!res) {
-                return;
-            }
-            // 清空复制内容时
-            if (Array.isArray(res.data) && !res.data.length) {
                 return;
             }
             value = res.data;

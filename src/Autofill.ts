@@ -122,10 +122,11 @@ export default class Autofill {
                     xArr: _xArr,
                     yArr: _yArr,
                 });
-                if (res) {
-                    _xArr = res.xArr;
-                    _yArr = res.yArr;
+                if (!res) {
+                    return;
                 }
+                _xArr = res.xArr;
+                _yArr = res.yArr;
             }
             this.ctx.autofill.xArr = _xArr;
             this.ctx.autofill.yArr = _yArr;

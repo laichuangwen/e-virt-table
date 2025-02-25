@@ -247,6 +247,6 @@ export type BeforeAutofillDataMethod = (
     yArr: number[],
 ) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
 
-export type BeforeSetSelectorMethod = (params: BeforeSetSelectorParams) => BeforeSetSelectorParams;
-export type BeforeSetAutofillMethod = (params: BeforeSetAutofillParams) => BeforeSetAutofillParams;
-export type BeforeCopyMethod = (params: BeforeCopyParams) => BeforeCopyParams;
+export type BeforeSetSelectorMethod = (params: BeforeSetSelectorParams) => BeforeSetSelectorParams | undefined;
+export type BeforeSetAutofillMethod = (params: BeforeSetAutofillParams) => BeforeSetAutofillParams | undefined;
+export type BeforeCopyMethod = (params: BeforeCopyParams) => BeforeCopyParams | undefined;
