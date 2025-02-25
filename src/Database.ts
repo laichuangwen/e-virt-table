@@ -1171,7 +1171,7 @@ export default class Database {
         for (let i = yArr[0]; i <= yArr[1]; i++) {
             for (let j = xArr[0]; j <= xArr[1]; j++) {
                 const cell = this.getVirtualBodyCell(i, j);
-                if (cell && (cell.mergeRow || cell.mergeCol)) {
+                if (cell && (cell.rowspan !== 1 || cell.colspan !== 1)) {
                     hasMergeCell = true;
                     break;
                 }
