@@ -82,6 +82,8 @@ export default class Editor {
         this.ctx.on('adjustBoundaryPosition', (cell) => {
             // 调整位置会触发重绘可能会导致cellClick事件不能触发，调整位置时需要赋值cellTarget
             this.cellTarget = cell;
+            const { xArr, yArr } = this.ctx.selector;
+            this.selectorArrStr = JSON.stringify(xArr) + JSON.stringify(yArr);
         });
         this.ctx.on('cellClick', (cell: Cell) => {
             // 没有编辑器的情况下不进入编辑模式
@@ -209,7 +211,10 @@ export default class Editor {
         } = this.ctx;
         const bottomY = stageHeight - footer.height - SCROLLER_TRACK_SIZE;
         this.editorEl.style.bottom = `auto`;
-        if (this.drawY + scrollHeight > bottomY || this.drawY < header.height) {
+        if (this.drawY < header.height) {
+            this.editorEl.style.top = `${header.height - 1}px`;
+        }
+        if (this.drawY + scrollHeight > bottomY) {
             this.editorEl.style.left = `${this.drawX - 1}px`;
             this.editorEl.style.top = `auto`;
             this.editorEl.style.bottom = `${stageHeight - bottomY}px`;
@@ -348,7 +353,7 @@ export default class Editor {
         this.ctx.emit('doneEdit', this.cellTarget);
         this.enable = false;
         this.ctx.editing = false;
-        // this.ctx.emit('draw');
+        this.ctx.emit('draw');
     }
     destroy() {
         this.editorEl?.remove();

@@ -202,6 +202,8 @@ export default class Cell extends BaseCell {
             const spanInfo = this.getSpanInfo();
             this.height = spanInfo.height;
             this.width = spanInfo.width;
+            this.drawX = this.getDrawX();
+            this.drawY = this.getDrawY();
             this.drawY -= spanInfo.offsetTop;
             this.drawX -= spanInfo.offsetLeft;
         }

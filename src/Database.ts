@@ -1122,7 +1122,7 @@ export default class Database {
             width: mergeWidth,
             offsetTop,
             offsetLeft,
-            dataList,
+            dataList
         };
     }
     setLoading(loading: boolean) {

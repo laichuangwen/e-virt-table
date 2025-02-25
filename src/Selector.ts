@@ -909,35 +909,40 @@ export default class Selector {
             body,
             scrollX,
             scrollY,
-            config: { SCROLLER_TRACK_SIZE, FOOTER_FIXED, FOOTER_POSITION },
+            config: { SCROLLER_TRACK_SIZE, FOOTER_FIXED, FOOTER_POSITION, ENABLE_MERGE_CELL_LINK },
         } = this.ctx;
         if (!focusCell) {
             return;
         }
+        // 处理合并的单元格的移动
+        if (ENABLE_MERGE_CELL_LINK && this.ctx.onlyMergeCell) {
+            focusCell.updateSpanInfo();
+        }
+        const { drawX, drawY, width, height, fixed } = focusCell;
         // 加1补选中框的边框,且可以移动滚动，以为getCell是获取渲染的cell
-        const diffLeft = fixedLeftWidth - focusCell.drawX + 1;
-        const diffRight = focusCell.drawX + focusCell.width - (stageWidth - fixedRightWidth) + 1;
-        let diffTop = header.height - focusCell.drawY;
+        const diffLeft = fixedLeftWidth - drawX + 1;
+        const diffRight = focusCell.drawX + width - (stageWidth - fixedRightWidth) + 1;
+        let diffTop = header.height - drawY;
         // 格子大于可视高度就取可视高度，防止上下跳动
-        let cellheight = focusCell.height;
+        let cellheight = height;
         if (cellheight > body.visibleHeight) {
             cellheight = body.visibleHeight;
         }
         let footerHeight = 0;
         if (FOOTER_FIXED) {
             if (FOOTER_POSITION === 'top') {
-                diffTop = header.height + footer.height - focusCell.drawY;
+                diffTop = header.height + footer.height - drawY;
             } else {
                 footerHeight = footer.visibleHeight;
             }
         }
-        const diffBottom = focusCell.drawY + cellheight - (stageHeight - footerHeight - SCROLLER_TRACK_SIZE);
+        const diffBottom = drawY + cellheight - (stageHeight - footerHeight - SCROLLER_TRACK_SIZE);
         let _scrollX = scrollX;
         let _scrollY = scrollY;
         // fixed禁用左右横向移动
-        if (diffRight > 0 && !focusCell.fixed) {
+        if (diffRight > 0 && !fixed) {
             _scrollX = Math.floor(scrollX + diffRight);
-        } else if (diffLeft > 0 && !focusCell.fixed) {
+        } else if (diffLeft > 0 && !fixed) {
             _scrollX = Math.floor(scrollX - diffLeft);
         }
         if (diffTop > 0) {
