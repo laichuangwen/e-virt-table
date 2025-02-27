@@ -86,10 +86,6 @@ export default class Editor {
             this.selectorArrStr = JSON.stringify(xArr) + JSON.stringify(yArr);
         });
         this.ctx.on('cellClick', (cell: Cell) => {
-            // 没有编辑器的情况下不进入编辑模式
-            if (cell.editorType === 'none') {
-                return;
-            }
             // 如果是调整边界位置，不进入编辑模式
             if (this.ctx.adjustPositioning) {
                 return;
@@ -303,7 +299,11 @@ export default class Editor {
         if (this.enable) {
             return;
         }
-        const { rowKey, key } = focusCell;
+        const { rowKey, key, editorType } = focusCell;
+        // 没有编辑器的情况下不进入编辑模式
+        if (editorType === 'none') {
+            return;
+        }
         const readonly = this.ctx.database.getReadonly(rowKey, key);
         if (focusCell && !readonly) {
             this.enable = true;
@@ -348,12 +348,11 @@ export default class Editor {
         if (!this.enable) {
             return;
         }
-
         this.doneEditByInput();
         this.ctx.emit('doneEdit', this.cellTarget);
         this.enable = false;
         this.ctx.editing = false;
-        this.ctx.emit('draw');
+        this.ctx.emit('drawView');
     }
     destroy() {
         this.editorEl?.remove();
