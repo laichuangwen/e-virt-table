@@ -85,7 +85,12 @@ class Scrollbar {
     }
 
     onMouseMove(e: MouseEvent) {
-        const { offsetX, offsetY, clientX, clientY } = e;
+        const { offsetX, offsetY, clientX, clientY, buttons } = e;
+        // 没有鼠标按下时不处理，要重置抬起事件
+        if (buttons === 0) {
+            this.onMouseUp();
+            return;
+        }
         // 悬浮提示
         if (this.isOnScrollbar(offsetX, offsetY) && e.target === this.ctx.canvasElement) {
             this.isFocus = true;
