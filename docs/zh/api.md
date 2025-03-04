@@ -57,7 +57,7 @@ type EVirtTableOptions = {
 | SCROLLER_FOCUS_COLOR | 滚动条滑块聚焦时的颜色 | string | #bbbec4 |
 | SELECT_BORDER_COLOR | 选中区域边框颜色 | string | `rgb(82,146,247)` |
 | SELECT_AREA_COLOR | 选中区域背景颜色 | string | `rgba(82,146,247,0.1)` |
-| SELECT_BG_COLOR | 当前焦点单元格所在行、列的背景色 | string | `rgba(82,146,247,0.1)` |
+| SELECT_ROW_COL_BG_COLOR | 当前焦点单元格所在行、列的背景色 | string | `rgba(82,146,247,0.1)` |
 | EDIT_BG_COLOR | 可编辑背景色 | string | `rgba(221,170,83,0.1)` |
 | AUTOFILL_POINT_BORDER_COLOR | 填充点的边框颜色 | string | #fff |
 | CHECKBOX_COLOR | 选择框颜色 | string | `rgb(82,146,247)` |

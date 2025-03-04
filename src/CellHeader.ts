@@ -128,6 +128,22 @@ export default class CellHeader extends BaseCell {
             verticalAlign: this.verticalAlign,
         });
         this.drawSelection();
+        this.drawSelector();
+    }
+    private drawSelector() {
+        // 选择区背景颜色
+        const { ENABLE_SELECTOR } = this.ctx.config;
+        if (!ENABLE_SELECTOR) {
+            return;
+        }
+        const { xArr } = this.ctx.selector;
+        const [minX, maxX] = xArr;
+        if (this.colIndex >= minX && this.colIndex <= maxX) {
+            this.ctx.paint.drawRect(this.drawX, this.drawY, this.width, this.height, {
+                borderColor: 'transparent',
+                fillColor: this.ctx.config.SELECT_ROW_COL_BG_COLOR || 'transparent',
+            });
+        }
     }
     private drawSelection() {
         const { width, height, type } = this;

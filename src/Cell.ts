@@ -743,7 +743,7 @@ export default class Cell extends BaseCell {
             xArr: xArrCopy,
             yArr: yArrCopy,
             borderColor: this.ctx.config.SELECT_BORDER_COLOR || 'rgb(82,146,247)',
-            fillColor: this.ctx.config.SELECT_AREA_COLOR || 'rgba(82,146,247,0.1)',
+            fillColor: 'transparent',
             borderWidth: 1,
             lineDash: [4, 4],
         });
@@ -752,7 +752,7 @@ export default class Cell extends BaseCell {
             xArr: this.ctx.autofill.xArr,
             yArr: this.ctx.autofill.yArr,
             borderColor: this.ctx.config.SELECT_BORDER_COLOR || 'rgb(82,146,247)',
-            fillColor: this.ctx.config.SELECT_AREA_COLOR || 'rgba(82,146,247,0.1)',
+            fillColor: 'transparent',
             borderWidth: 1,
             lineDash: [4, 4],
         });
@@ -761,9 +761,31 @@ export default class Cell extends BaseCell {
             xArr,
             yArr,
             borderColor: this.ctx.config.SELECT_BORDER_COLOR || 'rgb(82,146,247)',
-            fillColor: this.ctx.config.SELECT_AREA_COLOR || 'rgba(82,146,247,0.1)',
+            fillColor: 'transparent',
             borderWidth: 1,
         });
+        // 选择区背景颜色
+        const [minX, maxX] = xArr;
+        const [minY, maxY] = yArr;
+        const isOne = minX === maxX && minY === maxY;
+        if (
+            !isOne &&
+            this.colIndex >= minX &&
+            this.colIndex <= maxX &&
+            this.rowIndex >= minY &&
+            this.rowIndex <= maxY
+        ) {
+            this.ctx.paint.drawRect(this.drawX, this.drawY, this.visibleWidth, this.visibleHeight, {
+                borderColor: 'transparent',
+                fillColor: this.ctx.config.SELECT_AREA_COLOR || 'rgba(82,146,247,0.1)',
+            });
+        }
+        if (this.operation && this.rowIndex >= minY && this.rowIndex <= maxY) {
+            this.ctx.paint.drawRect(this.drawX, this.drawY, this.visibleWidth, this.visibleHeight, {
+                borderColor: 'transparent',
+                fillColor: this.ctx.config.SELECT_ROW_COL_BG_COLOR || 'transparent',
+            });
+        }
     }
     private drawErrorTip() {
         // 合计不显示
