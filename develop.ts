@@ -17,6 +17,7 @@ const columns: Column[] = [
         type: 'selection',
         fixed: 'left',
         width: 50,
+        operation: true,
         widthFillDisable: true,
     },
     // {

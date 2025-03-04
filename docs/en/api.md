@@ -25,7 +25,7 @@ type EVirtTableOptions = {
 | CSS_PREFIX | CSS class name prefix | string | — | e-virt-table |
 | ROW_KEY | Unique key for rows | string | — | — |
 | DISABLED | Disable editing | boolean | — | false |
-| HEAD_FONT | Header font | string | — | 12px normal Arial |
+| HEADR_FONT | Header font | string | — | 12px normal Arial |
 | BODY_FONT | Cell font | string | — | 12px normal Arial |
 | BORDER_COLOR | Border color | string | — | #e1e6eb |
 | WIDTH | Width (0 means auto fit to 100%) | number | — | 0 |
@@ -57,7 +57,7 @@ type EVirtTableOptions = {
 | SCROLLER_FOCUS_COLOR | Scrollbar slider focus color | string | — | #bbbec4 |
 | SELECT_BORDER_COLOR | Selected area border color | string | — | `rgb(82,146,247)` |
 | SELECT_AREA_COLOR | Selected area background color | string | — | `rgba(82,146,247,0.1)` |
-| SELECT_BG_COLOR | Background color of the current focus cell row and column | string | — | `rgba(82,146,247,0.1)` |
+| SELECT_ROW_COL_BG_COLOR | Background color of the current focus cell row and column | string | — | `rgba(82,146,247,0.1)` |
 | EDIT_BG_COLOR | Editable background color | string | — | `rgba(221,170,83,0.1)` |
 | AUTOFILL_POINT_BORDER_COLOR | Autofill point border color | string | — | #fff |
 | CHECKBOX_COLOR | Checkbox color | string | — | `rgb(82,146,247)` |

@@ -17,6 +17,9 @@ export default class EventBrowser {
         this.bind(this.ctx.stageElement, 'click', this.handleClick.bind(this));
         this.bind(window, 'keydown', this.handleKeydown.bind(this));
         this.bind(this.ctx.stageElement, 'wheel', this.handleWheel.bind(this));
+        this.bind(this.ctx.stageElement, 'touchstart', this.handleTouchstart.bind(this));
+        this.bind(this.ctx.stageElement, 'touchend', this.handleTouchend.bind(this));
+        this.bind(this.ctx.stageElement, 'touchmove', this.handleTouchmove.bind(this));
         this.bind(this.ctx.stageElement, 'contextmenu', this.handleContextMenu.bind(this));
         this.bind(this.ctx.stageElement, 'mousedown', this.handleMouseDown.bind(this));
         this.bind(this.ctx.stageElement, 'dblclick', this.handleDblclick.bind(this));
@@ -63,6 +66,15 @@ export default class EventBrowser {
     }
     private handleWheel(e: Event) {
         this.ctx.emit('wheel', e);
+    }
+    private handleTouchstart(e: Event) {
+        this.ctx.emit('touchstart', e);
+    }
+    private handleTouchend(e: Event) {
+        this.ctx.emit('touchend', e);
+    }
+    private handleTouchmove(e: Event) {
+        this.ctx.emit('touchmove', e);
     }
     private handleContextMenu(e: Event) {
         this.ctx.emit('contextMenu', e);

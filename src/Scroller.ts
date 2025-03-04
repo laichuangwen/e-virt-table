@@ -35,6 +35,29 @@ class Scrollbar {
     onWheel(e: WheelEvent) {
         this.updateScroll(e);
     }
+    onTouchmove(e: TouchEvent) {
+        const { clientY, clientX } = e.touches[0];
+        const deltaY = clientY - this.clientY; // 计算滑动距离
+        const deltaX = clientX - this.clientX; // 计算滑动距离
+        let scroll = 0;
+        if (this.type === 'vertical') {
+            scroll = Math.max(0, Math.min(this.dragStart - deltaY, this.distance));
+            // 只有在滚动条需要滚动时才阻止默认事件
+            const hasScrollbar = this.hasScrollbar();
+            if (hasScrollbar && !((scroll === 0 && deltaY > 0) || (scroll === this.distance && deltaY < 0))) {
+                e.preventDefault();
+            }
+        } else if (this.type === 'horizontal') {
+            scroll = Math.max(0, Math.min(this.dragStart - deltaX, this.distance));
+        }
+        this.scroll = scroll;
+    }
+    onTouchstart(e: TouchEvent) {
+        const { clientY, clientX } = e.touches[0];
+        this.clientX = clientX;
+        this.clientY = clientY;
+        this.dragStart = this.scroll;
+    }
 
     onMouseDown(e: MouseEvent) {
         if (!(e.target instanceof Element)) {
@@ -51,6 +74,7 @@ class Scrollbar {
         if (this.ctx.stageElement.style.cursor === 'col-resize') {
             return true;
         }
+
         const { offsetX, offsetY, clientX, clientY } = e;
         if (clientX == this.clientX && clientY == this.clientY) return;
         if (this.isOnScrollbar(offsetX, offsetY)) {
@@ -85,7 +109,12 @@ class Scrollbar {
     }
 
     onMouseMove(e: MouseEvent) {
-        const { offsetX, offsetY, clientX, clientY } = e;
+        const { offsetX, offsetY, clientX, clientY, buttons } = e;
+        // 没有鼠标按下时不处理，要重置抬起事件
+        if (buttons === 0) {
+            this.onMouseUp();
+            return;
+        }
         // 悬浮提示
         if (this.isOnScrollbar(offsetX, offsetY) && e.target === this.ctx.canvasElement) {
             this.isFocus = true;
@@ -272,6 +301,10 @@ export default class Scroller {
         this.ctx.on('mousedown', (e) => this.onMouseDown(e));
         this.ctx.on('mousemove', (e) => this.onMouseMove(e));
         this.ctx.on('mouseup', () => this.onMouseUp());
+        this.ctx.on('touchmove', (e) => this.onTouchmove(e));
+        this.ctx.on('touchstart', (e) => {
+            this.onTouchstart(e);
+        });
         this.ctx.on('setScroll', (scrollX: number, scrollY: number) => {
             this.setScroll(scrollX, scrollY);
         });
@@ -289,6 +322,17 @@ export default class Scroller {
         this.draw();
     }
 
+    onTouchmove(e: TouchEvent) {
+        this.verticalScrollbar.onTouchmove(e);
+        this.horizontalScrollbar.onTouchmove(e);
+        this.draw();
+    }
+
+    onTouchstart(e: TouchEvent) {
+        this.verticalScrollbar.onTouchstart(e);
+        this.horizontalScrollbar.onTouchstart(e);
+        this.draw();
+    }
     onMouseDown(e: MouseEvent) {
         this.verticalScrollbar.onMouseDown(e);
         this.horizontalScrollbar.onMouseDown(e);

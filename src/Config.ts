@@ -67,7 +67,7 @@ export default class Config {
     SCROLLER_FOCUS_COLOR = '#bbbec4';
     SELECT_BORDER_COLOR = 'rgb(82,146,247)';
     SELECT_AREA_COLOR = 'rgba(82,146,247,0.1)';
-    SELECT_BG_COLOR = 'rgba(82,146,247,0.1)';
+    SELECT_ROW_COL_BG_COLOR = 'transparent';
     AUTOFILL_POINT_BORDER_COLOR = '#fff';
     EDIT_BG_COLOR = '#fcf6ed';
     CHECKBOX_KEY = '';
