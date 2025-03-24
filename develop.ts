@@ -790,6 +790,9 @@ document.getElementById('search')?.addEventListener('click', () => {
         return list.filter((item) => item.emp_name.includes(text?.value));
     });
 });
+document.getElementById('scroll')?.addEventListener('click', () => {
+    eVirtTable.scrollYTo(1000);
+});
 document.getElementById('setValidator')?.addEventListener('click', () => {
     const errors = [
         {
@@ -832,4 +835,7 @@ function destroy() {
     eVirtTable.destroy();
     window.removeEventListener('beforeunload', destroy);
 }
+eVirtTable.on('onScrollY',(v,isTrust)=>{
+    console.log('onScrollY',v,isTrust);
+})
 window.addEventListener('beforeunload', destroy);
