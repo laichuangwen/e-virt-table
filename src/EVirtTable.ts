@@ -132,6 +132,7 @@ export default class EVirtTable {
         // 先关闭编辑
         this.editor.doneEdit();
         this.ctx.database.setData(data);
+        this.ctx.database.getData()
         this.header.init();
         this.ctx.emit('draw');
     }
