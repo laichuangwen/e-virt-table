@@ -210,7 +210,7 @@ export default class Context {
         }
     }
 
-    batchSetItemValueByEditor(_list: ChangeItem[], history?: boolean) {
+    batchSetItemValueByEditor(_list: ChangeItem[], history = true) {
         // 启用合并单元格关联
         if (this.config.ENABLE_MERGE_CELL_LINK) {
             const list: ChangeItem[] = [];
@@ -225,15 +225,6 @@ export default class Context {
                     list.push(...data);
                 }
             });
-            // 去重
-            // const uniqueData = list.reduce((acc, curr) => {
-            //     // 检查组合的 rowKey 和 key 是否已存在
-            //     const exists = acc.some((item) => item.rowKey === curr.rowKey && item.key === curr.key);
-            //     if (!exists) {
-            //         acc.push(curr); // 如果不存在，则添加到结果数组中
-            //     }
-            //     return acc;
-            // }, [] as typeof list);
             this.database.batchSetItemValue(list, history);
         } else {
             this.database.batchSetItemValue(_list, history);

@@ -173,6 +173,11 @@ export default class EVirtTable {
         this.ctx.setItemValueByEditor(rowKey, key, value, history, reDraw);
         this.editor.doneEdit();
     }
+    
+    batchSetItemValueByEditor(list: ChangeItem[], history = true) {
+        this.ctx.batchSetItemValueByEditor(list, history);
+        this.editor.doneEdit();
+    }
     doLayout() {
         this.ctx.emit('draw');
     }
