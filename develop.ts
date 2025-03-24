@@ -640,10 +640,7 @@ const eVirtTable = new EVirtTable(canvas, {
             }
         },
         SPAN_METHOD: (params) => {
-            const {
-                mergeColCell,
-                mergeRowCell,
-            } = eVirtTable.getUtils();
+            const { mergeColCell, mergeRowCell } = eVirtTable.getUtils();
             const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;
             if (
                 [
@@ -835,7 +832,7 @@ function destroy() {
     eVirtTable.destroy();
     window.removeEventListener('beforeunload', destroy);
 }
-eVirtTable.on('onScrollY',(v,isTrust)=>{
-    console.log('onScrollY',v,isTrust);
-})
+eVirtTable.on('onScrollY', (v, isTrust) => {
+    console.log('onScrollY', v, isTrust);
+});
 window.addEventListener('beforeunload', destroy);

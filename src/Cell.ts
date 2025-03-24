@@ -775,7 +775,7 @@ export default class Cell extends BaseCell {
             this.rowIndex >= minY &&
             this.rowIndex <= maxY
         ) {
-            this.ctx.paint.drawRect(this.drawX, this.drawY, this.visibleWidth, this.visibleHeight, {
+            this.ctx.paint.drawRect(this.drawX, this.drawY, this.width, this.height, {
                 borderColor: 'transparent',
                 fillColor: this.ctx.config.SELECT_AREA_COLOR || 'rgba(82,146,247,0.1)',
             });

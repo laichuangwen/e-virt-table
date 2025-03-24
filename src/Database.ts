@@ -56,6 +56,7 @@ export default class Database {
         this.validationErrorMap.clear();
         this.itemRowKeyMap = new WeakMap();
         this.initData(this.data);
+        this.getData();
     }
     /**
      * 清除缓存数据

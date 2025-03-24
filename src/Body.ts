@@ -316,6 +316,9 @@ export default class Body {
         // 更新最大行数
         this.ctx.maxRowIndex = data.length - 1;
         const _headIndex = this.binarySearch(positions, offset);
+        if (_headIndex === -1) {
+            return;
+        }
         let _tailIndex = this.binarySearch(positions, offset + this.visibleHeight);
         // 找不到就为data.length
         if (_tailIndex === -1) {
@@ -327,6 +330,7 @@ export default class Body {
         this.ctx.body.headIndex = this.headIndex;
         this.ctx.body.tailIndex = this.tailIndex;
         this.ctx.body.visibleRows = this.visibleRows;
+
         const rows: Row[] = [];
         for (let i = 0; i < this.visibleRows.length; i++) {
             const index = this.headIndex + i;

@@ -18,7 +18,7 @@ export default class EventTable {
             this.ctx.emit('resetHeader');
             this.ctx.emit('resizeObserver');
         });
-        this.resizeObserver.observe(this.ctx.stageElement);
+        this.resizeObserver.observe(this.ctx.containerElement);
         // 按下事件
         this.ctx.on('mousedown', (e) => {
             // 左边点击

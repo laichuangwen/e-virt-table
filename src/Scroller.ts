@@ -377,11 +377,11 @@ export default class Scroller {
     }
     setScrollX(scrollX: number) {
         this.horizontalScrollbar.scroll = scrollX;
-        this.ctx.emit('draw',false);
+        this.ctx.emit('draw');
     }
     setScrollY(scrollY: number) {
         this.verticalScrollbar.scroll = scrollY;
-        this.ctx.emit('draw',false);
+        this.ctx.emit('draw');
     }
     scrollToColkey(key: string) {
         const { header } = this.ctx;
