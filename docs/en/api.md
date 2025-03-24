@@ -147,8 +147,8 @@ type EVirtTableOptions = {
 | startEdit | Callback for start edit | focusCell |
 | doneEdit | Callback for end edit | cellTarget |
 | overlayerChange | Callback for overlay change | overlayer |
-| onScrollX | Callback for horizontal scroll | scrollX |
-| onScrollY | Callback for vertical scroll | scrollY |
+| onScrollX | Callback for horizontal scroll | scrollX, isTrusted |
+| onScrollY | Callback for vertical scroll | scrollY, isTrusted |
 | clearSelectedDataChange | Callback for clearing selected data | changeList |
 | cellMouseenter | Callback for cell mouse enter | — |
 | cellMousedown | Callback for cell mouse down | — |
