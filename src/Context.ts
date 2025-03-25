@@ -286,7 +286,7 @@ export default class Context {
             value: rowsData,
         };
     }
-    setScroll(x: number, y: number): void {
+    setScroll(x: number, y: number, isTrust = true): void {
         let scrollX = Math.floor(x);
         const scrollMaxX = this.body.width - this.body.visibleWidth;
         // x边界处理
@@ -306,9 +306,9 @@ export default class Context {
         } else if (scrollY > scrollMaxY) {
             scrollY = scrollMaxY;
         }
-        this.emit('setScroll', scrollX, scrollY);
+        this.emit('setScroll', scrollX, scrollY, isTrust);
     }
-    setScrollX(x: number): void {
+    setScrollX(x: number, isTrust = true): void {
         let scrollX = Math.floor(x);
         const scrollMaxX = this.body.width - this.body.visibleWidth;
         // 边界处理
@@ -317,9 +317,9 @@ export default class Context {
         } else if (scrollX > scrollMaxX) {
             scrollX = scrollMaxX;
         }
-        this.emit('setScrollX', scrollX);
+        this.emit('setScrollX', scrollX, isTrust);
     }
-    setScrollY(y: number): void {
+    setScrollY(y: number, isTrust = true): void {
         // 边界处理
         let scrollY = Math.floor(y);
         let footerHeight = 0;
@@ -332,7 +332,7 @@ export default class Context {
         } else if (scrollY > scrollMaxY) {
             scrollY = scrollMaxY;
         }
-        this.emit('setScrollY', scrollY);
+        this.emit('setScrollY', scrollY, isTrust);
     }
     isTarget(): boolean {
         // 鼠标在容器内

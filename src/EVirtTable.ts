@@ -252,12 +252,11 @@ export default class EVirtTable {
         return this.ctx.database.hasValidationError();
     }
     scrollTo(x: number, y: number) {
-        this.scrollXTo(x);
-        this.scrollYTo(y);
+        this.scroller.setScroll(x, y, false);
     }
 
     scrollXTo(x: number) {
-        this.ctx.setScrollX(x);
+        this.scroller.setScrollX(x, false);
     }
 
     scrollToColkey(key: string) {
@@ -273,7 +272,7 @@ export default class EVirtTable {
         this.scroller.scrollToRowIndex(rowIndex);
     }
     scrollYTo(y: number) {
-        this.ctx.setScrollY(y);
+        this.scroller.setScrollY(y, false);
     }
     setExpandRowKeys(keys: any[], expand = true) {
         this.ctx.database.setExpandRowKeys(keys, expand);

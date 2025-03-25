@@ -836,3 +836,61 @@ eVirtTable.on('onScrollY', (v, isTrust) => {
     console.log('onScrollY', v, isTrust);
 });
 window.addEventListener('beforeunload', destroy);
+function makeMockData() {
+    const randomNum = 1000 + Math.floor(Math.random() * 1000);
+    console.log('makeMockData', randomNum);
+    for (let i = 0; i < randomNum; i++) {
+        data.push({
+            id: data.length + i,
+            _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
+
+            // _readonly: true,
+            emp_img: 'https://devtest-oss-r.bananain.cn/wechat-mall/2024/08/27/1724754260406/20240827-182345.jpg',
+            emp_name: `xx${data.length}${i % 5 ? 1 : 0}`,
+            emp_name11: `张三mock${i % 5 ? 1 : 0}`,
+            emp_name221: `张三mock${i % 5 ? 1 : 0}`,
+            emp_name222: `张三mock${i % 5 ? 1 : 0}`,
+            emp_name2: `张三mock${i % 5 ? 1 : 0}`,
+            emp_no: i,
+            dep_name: ['zhinan', 'shejiyuanze', 'yizhi'],
+            job_name: i === 5 ? '产品经理测试很长的名字' : `产品经理${i}`,
+            phone: i === 4 ? '13159645561a' : `${13159645561 + i}`,
+            // eslint-disable-next-line no-nested-ternary
+            sex: i % 4 === 0 ? 1 : i === 3 ? null : 2,
+            address:
+                // eslint-disable-next-line no-nested-ternary
+                i === 1 ? `海淀区北京路海淀区北京路十分地${i}号` : i === 4 ? '' : `海淀区北京路${i}号`,
+            work_type: `兼职${i}`,
+            work_status: `在职${i}`,
+            household_city: `深圳${i}`,
+            household_address: `深南大道${i}号`,
+            nation: `汉${i}`,
+            work_address: `南京路${i}号`,
+            work_email: `${28976633 + i}@qq.com`,
+            email: `${4465566 + i}@qq.com`,
+            work_age: 2 + i,
+            company_age: 1 + i,
+            contract_company: `飞鸟物流公司${i}`,
+            qq: 35860567 + i,
+            salary_month: `${1996 + i}-09`,
+            birthday: `${1996 + i}-09-21`,
+            age: 1 + i,
+            brandName: `博世${i}`,
+            goodsName: `电钻${i}`,
+            sn: `SDFSD${i}`,
+            materialNo: `1231${i}`,
+            unit: '个',
+            requiredQuantity: 10,
+            customerRemarks: `测试测试${i}`,
+            purchasePrice: 10.2 + i,
+            salePrice: 12.3 + i,
+            children: [],
+            _hasChildren: true,
+        });
+    }
+}
+setInterval(() => {
+    makeMockData();
+    eVirtTable.loadData(data);
+    eVirtTable.scrollToRowIndex(data.length - 1);
+}, 2000);
