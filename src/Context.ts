@@ -241,13 +241,13 @@ export default class Context {
         this.emit('cellFocusChange', cell);
     }
     clearSelector() {
-        this.selector = {
-            enable: false,
-            xArr: [-1, -1],
-            yArr: [-1, -1],
-            xArrCopy: [-1, -1],
-            yArrCopy: [-1, -1],
-        };
+        this.selector.enable = false;
+        this.selector.xArr = [-1, -1];
+        this.selector.yArr = [-1, -1];
+    }
+    clearSelectorCopy() {
+        this.selector.xArrCopy = [-1, -1];
+        this.selector.yArrCopy = [-1, -1];
     }
     clearAutofill() {
         this.autofill = {

@@ -148,8 +148,8 @@ type EVirtTableOptions = {
 | startEdit | 开始编辑回调 | focusCell |
 | doneEdit | 结束编回调 | cellTarget |
 | overlayerChange | 覆盖层改变回调 | overlayer |
-| onScrollX | 横向滚动条回调 | scrollX, isTrusted |
-| onScrollY | 纵向滚动条回调 | scrollY, isTrusted |
+| onScrollX | 横向滚动条回调 | scrollX |
+| onScrollY | 纵向滚动条回调 | scrollY |
 | clearSelectedDataChange | 清除数据回调 | changeList |
 | cellMouseenter | 格子移入回调 | — |
 | cellMousedown | 格子按下回调 | — |

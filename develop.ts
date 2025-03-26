@@ -65,88 +65,6 @@ const columns: Column[] = [
         // render: "emp_name",
     },
     // {
-    //   title: "图片",
-    //   key: "emp_img",
-    //   readonly: true,
-    //   renderFooter(cell: any) {
-    //     return h(
-    //       "span",
-    //       {
-    //         class: "text",
-    //       },
-    //       "heji"
-    //     );
-    //   },
-    //   renderHeader(cell: any) {
-    //     return h(
-    //       "div",
-    //       {
-    //         class: "bg-img",
-    //       },
-    //       "图片11"
-    //     );
-    //   },
-    //   render(cell: any) {
-    //     return h(
-    //       "div",
-    //       {
-    //         style: {
-    //           width: "100%",
-    //           height: "100%",
-    //           display: "flex",
-    //           justifyContent: "center",
-    //           alignItems: "center",
-    //           "pointer-events": "initial",
-    //           position: "relative",
-    //           overflow: "hidden",
-    //         },
-    //       },
-    //       [
-    //         h(
-    //           "div",
-    //           {
-    //             style: {
-    //               padding: "4px",
-    //               width: "100%",
-    //               height: "auto",
-    //               position: "absolute",
-    //               top: "0",
-    //               left: "0",
-    //               transform: `translateY(${scrollY.value}px)`,
-    //             },
-    //           },
-    //           [
-    //             h("img", {
-    //               src: "https://devtest-oss-r.bananain.cn/wechat-mall/2024/08/27/1724754260406/20240827-182345.jpg",
-    //               style: {
-    //                 width: "100%",
-    //                 height: "100%",
-    //                 "pointer-events": "initial",
-    //               },
-    //             }),
-    //             h("img", {
-    //               src: "https://devtest-oss-r.bananain.cn/wechat-mall/2024/08/27/1724754558405/20240827-182906.jpg",
-    //               style: {
-    //                 width: "100%",
-    //                 height: "100%",
-    //                 "pointer-events": "initial",
-    //               },
-    //             }),
-    //             h("img", {
-    //               src: "https://devtest-oss-r.bananain.cn/wechat-mall/2024/08/27/1724754558408/20240827-182910.jpg",
-    //               style: {
-    //                 width: "100%",
-    //                 height: "100%",
-    //                 "pointer-events": "initial",
-    //               },
-    //             }),
-    //           ]
-    //         ),
-    //       ]
-    //     );
-    //   },
-    // },
-    // {
     //   title: '部门',
     //   key: 'dep_name',
     //   size: 'large',
@@ -371,7 +289,6 @@ for (let i = 0; i < 800; i += 1) {
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
         id: i,
         // _readonly: true,
-        emp_img: 'https://devtest-oss-r.bananain.cn/wechat-mall/2024/08/27/1724754260406/20240827-182345.jpg',
         emp_name: `张三${i % 5 ? 1 : 0}`,
         emp_name11: `张三${i % 5 ? 1 : 0}`,
         emp_name221: `张三${i % 5 ? 1 : 0}`,
@@ -609,15 +526,11 @@ const eVirtTable = new EVirtTable(canvas, {
                             emp_no: `${i}-1-1`,
                             emp_name: `张三${i}-层级1-1`,
                             children: [],
-                            emp_img:
-                                'https://img.alicdn.com/bao/uploaded/i1/3035493001/O1CN01ueaQmD1Y2VJOV3Ujo_!!3035493001.jpg',
                         },
                         {
                             id: 2,
                             emp_no: `${i}-1-2`,
                             emp_name: `张三${i}-层级1-1`,
-                            emp_img:
-                                'https://img.alicdn.com/bao/uploaded/i1/3035493001/O1CN01ueaQmD1Y2VJOV3Ujo_!!3035493001.jpg',
                         },
                     ];
                     resolve(list);
@@ -832,7 +745,4 @@ function destroy() {
     eVirtTable.destroy();
     window.removeEventListener('beforeunload', destroy);
 }
-eVirtTable.on('onScrollY', (v, isTrust) => {
-    console.log('onScrollY', v, isTrust);
-});
 window.addEventListener('beforeunload', destroy);

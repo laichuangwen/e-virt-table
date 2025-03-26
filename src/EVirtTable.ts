@@ -78,6 +78,7 @@ export default class EVirtTable {
         const canvasElement = document.createElement('canvas');
         const overlayerElement = _overlayerElement || document.createElement('div');
         stageElement.className = 'e-virt-table-stage';
+        containerElement.tabIndex = 0;
         canvasElement.className = 'e-virt-table-canvas';
         overlayerElement.className = 'e-virt-table-overlayer';
         const editorElement = _editorElement || document.createElement('div');
@@ -252,12 +253,11 @@ export default class EVirtTable {
         return this.ctx.database.hasValidationError();
     }
     scrollTo(x: number, y: number) {
-        this.scrollXTo(x);
-        this.scrollYTo(y);
+        this.scroller.setScroll(x, y);
     }
 
     scrollXTo(x: number) {
-        this.ctx.setScrollX(x);
+        this.scroller.setScrollX(x);
     }
 
     scrollToColkey(key: string) {
@@ -273,7 +273,7 @@ export default class EVirtTable {
         this.scroller.scrollToRowIndex(rowIndex);
     }
     scrollYTo(y: number) {
-        this.ctx.setScrollY(y);
+        this.scroller.setScrollY(y);
     }
     setExpandRowKeys(keys: any[], expand = true) {
         this.ctx.database.setExpandRowKeys(keys, expand);

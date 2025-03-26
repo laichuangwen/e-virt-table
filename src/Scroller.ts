@@ -319,30 +319,30 @@ export default class Scroller {
     onWheel(e: WheelEvent) {
         this.verticalScrollbar.onWheel(e);
         this.horizontalScrollbar.onWheel(e);
-        this.draw(true);
+        this.draw();
     }
 
     onTouchmove(e: TouchEvent) {
         this.verticalScrollbar.onTouchmove(e);
         this.horizontalScrollbar.onTouchmove(e);
-        this.draw(true);
+        this.draw();
     }
 
     onTouchstart(e: TouchEvent) {
         this.verticalScrollbar.onTouchstart(e);
         this.horizontalScrollbar.onTouchstart(e);
-        this.draw(true);
+        this.draw();
     }
     onMouseDown(e: MouseEvent) {
         this.verticalScrollbar.onMouseDown(e);
         this.horizontalScrollbar.onMouseDown(e);
-        this.draw(true);
+        this.draw();
     }
 
     onMouseMove(e: MouseEvent) {
         this.verticalScrollbar.onMouseMove(e);
         this.horizontalScrollbar.onMouseMove(e);
-        this.draw(true);
+        this.draw();
     }
 
     onMouseUp() {
@@ -351,19 +351,19 @@ export default class Scroller {
         this.ctx.scrollerMove = false;
     }
 
-    draw(isTrust: boolean = false) {
+    draw() {
         this.verticalScrollbar.draw();
         this.horizontalScrollbar.draw();
         const scrollX = Math.floor(this.horizontalScrollbar.scroll);
         const scrollY = Math.floor(this.verticalScrollbar.scroll);
         // 只有滚动条发生变化才触发绘制
         if (scrollX !== this.ctx.scrollX || scrollY !== this.ctx.scrollY) {
-            this.ctx.emit('onScroll', scrollX, scrollY, isTrust);
+            this.ctx.emit('onScroll', scrollX, scrollY);
             if (scrollX !== this.ctx.scrollX) {
-                this.ctx.emit('onScrollX', scrollX, isTrust);
+                this.ctx.emit('onScrollX', scrollX);
             }
             if (scrollY !== this.ctx.scrollY) {
-                this.ctx.emit('onScrollY', scrollY, isTrust);
+                this.ctx.emit('onScrollY', scrollY);
             }
             this.ctx.scrollX = scrollX;
             this.ctx.scrollY = scrollY;
@@ -374,6 +374,7 @@ export default class Scroller {
         this.horizontalScrollbar.scroll = x;
         this.verticalScrollbar.scroll = y;
         this.ctx.emit('draw');
+        this.ctx.emit('onScroll', x, y);
     }
     setScrollX(scrollX: number) {
         this.horizontalScrollbar.scroll = scrollX;
