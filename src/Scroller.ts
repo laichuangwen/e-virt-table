@@ -305,14 +305,14 @@ export default class Scroller {
         this.ctx.on('touchstart', (e) => {
             this.onTouchstart(e);
         });
-        this.ctx.on('setScroll', (scrollX: number, scrollY: number, isTrust = true) => {
-            this.setScroll(scrollX, scrollY, isTrust);
+        this.ctx.on('setScroll', (scrollX: number, scrollY: number) => {
+            this.setScroll(scrollX, scrollY);
         });
         this.ctx.on('setScrollX', (scrollX: number) => {
-            this.setScrollX(scrollX, true);
+            this.setScrollX(scrollX);
         });
         this.ctx.on('setScrollY', (scrollY: number) => {
-            this.setScrollY(scrollY, true);
+            this.setScrollY(scrollY);
         });
     }
 
@@ -358,42 +358,38 @@ export default class Scroller {
         const scrollY = Math.floor(this.verticalScrollbar.scroll);
         // 只有滚动条发生变化才触发绘制
         if (scrollX !== this.ctx.scrollX || scrollY !== this.ctx.scrollY) {
-            this.ctx.emit('onScroll', scrollX, scrollY, true);
+            this.ctx.emit('onScroll', scrollX, scrollY);
             if (scrollX !== this.ctx.scrollX) {
-                // 添加isTrust
-                this.ctx.emit('onScrollX', scrollX, true);
+                this.ctx.emit('onScrollX', scrollX);
             }
             if (scrollY !== this.ctx.scrollY) {
-                // 添加isTrust
-                this.ctx.emit('onScrollY', scrollY, true);
+                this.ctx.emit('onScrollY', scrollY);
             }
             this.ctx.scrollX = scrollX;
             this.ctx.scrollY = scrollY;
             this.ctx.emit('draw');
         }
     }
-    setScroll(x: number, y: number, isTrust = true) {
+    setScroll(x: number, y: number) {
         this.horizontalScrollbar.scroll = x;
         this.verticalScrollbar.scroll = y;
         this.ctx.emit('draw');
-        this.ctx.emit('onScroll', x, y, isTrust);
+        this.ctx.emit('onScroll', x, y);
     }
-    setScrollX(scrollX: number, isTrust = true) {
+    setScrollX(scrollX: number) {
         this.horizontalScrollbar.scroll = scrollX;
         this.ctx.emit('draw');
-        this.ctx.emit('onScrollX', scrollX, isTrust);
     }
-    setScrollY(scrollY: number, isTrust = true) {
+    setScrollY(scrollY: number) {
         this.verticalScrollbar.scroll = scrollY;
         this.ctx.emit('draw');
-        this.ctx.emit('onScrollY', scrollY, isTrust);
     }
     scrollToColkey(key: string) {
         const { header } = this.ctx;
         const cell = header.leafCellHeaders.find((cell) => cell.key === key);
         if (cell) {
             // 移动到窗口中间/2
-            this.setScrollX(cell.x - header.visibleWidth / 2, false);
+            this.setScrollX(cell.x - header.visibleWidth / 2);
         }
     }
     scrollToColIndex(colIndex: number) {
@@ -402,7 +398,7 @@ export default class Scroller {
         if (cell) {
             // 移动到窗口中间/2
             if (cell.x > header.visibleWidth / 2) {
-                this.setScrollX(cell.x - header.visibleWidth / 2, false);
+                this.setScrollX(cell.x - header.visibleWidth / 2);
             }
         }
     }
@@ -410,13 +406,13 @@ export default class Scroller {
         const { body, database } = this.ctx;
         const { top } = database.getPositionForRowIndex(rowIndex);
         if (top > body.visibleHeight) {
-            this.setScrollY(top - body.visibleHeight / 2, false);
+            this.setScrollY(top - body.visibleHeight / 2);
         }
     }
     scrollToRowKey(rowKey: string) {
         const { body, database } = this.ctx;
         const rowIndex = database.getRowIndexForRowKey(rowKey);
         const { top } = database.getPositionForRowIndex(rowIndex);
-        this.setScrollY(top - body.visibleHeight / 2, false);
+        this.setScrollY(top - body.visibleHeight / 2);
     }
 }
