@@ -77,16 +77,17 @@ export default class Editor {
                 'F10',
                 'F11',
                 'F12',
+                'Enter',
             ];
             if (functionKeys.includes(key)) {
                 return;
             }
             // 编辑模式按下按Enter进入编辑模式
-            if (e.code === 'Enter' && !this.enable) {
-                e.preventDefault();
-                this.startEdit();
-                return;
-            }
+            // if (e.code === 'Enter' && !this.enable) {
+            //     e.preventDefault();
+            //     this.startEdit();
+            //     return;
+            // }
             // 除了上面的建其他都开始编辑
             this.startEdit();
         });
@@ -191,6 +192,7 @@ export default class Editor {
             if (e.code === 'Escape' || e.code === 'Enter') {
                 e.preventDefault();
                 this.inputEl.blur();
+                this.ctx.emit('setMoveFocus', 'BOTTOM');
             }
         });
         // 监听输入事件，自动调整高度
