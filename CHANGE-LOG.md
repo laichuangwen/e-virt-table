@@ -59,7 +59,13 @@ V1.0.7
 - 修复点击容器外选中不失去焦点
 ---
 
-V1.0.8
+V1.0.8（有bug勿用）
 ### Bug Fixes
 - 修复loadData空失效
+---
+
+V1.0.9
+### Bug Fixes
+- 修复修复loadData后立刻scrollto性能问题
+- 修复V1.0.8版本
 ---
