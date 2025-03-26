@@ -310,13 +310,26 @@ export default class Body {
     }
     update() {
         this.init();
-        const { header, database, scrollY } = this.ctx;
+        const {
+            header,
+            database,
+            scrollY,
+            config: { CELL_HEIGHT },
+        } = this.ctx;
         const offset = scrollY;
         const { data, positions } = database.getData();
         // 更新最大行数
         this.ctx.maxRowIndex = data.length - 1;
-        const _headIndex = this.binarySearch(positions, offset);
+        let _headIndex = this.binarySearch(positions, offset);
         let _tailIndex = this.binarySearch(positions, offset + this.visibleHeight);
+        if (_tailIndex === -1) {
+            _tailIndex = this.ctx.maxRowIndex;
+        }
+        // 解决性能问题,设置数据时又设置滚动条可能导致虚拟滚动计算错误
+        if (_headIndex === -1 && _tailIndex === this.ctx.maxRowIndex) {
+            const buffer = Math.floor(this.visibleHeight / CELL_HEIGHT);
+            _headIndex = this.ctx.maxRowIndex - buffer;
+        }
         this.headIndex = Math.max(0, _headIndex);
         this.tailIndex = Math.min(this.ctx.maxRowIndex, _tailIndex + 1);
         this.visibleRows = data.slice(this.headIndex, this.tailIndex + 1);
