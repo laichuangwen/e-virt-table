@@ -316,14 +316,7 @@ export default class Body {
         // 更新最大行数
         this.ctx.maxRowIndex = data.length - 1;
         const _headIndex = this.binarySearch(positions, offset);
-        if (_headIndex === -1) {
-            return;
-        }
         let _tailIndex = this.binarySearch(positions, offset + this.visibleHeight);
-        // 找不到就为data.length
-        if (_tailIndex === -1) {
-            _tailIndex = data.length;
-        }
         this.headIndex = Math.max(0, _headIndex);
         this.tailIndex = Math.min(this.ctx.maxRowIndex, _tailIndex + 1);
         this.visibleRows = data.slice(this.headIndex, this.tailIndex + 1);
