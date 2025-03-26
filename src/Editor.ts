@@ -16,6 +16,14 @@ export default class Editor {
         this.init();
     }
     private init() {
+        // 容器不聚焦，清除选择器
+        this.ctx.on('focusout', () => {
+            // 编辑状态不处理
+            if (this.ctx.editing) {
+                return;
+            }
+            this.cellTarget = null;
+        });
         // 滚动时，结束编辑
         this.ctx.on('onScroll', () => {
             if (this.enable) {
@@ -29,6 +37,9 @@ export default class Editor {
             this.cellTarget = null;
         });
         this.ctx.on('keydown', (e) => {
+            if (!this.ctx.isTarget()) {
+                return;
+            }
             const key = e.key;
             const isCtrl = e.ctrlKey;
             const isAlt = e.altKey;

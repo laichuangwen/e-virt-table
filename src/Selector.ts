@@ -18,6 +18,15 @@ export default class Selector {
         this.init();
     }
     private init() {
+        // 容器不聚焦，清除选择器
+        this.ctx.on('focusout', () => {
+            // 编辑状态不处理
+            if (this.ctx.editing) {
+                return;
+            }
+            this.ctx.clearSelector();
+            this.ctx.emit('draw');
+        });
         // 鼠标移动fixed边界时，调整滚动条位置
         this.ctx.on(
             'mousemove',
