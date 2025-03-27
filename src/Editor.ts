@@ -10,6 +10,7 @@ export default class Editor {
     ctx: Context;
     private drawY = 0;
     private drawX = 0;
+    private cancel = false;
     constructor(ctx: Context) {
         this.ctx = ctx;
         this.initTextEditor();
@@ -17,10 +18,13 @@ export default class Editor {
     }
     private init() {
         // 容器不聚焦，清除选择器
-        this.ctx.on('focusout', () => {
+        this.ctx.on('focusout', (e) => {
+            if (e.target === this.ctx.stageElement) {
+                return;
+            }
             // 编辑状态不处理
             if (this.ctx.editing) {
-                return;
+                this.doneEdit();
             }
             this.cellTarget = null;
         });
@@ -40,6 +44,43 @@ export default class Editor {
             if (!this.ctx.isTarget()) {
                 return;
             }
+            if (e.code === 'Escape' && this.ctx.editing) {
+                this.cancel = true;
+                const { focusCell } = this.ctx;
+                if (focusCell) {
+                    this.ctx.emit('setSelectorCell', focusCell);
+                    this.cellTarget = focusCell;
+                }
+                this.doneEdit();
+                return;
+            }
+            if ((e.altKey || e.metaKey) && e.code === 'Enter' && this.ctx.editing && this.inputEl) {
+                e.preventDefault();
+                const cursorPos = this.inputEl.selectionStart; // 获取光标位置
+                const textBefore = this.inputEl.value.substring(0, cursorPos); // 光标前的文本
+                const textAfter = this.inputEl.value.substring(cursorPos); // 光标后的文本
+                // 更新 textarea 的内容，在光标位置插入换行符
+                this.inputEl.value = textBefore + '\n' + textAfter;
+                // 设置光标位置到新行
+                this.inputEl.selectionStart = this.inputEl.selectionEnd = cursorPos + 1;
+                this.autoSize();
+                return;
+            }
+            if (e.code === 'Enter' && this.ctx.editing) {
+                e.preventDefault();
+                this.doneEdit();
+                const { focusCell } = this.ctx;
+                if (focusCell) {
+                    this.ctx.emit('setSelectorCell', focusCell);
+                    this.cellTarget = focusCell;
+                }
+                if (e.shiftKey) {
+                    this.ctx.emit('setMoveFocus', 'TOP');
+                    return;
+                }
+                this.ctx.emit('setMoveFocus', 'BOTTOM');
+                return;
+            }
             const key = e.key;
             const isCtrl = e.ctrlKey;
             const isAlt = e.altKey;
@@ -51,7 +92,7 @@ export default class Editor {
             }
             // 检测功能键（比如 F1, Escape,Tab 等）
             const functionKeys = [
-                // "Enter",
+                'Enter',
                 'Escape',
                 'Tab',
                 'Backspace',
@@ -77,19 +118,12 @@ export default class Editor {
                 'F10',
                 'F11',
                 'F12',
-                'Enter',
             ];
             if (functionKeys.includes(key)) {
                 return;
             }
-            // 编辑模式按下按Enter进入编辑模式
-            // if (e.code === 'Enter' && !this.enable) {
-            //     e.preventDefault();
-            //     this.startEdit();
-            //     return;
-            // }
             // 除了上面的建其他都开始编辑
-            this.startEdit();
+            this.startEdit(true);
         });
         this.ctx.on('adjustBoundaryPosition', (cell) => {
             // 调整位置会触发重绘可能会导致cellClick事件不能触发，调整位置时需要赋值cellTarget
@@ -163,43 +197,8 @@ export default class Editor {
         // 初始化文本编辑器
         this.inputEl = document.createElement('textarea');
         this.inputEl.setAttribute('rows', '1');
-        // 监听键盘事件
-        this.inputEl.addEventListener('keydown', (e) => {
-            // 如果是在输入中文过程中，不触发
-            if (e.isComposing) {
-                return;
-            }
-            if (!this.enable) {
-                return;
-            }
-            e.stopPropagation();
-            // 模拟excel  altKey enter换行
-            if ((e.altKey || e.metaKey) && e.code === 'Enter') {
-                e.preventDefault();
-                // 插入换行符
-                const cursorPos = this.inputEl.selectionStart; // 获取光标位置
-                const textBefore = this.inputEl.value.substring(0, cursorPos); // 光标前的文本
-                const textAfter = this.inputEl.value.substring(cursorPos); // 光标后的文本
-
-                // 更新 textarea 的内容，在光标位置插入换行符
-                this.inputEl.value = textBefore + '\n' + textAfter;
-
-                // 设置光标位置到新行
-                this.inputEl.selectionStart = this.inputEl.selectionEnd = cursorPos + 1;
-                this.autoSize();
-                return;
-            }
-            if (e.code === 'Escape' || e.code === 'Enter') {
-                e.preventDefault();
-                this.inputEl.blur();
-                this.ctx.emit('setMoveFocus', 'BOTTOM');
-            }
-        });
         // 监听输入事件，自动调整高度
         this.inputEl.addEventListener('input', this.autoSize.bind(this));
-        this.inputEl.addEventListener('blur', () => {
-            this.doneEdit();
-        });
         this.editorEl = this.ctx.editorElement;
         this.inputEl.className = 'e-virt-table-editor-textarea';
         this.editorEl.appendChild(this.inputEl);
@@ -230,8 +229,8 @@ export default class Editor {
         }
         this.inputEl.style.height = `${scrollHeight}px`; // 设置为内容的高度
     }
-    private startEditByInput(cell: Cell) {
-        const value = cell.getValue();
+    private startEditByInput(cell: Cell, ignoreValue = false) {
+        const value = ignoreValue ? null : cell.getValue();
         const { editorType } = cell;
         if (this.ctx.config.ENABLE_MERGE_CELL_LINK) {
             cell.updateSpanInfo(); // 更新合并单元格信息
@@ -287,14 +286,15 @@ export default class Editor {
             const value = this.cellTarget.getValue();
             const textContent = this.inputEl.value;
             // !(text.textContent === '' && value === null)剔除点击编辑后未修改会把null变为''的情况
-            if (textContent !== value && !(textContent === '' && value === null)) {
+            if (textContent !== value && !(textContent === '' && value === null) && !this.cancel) {
                 this.ctx.setItemValueByEditor(rowKey, key, textContent, true);
                 // this.cellTarget.setValue(textContent);
             }
             this.inputEl.value = '';
         }
     }
-    startEdit() {
+    startEdit(ignoreValue = false) {
+        this.cancel = false;
         // 如果不启用点击选择器编辑
         const { ENABLE_EDIT_CLICK_SELECTOR } = this.ctx.config;
         if (!ENABLE_EDIT_CLICK_SELECTOR) {
@@ -322,7 +322,7 @@ export default class Editor {
             this.enable = true;
             this.ctx.editing = true;
             this.cellTarget = focusCell;
-            this.startEditByInput(this.cellTarget);
+            this.startEditByInput(this.cellTarget, ignoreValue);
             this.ctx.emit('startEdit', this.cellTarget);
         }
     }

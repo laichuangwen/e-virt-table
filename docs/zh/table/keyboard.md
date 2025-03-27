@@ -17,12 +17,14 @@
 | 复制区域单元格内容          | `Ctrl + C`                       | `Command + C`             |
 | 粘贴（支持 excel 内容格式） | `Ctrl + V`                       | `Command + V`             |
 | 剪切区域单元格内容          | `Ctrl + X`                       | `Command + X`             |
-| 删除区域单元格内容          | `Delete`                         | `Delete` 或 `Fn + Delete` |
+| 删除区域单元格内容          | `Delete` 或 `Backspace`          | `Delete` 或 `Fn + Delete` |
 | 上移选中单元格              | `↑`                              | `↑`                       |
 | 下移选中单元格              | `↓`                              | `↓`                       |
 | 左移选中单元格              | `←`                              | `←`                       |
 | 右移选中单元格              | `→`                              | `→`                       |
-| 开始编辑或完成编辑          | `Enter`                          | `Enter`                   |
+| 取消编辑                    | `Esc`                            | `Esc`                     |
+| 结束输入并移动到下一行      | `Enter`                          | `Enter`                   |
+| 结束输入并移动到上一行      | `Shift+Enter`                    | `Shift+Enter`             |
 | 输入框换行                  | `Ctrl+Enter`                     | `Command+Enter`           |
 | 撤销操作                    | `Ctrl + Z`                       | `Command + Z`             |
 | 恢复操作                    | `Ctrl + Y` 或 `Ctrl + Shift + Z` | `Command + Shift + Z`     |

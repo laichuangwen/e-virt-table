@@ -54,18 +54,27 @@ V1.0.6
 
 V1.0.7
 ### Bug Fixes
-- 更改enter变成下一个，而不会是进入编辑状态
-- 剔除isTrsut及文档
-- 修复点击容器外选中不失去焦点
+- 废弃
 ---
 
-V1.0.8（有bug勿用）
+V1.0.8
 ### Bug Fixes
-- 修复loadData空失效
+- 废弃
 ---
 
 V1.0.9
 ### Bug Fixes
+- 更改enter变成下一个，而不会是进入编辑状态
+- 剔除isTrsut及文档
+- 修复点击容器外选中不失去焦点
 - 修复修复loadData后立刻scrollto性能问题
 - 修复V1.0.8版本
+---
+
+V1.1.0
+### Bug Fixes
+- fix:调整按下esc键取消编辑
+- fix:修复插槽情况下点击编辑需要点击两次
+- fix:添加shift+enter向上移动并提交操作
+- fix:更改enter向下移动并提交操作，而不是进入编辑
 ---
