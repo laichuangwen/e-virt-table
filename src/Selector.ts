@@ -21,7 +21,7 @@ export default class Selector {
         // 容器不聚焦，清除选择器
         this.ctx.on('focusout', () => {
             this.ctx.clearSelector();
-            this.ctx.emit('draw');
+            this.ctx.emit('drawView');
         });
         this.ctx.on('setMoveFocus', (dir: 'LEFT' | 'TOP' | 'RIGHT' | 'BOTTOM') => {
             this.moveFocus(dir);
