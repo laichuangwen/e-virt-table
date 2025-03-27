@@ -1,4 +1,3 @@
-import { shift } from '@floating-ui/dom';
 import type Context from './Context';
 import type Cell from './Cell';
 import type CellHeader from './CellHeader';
