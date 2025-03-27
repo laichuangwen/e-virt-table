@@ -74,7 +74,12 @@ export default class Editor {
                     this.ctx.emit('setSelectorCell', focusCell);
                     this.cellTarget = focusCell;
                 }
+                if (e.shiftKey) {
+                    this.ctx.emit('setMoveFocus', 'TOP');
+                    return;
+                }
                 this.ctx.emit('setMoveFocus', 'BOTTOM');
+                return;
             }
             const key = e.key;
             const isCtrl = e.ctrlKey;
