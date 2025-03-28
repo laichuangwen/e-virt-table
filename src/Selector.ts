@@ -20,8 +20,13 @@ export default class Selector {
     private init() {
         // 容器不聚焦，清除选择器
         this.ctx.on('focusout', () => {
-            this.ctx.clearSelector();
-            this.ctx.emit('drawView');
+            // 如果是鼠标移动到容器内部就不处理
+            if (!this.ctx.isMouseoverTargetContainer) {
+                console.log('buzai');
+
+                this.ctx.clearSelector();
+                this.ctx.emit('drawView');
+            }
         });
         this.ctx.on('setMoveFocus', (dir: 'LEFT' | 'TOP' | 'RIGHT' | 'BOTTOM') => {
             this.moveFocus(dir);
@@ -798,6 +803,7 @@ export default class Selector {
         this.ctx.setFocusCell(cell);
         this.setSelector(xArr, yArr);
         this.adjustBoundaryPosition();
+        this.ctx.emit('moveFocus', cell);
         this.ctx.emit('draw');
     }
     private stopAdjustPosition() {

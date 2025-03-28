@@ -17,16 +17,19 @@ export default class Editor {
         this.init();
     }
     private init() {
-        // 容器不聚焦，清除选择器
-        this.ctx.on('focusout', (e) => {
-            if (e.target === this.ctx.stageElement) {
-                return;
+        this.ctx.on('clearSelector', () => {
+            if (this.enable) {
+                this.enable = false;
+                this.ctx.editing = false;
+                // 隐藏编辑器
+                this.editorEl.style.display = 'none';
+                this.cellTarget = null;
             }
-            // 编辑状态不处理
-            if (this.ctx.editing) {
-                this.doneEdit();
-            }
-            this.cellTarget = null;
+        });
+        this.ctx.on('moveFocus', (cell) => {
+            this.cellTarget = cell;
+            const { xArr, yArr } = this.ctx.selector;
+            this.selectorArrStr = JSON.stringify(xArr) + JSON.stringify(yArr);
         });
         // 滚动时，结束编辑
         this.ctx.on('onScroll', () => {
@@ -69,11 +72,6 @@ export default class Editor {
             if (e.code === 'Enter' && this.ctx.editing) {
                 e.preventDefault();
                 this.doneEdit();
-                const { focusCell } = this.ctx;
-                if (focusCell) {
-                    this.ctx.emit('setSelectorCell', focusCell);
-                    this.cellTarget = focusCell;
-                }
                 if (e.shiftKey) {
                     this.ctx.emit('setMoveFocus', 'TOP');
                     return;
@@ -132,6 +130,7 @@ export default class Editor {
             this.selectorArrStr = JSON.stringify(xArr) + JSON.stringify(yArr);
         });
         this.ctx.on('cellClick', (cell: Cell) => {
+            console.log('cellClick');
             // 如果是调整边界位置，不进入编辑模式
             if (this.ctx.adjustPositioning) {
                 return;
@@ -160,6 +159,7 @@ export default class Editor {
             }
             this.selectorArrStr = selectorArrStr;
             this.doneEdit();
+            console.log('cellClick');
             this.cellTarget = cell;
             // 单击单元格进入编辑模式
             if (this.ctx.config.ENABLE_EDIT_SINGLE_CLICK) {
@@ -199,6 +199,11 @@ export default class Editor {
         this.inputEl.setAttribute('rows', '1');
         // 监听输入事件，自动调整高度
         this.inputEl.addEventListener('input', this.autoSize.bind(this));
+        this.inputEl.addEventListener('blur', () => {
+            this.doneEdit();
+            console.log('blur');
+            this.cellTarget = null;
+        });
         this.editorEl = this.ctx.editorElement;
         this.inputEl.className = 'e-virt-table-editor-textarea';
         this.editorEl.appendChild(this.inputEl);
@@ -278,8 +283,6 @@ export default class Editor {
         if (!this.cellTarget) {
             return;
         }
-        // 隐藏编辑器
-        this.editorEl.style.display = 'none';
         // 如果是文本编辑器
         if (this.cellTarget.editorType === 'text') {
             const { rowKey, key } = this.cellTarget;
@@ -365,6 +368,8 @@ export default class Editor {
         this.ctx.emit('doneEdit', this.cellTarget);
         this.enable = false;
         this.ctx.editing = false;
+        // 隐藏编辑器
+        this.editorEl.style.display = 'none';
         this.ctx.emit('drawView');
     }
     destroy() {

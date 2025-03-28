@@ -85,6 +85,7 @@ export default class Context {
     paint: Paint;
     icons: Icons;
     isInsideTargetContainer = false;
+    isMouseoverTargetContainer = false;
     mousedown = false;
     isPointer = false;
     rowResizing = false; // 行调整大小中
@@ -244,6 +245,7 @@ export default class Context {
         this.selector.enable = false;
         this.selector.xArr = [-1, -1];
         this.selector.yArr = [-1, -1];
+        this.emit('clearSelector');
     }
     clearSelectorCopy() {
         this.selector.xArrCopy = [-1, -1];

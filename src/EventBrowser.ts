@@ -83,10 +83,12 @@ export default class EventBrowser {
     }
     private handleMouseover(e: Event) {
         this.ctx.isInsideTargetContainer = true;
+        this.ctx.isMouseoverTargetContainer = true;
         this.ctx.emit('mouseover', e);
     }
     private handleMouseout(e: Event) {
         // this.ctx.isInsideTargetContainer = false;
+        this.ctx.isMouseoverTargetContainer = false;
         this.ctx.emit('mouseout', e);
     }
     private handleDblclick(e: Event) {
