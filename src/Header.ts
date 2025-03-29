@@ -102,7 +102,7 @@ export default class Header {
             return;
         }
         this.ctx.on('mousedown', (e) => {
-            if (!this.ctx.isTarget()) {
+            if (!this.ctx.isTarget(e)) {
                 return;
             }
             this.clientX = e.clientX;
@@ -165,7 +165,7 @@ export default class Header {
                         col.colspan <= 1 // 父级表头不触发
                     ) {
                         // 在表头内
-                        if (this.ctx.isTarget() && offsetY <= this.height) {
+                        if (this.ctx.isTarget(e) && offsetY <= this.height) {
                             this.ctx.stageElement.style.cursor = 'col-resize';
                             this.resizeTarget = col;
                         }

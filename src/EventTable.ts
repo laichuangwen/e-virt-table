@@ -266,7 +266,7 @@ export default class EventTable {
         const y = offsetY;
         const x = offsetX;
 
-        if (!this.ctx.isTarget()) {
+        if (!this.ctx.isTarget(e)) {
             return true;
         }
         // 行调整大小中不处理

@@ -84,7 +84,6 @@ export default class Context {
     stageHeight = 0;
     paint: Paint;
     icons: Icons;
-    isInsideTargetContainer = false;
     isMouseoverTargetContainer = false;
     mousedown = false;
     isPointer = false;
@@ -336,9 +335,11 @@ export default class Context {
         }
         this.emit('setScrollY', scrollY);
     }
-    isTarget(): boolean {
-        // 鼠标在容器内
-        return this.isInsideTargetContainer;
+    isTarget(e: Event): boolean {
+        if (!this.containerElement.contains(e.target as Node)) {
+            return false;
+        }
+        return true;
     }
     getOffset(e: MouseEvent) {
         const { left, top } = this.containerElement.getBoundingClientRect();

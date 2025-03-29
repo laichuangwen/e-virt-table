@@ -17,14 +17,21 @@ export default class Editor {
         this.init();
     }
     private init() {
-        this.ctx.on('clearSelector', () => {
-            if (this.enable) {
-                this.enable = false;
-                this.ctx.editing = false;
-                // 隐藏编辑器
-                this.editorEl.style.display = 'none';
-                this.cellTarget = null;
+        // 容器不聚焦，清除选择器
+        this.ctx.on('outsideMousedown', () => {
+            if (!this.cellTarget) {
+                return;
             }
+            if (this.ctx.editing && this.cellTarget.editorType === 'text') {
+                this.doneEdit();
+            }
+            if (this.ctx.editing && !this.ctx.isMouseoverTargetContainer) {
+                return;
+            }
+            this.cellTarget = null;
+            this.selectorArrStr = '';
+            this.ctx.emit('drawView');
+            this.ctx.clearSelector();
         });
         this.ctx.on('moveFocus', (cell) => {
             this.cellTarget = cell;
@@ -44,7 +51,7 @@ export default class Editor {
             this.cellTarget = null;
         });
         this.ctx.on('keydown', (e) => {
-            if (!this.ctx.isTarget()) {
+            if (!this.ctx.isTarget(e)) {
                 return;
             }
             if (e.code === 'Escape' && this.ctx.editing) {
@@ -130,7 +137,6 @@ export default class Editor {
             this.selectorArrStr = JSON.stringify(xArr) + JSON.stringify(yArr);
         });
         this.ctx.on('cellClick', (cell: Cell) => {
-            console.log('cellClick');
             // 如果是调整边界位置，不进入编辑模式
             if (this.ctx.adjustPositioning) {
                 return;
@@ -159,7 +165,6 @@ export default class Editor {
             }
             this.selectorArrStr = selectorArrStr;
             this.doneEdit();
-            console.log('cellClick');
             this.cellTarget = cell;
             // 单击单元格进入编辑模式
             if (this.ctx.config.ENABLE_EDIT_SINGLE_CLICK) {
@@ -201,7 +206,6 @@ export default class Editor {
         this.inputEl.addEventListener('input', this.autoSize.bind(this));
         this.inputEl.addEventListener('blur', () => {
             this.doneEdit();
-            console.log('blur');
             this.cellTarget = null;
         });
         this.editorEl = this.ctx.editorElement;
@@ -369,6 +373,7 @@ export default class Editor {
         this.enable = false;
         this.ctx.editing = false;
         // 隐藏编辑器
+        this.ctx.containerElement.focus();
         this.editorEl.style.display = 'none';
         this.ctx.emit('drawView');
     }

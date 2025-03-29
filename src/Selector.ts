@@ -18,16 +18,6 @@ export default class Selector {
         this.init();
     }
     private init() {
-        // 容器不聚焦，清除选择器
-        this.ctx.on('focusout', () => {
-            // 如果是鼠标移动到容器内部就不处理
-            if (!this.ctx.isMouseoverTargetContainer) {
-                console.log('buzai');
-
-                this.ctx.clearSelector();
-                this.ctx.emit('drawView');
-            }
-        });
         this.ctx.on('setMoveFocus', (dir: 'LEFT' | 'TOP' | 'RIGHT' | 'BOTTOM') => {
             this.moveFocus(dir);
         });
@@ -37,7 +27,7 @@ export default class Selector {
             throttle((e) => {
                 const { offsetY, offsetX } = this.ctx.getOffset(e);
                 const isInsideBody =
-                    this.ctx.isTarget() &&
+                    this.ctx.isTarget(e) &&
                     offsetX > 0 &&
                     offsetX < this.ctx.body.visibleWidth &&
                     offsetY > this.ctx.header.visibleHeight &&
@@ -69,7 +59,7 @@ export default class Selector {
             this.mouseenter();
         });
         this.ctx.on('cellMousedown', (cell, e) => {
-            if (!this.ctx.isTarget()) {
+            if (!this.ctx.isTarget(e)) {
                 return;
             }
             // 如果是选中就不处理，比如chexkbox

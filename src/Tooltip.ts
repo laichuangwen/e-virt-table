@@ -48,7 +48,7 @@ export default class Tooltip {
     private init() {
         this.ctx.on('mousemove', (e) => {
             // 鼠标移动时，判断是否在target上，不在则隐藏
-            if (!this.ctx.isTarget()) {
+            if (!this.ctx.isTarget(e)) {
               return;
             }
             const targetRect = this.ctx.containerElement.getBoundingClientRect();
