@@ -16,7 +16,7 @@ export default class EventBrowser {
         this.bind(window, 'mousemove', this.handleMousemove.bind(this));
         this.bind(window, 'mousedown', (e) => {
             // 点击容器外
-            if (!this.ctx.containerElement.contains(e.target as Node)) {
+            if (!this.ctx.containerElement.contains(e.target as Node) && this.ctx.selector.enable) {
                 this.ctx.emit('outsideMousedown', e);
             }
         });
