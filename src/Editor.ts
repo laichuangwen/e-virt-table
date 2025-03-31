@@ -23,15 +23,8 @@ export default class Editor {
                 return;
             }
             if (this.ctx.editing && this.cellTarget.editorType === 'text') {
-                this.doneEdit();
+                this.clearEditor();
             }
-            if (this.ctx.editing && !this.ctx.isMouseoverTargetContainer) {
-                return;
-            }
-            this.cellTarget = null;
-            this.selectorArrStr = '';
-            this.ctx.emit('drawView');
-            this.ctx.clearSelector();
         });
         this.ctx.on('moveFocus', (cell) => {
             this.cellTarget = cell;
@@ -375,6 +368,13 @@ export default class Editor {
         // 隐藏编辑器
         this.ctx.containerElement.focus();
         this.editorEl.style.display = 'none';
+        this.ctx.emit('drawView');
+    }
+    clearEditor() {
+        this.doneEdit();
+        this.cellTarget = null;
+        this.selectorArrStr = '';
+        this.ctx.clearSelector();
         this.ctx.emit('drawView');
     }
     destroy() {

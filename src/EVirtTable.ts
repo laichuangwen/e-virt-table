@@ -174,6 +174,9 @@ export default class EVirtTable {
         this.ctx.setItemValueByEditor(rowKey, key, value, history, reDraw);
         this.editor.doneEdit();
     }
+    clearEditor(){
+        this.editor.clearEditor();
+    }
     doLayout() {
         this.ctx.emit('draw');
     }
