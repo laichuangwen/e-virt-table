@@ -22,7 +22,7 @@ export default class Editor {
             if (!this.cellTarget) {
                 return;
             }
-            if (this.ctx.editing && this.cellTarget.editorType === 'text') {
+            if (this.cellTarget.editorType === 'text') {
                 this.clearEditor();
             }
         });
