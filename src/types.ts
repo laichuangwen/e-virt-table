@@ -20,6 +20,7 @@ export type ChangeItem = {
     key: string;
     rowKey: string;
     row: any;
+    oldValue?: any;
 };
 export type OverflowTooltipPlacement =
     | 'top'
@@ -88,7 +89,10 @@ export type ValidateItemError = {
     key: string;
     message: string;
 };
-
+export type ValidateField = {
+    key: string;
+    rowKey: string;
+};
 export type Position = {
     height: number;
     top: number;

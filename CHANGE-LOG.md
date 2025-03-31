@@ -78,3 +78,12 @@ V1.1.0
 - fix:添加shift+enter向上移动并提交操作
 - fix:更改enter向下移动并提交操作，而不是进入编辑
 ---
+
+V1.1.1
+### Bug Fixes
+- fix:调整isTarget逻辑
+- fix:修复文本编辑器点击外层不会清除选中
+- feat:添加部分校验方法
+- feat:change事件添加旧值
+- feat:添加主动清除编辑器和选择器
+---

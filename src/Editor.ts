@@ -18,15 +18,18 @@ export default class Editor {
     }
     private init() {
         // 容器不聚焦，清除选择器
-        this.ctx.on('focusout', (e) => {
-            if (e.target === this.ctx.stageElement) {
+        this.ctx.on('outsideMousedown', () => {
+            if (!this.cellTarget) {
                 return;
             }
-            // 编辑状态不处理
-            if (this.ctx.editing) {
-                this.doneEdit();
+            if (this.cellTarget.editorType === 'text') {
+                this.clearEditor();
             }
-            this.cellTarget = null;
+        });
+        this.ctx.on('moveFocus', (cell) => {
+            this.cellTarget = cell;
+            const { xArr, yArr } = this.ctx.selector;
+            this.selectorArrStr = JSON.stringify(xArr) + JSON.stringify(yArr);
         });
         // 滚动时，结束编辑
         this.ctx.on('onScroll', () => {
@@ -41,7 +44,7 @@ export default class Editor {
             this.cellTarget = null;
         });
         this.ctx.on('keydown', (e) => {
-            if (!this.ctx.isTarget()) {
+            if (!this.ctx.isTarget(e)) {
                 return;
             }
             if (e.code === 'Escape' && this.ctx.editing) {
@@ -69,11 +72,6 @@ export default class Editor {
             if (e.code === 'Enter' && this.ctx.editing) {
                 e.preventDefault();
                 this.doneEdit();
-                const { focusCell } = this.ctx;
-                if (focusCell) {
-                    this.ctx.emit('setSelectorCell', focusCell);
-                    this.cellTarget = focusCell;
-                }
                 if (e.shiftKey) {
                     this.ctx.emit('setMoveFocus', 'TOP');
                     return;
@@ -199,6 +197,10 @@ export default class Editor {
         this.inputEl.setAttribute('rows', '1');
         // 监听输入事件，自动调整高度
         this.inputEl.addEventListener('input', this.autoSize.bind(this));
+        this.inputEl.addEventListener('blur', () => {
+            this.doneEdit();
+            this.cellTarget = null;
+        });
         this.editorEl = this.ctx.editorElement;
         this.inputEl.className = 'e-virt-table-editor-textarea';
         this.editorEl.appendChild(this.inputEl);
@@ -278,8 +280,6 @@ export default class Editor {
         if (!this.cellTarget) {
             return;
         }
-        // 隐藏编辑器
-        this.editorEl.style.display = 'none';
         // 如果是文本编辑器
         if (this.cellTarget.editorType === 'text') {
             const { rowKey, key } = this.cellTarget;
@@ -365,6 +365,16 @@ export default class Editor {
         this.ctx.emit('doneEdit', this.cellTarget);
         this.enable = false;
         this.ctx.editing = false;
+        // 隐藏编辑器
+        this.ctx.containerElement.focus();
+        this.editorEl.style.display = 'none';
+        this.ctx.emit('drawView');
+    }
+    clearEditor() {
+        this.doneEdit();
+        this.cellTarget = null;
+        this.selectorArrStr = '';
+        this.ctx.clearSelector();
         this.ctx.emit('drawView');
     }
     destroy() {

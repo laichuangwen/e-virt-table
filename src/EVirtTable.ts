@@ -6,6 +6,7 @@ import {
     EVirtTableOptions,
     FilterMethod,
     Position,
+    ValidateField,
     ValidateItemError,
 } from './types';
 import Context from './Context';
@@ -174,6 +175,9 @@ export default class EVirtTable {
         this.ctx.setItemValueByEditor(rowKey, key, value, history, reDraw);
         this.editor.doneEdit();
     }
+    clearEditor() {
+        this.editor.clearEditor();
+    }
     doLayout() {
         this.ctx.emit('draw');
     }
@@ -186,6 +190,34 @@ export default class EVirtTable {
     clearValidate() {
         this.ctx.database.clearValidate();
         this.ctx.emit('draw');
+    }
+    validateFields(ValidateFields: ValidateField[], scrollError = true) {
+        return new Promise(async (resolve, reject) => {
+            let errors: any[] = [];
+            for (let i = 0; i < ValidateFields.length; i++) {
+                const { rowKey, key } = ValidateFields[i];
+                const _errors = await this.ctx.database.getValidator(rowKey, key);
+                if (Array.isArray(_errors) && _errors.length) {
+                    errors.push(_errors);
+                }
+            }
+            if (errors.length) {
+                reject(errors);
+                if (scrollError) {
+                    const [err] = errors;
+                    if (Array.isArray(err) && err.length) {
+                        const [_err] = err;
+                        const { rowKey, key } = _err;
+                        this.scrollToRowkey(rowKey);
+                        this.scrollToColkey(key);
+                    }
+                }
+                this.ctx.emit('draw');
+            } else {
+                resolve([]);
+                this.ctx.emit('draw');
+            }
+        });
     }
     async validate(scrollError = true) {
         // 先关闭编辑

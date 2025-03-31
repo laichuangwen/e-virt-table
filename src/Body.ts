@@ -157,7 +157,7 @@ export default class Body {
             this.clientY = 0;
         });
         this.ctx.on('mousedown', (e) => {
-            if (!this.ctx.isTarget()) {
+            if (!this.ctx.isTarget(e)) {
                 return;
             }
             this.clientY = e.clientY;

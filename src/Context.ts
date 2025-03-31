@@ -84,7 +84,7 @@ export default class Context {
     stageHeight = 0;
     paint: Paint;
     icons: Icons;
-    isInsideTargetContainer = false;
+    isMouseoverTargetContainer = false;
     mousedown = false;
     isPointer = false;
     rowResizing = false; // 行调整大小中
@@ -244,6 +244,7 @@ export default class Context {
         this.selector.enable = false;
         this.selector.xArr = [-1, -1];
         this.selector.yArr = [-1, -1];
+        this.emit('clearSelector');
     }
     clearSelectorCopy() {
         this.selector.xArrCopy = [-1, -1];
@@ -334,9 +335,11 @@ export default class Context {
         }
         this.emit('setScrollY', scrollY);
     }
-    isTarget(): boolean {
-        // 鼠标在容器内
-        return this.isInsideTargetContainer;
+    isTarget(e: Event): boolean {
+        if (!this.containerElement.contains(e.target as Node)) {
+            return false;
+        }
+        return true;
     }
     getOffset(e: MouseEvent) {
         const { left, top } = this.containerElement.getBoundingClientRect();

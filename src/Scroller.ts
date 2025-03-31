@@ -63,7 +63,7 @@ class Scrollbar {
         if (!(e.target instanceof Element)) {
             return;
         }
-        if (!this.ctx.isTarget()) {
+        if (!this.ctx.isTarget(e)) {
             return;
         }
         // 行调整大小中不处理

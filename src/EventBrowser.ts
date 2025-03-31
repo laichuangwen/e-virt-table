@@ -14,6 +14,12 @@ export default class EventBrowser {
         this.bind(window, 'resize', this.handleResize.bind(this));
         this.bind(window, 'mouseup', this.handleMouseUp.bind(this));
         this.bind(window, 'mousemove', this.handleMousemove.bind(this));
+        this.bind(window, 'mousedown', (e) => {
+            // 点击容器外
+            if (!this.ctx.containerElement.contains(e.target as Node)) {
+                this.ctx.emit('outsideMousedown', e);
+            }
+        });
         this.bind(this.ctx.stageElement, 'click', this.handleClick.bind(this));
         this.bind(window, 'keydown', this.handleKeydown.bind(this));
         this.bind(this.ctx.stageElement, 'wheel', this.handleWheel.bind(this));
@@ -25,8 +31,6 @@ export default class EventBrowser {
         this.bind(this.ctx.stageElement, 'dblclick', this.handleDblclick.bind(this));
         this.bind(this.ctx.stageElement, 'mouseover', this.handleMouseover.bind(this));
         this.bind(this.ctx.stageElement, 'mouseout', this.handleMouseout.bind(this));
-        this.bind(this.ctx.containerElement, 'focusin', this.handleFocusin.bind(this));
-        this.bind(this.ctx.containerElement, 'focusout', this.handleFocusout.bind(this));
     }
     destroy() {
         this.eventTasks.forEach((fn, event) => {
@@ -61,7 +65,7 @@ export default class EventBrowser {
     private handleKeydown(e: Event) {
         const { ENABLE_KEYBOARD } = this.ctx.config;
         if (!ENABLE_KEYBOARD) return;
-        if (!this.ctx.isTarget()) {
+        if (!this.ctx.isTarget(e)) {
             return;
         }
         this.ctx.emit('keydown', e);
@@ -82,23 +86,15 @@ export default class EventBrowser {
         this.ctx.emit('contextMenu', e);
     }
     private handleMouseover(e: Event) {
-        this.ctx.isInsideTargetContainer = true;
+        this.ctx.isMouseoverTargetContainer = true;
         this.ctx.emit('mouseover', e);
     }
     private handleMouseout(e: Event) {
-        // this.ctx.isInsideTargetContainer = false;
+        this.ctx.isMouseoverTargetContainer = false;
         this.ctx.emit('mouseout', e);
     }
     private handleDblclick(e: Event) {
         this.ctx.emit('dblclick', e);
-    }
-    private handleFocusin(e: Event) {
-        this.ctx.isInsideTargetContainer = true;
-        this.ctx.emit('focusin', e);
-    }
-    private handleFocusout(e: Event) {
-        this.ctx.isInsideTargetContainer = false;
-        this.ctx.emit('focusout', e);
     }
     private bind(
         target: EventTarget,
