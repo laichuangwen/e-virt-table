@@ -180,6 +180,7 @@ type EVirtTableOptions = {
 | off                    | Remove event listener         | `(event, callback)` configuration reference event         |
 | filterMethod           | Filter data method            | FilterMethod                                              |
 | setLoading             | Set loading state             | boolean                                                   |
+| clearEditor            | Clear editor and selection              |   —                                                         |
 | editCell               | Start editing cell            | (rowIndex, colIndex)                                      |
 | setItemValue           | Set value                     | (rowKey, key, value, history, reDraw=true, isEditor=true) |
 | setItemValueByEditor   | Set value via editor          | (rowKey, key, value, history, reDraw=true, isEditor=true) |
@@ -187,6 +188,7 @@ type EVirtTableOptions = {
 | getChangedData         | Get changed data              | —                                                         |
 | getChangedRows         | Get changed rows data         | —                                                         |
 | validate               | Validate data, scroll to error| boolean                                                   |
+| validateFields         | Method for validating some form fields	| (ValidateField[], scrollError=true)         |
 | clearValidate          | Clear validation              | —                                                         |
 | setValidations         | Set validation errors         | ^[ValidateItemError]`[{message, key, rowKey}]`            |
 | getValidations         | Validate data and return errors| —                                                         |
@@ -295,6 +297,10 @@ type MenuItem = {
 
 type ChangeItem = {
     value: any;
+    key: string;
+    rowKey: string;
+};
+type ValidateField = {
     key: string;
     rowKey: string;
 };

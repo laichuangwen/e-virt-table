@@ -181,6 +181,7 @@ type EVirtTableOptions = {
 | off                    | 移除监听事件                  | `(event,callback)`配置参考 event                          |
 | filterMethod           | 过滤数据方法                  | FilterMethod                                              |
 | setLoading             | 设置加载方法                  | boolean                                                   |
+| clearEditor            | 清除编辑器及选中              |   —                                                         |
 | editCell               | 主动启动编辑格子              | (rowIndex, colIndex)                                      |
 | setItemValue           | 设置值                        | (rowKey, key, value, history, reDraw=true, isEditor=true) |
 | setItemValueByEditor   | 通过编辑器设置值              | (rowKey, key, value, history, reDraw=true, isEditor=true) |
@@ -188,8 +189,9 @@ type EVirtTableOptions = {
 | getChangedData         | 获取已改变数据                | —                                                         |
 | getChangedRows         | 获取已改变行数据              | —                                                         |
 | validate               | 校验数据，true 滚到错误的地方 | boolean                                                   |
+| validateFields         | 对部分表单字段进行校验的方法	 | (ValidateField[], scrollError=true)         |
 | clearValidate          | 清除校验                      | —                                                         |
-| setValidations         | 设置错误信息                  | ^[ValidateItemError]`[{message,key,rowKey}]`                                       |
+| setValidations         | 设置错误信息                  | ^[ValidateItemError]`[{message,key,rowKey}]`             |
 | getValidations         | 校验数据并返回错误信息        | —                                                         |
 | hasValidationError     | 是否有错误校验                | —                                                         |
 | scrollTo               | 滚动位置                      | ^`(x,y)`                                                  |
@@ -297,6 +299,10 @@ type MenuItem = {
 
 type ChangeItem = {
     value: any;
+    key: string;
+    rowKey: string;
+};
+type ValidateField = {
     key: string;
     rowKey: string;
 };
