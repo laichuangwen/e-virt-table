@@ -416,6 +416,7 @@ export default class Database {
                 rowKey: item.rowKey,
                 key: item.key,
                 value: item.newValue,
+                oldValue: item.oldValue,
                 row,
             };
         });
@@ -500,6 +501,7 @@ export default class Database {
             const changeItem: ChangeItem = {
                 rowKey,
                 key,
+                oldValue,
                 value,
                 row,
             };

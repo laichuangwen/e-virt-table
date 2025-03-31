@@ -20,6 +20,7 @@ export type ChangeItem = {
     key: string;
     rowKey: string;
     row: any;
+    oldValue?: any;
 };
 export type OverflowTooltipPlacement =
     | 'top'
