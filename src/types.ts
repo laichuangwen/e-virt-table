@@ -89,7 +89,10 @@ export type ValidateItemError = {
     key: string;
     message: string;
 };
-
+export type ValidateField = {
+    key: string;
+    rowKey: string;
+};
 export type Position = {
     height: number;
     top: number;
