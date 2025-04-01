@@ -1,3 +1,4 @@
+import { offset } from '@floating-ui/dom';
 import Context from './Context';
 import { getMaxRow, calCrossSpan, toLeaf, sortFixed, throttle } from './util';
 import CellHeader from './CellHeader';
@@ -146,6 +147,13 @@ export default class Header {
                 this.resizeTarget = null;
                 // 按下时不改变样式，有可能是多选表头
                 if (this.isMouseDown) {
+                    return;
+                }
+                // 鼠标在表头上,边界处理
+                if (e.offsetX < 0 || e.offsetX > this.visibleWidth) {
+                    if (this.ctx.stageElement.style.cursor === 'col-resize') {
+                        this.ctx.stageElement.style.cursor = 'default';
+                    }
                     return;
                 }
                 // 恢复默认样式
