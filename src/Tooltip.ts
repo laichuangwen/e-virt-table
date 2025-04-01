@@ -68,7 +68,11 @@ export default class Tooltip {
         this.ctx.on('startEdit', () => {
             this.hide();
         });
-        this.ctx.on('visibleCellHoverChange', (cell) => {
+        this.ctx.on('visibleCellHoverChange', (cell,e) => {
+            const contains = this.floatingEl.contains(e.target);;
+            if (contains) {
+                return;
+            }
             // 有移除或者有错误message时显示
             if (cell.ellipsis || cell.message) {
                 this.show(cell);
