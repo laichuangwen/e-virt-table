@@ -1,4 +1,3 @@
-import { offset } from '@floating-ui/dom';
 import Context from './Context';
 import { getMaxRow, calCrossSpan, toLeaf, sortFixed, throttle } from './util';
 import CellHeader from './CellHeader';
