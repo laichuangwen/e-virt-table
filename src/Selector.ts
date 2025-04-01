@@ -485,6 +485,10 @@ export default class Selector {
         }
         this.ctx.selector.enable = true;
         if (clickCell && shiftKey) {
+            // 启用单选就不能批量选中
+            if (this.ctx.config.ENABLE_SELECTOR_SINGLE) {
+                return;
+            }
             // shiftKey快捷选中
             const { colIndex, rowIndex } = clickCell;
             const { colIndex: oldX, rowIndex: oldY } = focusCell;

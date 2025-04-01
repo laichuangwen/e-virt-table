@@ -14,12 +14,8 @@ export default class EventBrowser {
         this.bind(window, 'resize', this.handleResize.bind(this));
         this.bind(window, 'mouseup', this.handleMouseUp.bind(this));
         this.bind(window, 'mousemove', this.handleMousemove.bind(this));
-        this.bind(window, 'mousedown', (e) => {
-            // 点击容器外
-            if (!this.ctx.containerElement.contains(e.target as Node)) {
-                this.ctx.emit('outsideMousedown', e);
-            }
-        });
+        this.bind(window, 'blur', this.handleOutsideMousedown.bind(this));
+        this.bind(window, 'mousedown', this.handleOutsideMousedown.bind(this));
         this.bind(this.ctx.stageElement, 'click', this.handleClick.bind(this));
         this.bind(window, 'keydown', this.handleKeydown.bind(this));
         this.bind(this.ctx.stageElement, 'wheel', this.handleWheel.bind(this));
@@ -95,6 +91,14 @@ export default class EventBrowser {
     }
     private handleDblclick(e: Event) {
         this.ctx.emit('dblclick', e);
+    }
+    private handleOutsideMousedown(e: Event) {
+        if (
+            this.ctx.selector.enable &&
+            (e.target instanceof Window || (e.target instanceof Node && !this.ctx.containerElement.contains(e.target)))
+        ) {
+            this.ctx.emit('outsideMousedown', e);
+        }
     }
     private bind(
         target: EventTarget,

@@ -148,6 +148,13 @@ export default class Header {
                 if (this.isMouseDown) {
                     return;
                 }
+                // 鼠标在表头上,边界处理
+                if (e.offsetX < 0 || e.offsetX > this.visibleWidth) {
+                    if (this.ctx.stageElement.style.cursor === 'col-resize') {
+                        this.ctx.stageElement.style.cursor = 'default';
+                    }
+                    return;
+                }
                 // 恢复默认样式
                 if (this.ctx.stageElement.style.cursor === 'col-resize') {
                     this.ctx.stageElement.style.cursor = 'default';

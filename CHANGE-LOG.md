@@ -87,3 +87,18 @@ V1.1.1
 - feat:change事件添加旧值
 - feat:添加主动清除编辑器和选择器
 ---
+
+V1.1.2
+### Bug Fixes
+- fix:修复文本编辑器点击外层,没有选中一直回调
+---
+
+V1.1.3
+### Bug Fixes
+- fix:修复滚动条hover失效问题
+- fix:修复Tooltip移到内容也会hide
+- docs:更新文档
+- 解决iframe下点击容器外不失焦
+- fix:移动表头宽度和移动行高到滚动条的边界处理
+- fix:单选ENABLE_SELECTOR_SINGLE下shift快捷选中也能多选
+---

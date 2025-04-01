@@ -197,6 +197,19 @@ export default class Body {
                 if (this.isMouseDown) {
                     return;
                 }
+                // 鼠标移动时，判断是否在行的范围内
+                if (
+                    x < 0 ||
+                    x > this.ctx.body.visibleWidth ||
+                    y < 0 ||
+                    y > this.ctx.header.visibleHeight + this.ctx.body.visibleHeight
+                ) {
+                    if (this.ctx.stageElement.style.cursor === 'row-resize') {
+                        // 恢复默认样式
+                        this.ctx.stageElement.style.cursor = 'default';
+                    }
+                    return;
+                }
                 // 如果是拖动选择
                 if (this.ctx.stageElement.style.cursor === 'crosshair') {
                     return;
