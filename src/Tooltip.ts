@@ -74,7 +74,11 @@ export default class Tooltip {
                 this.show(cell);
             }
         });
-        this.ctx.on('visibleCellMouseleave', () => {
+        this.ctx.on('visibleCellMouseleave', (_,e) => {
+            const contains = this.floatingEl.contains(e.target);;
+            if (contains) {
+                return;
+            }
             this.hide();
         });
     }
