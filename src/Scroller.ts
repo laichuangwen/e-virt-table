@@ -111,15 +111,14 @@ class Scrollbar {
     onMouseMove(e: MouseEvent) {
         const { offsetX, offsetY, clientX, clientY, buttons } = e;
         // 没有鼠标按下时不处理，要重置抬起事件
-        if (buttons === 0) {
-            this.onMouseUp();
-            return;
-        }
         // 悬浮提示
         if (this.isOnScrollbar(offsetX, offsetY) && e.target === this.ctx.canvasElement) {
             this.isFocus = true;
         } else {
             this.isFocus = false;
+        }
+        if (buttons === 0) {
+            return;
         }
         // 拖拽移动滚动条
         if (clientX == this.clientX && clientY == this.clientY) return;
@@ -273,7 +272,7 @@ class Scrollbar {
         });
         // 滚动条
         this.ctx.paint.drawRect(this.barX, this.barY, this.barWidth, this.barHeight, {
-            fillColor: this.isFocus || this.isDragging ? SCROLLER_FOCUS_COLOR : SCROLLER_COLOR,
+            fillColor: (this.isFocus || this.isDragging) ? SCROLLER_FOCUS_COLOR : SCROLLER_COLOR,
             radius: 4,
         });
         // 分割线范围外
