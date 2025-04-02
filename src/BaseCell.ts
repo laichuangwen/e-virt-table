@@ -44,7 +44,7 @@ export default class BaseCell {
                 config: { SCROLLER_TRACK_SIZE },
             } = this.ctx;
             const x = stageWidth - (this.ctx.header.width - this.x) - SCROLLER_TRACK_SIZE;
-            return x + 1; // +1是为了避免右边界的线被覆盖
+            return x;
         }
         return this.x - this.ctx.scrollX;
     }

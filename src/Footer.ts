@@ -73,7 +73,7 @@ export default class Footer {
         // 右边阴影
         if (scrollX < Math.floor(header.width - stageWidth - 1) && fixedRightWidth !== SCROLLER_TRACK_SIZE) {
             const x = header.width - (this.x + this.width) + stageWidth - fixedRightWidth;
-            this.ctx.paint.drawShadow(x + 1, y, fixedRightWidth, this.height, {
+            this.ctx.paint.drawShadow(x, y, fixedRightWidth, this.height, {
                 fillColor: HEADER_BG_COLOR,
                 side: 'left',
                 shadowWidth: 4,
