@@ -305,7 +305,7 @@ export default class Header {
             });
         }
     }
-    private drawFiexShadow() {
+    private drawFixedShadow() {
         const {
             fixedLeftWidth,
             fixedRightWidth,
@@ -370,16 +370,28 @@ export default class Header {
         this.ctx.header.renderLeafCellHeaders = this.renderLeafCellHeaders;
         this.ctx.header.renderCellHeaders = this.renderFixedCellHeaders.concat(this.renderCenterCellHeaders);
     }
+    drawBottomLine() {
+        const {
+            stageWidth,
+            config: { BORDER_COLOR },
+        } = this.ctx;
+        const poins = [0, this.height, stageWidth, this.height];
+        this.ctx.paint.drawLine(poins, {
+            borderColor: BORDER_COLOR,
+            borderWidth: 1,
+        });
+    }
     draw() {
         this.renderCenterCellHeaders.forEach((item) => {
             item.update();
             item.draw();
         });
-        this.drawFiexShadow();
+        this.drawFixedShadow();
         this.renderFixedCellHeaders.forEach((item) => {
             item.update();
             item.draw();
         });
         this.drawTipLine();
+        this.drawBottomLine();
     }
 }

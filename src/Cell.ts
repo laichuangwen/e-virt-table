@@ -343,6 +343,8 @@ export default class Cell extends BaseCell {
             HIGHLIGHT_SELECTED_ROW_COLOR,
             HIGHLIGHT_HOVER_ROW,
             HIGHLIGHT_HOVER_ROW_COLOR,
+            STRIPE,
+            STRIPE_COLOR,
         } = this.ctx.config;
         if (this.cellType === 'footer') {
             let bgColor = FOOTER_BG_COLOR;
@@ -396,6 +398,15 @@ export default class Cell extends BaseCell {
             bgColor = EDIT_BG_COLOR;
             textColor = READONLY_TEXT_COLOR;
         }
+        // 斑马纹,编辑背景色下会失效
+        if (STRIPE) {
+            if (this.rowIndex % 2) {
+                bgColor = STRIPE_COLOR;
+            } else {
+                bgColor = BODY_BG_COLOR;
+            }
+        }
+
         if (typeof BODY_CELL_STYLE_METHOD === 'function') {
             const cellStyleMethod: CellStyleMethod = BODY_CELL_STYLE_METHOD;
             const { backgroundColor, color } =
@@ -417,10 +428,6 @@ export default class Cell extends BaseCell {
         }
         this.drawCellBgColor = bgColor;
         this.drawTextColor = textColor;
-
-        // if (change) {
-        //   this.setBackgroundColor("red");
-        // }
     }
     private updateSelection() {
         const { visibleWidth, visibleHeight, rowspan, colspan, cellType, type, rowIndex, rowKey } = this;
@@ -635,30 +642,68 @@ export default class Cell extends BaseCell {
             userSelect: 'none',
         };
     }
-    draw() {
+    drawContainer() {
         const {
             paint,
-            config: { BORDER_COLOR },
+            config: { BORDER_COLOR, BORDER },
         } = this.ctx;
         const { drawX, drawY } = this;
-        // 绘制单元格
         paint.drawRect(drawX, drawY, this.visibleWidth, this.visibleHeight, {
-            borderColor: BORDER_COLOR,
+            borderColor: BORDER ? BORDER_COLOR : 'transparent',
             fillColor: this.drawCellBgColor,
         });
         paint.drawRect(drawX, drawY, this.width, this.height, {
             borderColor: 'transparent',
-            borderWidth: 1,
             fillColor: this.drawCellSkyBgColor,
         });
+        if (!BORDER) {
+            this.ctx.paint.drawLine(
+                [drawX, drawY + this.visibleHeight, drawX + this.visibleWidth, drawY + this.visibleHeight],
+                {
+                    borderColor: BORDER_COLOR,
+                    fillColor: BORDER_COLOR,
+                    borderWidth: 1,
+                    lineCap: 'round',
+                    lineJoin: 'round',
+                },
+            );
+        }
+    }
+    drawAutofillPiont() {
+        if (this.cellType === 'footer') {
+            return;
+        }
+        const { SELECT_BORDER_COLOR, ENABLE_AUTOFILL, ENABLE_SELECTOR, AUTOFILL_POINT_BORDER_COLOR } = this.ctx.config;
+        if (!ENABLE_SELECTOR) {
+            return;
+        }
+        if (!ENABLE_AUTOFILL) {
+            return;
+        }
+        if (this.ctx.editing) {
+            return;
+        }
+        const show = true;
+        const { xArr, yArr } = this.ctx.selector;
+        const maxX = xArr[1];
+        const maxY = yArr[1];
+        const { colIndex, rowIndex, drawX, drawY } = this;
+        // 绘制自动填充点
+        if (show && colIndex === maxX && rowIndex === maxY) {
+            const offset = colIndex === this.ctx.maxColIndex || rowIndex === this.ctx.maxRowIndex ? 6 : 4;
+            this.ctx.paint.drawRect(drawX + this.width - offset, drawY + this.height - offset, 6, 6, {
+                borderColor: AUTOFILL_POINT_BORDER_COLOR,
+                fillColor: SELECT_BORDER_COLOR,
+            });
+        }
+    }
+    draw() {
         // 画选中框
         this.drawText();
         this.drawImage();
         this.drawSelector();
-        this.drawAutofillPiont();
         this.drawErrorTip();
     }
-
     /**
      * 根据列的索引获取列的宽度
      * @param {Number} colIndex
@@ -704,30 +749,6 @@ export default class Cell extends BaseCell {
             this.drawImageWidth,
             this.drawImageHeight,
         );
-    }
-    private drawAutofillPiont() {
-        if (this.cellType === 'footer') {
-            return;
-        }
-        const { SELECT_BORDER_COLOR, ENABLE_AUTOFILL, ENABLE_SELECTOR, AUTOFILL_POINT_BORDER_COLOR } = this.ctx.config;
-        if (!ENABLE_SELECTOR) {
-            return;
-        }
-        if (!ENABLE_AUTOFILL) {
-            return;
-        }
-        const show = true;
-        const { xArr, yArr } = this.ctx.selector;
-        const maxX = xArr[1];
-        const maxY = yArr[1];
-        const { colIndex, rowIndex, drawX, drawY } = this;
-        // 绘制自动填充点
-        if (show && colIndex === maxX && rowIndex === maxY) {
-            this.ctx.paint.drawRect(drawX + this.width - 6, drawY + this.height - 6, 6, 6, {
-                borderColor: AUTOFILL_POINT_BORDER_COLOR,
-                fillColor: SELECT_BORDER_COLOR,
-            });
-        }
     }
     private drawSelector() {
         if (this.cellType === 'footer') {
@@ -827,50 +848,19 @@ export default class Cell extends BaseCell {
         borderWidth: number;
         lineDash?: number[];
     }) {
-        const { drawX, drawY, width, rowIndex, colIndex } = this;
-        let x = drawX + 0.5;
-        let y = drawY + 0.5;
-        let height = this.height;
-        // 第一行减去1，不然会被表头覆盖
-        if (rowIndex === 0) {
-            y = this.y + 1;
-            height = height - 1;
-        }
-        // 最后一列减去1，不然会被右边滚动条覆盖
-        if (colIndex === this.ctx.maxColIndex) {
-            x = x - 1;
-        }
+        const { drawX, drawY, rowIndex, colIndex, height, width } = this;
+        let x = drawX;
+        let y = drawY;
         const { xArr, yArr, lineDash = [], borderWidth = 1, borderColor, fillColor } = options;
-
         const minX = xArr[0];
         const maxX = xArr[1];
         const minY = yArr[0];
         const maxY = yArr[1];
-        // 选择
+        // top border
         if (colIndex >= minX && colIndex <= maxX && rowIndex === minY) {
-            this.ctx.paint.drawLine([x, y, x + width - 2, y], {
-                borderColor,
-                fillColor,
-                borderWidth,
-                lineCap: 'round',
-                lineJoin: 'round',
-                lineDash,
-            });
-        }
-        // bottom border
-        if (colIndex >= minX && colIndex <= maxX && rowIndex === maxY) {
-            this.ctx.paint.drawLine([x, y + height - 1.5, x + width, y + height - 1.5], {
-                borderColor,
-                fillColor,
-                borderWidth,
-                lineCap: 'round',
-                lineJoin: 'round',
-                lineDash,
-            });
-        }
-        // left border
-        if (colIndex === minX && rowIndex >= minY && rowIndex <= maxY) {
-            this.ctx.paint.drawLine([x, y, x, y + height - 1], {
+            const offsetW = colIndex === maxX ? 1 : 0;
+            const offsetX = colIndex === minX ? 1 : 0;
+            this.ctx.paint.drawLine([x + offsetX, y + 1, x + width - offsetW, y + 1], {
                 borderColor,
                 fillColor,
                 borderWidth,
@@ -881,7 +871,35 @@ export default class Cell extends BaseCell {
         }
         // right border
         if (colIndex === maxX && rowIndex >= minY && rowIndex <= maxY) {
-            this.ctx.paint.drawLine([x + width - 1.5, y, x + width - 1.5, y + height - 1.5], {
+            const offsetY = rowIndex === minY ? 1 : 0;
+            const offsetH = rowIndex === maxY ? 1 : 0;
+            this.ctx.paint.drawLine([x + width - 1, y + offsetY, x + width - 1, y + height - offsetH], {
+                borderColor,
+                fillColor,
+                borderWidth,
+                lineCap: 'round',
+                lineJoin: 'round',
+                lineDash,
+            });
+        }
+        // bottom border
+        if (colIndex >= minX && colIndex <= maxX && rowIndex === maxY) {
+            const offsetW = colIndex === maxX ? 1 : 0;
+            const offsetX = colIndex === minX ? 1 : 0;
+            this.ctx.paint.drawLine([x + offsetX, y + height - 1, x + width - offsetW, y + height - 1], {
+                borderColor,
+                fillColor,
+                borderWidth,
+                lineCap: 'round',
+                lineJoin: 'round',
+                lineDash,
+            });
+        }
+        // left border
+        if (colIndex === minX && rowIndex >= minY && rowIndex <= maxY) {
+            const offsetH = rowIndex === maxY ? 1 : 0;
+            const offsetY = rowIndex === minY ? 1 : 0;
+            this.ctx.paint.drawLine([x + 1, y + offsetY, x + 1, y + height - offsetH], {
                 borderColor,
                 fillColor,
                 borderWidth,

@@ -47,7 +47,7 @@ export default class Footer {
         this.ctx.footer.visibleWidth = this.visibleWidth;
         this.ctx.footer.visibleHeight = this.visibleHeight;
     }
-    private drawFiexShadow() {
+    private drawFixedShadow() {
         const {
             fixedLeftWidth,
             fixedRightWidth,
@@ -95,13 +95,31 @@ export default class Footer {
         this.renderRows = rows;
         this.ctx.footer.renderRows = this.renderRows;
     }
+    drawTopLine() {
+        const {
+            stageWidth,
+            config: { BORDER_COLOR },
+        } = this.ctx;
+        const poins = [0, this.y, stageWidth, this.y];
+        this.ctx.paint.drawLine(poins, {
+            borderColor: BORDER_COLOR,
+            borderWidth: 1,
+        });
+    }
     draw() {
+        this.renderRows.forEach((row) => {
+            row.drawContainer();
+        });
         this.renderRows.forEach((row) => {
             row.drawCenter();
         });
-        this.drawFiexShadow();
+        this.drawFixedShadow();
+        this.renderRows.forEach((row) => {
+            row.drawFixedContainer();
+        });
         this.renderRows.forEach((row) => {
             row.drawFixed();
         });
+        this.drawTopLine();
     }
 }

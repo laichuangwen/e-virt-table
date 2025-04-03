@@ -272,7 +272,7 @@ export default class Body {
             });
         }
     }
-    private drawFiexShadow() {
+    private drawFixedShadow() {
         const {
             fixedLeftWidth,
             fixedRightWidth,
@@ -362,12 +362,22 @@ export default class Body {
         this.ctx.body.renderRows = rows;
     }
     draw() {
+        // 容器背景
+        this.renderRows.forEach((row) => {
+            row.drawContainer();
+        });
         this.renderRows.forEach((row) => {
             row.drawCenter();
         });
-        this.drawFiexShadow();
+        this.drawFixedShadow();
+        this.renderRows.forEach((row) => {
+            row.drawFixedContainer();
+        });
         this.renderRows.forEach((row) => {
             row.drawFixed();
+        });
+        this.renderRows.forEach((row) => {
+            row.drawAutofillPiont();
         });
         this.drawTipLine();
     }

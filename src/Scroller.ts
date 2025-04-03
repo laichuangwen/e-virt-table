@@ -195,7 +195,7 @@ class Scrollbar {
             header,
             stageHeight,
             stageWidth,
-            config: { SCROLLER_TRACK_SIZE = 0, SCROLLER_SIZE = 0 },
+            config: { SCROLLER_TRACK_SIZE = 0, SCROLLER_SIZE = 0, BORDER },
         } = this.ctx;
         const visibleWidth = stageWidth;
         const visibleHeight = stageHeight;
@@ -238,8 +238,9 @@ class Scrollbar {
                 visibleWidth - SCROLLER_TRACK_SIZE,
                 visibleHeight,
             ];
+            const offset = BORDER ? 0 : 0.5; // 解决边框问题，补偿0.5px
             this.trackX = 0;
-            this.trackY = visibleHeight - SCROLLER_TRACK_SIZE;
+            this.trackY = visibleHeight - SCROLLER_TRACK_SIZE + offset;
             this.trackWidth = visibleWidth;
             this.trackHeight = SCROLLER_TRACK_SIZE;
 
@@ -262,23 +263,27 @@ class Scrollbar {
     }
     draw() {
         const {
-            config: { SCROLLER_FOCUS_COLOR, SCROLLER_COLOR, BORDER_COLOR, SCROLLER_TRACK_COLOR },
+            config: { SCROLLER_FOCUS_COLOR, SCROLLER_COLOR, BORDER_COLOR, BORDER, SCROLLER_TRACK_COLOR },
         } = this.ctx;
         this.updatedSize();
+        let borderColor = BORDER_COLOR;
+        if (!BORDER) {
+            borderColor = 'transparent';
+        }
         // 轨道
         this.ctx.paint.drawRect(this.trackX, this.trackY, this.trackWidth, this.trackHeight, {
-            borderColor: BORDER_COLOR,
+            borderColor,
             fillColor: SCROLLER_TRACK_COLOR,
         });
         // 滚动条
         this.ctx.paint.drawRect(this.barX, this.barY, this.barWidth, this.barHeight, {
-            fillColor: (this.isFocus || this.isDragging) ? SCROLLER_FOCUS_COLOR : SCROLLER_COLOR,
+            fillColor: this.isFocus || this.isDragging ? SCROLLER_FOCUS_COLOR : SCROLLER_COLOR,
             radius: 4,
         });
         // 分割线范围外
         if (this.splitPoints.length > 0) {
             this.ctx.paint.drawLine(this.splitPoints, {
-                borderColor: BORDER_COLOR,
+                borderColor,
                 borderWidth: 1,
             });
         }

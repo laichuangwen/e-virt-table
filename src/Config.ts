@@ -30,6 +30,9 @@ export default class Config {
     DISABLED = false; //禁用编辑,优先等级最高
     HEADER_FONT = '12px normal Arial';
     BODY_FONT = '12px normal Arial';
+    BORDER = true;
+    STRIPE = false; //斑马纹
+    STRIPE_COLOR = '#fafafa'; //斑马纹颜色
     BORDER_COLOR = '#e1e6eb';
     WIDTH = 0;
     RESIZE_MIN_WIDTH = 40;
