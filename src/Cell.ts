@@ -669,7 +669,7 @@ export default class Cell extends BaseCell {
             );
         }
     }
-    drawAutofillPiont() {
+    private drawAutofillPiont() {
         if (this.cellType === 'footer') {
             return;
         }
@@ -690,7 +690,11 @@ export default class Cell extends BaseCell {
         const { colIndex, rowIndex, drawX, drawY } = this;
         // 绘制自动填充点
         if (show && colIndex === maxX && rowIndex === maxY) {
-            const offset = colIndex === this.ctx.maxColIndex || rowIndex === this.ctx.maxRowIndex ? 6 : 4;
+            const isOffset =
+                colIndex === this.ctx.maxColIndex ||
+                rowIndex === this.ctx.maxRowIndex ||
+                colIndex === this.ctx.lastCenterColIndex;
+            const offset = isOffset ? 6 : 4;
             this.ctx.paint.drawRect(drawX + this.width - offset, drawY + this.height - offset, 6, 6, {
                 borderColor: AUTOFILL_POINT_BORDER_COLOR,
                 fillColor: SELECT_BORDER_COLOR,
@@ -702,6 +706,7 @@ export default class Cell extends BaseCell {
         this.drawText();
         this.drawImage();
         this.drawSelector();
+        this.drawAutofillPiont();
         this.drawErrorTip();
     }
     /**

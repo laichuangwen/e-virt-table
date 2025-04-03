@@ -376,9 +376,6 @@ export default class Body {
         this.renderRows.forEach((row) => {
             row.drawFixed();
         });
-        this.renderRows.forEach((row) => {
-            row.drawAutofillPiont();
-        });
         this.drawTipLine();
     }
 }

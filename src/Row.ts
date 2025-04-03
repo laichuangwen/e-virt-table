@@ -84,9 +84,4 @@ export default class Row {
             cell.drawContainer();
         });
     }
-    drawAutofillPiont(){
-        this.cells.forEach((cell) => {
-            cell.drawAutofillPiont();
-        });
-    }
 }

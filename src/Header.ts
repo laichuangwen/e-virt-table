@@ -340,6 +340,11 @@ export default class Header {
         const renderLeafCellHeaders: CellHeader[] = [];
         const renderCenterCellHeaders: CellHeader[] = [];
         const renderFixedCellHeaders: CellHeader[] = [];
+        // 中心的最后一个ColIndex
+        if (this.centerCellHeaders.length) {
+            const lastCenterCell = this.centerCellHeaders[this.centerCellHeaders.length - 1];
+            this.ctx.lastCenterColIndex = lastCenterCell.colIndex;
+        }
         this.centerCellHeaders.forEach((item) => {
             if (item.isHorizontalVisible() && item.isVerticalVisible()) {
                 renderCenterCellHeaders.push(item);

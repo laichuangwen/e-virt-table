@@ -101,6 +101,7 @@ export default class Context {
     scrollX = 0;
     fixedLeftWidth = 0;
     fixedRightWidth = 0;
+    lastCenterColIndex = 0; 
     maxColIndex = 0;
     maxRowIndex = 0;
     hoverRow?: Row;
