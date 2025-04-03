@@ -68,8 +68,6 @@ export default class Autofill {
         return true;
     }
     private setMousedown() {
-        console.log('setMousedown');
-
         this.ctx.autofill.enable = true;
         this.ctx.autofillMove = true;
     }

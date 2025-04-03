@@ -368,7 +368,7 @@ const eVirtTable = new EVirtTable(canvas, {
             },
         ],
         BORDER: true,
-        STRIPE: true,
+        STRIPE: false,
         // DISABLED: true,
         // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
