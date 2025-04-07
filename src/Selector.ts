@@ -142,7 +142,7 @@ export default class Selector {
                 this.moveFocus('LEFT');
                 return;
             }
-            if (e.code === 'ArrowUp' || (e.shiftKey && e.code === 'Enter')) {
+            if (e.code === 'ArrowUp') {
                 e.preventDefault();
                 this.moveFocus('TOP');
                 return;
@@ -152,7 +152,7 @@ export default class Selector {
                 this.moveFocus('RIGHT');
                 return;
             }
-            if (e.code === 'ArrowDown' || (!e.shiftKey && e.code === 'Enter')) {
+            if (e.code === 'ArrowDown') {
                 e.preventDefault();
                 this.moveFocus('BOTTOM');
                 return;

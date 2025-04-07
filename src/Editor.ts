@@ -79,6 +79,11 @@ export default class Editor {
                 this.ctx.emit('setMoveFocus', 'BOTTOM');
                 return;
             }
+            if (e.code === 'Enter' && !this.ctx.editing) {
+                e.preventDefault();
+                this.startEdit();
+                return;
+            }
             const key = e.key;
             const isCtrl = e.ctrlKey;
             const isAlt = e.altKey;
@@ -237,9 +242,9 @@ export default class Editor {
         if (this.ctx.config.ENABLE_MERGE_CELL_LINK) {
             cell.updateSpanInfo(); // 更新合并单元格信息
         }
-        let { drawX, drawY, height, width } = cell;
-        this.drawX = drawX;
-        this.drawY = drawY;
+        let { height, width } = cell;
+        this.drawX = cell.getDrawX();
+        this.drawY = cell.getDrawY();
         const {
             config: { CELL_PADDING },
             header,
@@ -250,8 +255,8 @@ export default class Editor {
         }
         // 显示编辑器
         this.editorEl.style.display = 'inline-block';
-        this.editorEl.style.left = `${drawX - 1}px`;
-        this.editorEl.style.top = `${drawY - 1}px`;
+        this.editorEl.style.left = `${this.drawX - 1}px`;
+        this.editorEl.style.top = `${this.drawY - 1}px`;
         this.editorEl.style.bottom = `auto`;
         this.editorEl.style.maxHeight = `${maxHeight}px`;
         if (editorType === 'text') {
@@ -272,7 +277,7 @@ export default class Editor {
             this.inputEl.style.display = 'none';
         }
 
-        if (this.inputEl.scrollHeight > height || drawY < header.height) {
+        if (this.inputEl.scrollHeight > height || this.drawY < header.height) {
             this.autoSize();
         }
     }
