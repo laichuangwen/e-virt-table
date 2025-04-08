@@ -415,7 +415,12 @@ export default class Database {
                     value = Number(_value);
                 } else {
                     value = oldValue;
-                    errList.push(item);
+                    errList.push({
+                        ...item,
+                        value,
+                        oldValue,
+                        row,
+                    });
                 }
             }
             return {
@@ -429,7 +434,7 @@ export default class Database {
         changeList = changeList.filter((item) => {
             return !errList.some((err) => item.rowKey === err.rowKey && item.key === err.key);
         });
-        if(errList.length){
+        if (errList.length) {
             const err: ErrorType = {
                 code: 'ERR_BATCH_SET_NUMBER_VALUE',
                 message: 'Assignment failed, not a numeric type',
@@ -517,24 +522,39 @@ export default class Database {
             this.originalDataMap.set(changeKey, oldValue);
         }
         const originalValue = this.originalDataMap.get(changeKey);
-
+        const row = this.getRowDataItemForRowKey(rowKey);
         // 是否是否是编辑器进来的
         if (isEditor) {
             const cell = this.getVirtualBodyCellByKey(rowKey, key);
-            if (cell?.type === 'number' && value !== null) {
+            if (cell?.type === 'number') {
                 // 处理数字
                 if (['', undefined, null].includes(_value)) {
                     value = null;
                 } else if (/^-?\d+(\.\d+)?$/.test(`${_value}`)) {
                     value = Number(_value);
                 } else {
+                    value = oldValue;
                     const err: ErrorType = {
                         code: 'ERR_SET_NUMBER_VALUE',
                         message: 'Assignment failed, not a numeric type',
+                        data: [
+                            {
+                                rowKey,
+                                key,
+                                value,
+                                oldValue,
+                                row,
+                            },
+                        ],
                     };
                     this.ctx.emit('error', err);
-                    return;
                 }
+            }
+            if (value === oldValue) {
+                return {
+                    oldValue,
+                    newValue: oldValue,
+                };
             }
             const { BEFORE_VALUE_CHANGE_METHOD } = this.ctx.config;
             if (typeof BEFORE_VALUE_CHANGE_METHOD === 'function') {
@@ -545,7 +565,7 @@ export default class Database {
                         key,
                         value,
                         oldValue: item[key],
-                        row: this.ctx.database.getRowDataItemForRowKey(rowKey),
+                        row,
                     },
                 ]);
                 if (values && values.length) {
@@ -555,7 +575,6 @@ export default class Database {
             // 设置改变值
             this.changedDataMap.set(changeKey, value);
             item[key] = value;
-            const row = this.ctx.database.getRowDataItemForRowKey(rowKey);
             const changeItem: ChangeItem = {
                 rowKey,
                 key,
@@ -590,7 +609,7 @@ export default class Database {
                 oldValue,
                 value,
                 originalValue: this.originalDataMap.get(changeKey),
-                row: this.ctx.database.getRowDataItemForRowKey(rowKey),
+                row,
             });
         }
         // 添加历史记录
@@ -817,7 +836,12 @@ export default class Database {
         if (key && this.headerMap.has(key)) {
             return this.headerMap.get(key)?.column;
         }
-        return undefined;
+    }
+    getColumnByKey(key: string) {
+        const column = this.headerMap.get(key);
+        if (column) {
+            return column;
+        }
     }
     getColIndexForKey(key: string) {
         if (key && this.headerMap.has(key)) {

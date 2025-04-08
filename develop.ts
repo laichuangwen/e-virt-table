@@ -277,10 +277,11 @@ const columns: Column[] = [
         title: '采购价(元)',
         key: 'purchasePrice',
         fixed: 'right',
+        type: 'number',
         rules: [
             {
                 required: true,
-                // type: 'number',
+                type: 'number',
                 message: '请输入销售价',
             },
         ],
@@ -291,13 +292,13 @@ const columns: Column[] = [
         key: 'salePrice',
         type: 'number',
         // readonly: true,
-        // rules: [
-        //     {
-        //         required: true,
-        //         type: 'number',
-        //         message: '请输入销售价',
-        //     },
-        // ],
+        rules: [
+            {
+                required: true,
+                type: 'number',
+                message: '请输入销售价',
+            },
+        ],
     },
     {
         title: '操作',
@@ -485,8 +486,6 @@ const eVirtTable = new EVirtTable(canvas, {
         // },
         // 改变前需要篡改数据
         BEFORE_VALUE_CHANGE_METHOD: (changeList) => {
-            console.log('BEFORE_VALUE_CHANGE_METHOD', changeList);
-            
             return changeList;
             // if(changeList.some((item) => item.key !== 'requiredQuantity')) {
             //     return changeList.map(item=>{
@@ -634,7 +633,10 @@ const eVirtTable = new EVirtTable(canvas, {
 });
 eVirtTable.on('error', (error) => {
     console.error(error);
-})
+});
+eVirtTable.on('change', (changeList) => {
+    eVirtTable.validate();
+});
 eVirtTable.on('overlayerChange', (container) => {
     if (!overlayerEl) {
         return;

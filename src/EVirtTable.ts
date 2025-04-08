@@ -369,6 +369,9 @@ export default class EVirtTable {
             getSpanObjByColumn,
         };
     }
+    getColumnByKey(key: string) {
+        return this.ctx.database.getColumnByKey(key)?.column;
+    }
     /**
      * 销毁
      */
