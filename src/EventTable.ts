@@ -176,7 +176,7 @@ export default class EventTable {
             if (cell.drawImageName === 'checkbox-uncheck' || cell.drawImageName === 'checkbox-indeterminate') {
                 this.ctx.database.toggleAllSelection();
             } else if (cell.drawImageName === 'checkbox-check') {
-                this.ctx.database.clearSelection();
+                this.ctx.database.clearSelection(true);
             }
         } else {
             // 点击body
@@ -305,7 +305,7 @@ export default class EventTable {
         return false;
     }
     private handleBodyEvent(x: number, y: number, renderRows: Row[], callback: Function, visible = false) {
-        if(!this.isInsideBody(y)){
+        if (!this.isInsideBody(y)) {
             return;
         }
         for (const row of renderRows) {

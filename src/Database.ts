@@ -705,10 +705,17 @@ export default class Database {
      * 清除选中
      * @param rowKey
      */
-    clearSelection() {
-        this.selectionMap.forEach((_, rowKey: string) => {
-            this.setRowSelection(rowKey, false, false);
-        });
+    clearSelection(ignoreReserve = false) {
+        // 清除选中,点击表头清除时要忽略跨页选的
+        if (ignoreReserve) {
+            this.rowKeyMap.forEach((_, rowKey: string) => {
+                this.setRowSelection(rowKey, false, false);
+            });
+        } else {
+            this.selectionMap.forEach((_, rowKey: string) => {
+                this.setRowSelection(rowKey, false, false);
+            });
+        }
         const rows = this.getSelectionRows();
         this.ctx.emit('clearSelection');
         this.ctx.emit('selectionChange', rows);
