@@ -45,7 +45,7 @@ export default class Config {
     ENABLE_OFFSET_HEIGHT = false;
     OFFSET_HEIGHT = 0;
     HEADER_HEIGHT = 36;
-    ENABLE_RESERVE_SELECTION=false;// 启用保留选中行
+    ENABLE_RESERVE_SELECTION = false; // 启用保留选中行
     ENABLE_HEADER_STICKY = false; // 启用头部固定,需要外面实现覆盖层，或者所有表头都要是元素
     HEADER_BG_COLOR = '#F8FAFF';
     BODY_BG_COLOR = '#FFF';

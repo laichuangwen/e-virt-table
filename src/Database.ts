@@ -14,6 +14,8 @@ import type {
     Descriptor,
     SpanInfo,
     SelectionMap,
+    ErrorType,
+    BeforeChangeItem,
 } from './types';
 import { generateShortUUID } from './util';
 import { HistoryItemData } from './History';
@@ -394,28 +396,61 @@ export default class Database {
      * @returns
      */
     async batchSetItemValue(_list: ChangeItem[], history = false) {
-        let changeList: HistoryItemData[] = [];
+        let historyList: HistoryItemData[] = [];
         const rowKeyList: Set<string> = new Set();
-        let list = _list;
+        let errList: ChangeItem[] = [];
+        let changeList: BeforeChangeItem[] = _list.map((item) => {
+            const { rowKey, key } = item;
+            let _value = item.value;
+            let value = _value;
+            const row = this.getRowDataItemForRowKey(rowKey);
+            const oldValue = this.getItemValue(rowKey, key);
+            // 判断数字
+            const cell = this.getVirtualBodyCellByKey(rowKey, key);
+            if (cell?.type === 'number') {
+                // 处理数字
+                if (['', undefined, null].includes(_value)) {
+                    value = null;
+                } else if (/^-?\d+(\.\d+)?$/.test(`${_value}`)) {
+                    value = Number(_value);
+                } else {
+                    value = oldValue;
+                    errList.push(item);
+                }
+            }
+            return {
+                ...item,
+                value,
+                oldValue,
+                row,
+            };
+        });
+        // 过滤错误的
+        changeList = changeList.filter((item) => {
+            return !errList.some((err) => item.rowKey === err.rowKey && item.key === err.key);
+        });
+        if(errList.length){
+            const err: ErrorType = {
+                code: 'ERR_BATCH_SET_NUMBER_VALUE',
+                message: 'Assignment failed, not a numeric type',
+                data: errList,
+            };
+            this.ctx.emit('error', err);
+        }
+        if (!changeList.length) {
+            return;
+        }
         const { BEFORE_VALUE_CHANGE_METHOD } = this.ctx.config;
         if (typeof BEFORE_VALUE_CHANGE_METHOD === 'function') {
             const beforeCellValueChange: BeforeCellValueChangeMethod = BEFORE_VALUE_CHANGE_METHOD;
-            const changeList = _list.map((item) => ({
-                rowKey: item.rowKey,
-                key: item.key,
-                value: item.value,
-                oldValue: this.getItemValue(item.rowKey, item.key),
-                row: this.ctx.database.getRowDataItemForRowKey(item.rowKey),
-            }));
             const values = await beforeCellValueChange(changeList);
-            list = values;
+            changeList = values;
         }
-        list.forEach((data) => {
-            const { value, rowKey, key } = data;
-            const oldValue = this.getItemValue(rowKey, key);
-            this.setItemValue(rowKey, key, value);
+        changeList.forEach((data) => {
+            const { value, rowKey, key, oldValue } = data;
             rowKeyList.add(rowKey);
-            changeList.push({
+            this.setItemValue(rowKey, key, value);
+            historyList.push({
                 rowKey,
                 key,
                 oldValue,
@@ -424,30 +459,20 @@ export default class Database {
         });
         // 触发change事件
         let rows: any[] = [];
-        const _changeList: ChangeItem[] = changeList.map((item) => {
-            const row = this.ctx.database.getRowDataItemForRowKey(item.rowKey);
-            return {
-                rowKey: item.rowKey,
-                key: item.key,
-                value: item.newValue,
-                oldValue: item.oldValue,
-                row,
-            };
-        });
         rowKeyList.forEach((rowKey) => {
             rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
         });
-        const promsieValidators = _changeList.map(({ rowKey, key }) => this.getValidator(rowKey, key));
+        const promsieValidators = changeList.map(({ rowKey, key }) => this.getValidator(rowKey, key));
         Promise.all(promsieValidators).then(() => {
             if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
                 this.ctx.emit('validateChangedData', this.getChangedData());
             }
         });
-        this.ctx.emit('change', _changeList, rows);
+        this.ctx.emit('change', changeList, rows);
         // 推历史记录
         if (history) {
             this.ctx.history.pushState({
-                changeList,
+                changeList: historyList,
                 scrollX: this.ctx.scrollX,
                 scrollY: this.ctx.scrollY,
                 type: 'multiple',
@@ -470,8 +495,11 @@ export default class Database {
         if (!this.rowKeyMap.has(rowKey)) {
             return {};
         }
+
         const { item } = this.rowKeyMap.get(rowKey);
         let oldValue = item[key];
+        let value = _value;
+
         // 只读返回旧值
         if (this.ctx.database.getReadonly(rowKey, key)) {
             return {
@@ -489,9 +517,25 @@ export default class Database {
             this.originalDataMap.set(changeKey, oldValue);
         }
         const originalValue = this.originalDataMap.get(changeKey);
-        let value = _value;
+
         // 是否是否是编辑器进来的
         if (isEditor) {
+            const cell = this.getVirtualBodyCellByKey(rowKey, key);
+            if (cell?.type === 'number' && value !== null) {
+                // 处理数字
+                if (['', undefined, null].includes(_value)) {
+                    value = null;
+                } else if (/^-?\d+(\.\d+)?$/.test(`${_value}`)) {
+                    value = Number(_value);
+                } else {
+                    const err: ErrorType = {
+                        code: 'ERR_SET_NUMBER_VALUE',
+                        message: 'Assignment failed, not a numeric type',
+                    };
+                    this.ctx.emit('error', err);
+                    return;
+                }
+            }
             const { BEFORE_VALUE_CHANGE_METHOD } = this.ctx.config;
             if (typeof BEFORE_VALUE_CHANGE_METHOD === 'function') {
                 const beforeCellValueChange: BeforeCellValueChangeMethod = BEFORE_VALUE_CHANGE_METHOD;
@@ -499,7 +543,7 @@ export default class Database {
                     {
                         rowKey,
                         key,
-                        value: _value,
+                        value,
                         oldValue: item[key],
                         row: this.ctx.database.getRowDataItemForRowKey(rowKey),
                     },
@@ -1186,6 +1230,14 @@ export default class Database {
         }
         const cell = new Cell(this.ctx, rowIndex, colIndex, 0, 0, 0, 0, column, row, 'body');
         return cell;
+    }
+    getVirtualBodyCellByKey(rowKey: string, key: string) {
+        const rowIndex = this.getRowIndexForRowKey(rowKey);
+        const colIndex = this.getColIndexForKey(key);
+        if (rowIndex === undefined || colIndex === undefined) {
+            return;
+        }
+        return this.getVirtualBodyCell(rowIndex, colIndex);
     }
     hasMergeCell(xArr: number[], yArr: number[]) {
         let hasMergeCell = false;

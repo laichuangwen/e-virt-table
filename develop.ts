@@ -197,7 +197,6 @@ const columns: Column[] = [
     },
     {
         title: '家庭地址',
-        sort: 8,
         key: 'address',
         align: 'left',
         width: 250,
@@ -277,11 +276,28 @@ const columns: Column[] = [
     {
         title: '采购价(元)',
         key: 'purchasePrice',
+        fixed: 'right',
+        rules: [
+            {
+                required: true,
+                // type: 'number',
+                message: '请输入销售价',
+            },
+        ],
     },
     {
         title: '销售价(元)',
+        fixed: 'right',
         key: 'salePrice',
-        readonly: true,
+        type: 'number',
+        // readonly: true,
+        // rules: [
+        //     {
+        //         required: true,
+        //         type: 'number',
+        //         message: '请输入销售价',
+        //     },
+        // ],
     },
     {
         title: '操作',
@@ -469,6 +485,8 @@ const eVirtTable = new EVirtTable(canvas, {
         // },
         // 改变前需要篡改数据
         BEFORE_VALUE_CHANGE_METHOD: (changeList) => {
+            console.log('BEFORE_VALUE_CHANGE_METHOD', changeList);
+            
             return changeList;
             // if(changeList.some((item) => item.key !== 'requiredQuantity')) {
             //     return changeList.map(item=>{
@@ -502,36 +520,36 @@ const eVirtTable = new EVirtTable(canvas, {
             //     }, 1000);
             // });
         },
-        BEFORE_PASTE_DATA_METHOD: (changeList, xArr, yArr) => {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    console.log('BEFORE_PASTE_DATA_METHOD', changeList);
-                    const ll = changeList.map((item) => {
-                        const { value } = item;
-                        return {
-                            ...item,
-                            value: `${value}粘贴`,
-                        };
-                    });
-                    resolve(ll);
-                }, 1000);
-            });
-        },
-        BEFORE_AUTOFILL_DATA_METHOD: (changeList) => {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    console.log('BEFORE_PASTE_DATA_METHOD', changeList);
-                    const ll = changeList.map((item) => {
-                        const { value } = item;
-                        return {
-                            ...item,
-                            value: `${value}填充`,
-                        };
-                    });
-                    resolve(ll);
-                }, 1000);
-            });
-        },
+        // BEFORE_PASTE_DATA_METHOD: (changeList, xArr, yArr) => {
+        //     return new Promise((resolve) => {
+        //         setTimeout(() => {
+        //             console.log('BEFORE_PASTE_DATA_METHOD', changeList);
+        //             const ll = changeList.map((item) => {
+        //                 const { value } = item;
+        //                 return {
+        //                     ...item,
+        //                     value: `${value}粘贴`,
+        //                 };
+        //             });
+        //             resolve(ll);
+        //         }, 1000);
+        //     });
+        // },
+        // BEFORE_AUTOFILL_DATA_METHOD: (changeList) => {
+        //     return new Promise((resolve) => {
+        //         setTimeout(() => {
+        //             console.log('BEFORE_PASTE_DATA_METHOD', changeList);
+        //             const ll = changeList.map((item) => {
+        //                 const { value } = item;
+        //                 return {
+        //                     ...item,
+        //                     value: `${value}填充`,
+        //                 };
+        //             });
+        //             resolve(ll);
+        //         }, 1000);
+        //     });
+        // },
         EXPAND_LAZY_METHOD: (params: any) => {
             const i = params.row.id;
             return new Promise((resolve) => {
@@ -614,9 +632,9 @@ const eVirtTable = new EVirtTable(canvas, {
         },
     },
 });
-// eVirtTable.on('error', (error) => {
-//     console.error(error);
-// })
+eVirtTable.on('error', (error) => {
+    console.error(error);
+})
 eVirtTable.on('overlayerChange', (container) => {
     if (!overlayerEl) {
         return;
