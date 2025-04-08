@@ -239,12 +239,13 @@ export default class Editor {
     private startEditByInput(cell: Cell, ignoreValue = false) {
         const value = ignoreValue ? null : cell.getValue();
         const { editorType } = cell;
+        cell.update(); // 更新单元格信息
         if (this.ctx.config.ENABLE_MERGE_CELL_LINK) {
             cell.updateSpanInfo(); // 更新合并单元格信息
         }
-        let { height, width } = cell;
-        this.drawX = cell.getDrawX();
-        this.drawY = cell.getDrawY();
+        let { height, width, drawY, drawX } = cell;
+        this.drawX = drawX;
+        this.drawY = drawY;
         const {
             config: { CELL_PADDING },
             header,
