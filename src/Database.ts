@@ -13,6 +13,7 @@ import type {
     BeforeCellValueChangeMethod,
     Descriptor,
     SpanInfo,
+    SelectionMap,
 } from './types';
 import { generateShortUUID } from './util';
 import { HistoryItemData } from './History';
@@ -28,6 +29,7 @@ export default class Database {
     private headerMap = new Map<string, CellHeader>();
     private rowIndexRowKeyMap = new Map<number, string>();
     private checkboxKeyMap = new Map<string, string[]>();
+    private selectionMap = new Map<string, SelectionMap>();
     private originalDataMap = new Map<string, any>();
     private changedDataMap = new Map<string, any>();
     private validationErrorMap = new Map<string, ValidateError[]>();
@@ -48,6 +50,7 @@ export default class Database {
     init() {
         this.clearBufferData();
         this.rowKeyMap.clear();
+
         this.checkboxKeyMap.clear();
         this.colIndexKeyMap.clear();
         this.rowIndexRowKeyMap.clear();
@@ -55,6 +58,11 @@ export default class Database {
         this.changedDataMap.clear();
         this.validationErrorMap.clear();
         this.itemRowKeyMap = new WeakMap();
+        const { ROW_KEY, ENABLE_RESERVE_SELECTION } = this.ctx.config;
+        // 没有跨页选时清除
+        if (!(ENABLE_RESERVE_SELECTION && ROW_KEY)) {
+            this.selectionMap.clear();
+        }
         this.initData(this.data);
         this.getData();
     }
@@ -98,6 +106,12 @@ export default class Database {
                     this.checkboxKeyMap.set(checkboxKey, [rowKey]);
                 }
             }
+            // 存key
+            this.selectionMap.set(rowKey, {
+                key: CHECKBOX_KEY ? item[CHECKBOX_KEY] : rowKey,
+                row: item,
+                check: this.selectionMap.get(rowKey)?.check || false,
+            });
             this.rowKeyMap.set(rowKey, {
                 readonly,
                 index,
@@ -589,8 +603,10 @@ export default class Database {
             if (this.checkboxKeyMap.has(checkboxKey)) {
                 const rowKeys = this.checkboxKeyMap.get(checkboxKey) || [];
                 rowKeys.forEach((rowKey: string) => {
-                    const row = this.rowKeyMap.get(rowKey);
-                    row.check = check;
+                    const selection = this.selectionMap.get(rowKey);
+                    if (selection) {
+                        selection.check = check;
+                    }
                 });
             }
         }
@@ -601,8 +617,12 @@ export default class Database {
      */
     toggleRowSelection(rowKey: string) {
         const row = this.rowKeyMap.get(rowKey);
-        row.check = !row.check;
-        this.setRowSelectionByCheckboxKey(rowKey, row.check);
+        const selection = this.selectionMap.get(rowKey);
+        if (!selection) {
+            return;
+        }
+        selection.check = !selection.check;
+        this.setRowSelectionByCheckboxKey(rowKey, selection.check);
         this.ctx.emit('toggleRowSelection', row);
         const rows = this.getSelectionRows();
         this.ctx.emit('selectionChange', rows);
@@ -612,19 +632,24 @@ export default class Database {
      * 根据rowKey 设置选中状态
      * @param rowKey
      */
-    setRowSelection(rowKey: string, check: boolean) {
-        const row = this.rowKeyMap.get(rowKey);
-        row.check = check;
-        this.setRowSelectionByCheckboxKey(rowKey, row.check);
+    setRowSelection(rowKey: string, check: boolean, draw = true) {
+        const selection = this.selectionMap.get(rowKey);
+        if (!selection) {
+            return;
+        }
+        selection.check = check;
+        this.setRowSelectionByCheckboxKey(rowKey, selection.check);
         const rows = this.getSelectionRows();
         this.ctx.emit('setRowSelection', rows);
-        this.ctx.emit('draw');
+        if (draw) {
+            this.ctx.emit('draw');
+        }
     }
     getSelectionRows() {
         let rows: any[] = [];
-        this.rowKeyMap.forEach((row: any) => {
-            if (row.check) {
-                rows.push(row.item);
+        this.selectionMap.forEach((selection: any) => {
+            if (selection.check) {
+                rows.push(selection.row);
             }
         });
         return rows;
@@ -634,8 +659,11 @@ export default class Database {
      * @param rowKey
      */
     getRowSelection(rowKey: string) {
-        const { check } = this.rowKeyMap.get(rowKey);
-        return check;
+        const selection = this.selectionMap.get(rowKey);
+        if (!selection) {
+            return false;
+        }
+        return selection.check;
     }
     /**
      * 根据rowKey 获取选中状态
@@ -656,20 +684,16 @@ export default class Database {
      * @param rowKey
      */
     toggleAllSelection() {
-        this.rowKeyMap.forEach((row: any) => {
-            const _selectable = row.selectable;
+        this.rowKeyMap.forEach((row: any, rowKey: string) => {
+            let _selectable = row.selectable;
             if (typeof _selectable === 'function') {
-                const selectable = _selectable({
+                _selectable = _selectable({
                     row: row.item,
                     rowIndex: row.rowIndex,
                 });
-                if (selectable) {
-                    row.check = true;
-                }
-            } else {
-                if (_selectable) {
-                    row.check = true;
-                }
+            }
+            if (_selectable) {
+                this.setRowSelection(rowKey, true, false);
             }
         });
         const rows = this.getSelectionRows();
@@ -682,21 +706,8 @@ export default class Database {
      * @param rowKey
      */
     clearSelection() {
-        this.rowKeyMap.forEach((row: any) => {
-            const _selectable = row.selectable;
-            if (typeof _selectable === 'function') {
-                const selectable = _selectable({
-                    row: row.item,
-                    rowIndex: row.rowIndex,
-                });
-                if (selectable) {
-                    row.check = false;
-                }
-            } else {
-                if (_selectable) {
-                    row.check = false;
-                }
-            }
+        this.selectionMap.forEach((_, rowKey: string) => {
+            this.setRowSelection(rowKey, false, false);
         });
         const rows = this.getSelectionRows();
         this.ctx.emit('clearSelection');
@@ -708,30 +719,30 @@ export default class Database {
      * @param rowKey
      */
     getCheckedState() {
-        let total = 0;
+        const total = this.rowKeyMap.size;
         let totalChecked = 0;
         let totalSelectable = 0;
-        this.rowKeyMap.forEach((row: any) => {
-            total += 1;
-            if (row.check) {
+        const reserveTotal = this.selectionMap.size;
+        const reserveHasChecked = Array.from(this.selectionMap.values()).some((item) => item.check);
+        this.rowKeyMap.forEach((row: any, rowKey: string) => {
+            if (this.selectionMap.get(rowKey)?.check) {
                 totalChecked += 1;
             }
-            const _selectable = row.selectable;
+            let _selectable = row.selectable;
             if (typeof _selectable === 'function') {
-                const selectable = _selectable({
+                _selectable = _selectable({
                     row: row.item,
                     rowIndex: row.rowIndex,
                 });
-                if (selectable) {
-                    totalSelectable += 1;
-                }
-            } else {
-                if (_selectable) {
-                    totalSelectable += 1;
-                }
+            }
+            if (_selectable) {
+                totalSelectable += 1;
             }
         });
-        const indeterminate = totalSelectable && totalSelectable > totalChecked && totalChecked > 0;
+        // 存在跨页时，变更半选中
+        const reserveIndeterminate = reserveTotal > total && totalChecked === 0 && reserveHasChecked;
+        const indeterminate =
+            (totalSelectable && totalSelectable > totalChecked && totalChecked > 0) || reserveIndeterminate;
         const selectable = totalSelectable !== 0;
         const check = totalSelectable && totalSelectable === totalChecked;
         return {

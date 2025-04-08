@@ -98,6 +98,11 @@ export type Position = {
     top: number;
     bottom: number;
 };
+export type SelectionMap = {
+    check: boolean;
+    key: string;
+    row: any;
+};
 
 export interface Column {
     key: string;

@@ -322,14 +322,14 @@ export default class EVirtTable {
     setSelectionByRows(rows: any[], selected = true) {
         rows.forEach((row) => {
             const rowKey = this.ctx.database.getRowKeyByItem(row);
-            this.ctx.database.setRowSelection(rowKey, selected);
+            this.ctx.database.setRowSelection(rowKey, selected, false);
         });
         this.ctx.emit('selectionChange', this.getSelectionRows());
         this.ctx.emit('draw');
     }
     setSelectionByRowKeys(keys: string[], selected = true) {
         keys.forEach((key) => {
-            this.ctx.database.setRowSelection(key, selected);
+            this.ctx.database.setRowSelection(key, selected, false);
         });
         this.ctx.emit('selectionChange', this.getSelectionRows());
         this.ctx.emit('draw');
