@@ -111,3 +111,12 @@ V1.1.4
 - feat:添加数字类型type
 
 ---
+
+
+V1.1.5
+### Bug Fixes
+- fix:添加selection缓存提升渲染速度
+- fix:修复虚拟cell传row出错
+- 更新文档
+
+---

@@ -14,6 +14,7 @@
 | ----------------- | ------------------------ | --------------------------------------------------------------- | ------- |
 | SELECTABLE_METHOD | Custom selectable method | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean` | —       |
 | CHECKBOX_KEY      | Selection key            | string                                                          | —       |
+| ENABLE_RESERVE_SELECTION | Whether to keep the option, you need to set `ROW_KEY`  | boolean                    | —      |
 
 ## Methods
 
@@ -111,4 +112,15 @@ h:350px
 
 selection/span
 h:625px
+:::
+
+## Retain Selection for Multiple Selection
+
+-   `config.ENABLE_RESERVE_SELECTION` to enable retaining selection
+-   `config.ROW_KEY` must be declared
+
+::: demo
+
+selection/reserve
+h:460px
 :::

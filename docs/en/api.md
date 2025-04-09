@@ -221,7 +221,7 @@ type EVirtTableOptions = {
 | --- | --- | --- | --- | --- |
 | key ^(required)| Unique identifier for the column | string | — | — |
 | title ^(required)| Title of the column | string | — | — |
-| type| Type of the column | Type |  ^[string]`index, selection, index-selection, tree` | — |
+| type| Type of the column | Type |  ^[string]`index, selection, index-selection, tree,number` | — |
 | operation | Specify the column as an operation column | boolean | — | false |
 | editorType | Specify the editor type for the column | string | — | text |
 | widthFillDisable | Disable width fill for the column | boolean | — | true |
@@ -282,7 +282,7 @@ type EVirtTableOptions = {
     emptyElement?: HTMLDivElement;
     contextMenuElement?: HTMLDivElement;
 };
-type Type = 'index' | 'selection' | 'index-selection' | 'tree';
+type Type = 'index' | 'selection' | 'index-selection' | 'tree'|'number';
 
 type SpanType = {
     rowspan: number;
