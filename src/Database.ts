@@ -1279,7 +1279,7 @@ export default class Database {
         if (!column || !row) {
             return;
         }
-        const cell = new Cell(this.ctx, rowIndex, colIndex, 0, 0, 0, 0, column, row, 'body');
+        const cell = new Cell(this.ctx, rowIndex, colIndex, 0, 0, 0, 0, column, row.item, 'body');
         return cell;
     }
     getVirtualBodyCellByKey(rowKey: string, key: string) {
