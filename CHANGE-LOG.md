@@ -102,3 +102,12 @@ V1.1.3
 - fix:移动表头宽度和移动行高到滚动条的边界处理
 - fix:单选ENABLE_SELECTOR_SINGLE下shift快捷选中也能多选
 ---
+
+V1.1.4
+### Bug Fixes
+- fix:修复右fixed阴影1px问题
+- fix:更改选择器和填充器的绘画逻辑修复线条存在点问题
+- feat:添加selection跨页选
+- feat:添加数字类型type
+
+---
