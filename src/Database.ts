@@ -37,6 +37,12 @@ export default class Database {
     private validationErrorMap = new Map<string, ValidateError[]>();
     private itemRowKeyMap = new WeakMap();
     private bufferData: any[] = [];
+    private bufferCheckState = {
+        buffer: false,
+        check: false,
+        indeterminate: false,
+        selectable: true,
+    };
     private sumHeight = 0;
     private filterMethod: FilterMethod | undefined;
     private positions: Position[] = []; //虚拟滚动位置
@@ -689,6 +695,8 @@ export default class Database {
         this.ctx.emit('toggleRowSelection', row);
         const rows = this.getSelectionRows();
         this.ctx.emit('selectionChange', rows);
+        // 清除缓存
+        this.bufferCheckState.buffer = false;
         this.ctx.emit('draw');
     }
     /**
@@ -705,6 +713,8 @@ export default class Database {
         const rows = this.getSelectionRows();
         this.ctx.emit('setRowSelection', rows);
         if (draw) {
+            // 清除缓存
+            this.bufferCheckState.buffer = false;
             this.ctx.emit('draw');
         }
     }
@@ -762,6 +772,8 @@ export default class Database {
         const rows = this.getSelectionRows();
         this.ctx.emit('toggleAllSelection', rows);
         this.ctx.emit('selectionChange', rows);
+        // 清除缓存
+        this.bufferCheckState.buffer = false;
         this.ctx.emit('draw');
     }
     /**
@@ -782,6 +794,8 @@ export default class Database {
         const rows = this.getSelectionRows();
         this.ctx.emit('clearSelection');
         this.ctx.emit('selectionChange', rows);
+        // 清除缓存
+        this.bufferCheckState.buffer = false;
         this.ctx.emit('draw');
     }
     /**
@@ -789,6 +803,11 @@ export default class Database {
      * @param rowKey
      */
     getCheckedState() {
+        // 缓存，解决性能问题
+        const { buffer, ...bufferState } = this.bufferCheckState;
+        if (buffer) {
+            return bufferState;
+        }
         const total = this.rowKeyMap.size;
         let totalChecked = 0;
         let totalSelectable = 0;
@@ -814,7 +833,15 @@ export default class Database {
         const indeterminate =
             (totalSelectable && totalSelectable > totalChecked && totalChecked > 0) || reserveIndeterminate;
         const selectable = totalSelectable !== 0;
-        const check = totalSelectable && totalSelectable === totalChecked;
+        const check = !!totalSelectable && totalSelectable === totalChecked;
+        // 缓存
+        this.bufferCheckState = {
+            buffer: true,
+            check,
+            indeterminate,
+            selectable,
+        };
+
         return {
             check,
             indeterminate,

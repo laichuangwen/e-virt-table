@@ -307,7 +307,7 @@ const columns: Column[] = [
     },
 ];
 let data: any[] = [];
-for (let i = 0; i < 800; i += 1) {
+for (let i = 0; i < 80000; i += 1) {
     data.push({
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
         id: `1_${i}`,
@@ -394,7 +394,7 @@ const eVirtTable = new EVirtTable(canvas, {
         STRIPE: false,
         // DISABLED: true,
         // HEIGHT: 500,
-        CHECKBOX_KEY: 'emp_name',
+        // CHECKBOX_KEY: 'emp_name',
         ROW_KEY: 'id',
         ENABLE_RESERVE_SELECTION: true,
         CELL_HEIGHT: 36,
@@ -590,7 +590,7 @@ const eVirtTable = new EVirtTable(canvas, {
             const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;
             if (
                 [
-                    'selection',
+                    // 'selection',
                     'unit',
                     'work_type',
                     'household_city',
@@ -634,9 +634,9 @@ const eVirtTable = new EVirtTable(canvas, {
 eVirtTable.on('error', (error) => {
     console.error(error);
 });
-eVirtTable.on('change', (changeList) => {
-    eVirtTable.validate();
-});
+// eVirtTable.on('change', (changeList) => {
+//     eVirtTable.validate();
+// });
 eVirtTable.on('overlayerChange', (container) => {
     if (!overlayerEl) {
         return;
