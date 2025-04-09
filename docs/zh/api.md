@@ -223,7 +223,7 @@ type EVirtTableOptions = {
 | --- | --- | --- | --- |
 | key ^(required)| 列的唯一标识 | string | — |
 | title ^(required)| 列的标题 | string | — |
-| type| 列的类型 | ^[string]`index, selection, index-selection,tree` | — |
+| type| 列的类型 | ^[string]`index, selection, index-selection,tree,number` | — |
 | operation | 指定列为操作列 | boolean | false |
 | editorType | 指定列编辑器类型 | string | text |
 | widthFillDisable | 指定当前列不可填充宽度 | boolean | true |
@@ -284,7 +284,8 @@ type EVirtTableOptions = {
     emptyElement?: HTMLDivElement;
     contextMenuElement?: HTMLDivElement;
 };
-type Type = 'index' | 'selection' | 'index-selection' | 'tree';
+// type为number时，内部会把数字字符串变更为数字类型
+type Type = 'index' | 'selection' | 'index-selection' | 'tree'|'number';
 
 type SpanType = {
     rowspan: number;
