@@ -13,6 +13,9 @@ import type {
     BeforeCellValueChangeMethod,
     Descriptor,
     SpanInfo,
+    SelectionMap,
+    ErrorType,
+    BeforeChangeItem,
 } from './types';
 import { generateShortUUID } from './util';
 import { HistoryItemData } from './History';
@@ -28,6 +31,7 @@ export default class Database {
     private headerMap = new Map<string, CellHeader>();
     private rowIndexRowKeyMap = new Map<number, string>();
     private checkboxKeyMap = new Map<string, string[]>();
+    private selectionMap = new Map<string, SelectionMap>();
     private originalDataMap = new Map<string, any>();
     private changedDataMap = new Map<string, any>();
     private validationErrorMap = new Map<string, ValidateError[]>();
@@ -48,6 +52,7 @@ export default class Database {
     init() {
         this.clearBufferData();
         this.rowKeyMap.clear();
+
         this.checkboxKeyMap.clear();
         this.colIndexKeyMap.clear();
         this.rowIndexRowKeyMap.clear();
@@ -55,6 +60,11 @@ export default class Database {
         this.changedDataMap.clear();
         this.validationErrorMap.clear();
         this.itemRowKeyMap = new WeakMap();
+        const { ROW_KEY, ENABLE_RESERVE_SELECTION } = this.ctx.config;
+        // 没有跨页选时清除
+        if (!(ENABLE_RESERVE_SELECTION && ROW_KEY)) {
+            this.selectionMap.clear();
+        }
         this.initData(this.data);
         this.getData();
     }
@@ -98,6 +108,12 @@ export default class Database {
                     this.checkboxKeyMap.set(checkboxKey, [rowKey]);
                 }
             }
+            // 存key
+            this.selectionMap.set(rowKey, {
+                key: CHECKBOX_KEY ? item[CHECKBOX_KEY] : rowKey,
+                row: item,
+                check: this.selectionMap.get(rowKey)?.check || false,
+            });
             this.rowKeyMap.set(rowKey, {
                 readonly,
                 index,
@@ -380,28 +396,66 @@ export default class Database {
      * @returns
      */
     async batchSetItemValue(_list: ChangeItem[], history = false) {
-        let changeList: HistoryItemData[] = [];
+        let historyList: HistoryItemData[] = [];
         const rowKeyList: Set<string> = new Set();
-        let list = _list;
+        let errList: ChangeItem[] = [];
+        let changeList: BeforeChangeItem[] = _list.map((item) => {
+            const { rowKey, key } = item;
+            let _value = item.value;
+            let value = _value;
+            const row = this.getRowDataItemForRowKey(rowKey);
+            const oldValue = this.getItemValue(rowKey, key);
+            // 判断数字
+            const cell = this.getVirtualBodyCellByKey(rowKey, key);
+            if (cell?.type === 'number') {
+                // 处理数字
+                if (['', undefined, null].includes(_value)) {
+                    value = null;
+                } else if (/^-?\d+(\.\d+)?$/.test(`${_value}`)) {
+                    value = Number(_value);
+                } else {
+                    value = oldValue;
+                    errList.push({
+                        ...item,
+                        value,
+                        oldValue,
+                        row,
+                    });
+                }
+            }
+            return {
+                ...item,
+                value,
+                oldValue,
+                row,
+            };
+        });
+        // 过滤错误的
+        changeList = changeList.filter((item) => {
+            return !errList.some((err) => item.rowKey === err.rowKey && item.key === err.key);
+        });
+        if (errList.length) {
+            const err: ErrorType = {
+                code: 'ERR_BATCH_SET_NUMBER_VALUE',
+                message: 'Assignment failed, not a numeric type',
+                data: errList,
+            };
+            this.ctx.emit('error', err);
+        }
+        if (!changeList.length) {
+            return;
+        }
         const { BEFORE_VALUE_CHANGE_METHOD } = this.ctx.config;
         if (typeof BEFORE_VALUE_CHANGE_METHOD === 'function') {
             const beforeCellValueChange: BeforeCellValueChangeMethod = BEFORE_VALUE_CHANGE_METHOD;
-            const changeList = _list.map((item) => ({
-                rowKey: item.rowKey,
-                key: item.key,
-                value: item.value,
-                oldValue: this.getItemValue(item.rowKey, item.key),
-                row: this.ctx.database.getRowDataItemForRowKey(item.rowKey),
-            }));
             const values = await beforeCellValueChange(changeList);
-            list = values;
+            changeList = values;
         }
-        list.forEach((data) => {
-            const { value, rowKey, key } = data;
-            const oldValue = this.getItemValue(rowKey, key);
-            this.setItemValue(rowKey, key, value);
+        changeList.forEach((data) => {
+            const { value, rowKey, key, oldValue } = data;
             rowKeyList.add(rowKey);
-            changeList.push({
+            this.setItemValue(rowKey, key, value);
+            historyList.push({
                 rowKey,
                 key,
                 oldValue,
@@ -410,30 +464,20 @@ export default class Database {
         });
         // 触发change事件
         let rows: any[] = [];
-        const _changeList: ChangeItem[] = changeList.map((item) => {
-            const row = this.ctx.database.getRowDataItemForRowKey(item.rowKey);
-            return {
-                rowKey: item.rowKey,
-                key: item.key,
-                value: item.newValue,
-                oldValue: item.oldValue,
-                row,
-            };
-        });
         rowKeyList.forEach((rowKey) => {
             rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
         });
-        const promsieValidators = _changeList.map(({ rowKey, key }) => this.getValidator(rowKey, key));
+        const promsieValidators = changeList.map(({ rowKey, key }) => this.getValidator(rowKey, key));
         Promise.all(promsieValidators).then(() => {
             if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
                 this.ctx.emit('validateChangedData', this.getChangedData());
             }
         });
-        this.ctx.emit('change', _changeList, rows);
+        this.ctx.emit('change', changeList, rows);
         // 推历史记录
         if (history) {
             this.ctx.history.pushState({
-                changeList,
+                changeList: historyList,
                 scrollX: this.ctx.scrollX,
                 scrollY: this.ctx.scrollY,
                 type: 'multiple',
@@ -456,8 +500,11 @@ export default class Database {
         if (!this.rowKeyMap.has(rowKey)) {
             return {};
         }
+
         const { item } = this.rowKeyMap.get(rowKey);
         let oldValue = item[key];
+        let value = _value;
+
         // 只读返回旧值
         if (this.ctx.database.getReadonly(rowKey, key)) {
             return {
@@ -475,9 +522,40 @@ export default class Database {
             this.originalDataMap.set(changeKey, oldValue);
         }
         const originalValue = this.originalDataMap.get(changeKey);
-        let value = _value;
+        const row = this.getRowDataItemForRowKey(rowKey);
         // 是否是否是编辑器进来的
         if (isEditor) {
+            const cell = this.getVirtualBodyCellByKey(rowKey, key);
+            if (cell?.type === 'number') {
+                // 处理数字
+                if (['', undefined, null].includes(_value)) {
+                    value = null;
+                } else if (/^-?\d+(\.\d+)?$/.test(`${_value}`)) {
+                    value = Number(_value);
+                } else {
+                    value = oldValue;
+                    const err: ErrorType = {
+                        code: 'ERR_SET_NUMBER_VALUE',
+                        message: 'Assignment failed, not a numeric type',
+                        data: [
+                            {
+                                rowKey,
+                                key,
+                                value,
+                                oldValue,
+                                row,
+                            },
+                        ],
+                    };
+                    this.ctx.emit('error', err);
+                }
+            }
+            if (value === oldValue) {
+                return {
+                    oldValue,
+                    newValue: oldValue,
+                };
+            }
             const { BEFORE_VALUE_CHANGE_METHOD } = this.ctx.config;
             if (typeof BEFORE_VALUE_CHANGE_METHOD === 'function') {
                 const beforeCellValueChange: BeforeCellValueChangeMethod = BEFORE_VALUE_CHANGE_METHOD;
@@ -485,9 +563,9 @@ export default class Database {
                     {
                         rowKey,
                         key,
-                        value: _value,
+                        value,
                         oldValue: item[key],
-                        row: this.ctx.database.getRowDataItemForRowKey(rowKey),
+                        row,
                     },
                 ]);
                 if (values && values.length) {
@@ -497,7 +575,6 @@ export default class Database {
             // 设置改变值
             this.changedDataMap.set(changeKey, value);
             item[key] = value;
-            const row = this.ctx.database.getRowDataItemForRowKey(rowKey);
             const changeItem: ChangeItem = {
                 rowKey,
                 key,
@@ -532,7 +609,7 @@ export default class Database {
                 oldValue,
                 value,
                 originalValue: this.originalDataMap.get(changeKey),
-                row: this.ctx.database.getRowDataItemForRowKey(rowKey),
+                row,
             });
         }
         // 添加历史记录
@@ -589,8 +666,10 @@ export default class Database {
             if (this.checkboxKeyMap.has(checkboxKey)) {
                 const rowKeys = this.checkboxKeyMap.get(checkboxKey) || [];
                 rowKeys.forEach((rowKey: string) => {
-                    const row = this.rowKeyMap.get(rowKey);
-                    row.check = check;
+                    const selection = this.selectionMap.get(rowKey);
+                    if (selection) {
+                        selection.check = check;
+                    }
                 });
             }
         }
@@ -601,8 +680,12 @@ export default class Database {
      */
     toggleRowSelection(rowKey: string) {
         const row = this.rowKeyMap.get(rowKey);
-        row.check = !row.check;
-        this.setRowSelectionByCheckboxKey(rowKey, row.check);
+        const selection = this.selectionMap.get(rowKey);
+        if (!selection) {
+            return;
+        }
+        selection.check = !selection.check;
+        this.setRowSelectionByCheckboxKey(rowKey, selection.check);
         this.ctx.emit('toggleRowSelection', row);
         const rows = this.getSelectionRows();
         this.ctx.emit('selectionChange', rows);
@@ -612,19 +695,24 @@ export default class Database {
      * 根据rowKey 设置选中状态
      * @param rowKey
      */
-    setRowSelection(rowKey: string, check: boolean) {
-        const row = this.rowKeyMap.get(rowKey);
-        row.check = check;
-        this.setRowSelectionByCheckboxKey(rowKey, row.check);
+    setRowSelection(rowKey: string, check: boolean, draw = true) {
+        const selection = this.selectionMap.get(rowKey);
+        if (!selection) {
+            return;
+        }
+        selection.check = check;
+        this.setRowSelectionByCheckboxKey(rowKey, selection.check);
         const rows = this.getSelectionRows();
         this.ctx.emit('setRowSelection', rows);
-        this.ctx.emit('draw');
+        if (draw) {
+            this.ctx.emit('draw');
+        }
     }
     getSelectionRows() {
         let rows: any[] = [];
-        this.rowKeyMap.forEach((row: any) => {
-            if (row.check) {
-                rows.push(row.item);
+        this.selectionMap.forEach((selection: any) => {
+            if (selection.check) {
+                rows.push(selection.row);
             }
         });
         return rows;
@@ -634,8 +722,11 @@ export default class Database {
      * @param rowKey
      */
     getRowSelection(rowKey: string) {
-        const { check } = this.rowKeyMap.get(rowKey);
-        return check;
+        const selection = this.selectionMap.get(rowKey);
+        if (!selection) {
+            return false;
+        }
+        return selection.check;
     }
     /**
      * 根据rowKey 获取选中状态
@@ -656,20 +747,16 @@ export default class Database {
      * @param rowKey
      */
     toggleAllSelection() {
-        this.rowKeyMap.forEach((row: any) => {
-            const _selectable = row.selectable;
+        this.rowKeyMap.forEach((row: any, rowKey: string) => {
+            let _selectable = row.selectable;
             if (typeof _selectable === 'function') {
-                const selectable = _selectable({
+                _selectable = _selectable({
                     row: row.item,
                     rowIndex: row.rowIndex,
                 });
-                if (selectable) {
-                    row.check = true;
-                }
-            } else {
-                if (_selectable) {
-                    row.check = true;
-                }
+            }
+            if (_selectable) {
+                this.setRowSelection(rowKey, true, false);
             }
         });
         const rows = this.getSelectionRows();
@@ -681,23 +768,17 @@ export default class Database {
      * 清除选中
      * @param rowKey
      */
-    clearSelection() {
-        this.rowKeyMap.forEach((row: any) => {
-            const _selectable = row.selectable;
-            if (typeof _selectable === 'function') {
-                const selectable = _selectable({
-                    row: row.item,
-                    rowIndex: row.rowIndex,
-                });
-                if (selectable) {
-                    row.check = false;
-                }
-            } else {
-                if (_selectable) {
-                    row.check = false;
-                }
-            }
-        });
+    clearSelection(ignoreReserve = false) {
+        // 清除选中,点击表头清除时要忽略跨页选的
+        if (ignoreReserve) {
+            this.rowKeyMap.forEach((_, rowKey: string) => {
+                this.setRowSelection(rowKey, false, false);
+            });
+        } else {
+            this.selectionMap.forEach((_, rowKey: string) => {
+                this.setRowSelection(rowKey, false, false);
+            });
+        }
         const rows = this.getSelectionRows();
         this.ctx.emit('clearSelection');
         this.ctx.emit('selectionChange', rows);
@@ -708,30 +789,30 @@ export default class Database {
      * @param rowKey
      */
     getCheckedState() {
-        let total = 0;
+        const total = this.rowKeyMap.size;
         let totalChecked = 0;
         let totalSelectable = 0;
-        this.rowKeyMap.forEach((row: any) => {
-            total += 1;
-            if (row.check) {
+        const reserveTotal = this.selectionMap.size;
+        const reserveHasChecked = Array.from(this.selectionMap.values()).some((item) => item.check);
+        this.rowKeyMap.forEach((row: any, rowKey: string) => {
+            if (this.selectionMap.get(rowKey)?.check) {
                 totalChecked += 1;
             }
-            const _selectable = row.selectable;
+            let _selectable = row.selectable;
             if (typeof _selectable === 'function') {
-                const selectable = _selectable({
+                _selectable = _selectable({
                     row: row.item,
                     rowIndex: row.rowIndex,
                 });
-                if (selectable) {
-                    totalSelectable += 1;
-                }
-            } else {
-                if (_selectable) {
-                    totalSelectable += 1;
-                }
+            }
+            if (_selectable) {
+                totalSelectable += 1;
             }
         });
-        const indeterminate = totalSelectable && totalSelectable > totalChecked && totalChecked > 0;
+        // 存在跨页时，变更半选中
+        const reserveIndeterminate = reserveTotal > total && totalChecked === 0 && reserveHasChecked;
+        const indeterminate =
+            (totalSelectable && totalSelectable > totalChecked && totalChecked > 0) || reserveIndeterminate;
         const selectable = totalSelectable !== 0;
         const check = totalSelectable && totalSelectable === totalChecked;
         return {
@@ -755,7 +836,12 @@ export default class Database {
         if (key && this.headerMap.has(key)) {
             return this.headerMap.get(key)?.column;
         }
-        return undefined;
+    }
+    getColumnByKey(key: string) {
+        const column = this.headerMap.get(key);
+        if (column) {
+            return column;
+        }
     }
     getColIndexForKey(key: string) {
         if (key && this.headerMap.has(key)) {
@@ -1168,6 +1254,14 @@ export default class Database {
         }
         const cell = new Cell(this.ctx, rowIndex, colIndex, 0, 0, 0, 0, column, row, 'body');
         return cell;
+    }
+    getVirtualBodyCellByKey(rowKey: string, key: string) {
+        const rowIndex = this.getRowIndexForRowKey(rowKey);
+        const colIndex = this.getColIndexForKey(key);
+        if (rowIndex === undefined || colIndex === undefined) {
+            return;
+        }
+        return this.getVirtualBodyCell(rowIndex, colIndex);
     }
     hasMergeCell(xArr: number[], yArr: number[]) {
         let hasMergeCell = false;

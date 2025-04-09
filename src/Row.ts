@@ -74,12 +74,14 @@ export default class Row {
             cell.draw();
         });
     }
-    draw() {
+    drawContainer() {
         this.noFixedCells.forEach((cell) => {
-            cell.draw();
+            cell.drawContainer();
         });
+    }
+    drawFixedContainer() {
         this.fixedCells.forEach((cell) => {
-            cell.draw();
+            cell.drawContainer();
         });
     }
 }

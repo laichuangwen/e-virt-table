@@ -1,35 +1,49 @@
 import type Context from './Context';
-import type Cell from './Cell';
+import Cell from './Cell';
 import { BeforeSetAutofillMethod, ErrorType } from './types';
 export default class Autofill {
     private ctx: Context;
+    private maxColRowCell: Cell | undefined;
     constructor(ctx: Context) {
         this.ctx = ctx;
         this.init();
     }
     private init() {
-        this.ctx.on('cellMouseenter', (cell, e) => {
+        this.ctx.on('mousemove', (e) => {
             if (this.ctx.stageElement.style.cursor === 'crosshair') {
                 this.ctx.stageElement.style.cursor = 'default';
             }
+            if (this.ctx.editing) {
+                return;
+            }
+            if (!this.ctx.focusCell) {
+                return;
+            }
+            if (!this.maxColRowCell) {
+                return;
+            }
             const { offsetX, offsetY } = this.ctx.getOffset(e);
+            const { colIndex, rowIndex, drawX, drawY, width, height } = this.maxColRowCell;
+            const pointWh = 6;
+            const offset = colIndex === this.ctx.maxColIndex || rowIndex === this.ctx.maxRowIndex ? 0 : 2;
+            const pointX = drawX + width - pointWh + offset;
+            const pointY = drawY + height - pointWh + offset;
+            if (offsetX > pointX && offsetY > pointY && offsetX < pointX + pointWh && offsetY < pointY + pointWh) {
+                // 引进到点
+                this.ctx.stageElement.style.cursor = 'crosshair';
+            }
+        });
+        this.ctx.on('cellMouseenter', (cell) => {
             const { xArr, yArr } = this.ctx.selector;
             const maxX = xArr[1];
             const maxY = yArr[1];
-            const { colIndex, rowIndex, drawX, drawY, width, height } = cell;
-            // 绘制自动填充点
+            const { colIndex, rowIndex } = cell;
             if (this.ctx.config.ENABLE_AUTOFILL && colIndex === maxX && rowIndex === maxY) {
-                const pointWh = 6;
-                const pointX = drawX + width - pointWh;
-                const pointY = drawY + height - pointWh;
-                if (offsetX > pointX && offsetY > pointY) {
-                    // 引进到点
-                    this.ctx.stageElement.style.cursor = 'crosshair';
-                }
+                this.maxColRowCell = cell;
             }
             this.mouseenter(cell);
         });
-        this.ctx.on('cellMousedown', () => {
+        this.ctx.on('mousedown', () => {
             if (this.ctx.stageElement.style.cursor === 'crosshair') {
                 this.setMousedown();
             }

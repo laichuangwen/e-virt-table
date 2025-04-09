@@ -305,7 +305,7 @@ export default class Header {
             });
         }
     }
-    private drawFiexShadow() {
+    private drawFixedShadow() {
         const {
             fixedLeftWidth,
             fixedRightWidth,
@@ -327,7 +327,7 @@ export default class Header {
         // 右边阴影
         if (scrollX < Math.floor(header.width - stageWidth - 1) && fixedRightWidth !== SCROLLER_TRACK_SIZE) {
             const x = header.width - (this.x + this.width) + stageWidth - fixedRightWidth;
-            this.ctx.paint.drawShadow(x + 1, this.y, fixedRightWidth, this.height, {
+            this.ctx.paint.drawShadow(x, this.y, fixedRightWidth, this.height, {
                 fillColor: HEADER_BG_COLOR,
                 side: 'left',
                 shadowWidth: 4,
@@ -340,6 +340,11 @@ export default class Header {
         const renderLeafCellHeaders: CellHeader[] = [];
         const renderCenterCellHeaders: CellHeader[] = [];
         const renderFixedCellHeaders: CellHeader[] = [];
+        // 中心的最后一个ColIndex
+        if (this.centerCellHeaders.length) {
+            const lastCenterCell = this.centerCellHeaders[this.centerCellHeaders.length - 1];
+            this.ctx.lastCenterColIndex = lastCenterCell.colIndex;
+        }
         this.centerCellHeaders.forEach((item) => {
             if (item.isHorizontalVisible() && item.isVerticalVisible()) {
                 renderCenterCellHeaders.push(item);
@@ -370,16 +375,28 @@ export default class Header {
         this.ctx.header.renderLeafCellHeaders = this.renderLeafCellHeaders;
         this.ctx.header.renderCellHeaders = this.renderFixedCellHeaders.concat(this.renderCenterCellHeaders);
     }
+    drawBottomLine() {
+        const {
+            stageWidth,
+            config: { BORDER_COLOR },
+        } = this.ctx;
+        const poins = [0, this.height, stageWidth, this.height];
+        this.ctx.paint.drawLine(poins, {
+            borderColor: BORDER_COLOR,
+            borderWidth: 1,
+        });
+    }
     draw() {
         this.renderCenterCellHeaders.forEach((item) => {
             item.update();
             item.draw();
         });
-        this.drawFiexShadow();
+        this.drawFixedShadow();
         this.renderFixedCellHeaders.forEach((item) => {
             item.update();
             item.draw();
         });
         this.drawTipLine();
+        this.drawBottomLine();
     }
 }

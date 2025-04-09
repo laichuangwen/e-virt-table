@@ -272,7 +272,7 @@ export default class Body {
             });
         }
     }
-    private drawFiexShadow() {
+    private drawFixedShadow() {
         const {
             fixedLeftWidth,
             fixedRightWidth,
@@ -294,7 +294,7 @@ export default class Body {
         // 右边阴影
         if (scrollX < Math.floor(header.width - stageWidth - 1) && fixedRightWidth !== SCROLLER_TRACK_SIZE) {
             const x = header.width - (this.x + this.width) + stageWidth - fixedRightWidth;
-            this.ctx.paint.drawShadow(x + 1, this.y, fixedRightWidth, this.height, {
+            this.ctx.paint.drawShadow(x, this.y, fixedRightWidth, this.height, {
                 fillColor: HEADER_BG_COLOR,
                 side: 'left',
                 shadowWidth: 4,
@@ -362,10 +362,17 @@ export default class Body {
         this.ctx.body.renderRows = rows;
     }
     draw() {
+        // 容器背景
+        this.renderRows.forEach((row) => {
+            row.drawContainer();
+        });
         this.renderRows.forEach((row) => {
             row.drawCenter();
         });
-        this.drawFiexShadow();
+        this.drawFixedShadow();
+        this.renderRows.forEach((row) => {
+            row.drawFixedContainer();
+        });
         this.renderRows.forEach((row) => {
             row.drawFixed();
         });

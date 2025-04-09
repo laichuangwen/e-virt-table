@@ -101,6 +101,7 @@ export default class Context {
     scrollX = 0;
     fixedLeftWidth = 0;
     fixedRightWidth = 0;
+    lastCenterColIndex = 0;
     maxColIndex = 0;
     maxRowIndex = 0;
     hoverRow?: Row;
@@ -196,18 +197,15 @@ export default class Context {
     setItemValueByEditor(rowKey: string, key: string, value: any, history = true, reDraw = true) {
         // 启用合并单元格关联
         if (this.config.ENABLE_MERGE_CELL_LINK) {
-            const rowIndex = this.database.getRowIndexForRowKey(rowKey);
-            const colIndex = this.database.getColIndexForKey(key);
-            if (rowIndex === undefined || colIndex === undefined) return;
-            const cell = this.database.getVirtualBodyCell(rowIndex, colIndex);
-            if (cell) {
+            const cell = this.database.getVirtualBodyCellByKey(rowKey, key);
+            if (cell && (cell.mergeRow || cell.mergeCol)) {
                 const { dataList } = cell.getSpanInfo();
                 const data = dataList.map((item: any) => ({ ...item, value }));
                 this.database.batchSetItemValue(data, history);
+                return;
             }
-        } else {
-            this.database.setItemValue(rowKey, key, value, history, reDraw, true);
         }
+        this.database.setItemValue(rowKey, key, value, history, reDraw, true);
     }
 
     batchSetItemValueByEditor(_list: ChangeItem[], history = true) {

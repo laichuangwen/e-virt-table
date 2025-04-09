@@ -39,7 +39,7 @@ export type OverflowTooltipPlacement =
 export type VerticalAlign = 'top' | 'middle' | 'bottom';
 export type Align = 'left' | 'center' | 'right';
 export type Fixed = 'left' | 'right';
-export type Type = 'index' | 'selection' | 'index-selection' | 'tree';
+export type Type = 'index' | 'selection' | 'index-selection' | 'tree' | 'number';
 
 export type TypeCheckbox =
     | 'checkbox-uncheck'
@@ -97,6 +97,11 @@ export type Position = {
     height: number;
     top: number;
     bottom: number;
+};
+export type SelectionMap = {
+    check: boolean;
+    key: string;
+    row: any;
 };
 
 export interface Column {
@@ -196,6 +201,7 @@ export type SpanType = {
 export type ErrorType = {
     code: string;
     message: string;
+    data?: any;
 };
 export type SpanParams = CellParams & {
     visibleLeafColumns: Column[];

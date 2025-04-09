@@ -113,11 +113,12 @@ export default class CellHeader extends BaseCell {
     draw() {
         const {
             paint,
-            config: { BORDER_COLOR, CELL_PADDING, HEADER_FONT },
+            config: { BORDER_COLOR, CELL_PADDING, HEADER_FONT, BORDER },
         } = this.ctx;
         const { drawX, drawY, displayText } = this;
+        // 有边框的情况下，绘制边框
         paint.drawRect(drawX, drawY, this.width, this.height, {
-            borderColor: BORDER_COLOR,
+            borderColor: BORDER ? BORDER_COLOR : 'transparent',
             fillColor: this.drawCellBgColor,
         });
         paint.drawText(displayText, drawX, drawY, this.width, this.height, {

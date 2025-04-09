@@ -30,6 +30,9 @@ export default class Config {
     DISABLED = false; //禁用编辑,优先等级最高
     HEADER_FONT = '12px normal Arial';
     BODY_FONT = '12px normal Arial';
+    BORDER = true;
+    STRIPE = false; //斑马纹
+    STRIPE_COLOR = '#fafafa'; //斑马纹颜色
     BORDER_COLOR = '#e1e6eb';
     WIDTH = 0;
     RESIZE_MIN_WIDTH = 40;
@@ -42,6 +45,7 @@ export default class Config {
     ENABLE_OFFSET_HEIGHT = false;
     OFFSET_HEIGHT = 0;
     HEADER_HEIGHT = 36;
+    ENABLE_RESERVE_SELECTION = false; // 启用保留选中行
     ENABLE_HEADER_STICKY = false; // 启用头部固定,需要外面实现覆盖层，或者所有表头都要是元素
     HEADER_BG_COLOR = '#F8FAFF';
     BODY_BG_COLOR = '#FFF';
