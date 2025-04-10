@@ -67,6 +67,8 @@ export default class EventTable {
                 this.selectionClick(cell);
                 // 树事件
                 this.treeClick(cell);
+                // hoverIcon事件
+                this.hoverIconClick(cell);
             });
         });
         this.ctx.on('dblclick', (e) => {
@@ -103,6 +105,13 @@ export default class EventTable {
             this.handleBodyEvent(x, y, this.ctx.body.renderRows, (cell: Cell) => {
                 this.ctx.emit('cellContextMenuClick', cell, e);
             });
+        });
+        this.ctx.on('mouseout', (e: MouseEvent) => {
+            if (!this.ctx.containerElement.contains(e.relatedTarget as Node) && this.ctx.hoverCell !== undefined) {
+                this.ctx.hoverRow = undefined;
+                this.ctx.hoverCell = undefined;
+                this.ctx.emit('draw');
+            }
         });
         this.ctx.on('mousemove', (e: MouseEvent) => {
             // 是否忙碌，进行其他操作
@@ -147,7 +156,7 @@ export default class EventTable {
                 this.ctx.emit('cellMouseenter', cell, e);
                 // 移出事件
                 if (this.ctx.hoverCell && this.ctx.hoverCell !== cell) {
-                    this.ctx.emit('cellMouseleave', this.ctx.hoverCell, e);
+                    this.ctx.emit('cellMouseleave', cell, e);
                 }
                 if (this.ctx.hoverCell === cell) return;
                 if (this.ctx.hoverCell?.rowKey !== cell.rowKey) {
@@ -160,6 +169,12 @@ export default class EventTable {
                 this.ctx.emit('cellHoverChange', cell, e);
             });
         });
+    }
+    private hoverIconClick(cell: Cell) {
+        // 鼠标移动到图标上会变成pointer，所以这里判断是否是pointer就能判断出是图标点击的
+        if (cell.hoverIconName && this.ctx.isPointer) {
+            this.ctx.emit('hoverIconClick', cell);
+        }
     }
     /**
      *选中点击

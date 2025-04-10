@@ -484,6 +484,10 @@ export default class Cell extends BaseCell {
         }
     }
     private updateHoverIcon() {
+        const readonly = this.ctx.database.getReadonly(this.rowKey, this.key);
+        if (readonly) {
+            return;
+        }
         const { BODY_CELL_HOVER_ICON_METHOD, CELL_HOVER_ICON_SIZE, CELL_PADDING } = this.ctx.config;
         if (typeof BODY_CELL_HOVER_ICON_METHOD === 'function') {
             const hoverIconMethod: CellHoverIconMethod = BODY_CELL_HOVER_ICON_METHOD;
@@ -503,7 +507,7 @@ export default class Cell extends BaseCell {
         const _x = this.drawX + this.width - CELL_HOVER_ICON_SIZE - CELL_PADDING;
         const _y = this.drawY + (this.height - CELL_HOVER_ICON_SIZE) / 2;
         if (this.hoverIconName) {
-            if (this.ctx.hoverCell && this.ctx.hoverCell.rowIndex === this.rowIndex) {
+            if (!this.ctx.editing && this.ctx.hoverCell && this.ctx.hoverCell.rowKey === this.rowKey) {
                 const drawImageSource = this.ctx.icons.get(this.hoverIconName);
                 this.drawImageX = _x;
                 this.drawImageY = _y;
