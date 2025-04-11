@@ -378,12 +378,33 @@ export default class Cell extends BaseCell {
         // 高亮行
         const focusCell = this.ctx.focusCell;
         const hoverCell = this.ctx.hoverCell;
-        if (HIGHLIGHT_HOVER_ROW && hoverCell?.rowKey === this.rowKey) {
-            drawCellSkyBgColor = HIGHLIGHT_HOVER_ROW_COLOR;
+        // 合并单元格
+        let minY = this.rowIndex;
+        let maxY = this.rowIndex;
+        if (this.rowspan !== 1 && (HIGHLIGHT_HOVER_ROW || HIGHLIGHT_SELECTED_ROW)) {
+            const spanInfo = this.getSpanInfo();
+            const { yArr } = spanInfo;
+            minY = yArr[0];
+            maxY = yArr[1];
         }
-        if (HIGHLIGHT_SELECTED_ROW && focusCell?.rowKey === this.rowKey) {
-            drawCellSkyBgColor = HIGHLIGHT_SELECTED_ROW_COLOR;
+        if (HIGHLIGHT_HOVER_ROW && hoverCell) {
+            if (hoverCell.rowKey === this.rowKey) {
+                drawCellSkyBgColor = HIGHLIGHT_HOVER_ROW_COLOR;
+            }
+            if (hoverCell.rowIndex >= minY && hoverCell.rowIndex <= maxY) {
+                drawCellSkyBgColor = HIGHLIGHT_HOVER_ROW_COLOR;
+            }
         }
+
+        if (HIGHLIGHT_SELECTED_ROW && focusCell) {
+            if (focusCell.rowKey === this.rowKey) {
+                drawCellSkyBgColor = HIGHLIGHT_SELECTED_ROW_COLOR;
+            }
+            if (focusCell.rowIndex >= minY && focusCell.rowIndex <= maxY) {
+                drawCellSkyBgColor = HIGHLIGHT_SELECTED_ROW_COLOR;
+            }
+        }
+
         this.drawCellSkyBgColor = drawCellSkyBgColor;
         // 恢复默认背景色
         let bgColor = BODY_BG_COLOR;
@@ -488,7 +509,8 @@ export default class Cell extends BaseCell {
         if (readonly) {
             return;
         }
-        const { BODY_CELL_HOVER_ICON_METHOD, CELL_HOVER_ICON_SIZE, CELL_PADDING } = this.ctx.config;
+        const { BODY_CELL_HOVER_ICON_METHOD, CELL_HOVER_ICON_SIZE, CELL_PADDING, ENABLE_MERGE_CELL_LINK } =
+            this.ctx.config;
         if (typeof BODY_CELL_HOVER_ICON_METHOD === 'function') {
             const hoverIconMethod: CellHoverIconMethod = BODY_CELL_HOVER_ICON_METHOD;
             const hoverIconName = hoverIconMethod({
@@ -504,18 +526,33 @@ export default class Cell extends BaseCell {
             }
         }
         // 永远放在右边
-        const _x = this.drawX + this.width - CELL_HOVER_ICON_SIZE - CELL_PADDING;
-        const _y = this.drawY + (this.height - CELL_HOVER_ICON_SIZE) / 2;
-        if (this.hoverIconName) {
-            if (!this.ctx.editing && this.ctx.hoverCell && this.ctx.hoverCell.rowKey === this.rowKey) {
-                const drawImageSource = this.ctx.icons.get(this.hoverIconName);
-                this.drawImageX = _x;
-                this.drawImageY = _y;
-                this.drawImageWidth = CELL_HOVER_ICON_SIZE;
-                this.drawImageHeight = CELL_HOVER_ICON_SIZE;
-                this.drawImageName = this.hoverIconName;
-                this.drawImageSource = drawImageSource;
+        const { hoverCell } = this.ctx;
+        if (this.hoverIconName && !this.ctx.editing && hoverCell) {
+            let _x = 0;
+            let _y = 0;
+            if (hoverCell.rowKey === this.rowKey) {
+                _x = this.drawX + this.width - CELL_HOVER_ICON_SIZE - CELL_PADDING;
+                _y = this.drawY + (this.height - CELL_HOVER_ICON_SIZE) / 2;
             }
+            // 合并单元格
+            if (this.rowspan !== 1 && ENABLE_MERGE_CELL_LINK) {
+                const spanInfo = this.getSpanInfo();
+                const { yArr } = spanInfo;
+                const minY = yArr[0];
+                const maxY = yArr[1];
+                if (hoverCell.rowIndex >= minY && hoverCell.rowIndex <= maxY) {
+                    const { width, height, offsetTop, offsetLeft } = spanInfo;
+                    _x = this.drawX - offsetLeft + width - CELL_HOVER_ICON_SIZE - CELL_PADDING;
+                    _y = this.drawY - offsetTop + (height - CELL_HOVER_ICON_SIZE) / 2;
+                }
+            }
+            const drawImageSource = this.ctx.icons.get(this.hoverIconName);
+            this.drawImageX = _x;
+            this.drawImageY = _y;
+            this.drawImageWidth = CELL_HOVER_ICON_SIZE;
+            this.drawImageHeight = CELL_HOVER_ICON_SIZE;
+            this.drawImageName = this.hoverIconName;
+            this.drawImageSource = drawImageSource;
         }
     }
     // 过去跨度配置
@@ -656,10 +693,12 @@ export default class Cell extends BaseCell {
             borderColor: BORDER ? BORDER_COLOR : 'transparent',
             fillColor: this.drawCellBgColor,
         });
+        // 列合并单元格
         paint.drawRect(drawX, drawY, this.width, this.height, {
             borderColor: 'transparent',
             fillColor: this.drawCellSkyBgColor,
         });
+
         if (!BORDER) {
             this.ctx.paint.drawLine(
                 [drawX, drawY + this.visibleHeight, drawX + this.visibleWidth, drawY + this.visibleHeight],
@@ -729,23 +768,23 @@ export default class Cell extends BaseCell {
         return width;
     }
     private drawText() {
-        const { CELL_PADDING, BODY_FONT } = this.ctx.config;
+        const { CELL_PADDING, BODY_FONT, PLACEHOLDER_COLOR } = this.ctx.config;
         const { ellipsis } = this.ctx.paint.handleEllipsis(this.text, this.width, CELL_PADDING, BODY_FONT);
         this.ellipsis = ellipsis;
-        return this.ctx.paint.drawText(
-            this.displayText,
-            this.drawTextX,
-            this.drawTextY,
-            this.visibleWidth,
-            this.visibleHeight,
-            {
-                font: BODY_FONT,
-                padding: CELL_PADDING,
-                align: this.align,
-                verticalAlign: this.verticalAlign,
-                color: this.drawTextColor,
-            },
-        );
+        const { placeholder } = this.column;
+        let text = this.displayText;
+        let color = this.drawTextColor;
+        if (placeholder && ['', null, undefined].includes(this.text) && this.cellType === 'body') {
+            text = placeholder;
+            color = PLACEHOLDER_COLOR;
+        }
+        return this.ctx.paint.drawText(text, this.drawTextX, this.drawTextY, this.visibleWidth, this.visibleHeight, {
+            font: BODY_FONT,
+            padding: CELL_PADDING,
+            align: this.align,
+            verticalAlign: this.verticalAlign,
+            color,
+        });
     }
     private drawImage() {
         if (!this.drawImageSource) {

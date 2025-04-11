@@ -118,6 +118,10 @@ export default class EventTable {
             if (this.isBusy(e)) {
                 return;
             }
+            this.ctx.isPointer = false;
+            if (this.ctx.stageElement.style.cursor === 'pointer') {
+                this.ctx.stageElement.style.cursor = 'default';
+            }
             const y = this.ctx.getOffset(e).offsetY;
             const x = this.ctx.getOffset(e).offsetX;
             this.handleHeaderEvent(x, y, this.ctx.header.renderCellHeaders, (cell: CellHeader) => {
@@ -141,7 +145,7 @@ export default class EventTable {
                 this.ctx.body.renderRows,
                 (cell: Cell) => {
                     // selection移入移除事件
-                    this.imageEnterAndLeave(cell, e);
+                    this.selectionEnterAndLeave(cell, e);
                     //  this.ctx.emit("visibleCellHoverChange", cell, e);
                     if (this.visibleHoverCell !== cell) {
                         this.ctx.emit('visibleCellMouseleave', cell, e);
@@ -153,6 +157,7 @@ export default class EventTable {
             );
             // 正常
             this.handleBodyEvent(x, y, this.ctx.body.renderRows, (cell: Cell) => {
+                this.imageEnterAndLeave(cell, e);
                 this.ctx.emit('cellMouseenter', cell, e);
                 // 移出事件
                 if (this.ctx.hoverCell && this.ctx.hoverCell !== cell) {
@@ -260,18 +265,27 @@ export default class EventTable {
         ) {
             this.ctx.stageElement.style.cursor = 'pointer';
             this.ctx.isPointer = true;
+        }
+    }
+    private selectionEnterAndLeave(cell: Cell | CellHeader, e: MouseEvent) {
+        const { offsetY, offsetX } = this.ctx.getOffset(e);
+        const y = offsetY;
+        const x = offsetX;
+        if (
+            x > cell.drawImageX &&
+            x < cell.drawImageX + cell.drawImageWidth &&
+            y > cell.drawImageY &&
+            y < cell.drawImageY + cell.drawImageHeight
+        ) {
             // body cell 选中图标
             if (cell instanceof Cell && ['selection', 'index-selection'].includes(cell.type)) {
+                this.ctx.stageElement.style.cursor = 'pointer';
+                this.ctx.isPointer = true;
                 // body cell 需要处理是否可选
                 const selectable = this.ctx.database.getRowSelectable(cell.rowKey);
                 if (!selectable) {
                     this.ctx.stageElement.style.cursor = 'not-allowed';
                 }
-            }
-        } else {
-            this.ctx.isPointer = false;
-            if (this.ctx.stageElement.style.cursor === 'pointer') {
-                this.ctx.stageElement.style.cursor = 'default';
             }
         }
     }

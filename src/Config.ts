@@ -37,6 +37,7 @@ export default class Config {
     WIDTH = 0;
     RESIZE_MIN_WIDTH = 40;
     HEIGHT = 0;
+    PLACEHOLDER_COLOR = '#CDD0DC';
     EMPTY_BODY_HEIGHT = 120;
     EMPTY_CUSTOM_STYLE: Partial<CSSStyleDeclaration> = {};
     EMPTY_TEXT = '暂无数据';
