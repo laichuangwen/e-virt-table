@@ -108,6 +108,7 @@ type EVirtTableOptions = {
 | TOOLTIP_ZINDEX | Tooltip z-index | number | — | 3000 |
 | TOOLTIP_CUSTOM_STYLE | Custom tooltip style | ^[object]`CSSProperties` | — | true |
 | CONTEXT_MENU | Custom context menu | ^[array]`MenuItem[]` | — | CONTEXT_MENU |
+| PLACEHOLDER_COLOR | Placeholder text color | string | `#CDD0DC` |
 | HEADER_CELL_STYLE_METHOD | Custom header cell style | ^[Function]`({column,colIndex})=>CellStyleOptions` | — | — |
 | BODY_CELL_STYLE_METHOD | Custom body cell style | ^[Function]`({row, column, rowIndex, colIndex,value,isHasChanged})=>CellStyleOptions` | — | — |
 | FOOTER_CELL_STYLE_METHOD | Custom footer cell style | ^[Function]`({row, column, rowIndex, colIndex,value})=>CellStyleOptions` | — | — |
@@ -165,6 +166,7 @@ type EVirtTableOptions = {
 | mousedown | Callback for mouse down | — |
 | mousemove | Callback for mouse move | — |
 | keydown | Callback for key down | — |
+| hoverIconClick | Callback for hoverIcon click | — |
 | error | Error callback | — |
 
 ## Methods
@@ -239,6 +241,8 @@ type EVirtTableOptions = {
 | readonly | Read-only column | boolean | — | false |
 | children | Child columns | Column[] | — | — |
 | column | Current column object | Column | — | — |
+| hoverIconName | Hover icon name, ICONS configurable | string | — |
+| placeholder | Placeholder text | string | — |
 | overflowTooltipShow | Show overflow tooltip | boolean | — | — |
 | overflowTooltipMaxWidth | Max width of overflow tooltip | number | — | — |
 | overflowTooltipPlacement | Placement of overflow tooltip | OverflowTooltipPlacement |  ^[string]`top, top-start, top-end, right, right-start, right-end, left, left-start, left-end, bottom, bottom-start, bottom-end` | — |

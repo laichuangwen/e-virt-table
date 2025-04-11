@@ -120,3 +120,13 @@ V1.1.5
 - 更新文档
 
 ---
+
+V1.1.6
+### Bug Fixes
+- fix:解决selection性能问题
+- fix:优化编辑提示图标，合并单元格场景
+- feat:添加placeholder
+- fix:editType为none时阻止hoverIconClick进入编辑
+- 更新文档
+
+---
