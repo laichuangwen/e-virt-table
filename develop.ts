@@ -50,7 +50,7 @@ const columns: Column[] = [
         fixed: 'left',
         align: 'left',
         hoverIconName: 'icon-edit',
-        // editorType: 'none',
+        editorType: 'none',
         verticalAlign: 'middle',
         // hide: true,
         // render: (pEl, cell) => {
@@ -642,6 +642,9 @@ const eVirtTable = new EVirtTable(canvas, {
 });
 eVirtTable.on('error', (error) => {
     console.error(error);
+});
+eVirtTable.on('hoverIconClick', (cell) => {
+    console.log('hoverIconClick', cell);
 });
 // eVirtTable.on('change', (changeList) => {
 //     eVirtTable.validate();
