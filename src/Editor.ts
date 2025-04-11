@@ -43,6 +43,13 @@ export default class Editor {
             }
             this.cellTarget = null;
         });
+        this.ctx.on('hoverIconClick', (cell) => {
+            // 没有编辑器就不进入编辑模式
+            if (cell.editorType === 'none') {
+                return;
+            }
+            this.editCell(cell.rowIndex, cell.colIndex);
+        });
         this.ctx.on('keydown', (e) => {
             if (!this.ctx.isTarget(e)) {
                 return;
@@ -300,6 +307,8 @@ export default class Editor {
         }
     }
     startEdit(ignoreValue = false) {
+        // 触发绘制，刷新
+        this.ctx.emit('draw');
         this.cancel = false;
         // 如果不启用点击选择器编辑
         const { ENABLE_EDIT_CLICK_SELECTOR } = this.ctx.config;

@@ -112,6 +112,7 @@ export interface Column {
     editorType?: string;
     editorProps?: any;
     hoverIconName?: string;
+    placeholder?: string;
     width?: number;
     widthFillDisable?: boolean;
     align?: Align;

@@ -58,7 +58,6 @@ export default class Database {
     init() {
         this.clearBufferData();
         this.rowKeyMap.clear();
-
         this.checkboxKeyMap.clear();
         this.colIndexKeyMap.clear();
         this.rowIndexRowKeyMap.clear();
@@ -73,6 +72,7 @@ export default class Database {
         }
         this.initData(this.data);
         this.getData();
+        this.bufferCheckState.buffer = false;
     }
     /**
      * 清除缓存数据
@@ -710,8 +710,7 @@ export default class Database {
         }
         selection.check = check;
         this.setRowSelectionByCheckboxKey(rowKey, selection.check);
-        const rows = this.getSelectionRows();
-        this.ctx.emit('setRowSelection', rows);
+        this.ctx.emit('setRowSelection', check, selection.row);
         if (draw) {
             // 清除缓存
             this.bufferCheckState.buffer = false;
@@ -965,8 +964,11 @@ export default class Database {
         }
         const row = this.rowKeyMap.get(rowKey);
         const colHeader = this.headerMap.get(key);
-        const rowReadonly = row?.readonly;
-        const colReadonly = colHeader?.readonly;
+        if (!row || !colHeader) {
+            return true;
+        }
+        const rowReadonly = row.readonly;
+        const colReadonly = colHeader.readonly;
         const { BODY_CELL_READONLY_METHOD } = this.ctx.config;
         // 自定义只读
         if (typeof BODY_CELL_READONLY_METHOD === 'function' && colHeader) {

@@ -109,6 +109,7 @@ type EVirtTableOptions = {
 | TOOLTIP_ZINDEX | 提示文本颜色 | number | 3000 |
 | TOOLTIP_CUSTOM_STYLE | 提示样式 | ^[object]`CSSProperties` | true |
 | CONTEXT_MENU | 自定义右键菜单 | ^[array]`MenuItem[]` | CONTEXT_MENU |
+| PLACEHOLDER_COLOR | 占位文本颜色 | string | `#CDD0DC` |
 | HEADER_CELL_STYLE_METHOD | 自定义表头单元格样式 | ^[Function]`({column,colIndex})=>CellStyleOptions` | — |
 | BODY_CELL_STYLE_METHOD | 自定义 body 单元格样式 | ^[Function]`({row, column, rowIndex, colIndex,value,isHasChanged})=>CellStyleOptions` | — |
 | FOOTER_CELL_STYLE_METHOD | 自定 footer 义单元格样式 | ^[Function]`({row, column, rowIndex, colIndex,value})=>CellStyleOptions` | — |
@@ -166,6 +167,7 @@ type EVirtTableOptions = {
 | mousedown | mousedown回调 | — |
 | mousemove | mousemove回调 | — |
 | keydown | keydown回调 | — |
+| hoverIconClick | hoverIcon点击回调 | — |
 | error | error回调 | — |
 
 ## Methods
@@ -217,7 +219,8 @@ type EVirtTableOptions = {
 | contextMenuHide        | 隐藏右键菜单                  | —                                                         |
 | destroy                | 销毁                          | —                                                         |
 
-
+    hoverIconName?: string;
+    placeholder?: string;
 ## Column
 | 参数 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
@@ -241,6 +244,8 @@ type EVirtTableOptions = {
 | readonly | 是否只读 | boolean | false |
 | children | 子列 | Column[] | — |
 | column | 当前列对象 | Column | — |
+| hoverIconName | 悬浮图标名字，可ICONS配置 | string | — |
+| placeholder | 占位符文本 | string | — |
 | overflowTooltipShow | 是否显示溢出提示 | boolean | true |
 | overflowTooltipMaxWidth | 溢出提示的宽度 | number | 500 |
 | overflowTooltipPlacement | 溢出提示的位置|  ^[string]`top, top-start, top-end, right, right-start, right-end, left, left-start, left-end, bottom, bottom-start, bottom-end` | — |

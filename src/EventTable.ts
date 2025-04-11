@@ -67,6 +67,8 @@ export default class EventTable {
                 this.selectionClick(cell);
                 // 树事件
                 this.treeClick(cell);
+                // hoverIcon事件
+                this.hoverIconClick(cell);
             });
         });
         this.ctx.on('dblclick', (e) => {
@@ -104,10 +106,21 @@ export default class EventTable {
                 this.ctx.emit('cellContextMenuClick', cell, e);
             });
         });
+        this.ctx.on('mouseout', (e: MouseEvent) => {
+            if (!this.ctx.containerElement.contains(e.relatedTarget as Node) && this.ctx.hoverCell !== undefined) {
+                this.ctx.hoverRow = undefined;
+                this.ctx.hoverCell = undefined;
+                this.ctx.emit('draw');
+            }
+        });
         this.ctx.on('mousemove', (e: MouseEvent) => {
             // 是否忙碌，进行其他操作
             if (this.isBusy(e)) {
                 return;
+            }
+            this.ctx.isPointer = false;
+            if (this.ctx.stageElement.style.cursor === 'pointer') {
+                this.ctx.stageElement.style.cursor = 'default';
             }
             const y = this.ctx.getOffset(e).offsetY;
             const x = this.ctx.getOffset(e).offsetX;
@@ -132,7 +145,7 @@ export default class EventTable {
                 this.ctx.body.renderRows,
                 (cell: Cell) => {
                     // selection移入移除事件
-                    this.imageEnterAndLeave(cell, e);
+                    this.selectionEnterAndLeave(cell, e);
                     //  this.ctx.emit("visibleCellHoverChange", cell, e);
                     if (this.visibleHoverCell !== cell) {
                         this.ctx.emit('visibleCellMouseleave', cell, e);
@@ -144,10 +157,11 @@ export default class EventTable {
             );
             // 正常
             this.handleBodyEvent(x, y, this.ctx.body.renderRows, (cell: Cell) => {
+                this.imageEnterAndLeave(cell, e);
                 this.ctx.emit('cellMouseenter', cell, e);
                 // 移出事件
                 if (this.ctx.hoverCell && this.ctx.hoverCell !== cell) {
-                    this.ctx.emit('cellMouseleave', this.ctx.hoverCell, e);
+                    this.ctx.emit('cellMouseleave', cell, e);
                 }
                 if (this.ctx.hoverCell === cell) return;
                 if (this.ctx.hoverCell?.rowKey !== cell.rowKey) {
@@ -160,6 +174,12 @@ export default class EventTable {
                 this.ctx.emit('cellHoverChange', cell, e);
             });
         });
+    }
+    private hoverIconClick(cell: Cell) {
+        // 鼠标移动到图标上会变成pointer，所以这里判断是否是pointer就能判断出是图标点击的
+        if (cell.hoverIconName && this.ctx.isPointer) {
+            this.ctx.emit('hoverIconClick', cell);
+        }
     }
     /**
      *选中点击
@@ -245,18 +265,27 @@ export default class EventTable {
         ) {
             this.ctx.stageElement.style.cursor = 'pointer';
             this.ctx.isPointer = true;
+        }
+    }
+    private selectionEnterAndLeave(cell: Cell | CellHeader, e: MouseEvent) {
+        const { offsetY, offsetX } = this.ctx.getOffset(e);
+        const y = offsetY;
+        const x = offsetX;
+        if (
+            x > cell.drawImageX &&
+            x < cell.drawImageX + cell.drawImageWidth &&
+            y > cell.drawImageY &&
+            y < cell.drawImageY + cell.drawImageHeight
+        ) {
             // body cell 选中图标
             if (cell instanceof Cell && ['selection', 'index-selection'].includes(cell.type)) {
+                this.ctx.stageElement.style.cursor = 'pointer';
+                this.ctx.isPointer = true;
                 // body cell 需要处理是否可选
                 const selectable = this.ctx.database.getRowSelectable(cell.rowKey);
                 if (!selectable) {
                     this.ctx.stageElement.style.cursor = 'not-allowed';
                 }
-            }
-        } else {
-            this.ctx.isPointer = false;
-            if (this.ctx.stageElement.style.cursor === 'pointer') {
-                this.ctx.stageElement.style.cursor = 'default';
             }
         }
     }
