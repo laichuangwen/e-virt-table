@@ -89,7 +89,7 @@ export default class Config {
     FOOTER_FIXED = true;
     FOOTER_POSITION: FooterPosition = 'bottom';
     CELL_FOOTER_HEIGHT = 36;
-    ENABLE_SELECTOR = false;
+    ENABLE_SELECTOR = true;
     ENABLE_EDIT_SINGLE_CLICK = false; // 启用单点击立马编辑
     ENABLE_EDIT_CLICK_SELECTOR = true; // 启用点击选择器编辑
     SELECTOR_AREA_MIN_X = 0; // 选择器X最小范围
