@@ -18,6 +18,7 @@ export default class Body {
     private visibleRows: any[] = [];
     private visibleHeight = 0;
     private visibleWidth = 0;
+    private containerRect: DOMRect | undefined;
     private data: any[] = [];
     constructor(ctx: Context) {
         this.ctx = ctx;
@@ -55,7 +56,6 @@ export default class Body {
         this.height = sumHeight;
         // 更新数据
         this.data = data;
-        const { top } = canvasElement.getBoundingClientRect();
         // 更新宽度
         this.width = header.width;
         this.visibleWidth = this.ctx.stageWidth - SCROLLER_TRACK_SIZE;
@@ -80,23 +80,21 @@ export default class Body {
         let containerHeight = this.height + header.height + SCROLLER_TRACK_SIZE;
         // 如果有底部,加上底部高度
         containerHeight += footerHeight;
-        let stageHeight = 0;
-        if (this.data.length && ENABLE_OFFSET_HEIGHT) {
-            const windowInnerHeight = window.innerHeight;
+        let stageHeight = containerHeight;
+        const windowInnerHeight = window.innerHeight;
+        const { top } = this.containerRect || this.ctx.containerElement.getBoundingClientRect();
+        if (this.data.length && windowInnerHeight > top && ENABLE_OFFSET_HEIGHT && !HEIGHT) {
             const visibleHeight = windowInnerHeight - top;
-            stageHeight = visibleHeight - OFFSET_HEIGHT;
-            if (stageHeight < 0) {
-                stageHeight = 32;
-                console.error(
-                    'There is an error in the height calculation ENABLE_OFFSET_HEIGHT and OFFSET_HEIGHT are invalid',
-                );
+            const _stageHeight = visibleHeight - OFFSET_HEIGHT;
+            if (_stageHeight > header.height + SCROLLER_TRACK_SIZE) {
+                stageHeight = _stageHeight;
+            } else if (containerHeight > MAX_HEIGHT) {
+                stageHeight = MAX_HEIGHT;
             }
         } else if (this.data.length && HEIGHT) {
             stageHeight = HEIGHT;
         } else if (this.data.length && MAX_HEIGHT && containerHeight > MAX_HEIGHT) {
             stageHeight = MAX_HEIGHT;
-        } else {
-            stageHeight = containerHeight;
         }
         // 更新窗口高度
         if (stageHeight > 0) {
@@ -140,6 +138,12 @@ export default class Body {
         if (!ENABLE_RESIZE_ROW) {
             return;
         }
+        this.ctx.on('resize', () => {
+            this.containerRect = this.ctx.containerElement.getBoundingClientRect();
+        });
+        this.ctx.on('resizeObserver', () => {
+            this.containerRect = this.ctx.containerElement.getBoundingClientRect();
+        });
         // 鼠标移动
         this.ctx.on('mouseup', () => {
             this.isMouseDown = false;
