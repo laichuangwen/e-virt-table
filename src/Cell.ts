@@ -774,8 +774,15 @@ export default class Cell extends BaseCell {
         const { placeholder } = this.column;
         let text = this.displayText;
         let color = this.drawTextColor;
+        // 更改颜色
         const isReadonly = this.ctx.database.getReadonly(this.rowKey, this.key);
-        if (!isReadonly && placeholder && ['', null, undefined].includes(this.text) && this.cellType === 'body') {
+        if (
+            !isReadonly &&
+            placeholder &&
+            ['', null, undefined].includes(this.text) &&
+            this.cellType === 'body' &&
+            !(this.rowspan === 0 || this.colspan === 0)
+        ) {
             text = placeholder;
             color = PLACEHOLDER_COLOR;
         }
