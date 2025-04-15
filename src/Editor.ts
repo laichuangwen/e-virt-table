@@ -54,6 +54,9 @@ export default class Editor {
             if (!this.ctx.isTarget(e)) {
                 return;
             }
+            if (!this.ctx.focusCell) {
+                return;
+            }
             if (e.code === 'Escape' && this.ctx.editing) {
                 this.cancel = true;
                 const { focusCell } = this.ctx;
@@ -150,7 +153,6 @@ export default class Editor {
             if (!this.isInSelectorRange(cell.rowIndex, cell.colIndex)) {
                 return;
             }
-            this.ctx.containerElement.focus();
             const { xArr, yArr } = this.ctx.selector;
             const selectorArrStr = JSON.stringify(xArr) + JSON.stringify(yArr);
             if (this.selectorArrStr === selectorArrStr && this.cellTarget) {
@@ -327,6 +329,11 @@ export default class Editor {
         if (this.enable) {
             return;
         }
+        // 可视区可见
+        const isVisible = focusCell.isVerticalVisible() && focusCell.isHorizontalVisible();
+        if(!isVisible){
+            return;
+        }
         const { rowKey, key, editorType } = focusCell;
         // 没有编辑器的情况下不进入编辑模式
         if (editorType === 'none') {
@@ -380,8 +387,8 @@ export default class Editor {
         this.ctx.emit('doneEdit', this.cellTarget);
         this.enable = false;
         this.ctx.editing = false;
-        // 隐藏编辑器
         this.ctx.containerElement.focus();
+        // 隐藏编辑器
         this.editorEl.style.display = 'none';
         this.ctx.emit('drawView');
     }
@@ -390,6 +397,7 @@ export default class Editor {
         this.cellTarget = null;
         this.selectorArrStr = '';
         this.ctx.clearSelector();
+        this.ctx.focusCell = undefined;
         this.ctx.emit('drawView');
     }
     destroy() {
