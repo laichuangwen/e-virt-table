@@ -50,7 +50,8 @@ const columns: Column[] = [
         fixed: 'left',
         align: 'left',
         hoverIconName: 'icon-edit',
-        editorType: 'none',
+        placeholder: '请输入',
+        // editorType: 'none',
         verticalAlign: 'middle',
         // hide: true,
         // render: (pEl, cell) => {

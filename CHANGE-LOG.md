@@ -130,3 +130,12 @@ V1.1.6
 - 更新文档
 
 ---
+
+V1.1.7
+### Bug Fixes
+- fix:合并单元格不能有placeholder
+- fix:修复offHeight的位置错位
+- fix:同给个页面两个table键盘输入会错乱
+- fix:默认选择器为启用
+  
+---

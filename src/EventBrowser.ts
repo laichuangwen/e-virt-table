@@ -42,7 +42,8 @@ export default class EventBrowser {
         const _e = e as MouseEvent;
         if (_e.button === 0) {
             this.ctx.mousedown = true;
-        }
+        } 
+        this.ctx.containerElement.focus();
         this.ctx.emit('mousedown', e);
     }
     private handleMousemove(e: Event) {
