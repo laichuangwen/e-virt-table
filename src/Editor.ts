@@ -150,6 +150,7 @@ export default class Editor {
             if (!this.isInSelectorRange(cell.rowIndex, cell.colIndex)) {
                 return;
             }
+            this.ctx.containerElement.focus();
             const { xArr, yArr } = this.ctx.selector;
             const selectorArrStr = JSON.stringify(xArr) + JSON.stringify(yArr);
             if (this.selectorArrStr === selectorArrStr && this.cellTarget) {
@@ -211,7 +212,6 @@ export default class Editor {
         this.inputEl.addEventListener('input', this.autoSize.bind(this));
         this.inputEl.addEventListener('blur', () => {
             this.doneEdit();
-            this.cellTarget = null;
         });
         this.editorEl = this.ctx.editorElement;
         this.inputEl.className = 'e-virt-table-editor-textarea';
