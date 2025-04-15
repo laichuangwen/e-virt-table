@@ -139,3 +139,9 @@ V1.1.7
 - fix:默认选择器为启用
   
 ---
+
+V1.1.8
+### Bug Fixes
+- fix:解决type为number时change方法中触发全局校验会递归
+
+---
