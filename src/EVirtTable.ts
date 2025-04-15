@@ -221,7 +221,6 @@ export default class EVirtTable {
     }
     async validate(scrollError = true) {
         // 先关闭编辑
-        this.editor.doneEdit();
         return new Promise(async (resolve, reject) => {
             try {
                 const res = await this.getValidations();
