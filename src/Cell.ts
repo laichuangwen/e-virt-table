@@ -774,7 +774,8 @@ export default class Cell extends BaseCell {
         const { placeholder } = this.column;
         let text = this.displayText;
         let color = this.drawTextColor;
-        if (placeholder && ['', null, undefined].includes(this.text) && this.cellType === 'body') {
+        const isReadonly = this.ctx.database.getReadonly(this.rowKey, this.key);
+        if (!isReadonly && placeholder && ['', null, undefined].includes(this.text) && this.cellType === 'body') {
             text = placeholder;
             color = PLACEHOLDER_COLOR;
         }
