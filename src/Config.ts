@@ -64,7 +64,9 @@ export default class Config {
     CELL_WIDTH = 100;
     CELL_HEIGHT = 36;
     CELL_PADDING = 8;
-    CELL_HOVER_ICON_SIZE = 20;
+    CELL_HOVER_ICON_SIZE = 14;
+    CELL_HOVER_ICON_BG_COLOR = '#fff';
+    CELL_HOVER_ICON_BORDER_COLOR = '#DDE0EA';
     SCROLLER_TRACK_SIZE = 14;
     SCROLLER_SIZE = 8;
     SCROLLER_COLOR = '#dee0e3';

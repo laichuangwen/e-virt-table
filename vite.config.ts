@@ -12,4 +12,7 @@ export default defineConfig({
         },
         sourcemap: true, // 生成 sourcemap 文件
     },
+    server:{
+        port: 8888, // 服务器端口号
+    }
 });
