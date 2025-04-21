@@ -236,7 +236,7 @@ export default class Selector {
                 return;
             }
             // 聚焦，解决iframe键盘事件不触发
-            this.ctx.stageElement.focus();
+            this.ctx.stageElement.focus({ preventScroll: true });
             // 启用合并单元格关联
             if (this.ctx.config.ENABLE_MERGE_CELL_LINK) {
                 const adjustMerge = this.adjustMergeCells(_xArr, _yArr);

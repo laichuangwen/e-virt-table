@@ -280,7 +280,7 @@ export default class Editor {
             if (value !== null) {
                 this.inputEl.value = value;
             }
-            this.inputEl.focus();
+            this.inputEl.focus({ preventScroll: true });
             const length = this.inputEl.value.length;
             this.inputEl.setSelectionRange(length, length);
         } else {
@@ -387,7 +387,7 @@ export default class Editor {
         this.ctx.emit('doneEdit', this.cellTarget);
         this.enable = false;
         this.ctx.editing = false;
-        this.ctx.containerElement.focus();
+        this.ctx.containerElement.focus({ preventScroll: true });
         // 隐藏编辑器
         this.editorEl.style.display = 'none';
         this.ctx.emit('drawView');
