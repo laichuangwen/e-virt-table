@@ -798,6 +798,21 @@ export default class Cell extends BaseCell {
         if (!this.drawImageSource) {
             return;
         }
+        if (this.hoverIconName) {
+            const { CELL_HOVER_ICON_BG_COLOR, CELL_HOVER_ICON_BORDER_COLOR } = this.ctx.config;
+            this.ctx.paint.drawRect(
+                this.drawImageX - 2,
+                this.drawImageY - 2,
+                this.drawImageWidth + 4,
+                this.drawImageHeight + 4,
+                {
+                    borderColor: CELL_HOVER_ICON_BORDER_COLOR,
+                    radius: 4,
+                    borderWidth: 1,
+                    fillColor: CELL_HOVER_ICON_BG_COLOR,
+                },
+            );
+        }
         this.ctx.paint.drawImage(
             this.drawImageSource,
             this.drawImageX,
