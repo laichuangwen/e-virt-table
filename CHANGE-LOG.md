@@ -145,3 +145,9 @@ V1.1.8
 - fix:解决type为number时change方法中触发全局校验会递归
 
 ---
+
+V1.1.9
+### Bug Fixes
+- fix:聚焦滚动问题
+- fix:修复hover图标
+---
