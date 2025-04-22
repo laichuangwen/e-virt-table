@@ -410,11 +410,6 @@ export default class Cell extends BaseCell {
         let bgColor = BODY_BG_COLOR;
         let textColor = READONLY_TEXT_COLOR;
         // 只读
-        if (['index', 'index-selection', 'selection'].includes(this.type)) {
-            this.drawCellBgColor = BODY_BG_COLOR;
-            this.drawTextColor = READONLY_TEXT_COLOR;
-            return;
-        }
         if (!this.ctx.database.getReadonly(this.rowKey, this.key)) {
             bgColor = EDIT_BG_COLOR;
             textColor = READONLY_TEXT_COLOR;
