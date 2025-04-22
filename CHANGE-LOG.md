@@ -151,3 +151,8 @@ V1.1.9
 - fix:聚焦滚动问题
 - fix:修复hover图标
 ---
+
+V1.2.0
+### Bug Fixes
+- fix:BODY_CELL_STYLE_METHOD 无法作用在index列
+---
