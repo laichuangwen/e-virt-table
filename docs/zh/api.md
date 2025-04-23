@@ -229,7 +229,7 @@ type EVirtTableOptions = {
 | type| 列的类型 | ^[string]`index, selection, index-selection,tree,number` | — |
 | operation | 指定列为操作列 | boolean | false |
 | editorType | 指定列编辑器类型 | string | text |
-| widthFillDisable | 指定当前列不可填充宽度 | boolean | true |
+| widthFillDisable | 指定当前列不可填充宽度 | boolean | false |
 | hide | 指定列隐藏 | boolean | false |
 | sort | 指定列排序 | number | 0 |
 | width | 列的宽度 | number | 100 |

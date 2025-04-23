@@ -8,7 +8,7 @@
 | 参数             | 说明                   | 类型    | 可选值 | 默认值 |
 | ---------------- | ---------------------- | ------- | ------ | ------ |
 | width            | 列的宽度               | number  | —      | 100    |
-| widthFillDisable | 指定当前列不可填充宽度 | boolean | —      | —      |
+| widthFillDisable | 指定当前列不可填充宽度 | boolean | —      | false      |
 
 ## Config
 
