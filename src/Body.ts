@@ -67,23 +67,14 @@ export default class Body {
             // 如果有设置高度的情况，空数据时，高度也要保持为设置的高度
             this.height = HEIGHT - header.height - footerHeight - SCROLLER_TRACK_SIZE;
         }
-        const isEmpty = !this.data.length ? 'empty' : 'not-empty';
-        this.ctx.emit('emptyChange', {
-            isEmpty,
-            type: isEmpty,
-            headerHeight: header.height,
-            bodyHeight: this.height,
-            footerHeight,
-            width: this.width,
-            height: !this.data.length ? EMPTY_BODY_HEIGHT + footerHeight : 0,
-        });
+        
         let containerHeight = this.height + header.height + SCROLLER_TRACK_SIZE;
         // 如果有底部,加上底部高度
         containerHeight += footerHeight;
         let stageHeight = containerHeight;
         const windowInnerHeight = window.innerHeight;
         const { top } = this.containerRect || this.ctx.containerElement.getBoundingClientRect();
-        if (this.data.length && windowInnerHeight > top && ENABLE_OFFSET_HEIGHT && !HEIGHT) {
+        if (windowInnerHeight > top && ENABLE_OFFSET_HEIGHT && !HEIGHT) {
             const visibleHeight = windowInnerHeight - top;
             const _stageHeight = visibleHeight - OFFSET_HEIGHT;
             if (_stageHeight > header.height + SCROLLER_TRACK_SIZE) {
@@ -110,6 +101,9 @@ export default class Body {
         } else {
             this.visibleHeight = _visibleHeight;
         }
+        if(!this.data.length){
+            this.height = this.visibleHeight;
+        }
         this.ctx.body.x = this.x;
         this.ctx.body.y = this.y;
         this.ctx.body.width = this.width;
@@ -120,9 +114,18 @@ export default class Body {
         const dpr = window.devicePixelRatio || 1; // 获取设备像素比
         const canvasWidth = this.ctx.stageWidth * dpr;
         const canvasHeight = this.ctx.stageHeight * dpr;
-
         canvasElement.width = Math.floor(canvasWidth);
         canvasElement.height = Math.floor(canvasHeight);
+        const isEmpty = !this.data.length ? 'empty' : 'not-empty';
+        this.ctx.emit('emptyChange', {
+            isEmpty,
+            type: isEmpty,
+            headerHeight: header.height,
+            bodyHeight: this.height,
+            footerHeight,
+            width: this.width,
+            height: !this.data.length ? EMPTY_BODY_HEIGHT + footerHeight : 0,
+        });
         // 外层容器样式
         this.ctx.canvasElement.setAttribute(
             'style',
