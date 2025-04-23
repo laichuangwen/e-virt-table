@@ -226,7 +226,7 @@ type EVirtTableOptions = {
 | type| Type of the column | Type |  ^[string]`index, selection, index-selection, tree,number` | — |
 | operation | Specify the column as an operation column | boolean | — | false |
 | editorType | Specify the editor type for the column | string | — | text |
-| widthFillDisable | Disable width fill for the column | boolean | — | true |
+| widthFillDisable | Disable width fill for the column | boolean | — | false |
 | hide | Hide the column | boolean | — | false |
 | sort | Sort order of the column | number | — | 0 |
 | width | Width of the column | number | — | — |
