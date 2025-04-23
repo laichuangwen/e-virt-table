@@ -25,7 +25,7 @@ type EVirtTableOptions = {
 | CSS_PREFIX | CSS 类名前缀 | string | e-virt-table |
 | ROW_KEY | 行的唯一标识键 | string | — |
 | DISABLED | 禁止编辑 | boolean | false |
-| HEADR_FONT | 表头字体 | string | 12px normal Arial |
+| HEADER_FONT | 表头字体 | string | 12px normal Arial |
 | BODY_FONT | 单元格字体 | string | 12px normal Arial |
 | BORDER_COLOR | 区域边框颜色 | string | #e1e6eb |
 | WIDTH | 宽度为 0 表示自适应100% | number | 0 |

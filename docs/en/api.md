@@ -25,7 +25,7 @@ type EVirtTableOptions = {
 | CSS_PREFIX | CSS class name prefix | string | — | e-virt-table |
 | ROW_KEY | Unique key for rows | string | — | — |
 | DISABLED | Disable editing | boolean | — | false |
-| HEADR_FONT | Header font | string | — | 12px normal Arial |
+| HEADER_FONT | Header font | string | — | 12px normal Arial |
 | BODY_FONT | Cell font | string | — | 12px normal Arial |
 | BORDER_COLOR | Border color | string | — | #e1e6eb |
 | WIDTH | Width (0 means auto fit to 100%) | number | — | 0 |

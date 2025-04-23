@@ -7,7 +7,7 @@
 | HEADER_HEIGHT     | Header Row Height       | number | 32                |
 | HEADER_BG_COLOR   | Header Background Color | string | #F8FAFF           |
 | HEADER_TEXT_COLOR | Header Text Color       | string | #1D2129           |
-| HEADR_FONT         | Header Font             | string | 12px normal Arial |
+| HEADER_FONT         | Header Font             | string | 12px normal Arial |
 
 ## Grouping 
 
