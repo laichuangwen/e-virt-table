@@ -18,10 +18,10 @@ export default class EventBrowser {
         this.bind(window, 'mousedown', this.handleOutsideMousedown.bind(this));
         this.bind(this.ctx.stageElement, 'click', this.handleClick.bind(this));
         this.bind(window, 'keydown', this.handleKeydown.bind(this));
-        this.bind(this.ctx.stageElement, 'wheel', this.handleWheel.bind(this));
-        this.bind(this.ctx.stageElement, 'touchstart', this.handleTouchstart.bind(this));
+        this.bind(this.ctx.stageElement, 'wheel', this.handleWheel.bind(this), { passive: false });
+        this.bind(this.ctx.stageElement, 'touchstart', this.handleTouchstart.bind(this), { passive: false });
         this.bind(this.ctx.stageElement, 'touchend', this.handleTouchend.bind(this));
-        this.bind(this.ctx.stageElement, 'touchmove', this.handleTouchmove.bind(this));
+        this.bind(this.ctx.stageElement, 'touchmove', this.handleTouchmove.bind(this), { passive: false });
         this.bind(this.ctx.stageElement, 'contextmenu', this.handleContextMenu.bind(this));
         this.bind(this.ctx.stageElement, 'mousedown', this.handleMouseDown.bind(this));
         this.bind(this.ctx.stageElement, 'dblclick', this.handleDblclick.bind(this));
@@ -42,7 +42,7 @@ export default class EventBrowser {
         const _e = e as MouseEvent;
         if (_e.button === 0) {
             this.ctx.mousedown = true;
-        } 
+        }
         this.ctx.containerElement.focus({ preventScroll: true });
         this.ctx.emit('mousedown', e);
     }
