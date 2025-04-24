@@ -155,11 +155,9 @@ export default class EVirtTable {
         this.ctx.off(event, callback);
     }
     filterMethod(func: FilterMethod) {
-        this.ctx.setScrollY(0);
-        this.ctx.setScrollX(0);
-        this.ctx.database.init();
-        this.header.init();
+        this.scrollTo(0, 0);
         this.ctx.database.setFilterMethod(func);
+        this.ctx.database.init();
         this.ctx.emit('draw');
     }
     editCell(rowIndex: number, colIndex: number) {
