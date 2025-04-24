@@ -6,7 +6,7 @@
 
 | Parameter          | Description               | Type | Default |
 | ------------------ | ------------------------- | ---- | ------- |
-| CELL_RENDER_METHOD | Custom cell type render   | —    |         |
+| BODY_CELL_RENDER_METHOD | Custom cell type render   | —    |         |
 
 ## Events
 
