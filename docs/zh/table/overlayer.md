@@ -6,7 +6,7 @@
 
 | 参数               | 说明                  | 类型 | 默认值 |
 | ------------------ | --------------------- | ---- | ------ |
-| CELL_RENDER_METHOD | 自定义格子类型 render | —    |        |
+| BODY_CELL_RENDER_METHOD | 自定义格子类型 render | —    |        |
 
 ## Events
 
