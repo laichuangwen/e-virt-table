@@ -156,3 +156,11 @@ V1.2.0
 ### Bug Fixes
 - fix:BODY_CELL_STYLE_METHOD 无法作用在index列
 ---
+
+V1.2.1
+### Bug Fixes
+- fix: 优化空数据处理逻辑，调整高度计算并重新触发空状态事件
+- fix:优化svg图片加载性能
+- fix:添加passive去除阻止滚动警告
+- fix:过滤数据方法没刷新数据
+---

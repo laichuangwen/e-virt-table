@@ -17,6 +17,7 @@ export interface IconType {
     name: string;
     svg: string;
     color: string;
+    isBlob?: boolean;
 }
 const svgSelect =
     '<svg t="1724122044148" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4551" width="32" height="32"><path d="M707.648 401.28L489.28 560.704l22.656 30.976 22.656-30.976L316.16 401.216q-3.072-2.24-6.464-3.84-3.456-1.536-7.104-2.432-3.712-0.896-7.488-1.088-3.776-0.128-7.488 0.448-3.776 0.64-7.296 1.92-3.584 1.28-6.784 3.2-3.2 1.984-6.016 4.544-2.816 2.56-5.056 5.632-2.176 3.072-3.84 6.464-1.536 3.456-2.432 7.104-0.896 3.712-1.088 7.488-0.128 3.776 0.448 7.488 0.64 3.776 1.92 7.296 1.28 3.584 3.2 6.784 1.984 3.2 4.544 6.016 2.56 2.752 5.632 4.992l218.368 159.552q4.928 3.584 10.752 5.504 5.76 1.92 11.904 1.92 6.08 0 11.904-1.92 5.76-1.92 10.752-5.504l218.368-159.552q3.008-2.24 5.568-4.992 2.56-2.816 4.544-6.016 1.92-3.2 3.264-6.784 1.28-3.52 1.92-7.296 0.576-3.712 0.384-7.488-0.128-3.84-1.024-7.488-0.896-3.648-2.496-7.04-1.6-3.456-3.84-6.528-2.24-3.072-4.992-5.632-2.816-2.56-6.016-4.48-3.2-1.984-6.784-3.328-3.584-1.28-7.296-1.856-3.712-0.64-7.488-0.448-3.84 0.192-7.488 1.088-3.648 0.896-7.04 2.496-3.456 1.536-6.528 3.84z m61.056 30.976q0-3.84-0.768-7.488-0.704-3.712-2.176-7.232-1.472-3.456-3.52-6.656-2.112-3.136-4.8-5.76-2.688-2.688-5.76-4.8-3.2-2.112-6.72-3.584-3.456-1.408-7.168-2.176-3.712-0.704-7.488-0.704-3.84 0-7.488 0.704-3.712 0.768-7.232 2.176-3.456 1.472-6.656 3.584-3.136 2.112-5.76 4.8-2.688 2.624-4.8 5.76-2.112 3.2-3.584 6.656-1.408 3.52-2.176 7.232-0.704 3.712-0.704 7.488 0 3.776 0.704 7.488 0.768 3.712 2.176 7.168 1.472 3.52 3.584 6.656 2.112 3.2 4.8 5.824 2.624 2.688 5.76 4.8 3.2 2.112 6.656 3.52 3.52 1.472 7.232 2.176 3.712 0.768 7.488 0.768 3.776 0 7.488-0.768 3.712-0.704 7.168-2.176 3.52-1.408 6.656-3.52 3.2-2.112 5.824-4.8 2.688-2.688 4.8-5.76 2.048-3.2 3.52-6.72 1.472-3.456 2.176-7.168 0.768-3.712 0.768-7.488z m-436.736 0q0-3.84-0.768-7.488-0.704-3.712-2.176-7.232-1.408-3.456-3.52-6.656-2.112-3.136-4.8-5.76-2.688-2.688-5.76-4.8-3.2-2.112-6.656-3.584-3.52-1.408-7.232-2.176-3.712-0.704-7.488-0.704-3.84 0-7.488 0.704-3.712 0.768-7.232 2.176-3.456 1.472-6.592 3.584-3.2 2.112-5.824 4.8-2.688 2.624-4.8 5.76-2.112 3.2-3.52 6.656-1.472 3.52-2.24 7.232-0.704 3.712-0.704 7.488 0 3.776 0.704 7.488 0.768 3.712 2.24 7.168 1.408 3.52 3.52 6.656 2.112 3.2 4.8 5.824 2.624 2.688 5.76 4.8 3.2 2.112 6.656 3.52 3.52 1.472 7.232 2.176 3.712 0.768 7.488 0.768 3.776 0 7.488-0.768 3.712-0.704 7.232-2.176 3.456-1.408 6.592-3.52 3.2-2.112 5.824-4.8 2.688-2.688 4.8-5.76 2.112-3.2 3.52-6.72 1.472-3.456 2.176-7.168 0.768-3.712 0.768-7.488z" p-id="4552"></path></svg>';
@@ -135,7 +136,7 @@ export default class Icons {
             const item = this.ctx.config.ICONS[i];
             let color = item.color;
             // 将异步操作推入 promises 数组
-            const promise = this.createImageFromSVG(item.svg, color).then((icon) => {
+            const promise = this.createImageFromSVG(item.svg, color, item.isBlob).then((icon) => {
                 this.icons.set(item.name, icon);
             });
             promises.push(promise);
@@ -145,7 +146,7 @@ export default class Icons {
         // 加载完成后触发绘制
         this.ctx.emit('draw');
     }
-    private async createImageFromSVG(svgContent: string, fill?: string) {
+    private async createImageFromSVG(svgContent: string, fill?: string, isBlob = false) {
         const parser = new DOMParser();
         const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
         const svg = svgDoc.documentElement;
@@ -156,10 +157,15 @@ export default class Icons {
             });
         }
         const img = new Image();
-        const svgBlob = new Blob([new XMLSerializer().serializeToString(svg)], {
-            type: 'image/svg+xml',
-        });
-        const url = URL.createObjectURL(svgBlob);
+        let url = '';
+        if (isBlob) {
+            const svgBlob = new Blob([new XMLSerializer().serializeToString(svg)], {
+                type: 'image/svg+xml',
+            });
+            url = URL.createObjectURL(svgBlob);
+        } else {
+            url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(svg));
+        }
         img.src = url;
         return new Promise<HTMLImageElement>((resolve, reject) => {
             img.onerror = () => reject(new Error('Failed to load image'));
