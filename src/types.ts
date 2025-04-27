@@ -251,6 +251,7 @@ export type BeforePasteDataMethod = (
     changeList: BeforeChangeItem[],
     xArr: number[],
     yArr: number[],
+    textArr: string[][],
 ) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
 export type BeforeAutofillDataMethod = (
     changeList: BeforeChangeItem[],

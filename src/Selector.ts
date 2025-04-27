@@ -720,7 +720,7 @@ export default class Selector {
                             oldValue: this.ctx.database.getItemValue(item.rowKey, item.key),
                             row: this.ctx.database.getRowDataItemForRowKey(item.rowKey),
                         }));
-                        changeList = await beforePasteDataMethod(_changeList, _xArr, _yArr);
+                        changeList = await beforePasteDataMethod(_changeList, _xArr, _yArr, textArr);
                         if (changeList && !changeList.length) {
                             return;
                         }
