@@ -164,3 +164,9 @@ V1.2.1
 - fix:添加passive去除阻止滚动警告
 - fix:过滤数据方法没刷新数据
 ---
+
+V1.2.2
+### Bug Fixes
+- fix:beforePasteDataMethod中添加textArr参数
+- feat:添加onPastedDataOverflow方法回调
+---

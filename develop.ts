@@ -1,9 +1,9 @@
 import EVirtTable from './src/EVirtTable';
-import { BeforeCopyParams, BeforeSetSelectorParams, Column, SelectableParams } from './src/types';
+import { BeforeCopyParams, BeforeSetSelectorParams, Column, PastedDataOverflow, SelectableParams } from './src/types';
 // import { mergeColCell, mergeRowCell } from './src/util';
 
 const canvas = document.getElementById('e-virt-table') as HTMLDivElement;
-const columns: Column[] = [
+let columns: Column[] = [
     // {
     //   title: "序号",
     //   key: "index",
@@ -314,7 +314,7 @@ const columns: Column[] = [
     },
 ];
 let data: any[] = [];
-for (let i = 0; i < 800; i += 1) {
+for (let i = 0; i < 1; i += 1) {
     data.push({
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
         id: `1_${i}`,
@@ -521,7 +521,18 @@ const eVirtTable = new EVirtTable(canvas, {
             //     }, 1000);
             // });
         },
-        // BEFORE_PASTE_DATA_METHOD: (changeList, xArr, yArr) => {
+        // BEFORE_PASTE_DATA_METHOD: (changeList, xArr, yArr, texArr) => {
+        //     console.log(yArr, texArr);
+        //     const [minY, maxY] = yArr;
+        //     const num = maxY - eVirtTable.ctx.maxRowIndex;
+        //     if (num > 0) {
+        //         Array.from({ length: num }).forEach(() => {
+        //             data.push({});
+        //         });
+        //         console.log(data);
+
+        //         eVirtTable.loadData(data);
+        //     }
         //     return new Promise((resolve) => {
         //         setTimeout(() => {
         //             console.log('BEFORE_PASTE_DATA_METHOD', changeList);
@@ -587,54 +598,54 @@ const eVirtTable = new EVirtTable(canvas, {
                 return true;
             }
         },
-        SPAN_METHOD: (params) => {
-            const { mergeColCell, mergeRowCell } = eVirtTable.getUtils();
-            const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;
-            if (
-                [
-                    // 'selection',
-                    'unit',
-                    'work_type',
-                    'household_city',
-                    'household_address',
-                    'requiredQuantity',
-                    'work_status',
-                    'materialNo',
-                ].includes(column.key)
-            ) {
-                // 合并行单元格
-                return mergeRowCell(params, column.key, ['emp_name', column.key]);
-            }
-            if (column.key === 'emp_name') {
-                // 合并行单元格
-                return mergeRowCell(params, 'emp_name', ['emp_name']);
-            }
-            if (column.key === 'phone') {
-                // 合并行单元格
-                return mergeRowCell(params, 'emp_name', ['emp_name', 'phone']);
-            }
-            if (['emp_name221', 'emp_name222', 'emp_name2'].includes(column.key)) {
-                return mergeColCell(params, ['emp_name221', 'emp_name222', 'emp_name2']);
-            }
-            // if (column.key === 'selection') {
-            //     // 合并行单元格
-            //     return mergeRowCell(params, 'emp_name');
-            // }
-            // // 合并动态列单元格
-            // if (colIndex > 4) {
-            //   const spanObj = getSpanObjByColumn(row, visibleLeafColumns);
-            //   if (spanObj[column.key] === 0) {
-            //     return {
-            //       rowspan: 0,
-            //       colspan: 0,
-            //     };
-            //   }
-            //   return {
-            //     rowspan: 1,
-            //     colspan: spanObj[column.key],
-            //   };
-            // }
-        },
+        // SPAN_METHOD: (params) => {
+        //     const { mergeColCell, mergeRowCell } = eVirtTable.getUtils();
+        //     const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;
+        //     if (
+        //         [
+        //             // 'selection',
+        //             'unit',
+        //             'work_type',
+        //             'household_city',
+        //             'household_address',
+        //             'requiredQuantity',
+        //             'work_status',
+        //             'materialNo',
+        //         ].includes(column.key)
+        //     ) {
+        //         // 合并行单元格
+        //         return mergeRowCell(params, column.key, ['emp_name', column.key]);
+        //     }
+        //     if (column.key === 'emp_name') {
+        //         // 合并行单元格
+        //         return mergeRowCell(params, 'emp_name', ['emp_name']);
+        //     }
+        //     if (column.key === 'phone') {
+        //         // 合并行单元格
+        //         return mergeRowCell(params, 'emp_name', ['emp_name', 'phone']);
+        //     }
+        //     if (['emp_name221', 'emp_name222', 'emp_name2'].includes(column.key)) {
+        //         return mergeColCell(params, ['emp_name221', 'emp_name222', 'emp_name2']);
+        //     }
+        //     // if (column.key === 'selection') {
+        //     //     // 合并行单元格
+        //     //     return mergeRowCell(params, 'emp_name');
+        //     // }
+        //     // // 合并动态列单元格
+        //     // if (colIndex > 4) {
+        //     //   const spanObj = getSpanObjByColumn(row, visibleLeafColumns);
+        //     //   if (spanObj[column.key] === 0) {
+        //     //     return {
+        //     //       rowspan: 0,
+        //     //       colspan: 0,
+        //     //     };
+        //     //   }
+        //     //   return {
+        //     //     rowspan: 1,
+        //     //     colspan: spanObj[column.key],
+        //     //   };
+        //     // }
+        // },
     },
 });
 eVirtTable.on('error', (error) => {
@@ -646,6 +657,25 @@ eVirtTable.on('hoverIconClick', (cell) => {
 // eVirtTable.on('change', (changeList) => {
 //     eVirtTable.validate();
 // });
+eVirtTable.on('onPastedDataOverflow', (val: PastedDataOverflow) => {
+    const { overflowColCount, overflowRowCount } = val;
+    if (overflowRowCount > 0) {
+        console.log('粘贴数据超出行数', overflowRowCount);
+        data = data.concat(Array.from({ length: overflowRowCount }).map(() => ({})));
+        eVirtTable.loadData(data);
+    }
+    if (overflowColCount > 0) {
+        console.log('粘贴数据超出列数', overflowColCount);
+        columns = columns.concat(
+            Array.from({ length: overflowColCount }).map((_, index) => ({
+                title: `溢出表头${index}`,
+                key: `overflow${index}`,
+                fixed: 'right',
+            })),
+        );
+        eVirtTable.loadColumns(columns);
+    }
+});
 eVirtTable.on('overlayerChange', (container) => {
     if (!overlayerEl) {
         return;

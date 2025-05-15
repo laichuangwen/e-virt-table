@@ -167,6 +167,7 @@ type EVirtTableOptions = {
 | mousemove | Callback for mouse move | — |
 | keydown | Callback for key down | — |
 | hoverIconClick | Callback for hoverIcon click | — |
+| onPastedDataOverflow | Callback when paste overflows | `PastedDataOverflow` |
 | error | Error callback | — |
 
 ## Methods
@@ -336,4 +337,13 @@ type CellStyleOptions = {
     backgroundColor?: string;
 };
 
+type PastedDataOverflow = {
+    maxY: number;
+    maxX: number;
+    minY: number;
+    minX: number;
+    overflowRowCount: number;
+    overflowColCount: number;
+    textArr: string[][];
+};
 ```

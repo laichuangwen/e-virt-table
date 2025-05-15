@@ -643,6 +643,22 @@ export default class Selector {
                     let textArr = decodeSpreadsheetStr(val);
                     const _xArr = [colIndex, colIndex + textArr[0].length - 1];
                     const _yArr = [rowIndex, rowIndex + textArr.length - 1];
+                    const [minY, maxY] = _yArr;
+                    const [minX, maxX] = _xArr;
+                    const overflowRowCount = maxY - this.ctx.maxRowIndex;
+                    const overflowColCount = maxX - this.ctx.maxColIndex;
+                    // 粘贴溢出回调处理
+                    if (overflowRowCount > 0 || overflowColCount > 0) {
+                        this.ctx.emit('onPastedDataOverflow', {
+                            maxY,
+                            maxX,
+                            minY,
+                            minX,
+                            overflowRowCount,
+                            overflowColCount,
+                            textArr,
+                        });
+                    }
                     // textArr只有一个
                     const isOneData = textArr.length === 1 && textArr[0].length === 1;
                     // 启用合并时禁用粘贴填充
@@ -720,7 +736,7 @@ export default class Selector {
                             oldValue: this.ctx.database.getItemValue(item.rowKey, item.key),
                             row: this.ctx.database.getRowDataItemForRowKey(item.rowKey),
                         }));
-                        changeList = await beforePasteDataMethod(_changeList, _xArr, _yArr);
+                        changeList = await beforePasteDataMethod(_changeList, _xArr, _yArr, textArr);
                         if (changeList && !changeList.length) {
                             return;
                         }
