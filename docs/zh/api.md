@@ -168,6 +168,7 @@ type EVirtTableOptions = {
 | mousemove | mousemove回调 | — |
 | keydown | keydown回调 | — |
 | hoverIconClick | hoverIcon点击回调 | — |
+| onPastedDataOverflow | 粘贴溢出时回调 | `PastedDataOverflow`  |
 | error | error回调 | — |
 
 ## Methods
@@ -219,8 +220,6 @@ type EVirtTableOptions = {
 | contextMenuHide        | 隐藏右键菜单                  | —                                                         |
 | destroy                | 销毁                          | —                                                         |
 
-    hoverIconName?: string;
-    placeholder?: string;
 ## Column
 | 参数 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
@@ -338,6 +337,16 @@ type BeforeCopyParams = {
 type CellStyleOptions = {
     color?: string;
     backgroundColor?: string;
+};
+
+type PastedDataOverflow = {
+    maxY: number;
+    maxX: number;
+    minY: number;
+    minX: number;
+    overflowRowCount: number;
+    overflowColCount: number;
+    textArr: string[][];
 };
 
 ```

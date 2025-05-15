@@ -98,6 +98,15 @@ export type Position = {
     top: number;
     bottom: number;
 };
+export type PastedDataOverflow = {
+    maxY: number;
+    maxX: number;
+    minY: number;
+    minX: number;
+    overflowRowCount: number;
+    overflowColCount: number;
+    textArr: string[][];
+};
 export type SelectionMap = {
     check: boolean;
     key: string;
