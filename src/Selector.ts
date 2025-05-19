@@ -1,3 +1,4 @@
+import { shift } from '@floating-ui/dom';
 import type Context from './Context';
 import type Cell from './Cell';
 import type CellHeader from './CellHeader';
@@ -137,7 +138,7 @@ export default class Selector {
                 e.preventDefault();
                 this.selectAll();
             }
-            if (e.code === 'ArrowLeft') {
+            if (e.code === 'ArrowLeft' || (e.shiftKey && e.code === 'Tab')) {
                 e.preventDefault();
                 this.moveFocus('LEFT');
                 return;
