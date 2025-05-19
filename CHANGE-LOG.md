@@ -170,3 +170,9 @@ V1.2.2
 - fix:beforePasteDataMethod中添加textArr参数
 - feat:添加onPastedDataOverflow方法回调
 ---
+
+V1.2.3
+### Bug Fixes
+feat: 支持使用 Shift + Tab 键向左移动焦点
+feat: 支持使用 Tab 键在编辑状态下移动焦点
+---
