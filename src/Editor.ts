@@ -79,6 +79,16 @@ export default class Editor {
                 this.autoSize();
                 return;
             }
+            if (e.code === 'Tab' && this.ctx.editing) {
+                e.preventDefault();
+                this.doneEdit();
+                if (e.shiftKey) {
+                    this.ctx.emit('setMoveFocus', 'LEFT');
+                    return;
+                }
+                this.ctx.emit('setMoveFocus', 'RIGHT');
+                return;
+            }
             if (e.code === 'Enter' && this.ctx.editing) {
                 e.preventDefault();
                 this.doneEdit();
