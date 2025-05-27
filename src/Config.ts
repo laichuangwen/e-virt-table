@@ -22,6 +22,7 @@ import {
     SelectableMethod,
     SpanMethod,
 } from './types';
+import { getCssVar } from './util';
 
 export default class Config {
     CSS_PREFIX = 'e-virt-table';
@@ -154,10 +155,22 @@ export default class Config {
     BEFORE_SET_AUTOFILL_METHOD?: BeforeSetAutofillMethod;
     BEFORE_COPY_METHOD?: BeforeCopyMethod;
     constructor(config: Partial<Config>) {
+        this.updateCssVar();
         Object.assign(this, config);
     }
 
     init(config: ConfigType) {
+        this.updateCssVar();
         Object.assign(this, config);
+    }
+    // 同步css 样式变量
+    updateCssVar() {
+        Object.keys(this).forEach((key) => {
+            if (key.endsWith('_COLOR')) {
+                const cssKey = `--evt-${key.toLocaleLowerCase().replace(/_/g, '-')}`;
+                const val = getCssVar(cssKey);
+                (this as any)[key] = val;
+            }
+        });
     }
 }

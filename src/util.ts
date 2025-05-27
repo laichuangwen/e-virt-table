@@ -331,6 +331,17 @@ function mergeColCell(params: SpanParams, mergeColKeys: string[] = []) {
         };
     }
 }
+/**
+ * 获取某个 CSS 变量的实际值
+ * @param name 变量名（可以带或不带前缀，例如 "color-primary" 或 "--color-primary"）
+ * @param el 可选元素，默认为 document.documentElement
+ * @returns CSS 变量的计算值（如 "#1e90ff"）
+ */
+function getCssVar(name: string, el: HTMLElement = document.documentElement): string {
+    const key = name.startsWith('--') ? name : `--${name}`;
+    const styles = getComputedStyle(el);
+    return styles.getPropertyValue(key).trim();
+}
 export {
     debounce,
     throttle,
@@ -345,4 +356,5 @@ export {
     mergeColCell,
     getSpanArrByRow,
     getSpanObjByColumn,
+    getCssVar,
 };
