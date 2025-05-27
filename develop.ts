@@ -880,6 +880,13 @@ document.getElementById('next')?.addEventListener('click', () => {
 document.getElementById('clearSelection')?.addEventListener('click', () => {
     eVirtTable.clearSelection();
 });
+document.getElementById('updateCssVar')?.addEventListener('click', () => {
+    if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+    } else {
+        document.documentElement.classList.add('dark');
+    }
+});
 document.getElementById('setValidator')?.addEventListener('click', () => {
     const errors = [
         {
