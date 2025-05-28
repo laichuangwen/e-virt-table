@@ -393,7 +393,6 @@ const eVirtTable = new EVirtTable(canvas, {
         ICONS: [],
         BORDER: true,
         STRIPE: false,
-        EDIT_BG_COLOR: '#fff',
         // DISABLED: true,
         // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
@@ -880,6 +879,13 @@ document.getElementById('next')?.addEventListener('click', () => {
 });
 document.getElementById('clearSelection')?.addEventListener('click', () => {
     eVirtTable.clearSelection();
+});
+document.getElementById('updateCssVar')?.addEventListener('click', () => {
+    if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+    } else {
+        document.documentElement.classList.add('dark');
+    }
 });
 document.getElementById('setValidator')?.addEventListener('click', () => {
     const errors = [

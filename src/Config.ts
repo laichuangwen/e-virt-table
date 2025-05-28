@@ -22,8 +22,10 @@ import {
     SelectableMethod,
     SpanMethod,
 } from './types';
+import { getCssVar } from './util';
 
 export default class Config {
+    private _config: ConfigType = {};
     CSS_PREFIX = 'e-virt-table';
     ICONS: IconType[] = [];
     ROW_KEY = '';
@@ -100,6 +102,7 @@ export default class Config {
     SELECTOR_AREA_MIN_Y = 0; // 选择器Y最小范围
     SELECTOR_AREA_MAX_Y = 0; // 选择器Y最大范围,0默认rowMax
     SELECTOR_AREA_MAX_Y_OFFSET = 0; // 选择器Y最大范围,0默认rowMax
+    ENABLE_AUTO_THEME= true;
     ENABLE_SELECTOR_SINGLE = false;
     ENABLE_SELECTOR_SPAN_COL = true;
     ENABLE_SELECTOR_SPAN_ROW = true;
@@ -154,10 +157,23 @@ export default class Config {
     BEFORE_SET_AUTOFILL_METHOD?: BeforeSetAutofillMethod;
     BEFORE_COPY_METHOD?: BeforeCopyMethod;
     constructor(config: Partial<Config>) {
-        Object.assign(this, config);
+        this._config = config;
+        this.updateCssVar();
     }
 
     init(config: ConfigType) {
-        Object.assign(this, config);
+        this._config = config;
+        this.updateCssVar();
+    }
+    // 同步css 样式变量
+    updateCssVar() {
+        Object.keys(this).forEach((key) => {
+            if (key.endsWith('_COLOR')) {
+                const cssKey = `--evt-${key.toLocaleLowerCase().replace(/_/g, '-')}`;
+                const val = getCssVar(cssKey);
+                (this as any)[key] = val;
+            }
+        });
+        Object.assign(this, this._config);
     }
 }

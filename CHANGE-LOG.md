@@ -176,3 +176,14 @@ V1.2.3
 feat: 支持使用 Shift + Tab 键向左移动焦点
 feat: 支持使用 Tab 键在编辑状态下移动焦点
 ---
+
+V1.2.4(废弃)
+### Bug Fixes
+feat: 添加css全局变量及暗黑主题切换
+docs: 更新主题文档
+---
+
+V1.2.5
+### Bug Fixes
+fix: 修复css全局变量比config优先级
+---

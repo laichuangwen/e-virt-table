@@ -8,6 +8,7 @@ export default class EventTable {
     ctx: Context;
     private visibleHoverCell?: Cell;
     private resizeObserver!: ResizeObserver;
+    private mutationObserver!: MutationObserver;
     constructor(ctx: Context) {
         this.ctx = ctx;
         this.init();
@@ -19,6 +20,21 @@ export default class EventTable {
             this.ctx.emit('resizeObserver');
         });
         this.resizeObserver.observe(this.ctx.containerElement);
+        this.mutationObserver = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    this.ctx.config.updateCssVar();
+                    this.ctx.emit('draw');
+                }
+            }
+        });
+        if (this.ctx.config.ENABLE_AUTO_THEME) {
+            this.mutationObserver.observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ['class'], // ✅ 只监听 class 更改
+            });
+        }
+
         // 按下事件
         this.ctx.on('mousedown', (e) => {
             // 左边点击
@@ -370,5 +386,6 @@ export default class EventTable {
     }
     destroy() {
         this.resizeObserver.unobserve(this.ctx.stageElement);
+        this.mutationObserver.disconnect();
     }
 }

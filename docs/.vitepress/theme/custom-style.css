@@ -3,6 +3,9 @@
   --vp-sidebar-width: 200px;
   /* --vp-layout-max-width: 1440px; */
 }
+.dark{
+  background-color: var(--vp-c-bg);
+}
 .VPDoc.has-aside .content-container {
   max-width: 1200px !important;
 }
