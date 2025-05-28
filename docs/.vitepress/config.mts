@@ -5,7 +5,7 @@ import middlewaresPlugin from './plugins/middlewares-plugin';
 export default defineConfig({
     base: '/e-virt-table/',
     outDir: './.vitepress/dist',
-    appearance: false,
+    appearance: true,
     title: 'e-virt-table',
     description:
         'A powerful data table based on canvas. You can use it as data grid、Microsoft Excel or Google sheets. It supports virtual scroll、cell edit etc.',

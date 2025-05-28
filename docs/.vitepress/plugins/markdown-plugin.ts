@@ -92,17 +92,14 @@ export const markdownConfig = (md) => {
             if (tokens[idx].nesting === 1 /* means the tag is opening */) {
                 // 取出:::demo 后面的配置，即源码路径
                 const title = m && m.length > 1 ? m[1] : '';
-                
+
                 const sourceFileToken = tokens[idx + 2];
                 let source = '';
                 const sourceFile = sourceFileToken.children?.[0].content ?? '';
                 const fileType = sourceFile.split('.').pop();
-                
+
                 if (sourceFileToken.type === 'inline') {
-                    source = fs.readFileSync(
-                        path.resolve(process.cwd(), 'examples', `${sourceFile}`),
-                        'utf-8',
-                    );
+                    source = fs.readFileSync(path.resolve(process.cwd(), 'examples', `${sourceFile}`), 'utf-8');
                 }
                 const sourcePath = `/examples/${sourceFile}`;
                 if (!source) throw new Error(`Incorrect source file: ${sourceFile}`);

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useClipboard, useToggle } from '@vueuse/core';
 import { ElMessage } from 'element-plus';
 import IconCopy from './icon-copy.vue';
@@ -20,7 +20,11 @@ const props = defineProps<{
     description: string;
 }>();
 const decodedRawSource = computed(() => {
-    return decodeURIComponent(props.rawSource);
+    const str = decodeURIComponent(props.rawSource);
+    if (isDark.value) {
+        return str.replace(/<html lang="en"/g, '<html lang="en" class="dark" style="background-color: #1b1b1f"');
+    }
+    return str;
 });
 const { copy } = useClipboard({
     source: decodeURIComponent(props.rawSource),
@@ -78,6 +82,48 @@ const goCodepen = () => {
     form.submit();
     document.body.removeChild(form);
 };
+const iframeRef = ref<HTMLIFrameElement | null>(null);
+let observer: MutationObserver | null = null;
+const isDark = ref(false);
+function shetTheme() {
+    if (!development) {
+        return;
+    }
+    if (iframeRef.value) {
+        const iframeDoc = iframeRef.value?.contentDocument;
+        if (isDark.value) {
+            if (iframeDoc?.documentElement) {
+                iframeDoc.documentElement.classList.add('dark');
+                iframeDoc.documentElement.style.backgroundColor = '#1b1b1f';
+            }
+        } else {
+            if (iframeDoc?.documentElement) {
+                iframeDoc.documentElement.classList.remove('dark');
+                iframeDoc.documentElement.style = '';
+            }
+            iframeDoc?.documentElement.classList.remove('dark');
+        }
+        ready.value = true;
+    }
+}
+const ready = ref(false);
+const onIframeLoad = () => {
+    shetTheme();
+};
+onMounted(() => {
+    isDark.value = document.documentElement.classList.contains('dark');
+    observer = new MutationObserver(() => {
+        isDark.value = document.documentElement.classList.contains('dark');
+        shetTheme();
+    });
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class'],
+    });
+});
+onUnmounted(() => {
+    observer?.disconnect();
+});
 </script>
 
 <template>
@@ -87,15 +133,19 @@ const goCodepen = () => {
             <div class="example-showcase" ref="showcase">
                 <template v-if="development">
                     <iframe
+                        ref="iframeRef"
                         :src="props.path"
+                        @load="onIframeLoad"
                         :style="{
                             width: props.width,
                             height: props.height,
+                            visibility: ready ? 'visible' : 'hidden',
                         }"
                     />
                 </template>
                 <iframe
                     v-else
+                    ref="iframeRef"
                     :srcdoc="decodedRawSource"
                     :style="{
                         width: props.width,
@@ -156,12 +206,12 @@ iframe {
 .example-showcase {
     padding: 1.5rem;
     margin: 0.5px;
-    background-color: #fff;
+    background-color: var(--vp-c-bg);
 }
 .example-showcase:fullscreen {
     padding: 0px;
     margin: 0px;
-    background-color: #fff;
+    background-color: var(--vp-c-bg);
 }
 
 .example {
