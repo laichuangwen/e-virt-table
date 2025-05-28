@@ -115,19 +115,16 @@ export default class Selector {
             }
             // CTRL+C／Command+C
             if ((e.ctrlKey && e.code === 'KeyV') || (e.metaKey && e.code === 'KeyV')) {
-                e.preventDefault();
                 this.paste();
                 return;
             }
             if ((e.ctrlKey && e.code === 'KeyC') || (e.metaKey && e.code === 'KeyC')) {
-                e.preventDefault();
                 this.copy();
                 this.isCut = false;
                 return;
             }
             // CTRL+X／Command+X
             if ((e.ctrlKey && e.code === 'KeyX') || (e.metaKey && e.code === 'KeyX')) {
-                e.preventDefault();
                 this.isCut = true;
                 this.copy();
                 return;
