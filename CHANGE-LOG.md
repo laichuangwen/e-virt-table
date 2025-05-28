@@ -187,3 +187,8 @@ V1.2.5
 ### Bug Fixes
 fix: 修复css全局变量比config优先级
 ---
+
+V1.2.6
+### Bug Fixes
+fix: 去除复制粘贴剪切阻止默认行为
+---
