@@ -28,6 +28,8 @@ h:500px
 - 注意:config传入自定义颜色配置比css优先等级高
 ``` css
 :root {
+    --evt-header-font: '12px normal Arial';
+    --evt-body-font: '12px normal Arial';
     --evt-color-white: #fff;
     --evt-color-black: #000000;
     --evt-color-primary: rgb(82, 146, 247);

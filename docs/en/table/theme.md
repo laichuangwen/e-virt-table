@@ -27,6 +27,8 @@ h:500px
 - Note: Custom color configuration passed in config has a higher priority than css
 ``` css
 :root {
+    --evt-header-font: '12px normal Arial';
+    --evt-body-font: '12px normal Arial';
     --evt-color-white: #fff;
     --evt-color-black: #000000;
     --evt-color-primary: rgb(82, 146, 247);
