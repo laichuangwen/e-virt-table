@@ -25,6 +25,7 @@ import {
 import { getCssVar } from './util';
 
 export default class Config {
+    private _config: ConfigType = {};
     CSS_PREFIX = 'e-virt-table';
     ICONS: IconType[] = [];
     ROW_KEY = '';
@@ -156,13 +157,13 @@ export default class Config {
     BEFORE_SET_AUTOFILL_METHOD?: BeforeSetAutofillMethod;
     BEFORE_COPY_METHOD?: BeforeCopyMethod;
     constructor(config: Partial<Config>) {
+        this._config = config;
         this.updateCssVar();
-        Object.assign(this, config);
     }
 
     init(config: ConfigType) {
+        this._config = config;
         this.updateCssVar();
-        Object.assign(this, config);
     }
     // 同步css 样式变量
     updateCssVar() {
@@ -173,5 +174,6 @@ export default class Config {
                 (this as any)[key] = val;
             }
         });
+        Object.assign(this, this._config);
     }
 }
