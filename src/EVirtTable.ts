@@ -158,6 +158,7 @@ export default class EVirtTable {
         this.scrollTo(0, 0);
         this.ctx.database.setFilterMethod(func);
         this.ctx.database.init();
+        this.header.init();
         this.ctx.emit('draw');
     }
     editCell(rowIndex: number, colIndex: number) {

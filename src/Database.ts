@@ -30,6 +30,7 @@ export default class Database {
     private colIndexKeyMap = new Map<number, string>();
     private headerMap = new Map<string, CellHeader>();
     private rowIndexRowKeyMap = new Map<number, string>();
+    private rowKeyRowIndexMap = new Map<string, number>();
     private checkboxKeyMap = new Map<string, string[]>();
     private selectionMap = new Map<string, SelectionMap>();
     private originalDataMap = new Map<string, any>();
@@ -61,6 +62,7 @@ export default class Database {
         this.checkboxKeyMap.clear();
         this.colIndexKeyMap.clear();
         this.rowIndexRowKeyMap.clear();
+        this.rowKeyRowIndexMap.clear();
         this.originalDataMap.clear();
         this.changedDataMap.clear();
         this.validationErrorMap.clear();
@@ -221,6 +223,7 @@ export default class Database {
                 const top = this.sumHeight;
                 this.sumHeight += height;
                 this.rowIndexRowKeyMap.set(rowIndex, rowKey);
+                this.rowKeyRowIndexMap.set(rowKey, rowIndex);
                 this.positions.push({
                     top,
                     height,
@@ -233,6 +236,7 @@ export default class Database {
             });
         };
         this.rowIndexRowKeyMap.clear();
+        this.rowKeyRowIndexMap.clear();
         let _data = this.data;
         if (typeof this.filterMethod === 'function') {
             _data = this.filterMethod(_data);
@@ -354,7 +358,7 @@ export default class Database {
         return this.itemRowKeyMap.get(item);
     }
     getRowIndexForRowKey(rowKey: string) {
-        return this.rowKeyMap.get(rowKey).index;
+        return this.rowKeyRowIndexMap.get(rowKey);
     }
     /**
      * 根据rowIndex和colIndex获取单元格数据

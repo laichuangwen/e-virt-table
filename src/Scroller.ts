@@ -416,6 +416,9 @@ export default class Scroller {
     scrollToRowKey(rowKey: string) {
         const { body, database } = this.ctx;
         const rowIndex = database.getRowIndexForRowKey(rowKey);
+        if (rowIndex === undefined) {
+            return; 
+        }
         const { top } = database.getPositionForRowIndex(rowIndex);
         this.setScrollY(top - body.visibleHeight / 2);
     }
