@@ -202,4 +202,5 @@ V1.2.8
 ### Bug Fixes
 fix: 修复tree溢出文本显示的错误
 docs: 更新ENABLE_HISTORY默认值为false
+docs: 更新tree文档
 ---
