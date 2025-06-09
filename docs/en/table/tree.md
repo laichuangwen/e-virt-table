@@ -3,6 +3,12 @@
 -   Set `type=tree` for the column that needs to be expandable.
 -   Rows with `children` in the data will be expandable.
 
+## Row
+| Parameter | Description  | Type                                   | Default |
+| ------------ | -------------------------- | ------- | ------ |
+| children     | row data               | array   | —      |
+| _hasChildren | Need to load, lazy loading is effective | boolean | false  |
+
 ## Column
 
 -   Set `type=tree` to enable.
