@@ -4,7 +4,7 @@
 
 | 参数           | 说明       | 类型    | 默认值 |
 | -------------- | ---------- | ------- | ------ |
-| ENABLE_HISTORY | 启用历史   | boolean | true   |
+| ENABLE_HISTORY | 启用历史   | boolean | false   |
 | HISTORY_NUM    | 历史栈数量 | number  | 50     |
 
 注意：
@@ -14,7 +14,7 @@
 
 ## 启用
 
--   `config.ENABLE_HISTORY`为`true`,默认是开开启的
+-   `config.ENABLE_HISTORY`为`true`,默认是禁用的
 
 ::: demo
 

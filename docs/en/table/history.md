@@ -4,7 +4,7 @@
 
 | Parameter       | Description       | Type    | Default |
 | --------------- | ----------------- | ------- | ------------- |
-| ENABLE_HISTORY  | Enable History    | boolean | true          |
+| ENABLE_HISTORY  | Enable History    | boolean | false          |
 | HISTORY_NUM     | History Stack Size| number  | 50            |
 
 Note:
@@ -14,7 +14,7 @@ Note:
 
 ## Enable
 
--   `config.ENABLE_HISTORY` is `true` by default.
+-   `config.ENABLE_HISTORY` is `false` by default.
 
 ::: demo
 
