@@ -197,3 +197,9 @@ V1.2.7
 ### Bug Fixes
 fix:修复过滤数据后，编辑数据会错乱
 ---
+
+V1.2.8
+### Bug Fixes
+fix: 修复tree溢出文本显示的错误
+docs: 更新ENABLE_HISTORY默认值为false
+---

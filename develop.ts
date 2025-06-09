@@ -314,7 +314,7 @@ let columns: Column[] = [
     },
 ];
 let data: any[] = [];
-for (let i = 0; i < 100; i += 1) {
+for (let i = 0; i < 10000; i += 1) {
     data.push({
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
         id: `1_${i}`,
@@ -567,15 +567,16 @@ const eVirtTable = new EVirtTable(canvas, {
                 setTimeout(() => {
                     const list = [
                         {
-                            id: 1,
-                            emp_no: `${i}-1-1`,
-                            emp_name: `张三${i}-层级1-1`,
+                            id: `${i}-1`,
+                            emp_no: `${i}-1`,
+                            emp_name: `张三${i}-1`,
                             children: [],
+                            _hasChildren: true,
                         },
                         {
-                            id: 2,
-                            emp_no: `${i}-1-2`,
-                            emp_name: `张三${i}-层级1-1`,
+                            id: `${i}-2`,
+                            emp_no: `${i}-2`,
+                            emp_name: `张三${i}-2`,
                         },
                     ];
                     resolve(list);

@@ -1,3 +1,4 @@
+import { offset } from '@floating-ui/dom';
 import type {
     Column,
     Fixed,
@@ -764,7 +765,12 @@ export default class Cell extends BaseCell {
     }
     private drawText() {
         const { CELL_PADDING, BODY_FONT, PLACEHOLDER_COLOR } = this.ctx.config;
-        const { ellipsis } = this.ctx.paint.handleEllipsis(this.text, this.width, CELL_PADDING, BODY_FONT);
+        let visibleWidth = this.visibleWidth;
+        if (this.type === 'tree') {
+            const offsetIconX = this.drawTextX - this.drawX;
+            visibleWidth = this.visibleWidth - offsetIconX; // 减去树形图标的宽度
+        }
+        const { ellipsis } = this.ctx.paint.handleEllipsis(this.displayText, visibleWidth, CELL_PADDING, BODY_FONT);
         this.ellipsis = ellipsis;
         const { placeholder } = this.column;
         let text = this.displayText;
@@ -781,7 +787,7 @@ export default class Cell extends BaseCell {
             text = placeholder;
             color = PLACEHOLDER_COLOR;
         }
-        return this.ctx.paint.drawText(text, this.drawTextX, this.drawTextY, this.visibleWidth, this.visibleHeight, {
+        return this.ctx.paint.drawText(text, this.drawTextX, this.drawTextY, visibleWidth, this.visibleHeight, {
             font: BODY_FONT,
             padding: CELL_PADDING,
             align: this.align,
