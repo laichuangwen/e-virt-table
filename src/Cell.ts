@@ -1,4 +1,3 @@
-import { offset } from '@floating-ui/dom';
 import type {
     Column,
     Fixed,
