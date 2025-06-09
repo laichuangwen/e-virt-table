@@ -2,6 +2,14 @@
 
 -   需要展开列的`type=tree`
 -   row 数据中有`children`就有展开
+-   row._hasChildren,隐藏字段懒加载时标识是否还需要加载
+
+## Row
+| 参数         | 说明                       | 类型    | 默认值 |
+| ------------ | -------------------------- | ------- | ------ |
+| children     | 子row 数据                 | array   | —      |
+| _hasChildren | 是否还需要加载，懒加载有效 | boolean | false  |
+
 
 ## Column
 
