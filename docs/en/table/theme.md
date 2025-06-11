@@ -27,8 +27,8 @@ h:500px
 - Note: Custom color configuration passed in config has a higher priority than css
 ``` css
 :root {
-    --evt-header-font: '12px normal Arial';
-    --evt-body-font: '12px normal Arial';
+    --evt-header-font: 12px normal Arial;
+    --evt-body-font: 12px normal Arial;
     --evt-color-white: #fff;
     --evt-color-black: #000000;
     --evt-color-primary: rgb(82, 146, 247);
@@ -45,6 +45,8 @@ h:500px
     --evt-header-bg-color: #f8faff;
     --evt-body-bg-color: #fff;
     --evt-header-text-color: #1d2129;
+    --evt-body-text-color: #4e5969;
+    --evt-footer-text-color: #4e5969;
     --evt-loading-icon-color: #4e5969;
     --evt-expand-icon-color: #4e5969;
     --evt-shrink-icon-color: #4e5969;
@@ -61,7 +63,7 @@ h:500px
     --evt-edit-bg-color: #fcf6ed;
     --evt-checkbox-color: var(--evt-color-primary);
     --evt-readonly-color: #fff;
-    --evt-readonly-text-color: #4e5969;
+    --evt-readonly-text-color: var(--evt-body-text-color);
     --evt-error-tip-color: #ed3f14;
     --evt-footer-bg-color: #fafafa;
     --evt-highlight-hover-row-color: rgba(186, 203, 231, 0.1);

@@ -40,6 +40,8 @@ type EVirtTableOptions = {
 | HEADER_BG_COLOR | Header background color | string | — | #F8FAFF |
 | BODY_BG_COLOR | Body background color | string | — | #F8FAFF |
 | HEADER_TEXT_COLOR | Header text color | string | — | #1D2129 |
+| BODY_TEXT_COLOR | Body text color | string | — | #4E5969 |
+| FOOTER_TEXT_COLOR | Footer text color | string | — | #4E5969 |
 | LOADING_ICON_SVG | Loading SVG icon | string | — | — |
 | LOADING_ICON_COLOR | Color of the loading SVG icon | string | — | — |
 | EXPAND_ICON_SVG | Tree expand SVG icon | string | — | — |

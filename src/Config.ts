@@ -53,6 +53,8 @@ export default class Config {
     HEADER_BG_COLOR = '#F8FAFF';
     BODY_BG_COLOR = '#FFF';
     HEADER_TEXT_COLOR = '#1D2129';
+    BODY_TEXT_COLOR = '#4E5969';
+    FOOTER_TEXT_COLOR = '#4E5969';
     LOADING_ICON_SVG = '';
     LOADING_ICON_COLOR = '#4E5969';
     EXPAND_ICON_SVG = '';
@@ -102,7 +104,7 @@ export default class Config {
     SELECTOR_AREA_MIN_Y = 0; // 选择器Y最小范围
     SELECTOR_AREA_MAX_Y = 0; // 选择器Y最大范围,0默认rowMax
     SELECTOR_AREA_MAX_Y_OFFSET = 0; // 选择器Y最大范围,0默认rowMax
-    ENABLE_AUTO_THEME= true;
+    ENABLE_AUTO_THEME = true;
     ENABLE_SELECTOR_SINGLE = false;
     ENABLE_SELECTOR_SPAN_COL = true;
     ENABLE_SELECTOR_SPAN_ROW = true;
@@ -167,13 +169,14 @@ export default class Config {
     }
     // 同步css 样式变量
     updateCssVar() {
+        let obj: any = {};
         Object.keys(this).forEach((key) => {
-            if (key.endsWith('_COLOR')) {
+            if (key.endsWith('_COLOR') || key.endsWith('_FONT')) {
                 const cssKey = `--evt-${key.toLocaleLowerCase().replace(/_/g, '-')}`;
                 const val = getCssVar(cssKey);
-                (this as any)[key] = val;
+                obj[key] = val;
             }
         });
-        Object.assign(this, this._config);
+        Object.assign(this, obj, this._config);
     }
 }
