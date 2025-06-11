@@ -36,6 +36,7 @@ export class Paint {
         this.ctx = ctx;
     }
     scale(dpr: number) {
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.ctx.scale(dpr, dpr);
     }
     save() {
