@@ -67,7 +67,7 @@ export default class Body {
             // 如果有设置高度的情况，空数据时，高度也要保持为设置的高度
             this.height = HEIGHT - header.height - footerHeight - SCROLLER_TRACK_SIZE;
         }
-        
+
         let containerHeight = this.height + header.height + SCROLLER_TRACK_SIZE;
         // 如果有底部,加上底部高度
         containerHeight += footerHeight;
@@ -101,7 +101,7 @@ export default class Body {
         } else {
             this.visibleHeight = _visibleHeight;
         }
-        if(!this.data.length){
+        if (!this.data.length) {
             this.height = this.visibleHeight;
         }
         this.ctx.body.x = this.x;
@@ -114,8 +114,8 @@ export default class Body {
         const dpr = window.devicePixelRatio || 1; // 获取设备像素比
         const canvasWidth = this.ctx.stageWidth * dpr;
         const canvasHeight = this.ctx.stageHeight * dpr;
-        canvasElement.width = Math.floor(canvasWidth);
-        canvasElement.height = Math.floor(canvasHeight);
+        canvasElement.width = Math.round(canvasWidth);
+        canvasElement.height = Math.round(canvasHeight);
         const isEmpty = !this.data.length ? 'empty' : 'not-empty';
         this.ctx.emit('emptyChange', {
             isEmpty,
@@ -127,10 +127,9 @@ export default class Body {
             height: !this.data.length ? EMPTY_BODY_HEIGHT + footerHeight : 0,
         });
         // 外层容器样式
-        this.ctx.canvasElement.setAttribute(
-            'style',
-            ` height:${this.ctx.stageHeight}px;width:${this.ctx.stageWidth}px;`,
-        );
+        const _cssWidth = Math.round((canvasElement.width / dpr) * 10000) / 10000;
+        const _cssHeight = Math.round((canvasElement.height / dpr) * 10000) / 10000;
+        this.ctx.canvasElement.setAttribute('style', `height:${_cssHeight}px;width:${_cssWidth}px;`);
         this.ctx.paint.scale(dpr);
     }
     // 调整行的高度

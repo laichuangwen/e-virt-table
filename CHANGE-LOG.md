@@ -210,3 +210,8 @@ V1.2.9
 fix: 主题css字体样式失效
 feat: body,footer文本颜色配置
 ---
+
+V1.2.10
+### Bug Fixes
+fix: 浏览器修复部分缩放canvas字体会糊
+---
