@@ -338,6 +338,8 @@ export default class Cell extends BaseCell {
             BODY_CELL_STYLE_METHOD,
             FOOTER_CELL_STYLE_METHOD,
             READONLY_TEXT_COLOR,
+            BODY_TEXT_COLOR,
+            FOOTER_TEXT_COLOR,
             FOOTER_BG_COLOR,
             HIGHLIGHT_SELECTED_ROW,
             HIGHLIGHT_SELECTED_ROW_COLOR,
@@ -348,7 +350,7 @@ export default class Cell extends BaseCell {
         } = this.ctx.config;
         if (this.cellType === 'footer') {
             let bgColor = FOOTER_BG_COLOR;
-            let textColor = READONLY_TEXT_COLOR;
+            let textColor = FOOTER_TEXT_COLOR;
             if (typeof FOOTER_CELL_STYLE_METHOD === 'function') {
                 const footerCellStyleMethod: CellStyleMethod = FOOTER_CELL_STYLE_METHOD;
                 const { backgroundColor, color } =
@@ -408,7 +410,7 @@ export default class Cell extends BaseCell {
         this.drawCellSkyBgColor = drawCellSkyBgColor;
         // 恢复默认背景色
         let bgColor = BODY_BG_COLOR;
-        let textColor = READONLY_TEXT_COLOR;
+        let textColor = BODY_TEXT_COLOR;
         // 只读
         if (!this.ctx.database.getReadonly(this.rowKey, this.key)) {
             bgColor = EDIT_BG_COLOR;

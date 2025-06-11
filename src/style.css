@@ -17,6 +17,8 @@
     --evt-header-bg-color: #f8faff;
     --evt-body-bg-color: #fff;
     --evt-header-text-color: #1d2129;
+    --evt-body-text-color: #4e5969;
+    --evt-footer-text-color: #4e5969;
     --evt-loading-icon-color: #4e5969;
     --evt-expand-icon-color: #4e5969;
     --evt-shrink-icon-color: #4e5969;
@@ -33,7 +35,7 @@
     --evt-edit-bg-color: #fcf6ed;
     --evt-checkbox-color: var(--evt-color-primary);
     --evt-readonly-color: #fff;
-    --evt-readonly-text-color: #4e5969;
+    --evt-readonly-text-color: var(--evt-body-text-color);
     --evt-error-tip-color: #ed3f14;
     --evt-footer-bg-color: #fafafa;
     --evt-highlight-hover-row-color: rgba(186, 203, 231, 0.1);

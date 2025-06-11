@@ -53,6 +53,8 @@ export default class Config {
     HEADER_BG_COLOR = '#F8FAFF';
     BODY_BG_COLOR = '#FFF';
     HEADER_TEXT_COLOR = '#1D2129';
+    BODY_TEXT_COLOR = '#4E5969';
+    FOOTER_TEXT_COLOR = '#4E5969';
     LOADING_ICON_SVG = '';
     LOADING_ICON_COLOR = '#4E5969';
     EXPAND_ICON_SVG = '';

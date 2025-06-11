@@ -208,4 +208,5 @@ docs: 更新tree文档
 V1.2.9
 ### Bug Fixes
 fix: 主题css字体样式失效
+feat: body,footer文本颜色配置
 ---

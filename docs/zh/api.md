@@ -40,6 +40,8 @@ type EVirtTableOptions = {
 | HEADER_BG_COLOR | 表头背景色 | string | #F8FAFF |
 | BODY_BG_COLOR | body 背景色 | string | #F8FAFF |
 | HEADER_TEXT_COLOR | 表头文本颜色 | string | #1D2129 |
+| BODY_TEXT_COLOR | body文本颜色 | string | — | #4E5969 |
+| FOOTER_TEXT_COLOR | footer文本颜色 | string | — | #4E5969 |
 | LOADING_ICON_SVG | 加载 svg 图标 | string | — |
 | LOADING_ICON_COLOR | 加载 svg 图标颜色 | string | — |
 | EXPAND_ICON_SVG | 树形展开svg 图标 | string | — |
