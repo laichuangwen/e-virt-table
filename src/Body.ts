@@ -91,7 +91,7 @@ export default class Body {
         if (stageHeight > 0) {
             // this.ctx.canvasElement.height = stageHeight;
             this.ctx.stageHeight = Math.floor(stageHeight);
-            this.ctx.stageElement.style.height = `${this.ctx.stageHeight - 0.5}px`;
+            this.ctx.stageElement.style.height = `${this.ctx.stageHeight}px`;
         }
         // 可视区高度
         let _visibleHeight = this.ctx.stageHeight - header.height - SCROLLER_TRACK_SIZE;

@@ -71,7 +71,7 @@ export default class Header {
             // this.ctx.canvasElement.width = this.width + SCROLLER_TRACK_SIZE - 1;
             this.ctx.stageWidth = Math.floor(this.width + SCROLLER_TRACK_SIZE);
         }
-        this.ctx.stageElement.style.width = this.ctx.stageWidth - 0.5 + 'px';
+        this.ctx.stageElement.style.width = this.ctx.stageWidth  + 'px';
         this.visibleWidth = this.ctx.stageWidth - SCROLLER_TRACK_SIZE;
 
         // 如果表头宽度小于可视宽度，平均分配
