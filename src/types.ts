@@ -123,6 +123,8 @@ export interface Column {
     hoverIconName?: string;
     placeholder?: string;
     width?: number;
+    minWidth?: number;
+    maxWidth?: number;
     widthFillDisable?: boolean;
     align?: Align;
     verticalAlign?: VerticalAlign;
