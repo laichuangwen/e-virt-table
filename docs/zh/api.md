@@ -239,6 +239,8 @@ type EVirtTableOptions = {
 | hide | 指定列隐藏 | boolean | false |
 | sort | 指定列排序 | number | 0 |
 | width | 列的宽度 | number | 100 |
+| minWidth | 列的最小宽度 | number | —|
+| maxWidth | 列的最大宽度 | number | —|
 | align | 水平对齐方式 | `"left"`, `"center"`, `"right"` | center |
 | verticalAlign | 垂直对齐方式 | `"top"`, `"middle"`, `"bottom"` | middle |
 | fixed | 是否固定列 | `"left"`, `"right"` | — |

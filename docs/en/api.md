@@ -238,6 +238,8 @@ type EVirtTableOptions = {
 | hide | Hide the column | boolean | — | false |
 | sort | Sort order of the column | number | — | 0 |
 | width | Width of the column | number | — | — |
+| minWidth | Min width of the column | number | —|
+| maxWidth | Max width of the column | number | —|
 | align | Horizontal alignment | string | `"left"`, `"center"`, `"right"` | — |
 | verticalAlign | Vertical alignment | string | `"top"`, `"middle"`, `"bottom"` | — |
 | fixed | Fix the column position | string | `"left"`, `"right"` | — |
