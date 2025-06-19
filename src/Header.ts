@@ -132,8 +132,10 @@ export default class Header {
             }
             this.resizeTarget = null;
             this.isResizing = false;
+            this.isMouseDown = false;
             this.ctx.columnResizing = false;
             this.clientX = 0;
+            this.resizeDiff = 0;
         });
         this.ctx.on('mousemove', (e) => {
             // 编辑中不触发mousemove
