@@ -209,6 +209,7 @@ type EVirtTableOptions = {
 | setExpandRowKeys       | Set expanded rows by rowKey   | (rowKeys[], boolean)                                      |
 | toggleRowExpand        | Toggle row expand             | (rowKey, expand)                                          |
 | toggleExpandAll        | Toggle expand all             | boolean                                                   |
+| getExpandRowKeys       | Get expanded keys            | rowkeys[]                                                     |
 | clearSelection         | Clear selection               | —                                                         |
 | toggleRowSelection     | Toggle row selection          | row                                                       |
 | setSelectionByRows     | Set selection by rows         | (rows, selected)                                          |

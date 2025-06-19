@@ -211,6 +211,7 @@ type EVirtTableOptions = {
 | setExpandRowKeys       | 通过 rowKey 设置展开项        | (rowkeys[],boolean)                                       |
 | toggleRowExpand        | 展开项取反                    | (rowKey, expand)                                          |
 | toggleExpandAll        | 展开全部                      | boolean                                                   |
+| getExpandRowKeys       | 获取展开keys                 | rowkeys[]                                                   |
 | clearSelection         | 清除选中                      | —                                                         |
 | toggleRowSelection     | 取反                          | row                                                       |
 | setSelectionByRows     | 设置选中                      | (rows,selected)                                           |

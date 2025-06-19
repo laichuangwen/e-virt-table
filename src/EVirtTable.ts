@@ -336,10 +336,6 @@ export default class EVirtTable {
     getExpandRowKeys() {
         return this.ctx.database.getExpandRowKeys();
     }
-    expandAll(expand: boolean) {
-        this.ctx.database.expandAll(expand);
-        this.ctx.emit('draw');
-    }
     clearSelection() {
         this.ctx.database.clearSelection();
         this.ctx.emit('draw');
