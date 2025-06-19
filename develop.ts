@@ -40,7 +40,6 @@ let columns: Column[] = [
         // operation: true,
         readonly: true,
         width: 120,
-        maxWidth: 60,
         type: 'tree',
         fixed: 'left',
         sort: 4,
@@ -361,7 +360,29 @@ for (let i = 0; i < 10000; i += 1) {
         customerRemarks: `测试测试${i}`,
         purchasePrice: 10.2 + i,
         salePrice: 12.3 + i,
-        children: [],
+        children: [
+            {
+                id: `${i}-1`,
+                emp_no: `${i}-1`,
+                emp_name: `张三${i}-1`,
+                children: [],
+                _hasChildren: true,
+            },
+            {
+                id: `${i}-2`,
+                emp_no: `${i}-2`,
+                emp_name: `张三${i}-2`,
+                children: [
+                    {
+                        id: `${i}-2-1`,
+                        emp_no: `${i}-2-1`,
+                        emp_name: `张三${i}-2-1`,
+                        children: [],
+                        _hasChildren: true,
+                    },
+                ],
+            },
+        ],
         _hasChildren: true,
     });
 }
@@ -408,14 +429,13 @@ const eVirtTable = new EVirtTable(canvas, {
         ENABLE_KEYBOARD: true,
         ENABLE_HISTORY: true,
         ENABLE_OFFSET_HEIGHT: true,
-        HIGHLIGHT_SELECTED_ROW: true,
+        HIGHLIGHT_SELECTED_ROW: false,
         HIGHLIGHT_HOVER_ROW: true,
         ENABLE_MERGE_CELL_LINK: true,
         ENABLE_EDIT_SINGLE_CLICK: false,
         FOOTER_FIXED: true,
         ENABLE_COPY: true,
         ENABLE_PASTER: true,
-
         FOOTER_POSITION: 'bottom',
         OFFSET_HEIGHT: 16,
         // SELECTOR_AREA_MAX_X_OFFSET: 1,
@@ -894,6 +914,11 @@ document.getElementById('updateCssVar')?.addEventListener('click', () => {
         document.documentElement.classList.add('dark');
     }
 });
+let falg = false;
+document.getElementById('expandAll')?.addEventListener('click', () => {
+    falg = !falg;
+    eVirtTable.expandAll(falg)
+});
 document.getElementById('setValidator')?.addEventListener('click', () => {
     const errors = [
         {
@@ -930,6 +955,74 @@ document.getElementById('setConfig')?.addEventListener('click', () => {
             },
         ],
     });
+});
+document.getElementById('loadData')?.addEventListener('click', () => {
+    let data: any[] = [];
+    for (let i = 0; i < 10000; i += 1) {
+        data.push({
+            _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
+            id: `1_${i}`,
+            // _readonly: true,
+            emp_name: `张三${i % 5 ? 1 : 0}`,
+            emp_name11: `张三${i % 5 ? 1 : 0}`,
+            emp_name221: `张三${i % 5 ? 1 : 0}`,
+            emp_name222: `张三${i % 5 ? 1 : 0}`,
+            emp_name2: `张三${i % 5 ? 1 : 0}`,
+            emp_no: i,
+            dep_name: ['zhinan', 'shejiyuanze', 'yizhi'],
+            job_name: i === 5 ? '产品经理测试很长的名字' : `产品经理${i}`,
+            phone: i === 4 ? '13159645561a' : `${13159645561 + i}`,
+            // eslint-disable-next-line no-nested-ternary
+            sex: i % 4 === 0 ? 1 : i === 3 ? null : 2,
+            address:
+                // eslint-disable-next-line no-nested-ternary
+                i === 1 ? `海淀区北京路海淀区北京路十分地${i}号` : i === 4 ? '' : `海淀区北京路${i}号`,
+            work_type: `兼职${i}`,
+            work_status: `在职${i}`,
+            household_city: `深圳${i}`,
+            household_address: `深南大道${i}号`,
+            nation: `汉${i}`,
+            work_address: `南京路${i}号`,
+            work_email: `${28976633 + i}@qq.com`,
+            email: `${4465566 + i}@qq.com`,
+            work_age: 2 + i,
+            company_age: 1 + i,
+            contract_company: `飞鸟物流公司${i}`,
+            qq: 35860567 + i,
+            salary_month: `${1996 + i}-09`,
+            birthday: `${1996 + i}-09-21`,
+            age: 1 + i,
+            brandName: `博世${i}`,
+            goodsName: `电钻${i}`,
+            sn: `SDFSD${i}`,
+            materialNo: `1231${i}`,
+            unit: '个',
+            requiredQuantity: 10,
+            customerRemarks: `测试测试${i}`,
+            purchasePrice: 10.2 + i,
+            salePrice: 12.3 + i,
+            children: [
+                {
+                    id: `${i}-1`,
+                    emp_no: `${i}-1`,
+                    emp_name: `张三${i}-1`,
+                },
+                {
+                    id: `${i}-2`,
+                    emp_no: `${i}-2`,
+                    emp_name: `张三${i}-2`,
+                    children: [
+                        {
+                            id: `${i}-2-1`,
+                            emp_no: `${i}-2-1`,
+                            emp_name: `张三${i}-2-1`,
+                        },
+                    ],
+                },
+            ],
+        });
+    }
+    eVirtTable.loadData(data);
 });
 // 销毁
 function destroy() {

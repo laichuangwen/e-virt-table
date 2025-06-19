@@ -16,6 +16,7 @@ import type {
     SelectionMap,
     ErrorType,
     BeforeChangeItem,
+    ExpandMap,
 } from './types';
 import { generateShortUUID } from './util';
 import { HistoryItemData } from './History';
@@ -33,6 +34,7 @@ export default class Database {
     private rowKeyRowIndexMap = new Map<string, number>();
     private checkboxKeyMap = new Map<string, string[]>();
     private selectionMap = new Map<string, SelectionMap>();
+    private expandMap = new Map<string, ExpandMap>();
     private originalDataMap = new Map<string, any>();
     private changedDataMap = new Map<string, any>();
     private validationErrorMap = new Map<string, ValidateError[]>();
@@ -84,10 +86,13 @@ export default class Database {
      */
     private initData(dataList: any[], level: number = 0) {
         dataList.forEach((item, index) => {
-            let hasChildren = item._hasChildren || false;
-            if (Array.isArray(item.children) && item.children.length) {
-                hasChildren = true;
-                this.initData(item.children, level + 1);
+            let hasChildren = false;
+            if (Array.isArray(item.children)) {
+                hasChildren = item._hasChildren;
+                if (item.children.length) {
+                    hasChildren = true;
+                    this.initData(item.children, level + 1);
+                }
             }
             const { ROW_KEY = '', DEFAULT_EXPAND_ALL, CELL_HEIGHT, SELECTABLE_METHOD, CHECKBOX_KEY } = this.ctx.config;
             const _rowKey = item[ROW_KEY]; // 行唯一标识,否则就rowKey
@@ -117,6 +122,12 @@ export default class Database {
                 row: item,
                 check: this.selectionMap.get(rowKey)?.check || false,
             });
+            const expand = DEFAULT_EXPAND_ALL || this.expandMap.get(rowKey)?.expand || item._expand || false;
+            this.expandMap.set(rowKey, {
+                key: rowKey,
+                row: item,
+                expand,
+            });
             this.rowKeyMap.set(rowKey, {
                 readonly,
                 index,
@@ -125,7 +136,7 @@ export default class Database {
                 height,
                 check: false,
                 selectable,
-                expand: DEFAULT_EXPAND_ALL,
+                expand,
                 expandLazy: false,
                 hasChildren,
                 expandLoading: false,
@@ -271,12 +282,22 @@ export default class Database {
     expandItem(rowKey: string, expand = false) {
         const row = this.rowKeyMap.get(rowKey);
         row.expand = expand;
+        this.expandMap.set(rowKey, {
+            key: rowKey,
+            row: row.item,
+            expand: expand,
+        });
         this.clearBufferData(); // 清除缓存数据
         this.ctx.emit('draw');
     }
     setExpandRowKeys(rowKeys: any[], expand = true) {
         rowKeys.forEach((rowkey) => {
             const row = this.rowKeyMap.get(rowkey);
+            this.expandMap.set(rowkey, {
+                key: rowkey,
+                row: row.item,
+                expand: expand,
+            });
             row.expand = expand;
         });
         this.clearBufferData(); // 清除缓存数据
@@ -294,6 +315,11 @@ export default class Database {
     expandAll(expand: boolean) {
         this.rowKeyMap.forEach((row: any) => {
             row.expand = expand;
+            this.expandMap.set(row.key, {
+                key: row.key,
+                row: row.item,
+                expand,
+            });
         });
         this.clearBufferData(); // 清除缓存数据
         this.ctx.emit('draw');
@@ -307,6 +333,11 @@ export default class Database {
     setExpandChildren(rowKey: string, children: any[]) {
         const row = this.rowKeyMap.get(rowKey);
         row.expand = true;
+        this.expandMap.set(rowKey, {
+            key: rowKey,
+            row: row.item,
+            expand: true,
+        });
         row.expandLazy = true;
         row.item.children = children;
         this.initData(row.item.children, row.level + 1);
