@@ -171,6 +171,11 @@ export type CellParams = {
     column: Column;
     value: any;
 };
+export type RowParams = {
+    row: any;
+    rowIndex: number;
+    rowKey: string;
+};
 export type CellHeaderParams = {
     colIndex: number;
     column: Column;

@@ -408,7 +408,7 @@ const eVirtTable = new EVirtTable(canvas, {
         ENABLE_KEYBOARD: true,
         ENABLE_HISTORY: true,
         ENABLE_OFFSET_HEIGHT: true,
-        HIGHLIGHT_SELECTED_ROW: false,
+        HIGHLIGHT_SELECTED_ROW: true,
         HIGHLIGHT_HOVER_ROW: true,
         ENABLE_MERGE_CELL_LINK: true,
         ENABLE_EDIT_SINGLE_CLICK: false,
@@ -601,54 +601,54 @@ const eVirtTable = new EVirtTable(canvas, {
                 return true;
             }
         },
-        // SPAN_METHOD: (params) => {
-        //     const { mergeColCell, mergeRowCell } = eVirtTable.getUtils();
-        //     const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;
-        //     if (
-        //         [
-        //             // 'selection',
-        //             'unit',
-        //             'work_type',
-        //             'household_city',
-        //             'household_address',
-        //             'requiredQuantity',
-        //             'work_status',
-        //             'materialNo',
-        //         ].includes(column.key)
-        //     ) {
-        //         // 合并行单元格
-        //         return mergeRowCell(params, column.key, ['emp_name', column.key]);
-        //     }
-        //     if (column.key === 'emp_name') {
-        //         // 合并行单元格
-        //         return mergeRowCell(params, 'emp_name', ['emp_name']);
-        //     }
-        //     if (column.key === 'phone') {
-        //         // 合并行单元格
-        //         return mergeRowCell(params, 'emp_name', ['emp_name', 'phone']);
-        //     }
-        //     if (['emp_name221', 'emp_name222', 'emp_name2'].includes(column.key)) {
-        //         return mergeColCell(params, ['emp_name221', 'emp_name222', 'emp_name2']);
-        //     }
-        //     // if (column.key === 'selection') {
-        //     //     // 合并行单元格
-        //     //     return mergeRowCell(params, 'emp_name');
-        //     // }
-        //     // // 合并动态列单元格
-        //     // if (colIndex > 4) {
-        //     //   const spanObj = getSpanObjByColumn(row, visibleLeafColumns);
-        //     //   if (spanObj[column.key] === 0) {
-        //     //     return {
-        //     //       rowspan: 0,
-        //     //       colspan: 0,
-        //     //     };
-        //     //   }
-        //     //   return {
-        //     //     rowspan: 1,
-        //     //     colspan: spanObj[column.key],
-        //     //   };
-        //     // }
-        // },
+        SPAN_METHOD: (params) => {
+            const { mergeColCell, mergeRowCell } = eVirtTable.getUtils();
+            const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;
+            if (
+                [
+                    // 'selection',
+                    'unit',
+                    'work_type',
+                    'household_city',
+                    'household_address',
+                    'requiredQuantity',
+                    'work_status',
+                    'materialNo',
+                ].includes(column.key)
+            ) {
+                // 合并行单元格
+                return mergeRowCell(params, column.key, ['emp_name', column.key]);
+            }
+            if (column.key === 'emp_name') {
+                // 合并行单元格
+                return mergeRowCell(params, 'emp_name', ['emp_name']);
+            }
+            if (column.key === 'phone') {
+                // 合并行单元格
+                return mergeRowCell(params, 'emp_name', ['emp_name', 'phone']);
+            }
+            if (['emp_name221', 'emp_name222', 'emp_name2'].includes(column.key)) {
+                return mergeColCell(params, ['emp_name221', 'emp_name222', 'emp_name2']);
+            }
+            // if (column.key === 'selection') {
+            //     // 合并行单元格
+            //     return mergeRowCell(params, 'emp_name');
+            // }
+            // // 合并动态列单元格
+            // if (colIndex > 4) {
+            //   const spanObj = getSpanObjByColumn(row, visibleLeafColumns);
+            //   if (spanObj[column.key] === 0) {
+            //     return {
+            //       rowspan: 0,
+            //       colspan: 0,
+            //     };
+            //   }
+            //   return {
+            //     rowspan: 1,
+            //     colspan: spanObj[column.key],
+            //   };
+            // }
+        },
     },
 });
 eVirtTable.on('error', (error) => {
@@ -778,6 +778,9 @@ document.getElementById('search')?.addEventListener('click', () => {
     eVirtTable.filterMethod((list) => {
         return list.filter((item) => item.emp_name.includes(text?.value));
     });
+});
+document.getElementById('getCurrentRow')?.addEventListener('click', () => {
+    console.log(eVirtTable.getCurrentRow());
 });
 document.getElementById('pre')?.addEventListener('click', () => {
     let data: any[] = [];

@@ -4,7 +4,7 @@ import EventBrowser from './EventBrowser';
 import EventBus, { EventCallback } from './EventBus';
 import Paint from './Paint';
 import Config from './Config';
-import { ChangeItem, Column, EVirtTableOptions } from './types';
+import { ChangeItem, Column, EVirtTableOptions, RowParams } from './types';
 import Icons from './Icons';
 import CellHeader from './CellHeader';
 import Row from './Row';
@@ -107,6 +107,7 @@ export default class Context {
     hoverRow?: Row;
     clickCell?: Cell;
     focusCell?: Cell;
+    currentCell?: Cell;
     hoverCell?: Cell;
     clickCellHeader?: CellHeader;
     focusCellHeader?: CellHeader;
@@ -232,8 +233,14 @@ export default class Context {
         if (this.focusCell === cell) return;
         if (this.focusCell?.rowKey !== cell.rowKey) {
             // 提前设置一下，保证rowFocusChange事件，能用focusCell
-            this.focusCell = cell;
+            this.currentCell = cell;
             this.emit('rowFocusChange', cell);
+            const data: RowParams = {
+                rowIndex: cell.rowIndex,
+                rowKey: cell.rowKey,
+                row: cell.row,
+            };
+            this.emit('currentRowChange', data);
         }
         this.focusCell = cell;
         this.emit('cellFocusChange', cell);

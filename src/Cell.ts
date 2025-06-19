@@ -378,8 +378,8 @@ export default class Cell extends BaseCell {
         // 高亮行,在背景色上加一层颜色
         let drawCellSkyBgColor = 'transparent';
         // 高亮行
-        const focusCell = this.ctx.focusCell;
         const hoverCell = this.ctx.hoverCell;
+        const currentCell = this.ctx.currentCell;
         // 合并单元格
         let minY = this.rowIndex;
         let maxY = this.rowIndex;
@@ -398,11 +398,11 @@ export default class Cell extends BaseCell {
             }
         }
 
-        if (HIGHLIGHT_SELECTED_ROW && focusCell) {
-            if (focusCell.rowKey === this.rowKey) {
+        if (HIGHLIGHT_SELECTED_ROW && currentCell) {
+            if (currentCell.rowKey === this.rowKey) {
                 drawCellSkyBgColor = HIGHLIGHT_SELECTED_ROW_COLOR;
             }
-            if (focusCell.rowIndex >= minY && focusCell.rowIndex <= maxY) {
+            if (currentCell.rowIndex >= minY && currentCell.rowIndex <= maxY) {
                 drawCellSkyBgColor = HIGHLIGHT_SELECTED_ROW_COLOR;
             }
         }
