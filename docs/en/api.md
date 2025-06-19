@@ -160,6 +160,7 @@ type EVirtTableOptions = {
 | cellClick | Callback for body cell click | — |
 | cellHoverChange | Callback for cell hover | — |
 | cellHeaderHoverChange | Callback for header cell hover | — |
+| currentRowChange | Highlighted row callback | — |
 | mouseup | Callback for mouse up | — |
 | click | Callback for click | — |
 | dblclick | Callback for double click | — |
@@ -213,6 +214,9 @@ type EVirtTableOptions = {
 | setSelectionByRows     | Set selection by rows         | (rows, selected)                                          |
 | setSelectionByRowKeys  | Set selection by row keys     | (rowKeys, selected)                                       |
 | getSelectionRows       | Get selected rows             | —                                                         |
+| setCurrentRow          | Highlight the current row by setting rowkey   |—                                          |
+| setCurrentRowByRowIndex| Highlight the current row by setting rowindex     |—                                      |
+| getCurrentRow          | Get Current Row          | —                                                     |
 | toggleAllSelection     | Toggle selection for all rows | —                                                         |
 | getPositionForRowIndex | Get position for row index    | —                                                         |
 | getCellValue           | Get cell value by rowKey and key | (rowKey, key)                                           |

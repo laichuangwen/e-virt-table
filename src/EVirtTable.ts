@@ -187,7 +187,7 @@ export default class EVirtTable {
     getChangedRows() {
         return this.ctx.database.getChangedRows();
     }
-    setCurrentRowByIndex(rowIndex: number) {
+    setCurrentRowByRowIndex(rowIndex: number) {
         this.ctx.currentCell = this.ctx.database.getVirtualBodyCell(rowIndex, 0);
         this.ctx.emit('draw');
     }

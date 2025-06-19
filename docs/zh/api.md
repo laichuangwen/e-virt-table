@@ -161,6 +161,7 @@ type EVirtTableOptions = {
 | cellClick | body格子按下回调 | — |
 | cellHoverChange | 格子hover回调 | — |
 | cellHeaderHoverChange | 表头格子hover回调 | — |
+| currentRowChange | 选中高亮行回调 | — |
 | mouseup | mouseup回调 | — |
 | click | click回调 | — |
 | dblclick | dblclick回调 | — |
@@ -215,6 +216,9 @@ type EVirtTableOptions = {
 | setSelectionByRows     | 设置选中                      | (rows,selected)                                           |
 | setSelectionByRowKeys  | 通过 RowKeys 设置选中         | (RowKeys,selected)                                        |
 | getSelectionRows       | 获取选中                      | —                                                         |
+| setCurrentRow          | 通过rowkey设置高亮当前行          | —                                                      |
+| setCurrentRowByRowIndex| 通过rowIndex设置高亮当前行    | —                                                     |
+| getCurrentRow          | 获取高亮当前行数据          | —                                                     |
 | toggleAllSelection     | 切换所有行的选中状态          | —                                                         |
 | getPositionForRowIndex | 获取当前行的高度定位          | —                                                         |
 | getCellValue           | 通过 rowKey 和 key 获取格子值 | (rowKey, key)                                             |
