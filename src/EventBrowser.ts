@@ -80,6 +80,7 @@ export default class EventBrowser {
         this.ctx.emit('touchmove', e);
     }
     private handleContextMenu(e: Event) {
+        e.preventDefault();
         this.ctx.emit('contextMenu', e);
     }
     private handleMouseover(e: Event) {

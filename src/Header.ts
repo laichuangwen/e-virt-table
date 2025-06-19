@@ -55,7 +55,16 @@ export default class Header {
         const maxHeaderRow = getMaxRow(columns);
         const leafColumns = toLeaf(columns);
         this.height = HEADER_HEIGHT * maxHeaderRow;
-        this.width = leafColumns.reduce((sum, _item) => sum + (_item?.width || 100), 0);
+        this.width = leafColumns.reduce((sum, _item) => {
+            const { width = 100, maxWidth, minWidth } = _item;
+            if (maxWidth && width > maxWidth) {
+                return sum + maxWidth;
+            }
+            if (minWidth && width < minWidth) {
+                return sum + minWidth;
+            }
+            return sum + width;
+        }, 0);
         this.visibleHeight = this.height;
         const spanColumns = sortFixed(calCrossSpan(columns, maxHeaderRow));
         this.columnIndex = 0;
@@ -71,7 +80,7 @@ export default class Header {
             // this.ctx.canvasElement.width = this.width + SCROLLER_TRACK_SIZE - 1;
             this.ctx.stageWidth = Math.floor(this.width + SCROLLER_TRACK_SIZE);
         }
-        this.ctx.stageElement.style.width = this.ctx.stageWidth - 0.5 + 'px';
+        this.ctx.stageElement.style.width = this.ctx.stageWidth + 'px';
         this.visibleWidth = this.ctx.stageWidth - SCROLLER_TRACK_SIZE;
 
         // 如果表头宽度小于可视宽度，平均分配
@@ -123,8 +132,10 @@ export default class Header {
             }
             this.resizeTarget = null;
             this.isResizing = false;
+            this.isMouseDown = false;
             this.ctx.columnResizing = false;
             this.clientX = 0;
+            this.resizeDiff = 0;
         });
         this.ctx.on('mousemove', (e) => {
             // 编辑中不触发mousemove
@@ -136,9 +147,17 @@ export default class Header {
             // 鼠标移动
             if (this.isResizing && this.resizeTarget) {
                 const resizeTargetWidth = this.resizeTarget.width;
+                const resizeTargetMinWidth = this.resizeTarget.minWidth;
+                const resizeTargetMaxWidth = this.resizeTarget.maxWidth;
                 let diff = e.clientX - this.clientX;
                 if (diff + resizeTargetWidth < RESIZE_COLUMN_MIN_WIDTH) {
                     diff = -(resizeTargetWidth - RESIZE_COLUMN_MIN_WIDTH);
+                }
+                if (resizeTargetMinWidth && diff + resizeTargetWidth < resizeTargetMinWidth) {
+                    diff = -(resizeTargetWidth - resizeTargetMinWidth);
+                }
+                if (resizeTargetMaxWidth && diff + resizeTargetWidth > resizeTargetMaxWidth) {
+                    diff = resizeTargetMaxWidth - resizeTargetWidth;
                 }
                 this.resizeDiff = diff;
                 this.ctx.emit('draw');
@@ -260,7 +279,14 @@ export default class Header {
             const item = arr[i];
             const height = HEADER_HEIGHT * (item.rowspan || 0);
             const y = HEADER_HEIGHT * (item.level || 0);
+            let { minWidth, maxWidth } = item;
             let width = item.width || 100; // 读取映射宽度
+            if (minWidth && width < minWidth) {
+                width = minWidth;
+            }
+            if (maxWidth && width > maxWidth) {
+                width = maxWidth;
+            }
             if (item.children) {
                 // 父级表头的宽度是叶子节点表头的宽度总和
                 const _arr = toLeaf(item.children);

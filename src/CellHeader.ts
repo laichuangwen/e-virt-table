@@ -6,6 +6,8 @@ export default class CellHeader extends BaseCell {
     align: Align;
     verticalAlign: VerticalAlign = 'middle';
     fixed?: Fixed;
+    minWidth?: number;
+    maxWidth?: number;
     widthFillDisable: boolean;
     type: Type | '';
     operation = false;
@@ -46,6 +48,8 @@ export default class CellHeader extends BaseCell {
         this.height = height;
         this.colIndex = colIndex;
         this.key = column.key;
+        this.minWidth = column.minWidth;
+        this.maxWidth = column.maxWidth;
         this.type = column.type || '';
         this.editorType = column.editorType || 'text';
         this.align = column.align || 'center';

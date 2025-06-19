@@ -6,6 +6,7 @@ import {
     EVirtTableOptions,
     FilterMethod,
     Position,
+    RowParams,
     ValidateField,
     ValidateItemError,
 } from './types';
@@ -186,6 +187,30 @@ export default class EVirtTable {
     getChangedRows() {
         return this.ctx.database.getChangedRows();
     }
+    setCurrentRowByRowIndex(rowIndex: number) {
+        this.ctx.currentCell = this.ctx.database.getVirtualBodyCell(rowIndex, 0);
+        this.ctx.emit('draw');
+    }
+    setCurrentRow(rowKey: string) {
+        const column = this.ctx.database.getColumnByColIndex(0);
+        if (!column) {
+            return;
+        }
+        this.ctx.currentCell = this.ctx.database.getVirtualBodyCellByKey(rowKey, column.key);
+        this.ctx.emit('draw');
+    }
+    getCurrentRow() {
+        const cell = this.ctx.currentCell;
+        if (!cell) {
+            return;
+        }
+        const rowData: RowParams = {
+            row: cell.row,
+            rowIndex: cell.rowIndex,
+            rowKey: cell.rowKey,
+        };
+        return rowData;
+    }
     clearValidate() {
         this.ctx.database.clearValidate();
         this.ctx.emit('draw');
@@ -307,6 +332,9 @@ export default class EVirtTable {
     }
     setExpandRowKeys(keys: any[], expand = true) {
         this.ctx.database.setExpandRowKeys(keys, expand);
+    }
+    getExpandRowKeys() {
+        return this.ctx.database.getExpandRowKeys();
     }
     clearSelection() {
         this.ctx.database.clearSelection();

@@ -161,6 +161,7 @@ type EVirtTableOptions = {
 | cellClick | body格子按下回调 | — |
 | cellHoverChange | 格子hover回调 | — |
 | cellHeaderHoverChange | 表头格子hover回调 | — |
+| currentRowChange | 选中高亮行回调 | — |
 | mouseup | mouseup回调 | — |
 | click | click回调 | — |
 | dblclick | dblclick回调 | — |
@@ -210,11 +211,15 @@ type EVirtTableOptions = {
 | setExpandRowKeys       | 通过 rowKey 设置展开项        | (rowkeys[],boolean)                                       |
 | toggleRowExpand        | 展开项取反                    | (rowKey, expand)                                          |
 | toggleExpandAll        | 展开全部                      | boolean                                                   |
+| getExpandRowKeys       | 获取展开keys                 | rowkeys[]                                                   |
 | clearSelection         | 清除选中                      | —                                                         |
 | toggleRowSelection     | 取反                          | row                                                       |
 | setSelectionByRows     | 设置选中                      | (rows,selected)                                           |
 | setSelectionByRowKeys  | 通过 RowKeys 设置选中         | (RowKeys,selected)                                        |
 | getSelectionRows       | 获取选中                      | —                                                         |
+| setCurrentRow          | 通过rowkey设置高亮当前行          | —                                                      |
+| setCurrentRowByRowIndex| 通过rowIndex设置高亮当前行    | —                                                     |
+| getCurrentRow          | 获取高亮当前行数据          | —                                                     |
 | toggleAllSelection     | 切换所有行的选中状态          | —                                                         |
 | getPositionForRowIndex | 获取当前行的高度定位          | —                                                         |
 | getCellValue           | 通过 rowKey 和 key 获取格子值 | (rowKey, key)                                             |
@@ -234,6 +239,8 @@ type EVirtTableOptions = {
 | hide | 指定列隐藏 | boolean | false |
 | sort | 指定列排序 | number | 0 |
 | width | 列的宽度 | number | 100 |
+| minWidth | 列的最小宽度 | number | —|
+| maxWidth | 列的最大宽度 | number | —|
 | align | 水平对齐方式 | `"left"`, `"center"`, `"right"` | center |
 | verticalAlign | 垂直对齐方式 | `"top"`, `"middle"`, `"bottom"` | middle |
 | fixed | 是否固定列 | `"left"`, `"right"` | — |

@@ -16,15 +16,17 @@ let columns: Column[] = [
         key: 'selection',
         type: 'selection',
         fixed: 'left',
-        width: 50,
+        maxWidth: 60,
         operation: true,
-        widthFillDisable: true,
+        // widthFillDisable: true,
     },
     {
         key: 'id',
         width: 100,
         title: 'ID',
         fixed: 'left',
+        minWidth: 80,
+        maxWidth: 200,
     },
     // {
     //   key: "selection",
@@ -37,6 +39,7 @@ let columns: Column[] = [
         key: 'emp_no',
         // operation: true,
         readonly: true,
+        width: 120,
         type: 'tree',
         fixed: 'left',
         sort: 4,
@@ -357,7 +360,29 @@ for (let i = 0; i < 10000; i += 1) {
         customerRemarks: `测试测试${i}`,
         purchasePrice: 10.2 + i,
         salePrice: 12.3 + i,
-        children: [],
+        children: [
+            {
+                id: `${i}-1`,
+                emp_no: `${i}-1`,
+                emp_name: `张三${i}-1`,
+                children: [],
+                _hasChildren: true,
+            },
+            {
+                id: `${i}-2`,
+                emp_no: `${i}-2`,
+                emp_name: `张三${i}-2`,
+                children: [
+                    {
+                        id: `${i}-2-1`,
+                        emp_no: `${i}-2-1`,
+                        emp_name: `张三${i}-2-1`,
+                        children: [],
+                        _hasChildren: true,
+                    },
+                ],
+            },
+        ],
         _hasChildren: true,
     });
 }
@@ -397,7 +422,6 @@ const eVirtTable = new EVirtTable(canvas, {
         // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
         ROW_KEY: 'id',
-        ENABLE_RESERVE_SELECTION: true,
         CELL_HEIGHT: 36,
         SELECTOR_AREA_MIN_X: 0,
         ENABLE_AUTOFILL: true,
@@ -412,7 +436,6 @@ const eVirtTable = new EVirtTable(canvas, {
         FOOTER_FIXED: true,
         ENABLE_COPY: true,
         ENABLE_PASTER: true,
-
         FOOTER_POSITION: 'bottom',
         OFFSET_HEIGHT: 16,
         // SELECTOR_AREA_MAX_X_OFFSET: 1,
@@ -598,54 +621,54 @@ const eVirtTable = new EVirtTable(canvas, {
                 return true;
             }
         },
-        // SPAN_METHOD: (params) => {
-        //     const { mergeColCell, mergeRowCell } = eVirtTable.getUtils();
-        //     const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;
-        //     if (
-        //         [
-        //             // 'selection',
-        //             'unit',
-        //             'work_type',
-        //             'household_city',
-        //             'household_address',
-        //             'requiredQuantity',
-        //             'work_status',
-        //             'materialNo',
-        //         ].includes(column.key)
-        //     ) {
-        //         // 合并行单元格
-        //         return mergeRowCell(params, column.key, ['emp_name', column.key]);
-        //     }
-        //     if (column.key === 'emp_name') {
-        //         // 合并行单元格
-        //         return mergeRowCell(params, 'emp_name', ['emp_name']);
-        //     }
-        //     if (column.key === 'phone') {
-        //         // 合并行单元格
-        //         return mergeRowCell(params, 'emp_name', ['emp_name', 'phone']);
-        //     }
-        //     if (['emp_name221', 'emp_name222', 'emp_name2'].includes(column.key)) {
-        //         return mergeColCell(params, ['emp_name221', 'emp_name222', 'emp_name2']);
-        //     }
-        //     // if (column.key === 'selection') {
-        //     //     // 合并行单元格
-        //     //     return mergeRowCell(params, 'emp_name');
-        //     // }
-        //     // // 合并动态列单元格
-        //     // if (colIndex > 4) {
-        //     //   const spanObj = getSpanObjByColumn(row, visibleLeafColumns);
-        //     //   if (spanObj[column.key] === 0) {
-        //     //     return {
-        //     //       rowspan: 0,
-        //     //       colspan: 0,
-        //     //     };
-        //     //   }
-        //     //   return {
-        //     //     rowspan: 1,
-        //     //     colspan: spanObj[column.key],
-        //     //   };
-        //     // }
-        // },
+        SPAN_METHOD: (params) => {
+            const { mergeColCell, mergeRowCell } = eVirtTable.getUtils();
+            const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;
+            if (
+                [
+                    // 'selection',
+                    'unit',
+                    'work_type',
+                    'household_city',
+                    'household_address',
+                    'requiredQuantity',
+                    'work_status',
+                    'materialNo',
+                ].includes(column.key)
+            ) {
+                // 合并行单元格
+                return mergeRowCell(params, column.key, ['emp_name', column.key]);
+            }
+            if (column.key === 'emp_name') {
+                // 合并行单元格
+                return mergeRowCell(params, 'emp_name', ['emp_name']);
+            }
+            if (column.key === 'phone') {
+                // 合并行单元格
+                return mergeRowCell(params, 'emp_name', ['emp_name', 'phone']);
+            }
+            if (['emp_name221', 'emp_name222', 'emp_name2'].includes(column.key)) {
+                return mergeColCell(params, ['emp_name221', 'emp_name222', 'emp_name2']);
+            }
+            // if (column.key === 'selection') {
+            //     // 合并行单元格
+            //     return mergeRowCell(params, 'emp_name');
+            // }
+            // // 合并动态列单元格
+            // if (colIndex > 4) {
+            //   const spanObj = getSpanObjByColumn(row, visibleLeafColumns);
+            //   if (spanObj[column.key] === 0) {
+            //     return {
+            //       rowspan: 0,
+            //       colspan: 0,
+            //     };
+            //   }
+            //   return {
+            //     rowspan: 1,
+            //     colspan: spanObj[column.key],
+            //   };
+            // }
+        },
     },
 });
 eVirtTable.on('error', (error) => {
@@ -776,6 +799,9 @@ document.getElementById('search')?.addEventListener('click', () => {
         return list.filter((item) => item.emp_name.includes(text?.value));
     });
 });
+document.getElementById('getCurrentRow')?.addEventListener('click', () => {
+    console.log(eVirtTable.getCurrentRow());
+});
 document.getElementById('pre')?.addEventListener('click', () => {
     let data: any[] = [];
     for (let i = 0; i < 800; i += 1) {
@@ -888,6 +914,11 @@ document.getElementById('updateCssVar')?.addEventListener('click', () => {
         document.documentElement.classList.add('dark');
     }
 });
+let falg = false;
+document.getElementById('expandAll')?.addEventListener('click', () => {
+    falg = !falg;
+    eVirtTable.expandAll(falg)
+});
 document.getElementById('setValidator')?.addEventListener('click', () => {
     const errors = [
         {
@@ -924,6 +955,74 @@ document.getElementById('setConfig')?.addEventListener('click', () => {
             },
         ],
     });
+});
+document.getElementById('loadData')?.addEventListener('click', () => {
+    let data: any[] = [];
+    for (let i = 0; i < 10000; i += 1) {
+        data.push({
+            _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
+            id: `1_${i}`,
+            // _readonly: true,
+            emp_name: `张三${i % 5 ? 1 : 0}`,
+            emp_name11: `张三${i % 5 ? 1 : 0}`,
+            emp_name221: `张三${i % 5 ? 1 : 0}`,
+            emp_name222: `张三${i % 5 ? 1 : 0}`,
+            emp_name2: `张三${i % 5 ? 1 : 0}`,
+            emp_no: i,
+            dep_name: ['zhinan', 'shejiyuanze', 'yizhi'],
+            job_name: i === 5 ? '产品经理测试很长的名字' : `产品经理${i}`,
+            phone: i === 4 ? '13159645561a' : `${13159645561 + i}`,
+            // eslint-disable-next-line no-nested-ternary
+            sex: i % 4 === 0 ? 1 : i === 3 ? null : 2,
+            address:
+                // eslint-disable-next-line no-nested-ternary
+                i === 1 ? `海淀区北京路海淀区北京路十分地${i}号` : i === 4 ? '' : `海淀区北京路${i}号`,
+            work_type: `兼职${i}`,
+            work_status: `在职${i}`,
+            household_city: `深圳${i}`,
+            household_address: `深南大道${i}号`,
+            nation: `汉${i}`,
+            work_address: `南京路${i}号`,
+            work_email: `${28976633 + i}@qq.com`,
+            email: `${4465566 + i}@qq.com`,
+            work_age: 2 + i,
+            company_age: 1 + i,
+            contract_company: `飞鸟物流公司${i}`,
+            qq: 35860567 + i,
+            salary_month: `${1996 + i}-09`,
+            birthday: `${1996 + i}-09-21`,
+            age: 1 + i,
+            brandName: `博世${i}`,
+            goodsName: `电钻${i}`,
+            sn: `SDFSD${i}`,
+            materialNo: `1231${i}`,
+            unit: '个',
+            requiredQuantity: 10,
+            customerRemarks: `测试测试${i}`,
+            purchasePrice: 10.2 + i,
+            salePrice: 12.3 + i,
+            children: [
+                {
+                    id: `${i}-1`,
+                    emp_no: `${i}-1`,
+                    emp_name: `张三${i}-1`,
+                },
+                {
+                    id: `${i}-2`,
+                    emp_no: `${i}-2`,
+                    emp_name: `张三${i}-2`,
+                    children: [
+                        {
+                            id: `${i}-2-1`,
+                            emp_no: `${i}-2-1`,
+                            emp_name: `张三${i}-2-1`,
+                        },
+                    ],
+                },
+            ],
+        });
+    }
+    eVirtTable.loadData(data);
 });
 // 销毁
 function destroy() {

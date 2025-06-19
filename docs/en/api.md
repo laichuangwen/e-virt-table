@@ -160,6 +160,7 @@ type EVirtTableOptions = {
 | cellClick | Callback for body cell click | — |
 | cellHoverChange | Callback for cell hover | — |
 | cellHeaderHoverChange | Callback for header cell hover | — |
+| currentRowChange | Highlighted row callback | — |
 | mouseup | Callback for mouse up | — |
 | click | Callback for click | — |
 | dblclick | Callback for double click | — |
@@ -208,11 +209,15 @@ type EVirtTableOptions = {
 | setExpandRowKeys       | Set expanded rows by rowKey   | (rowKeys[], boolean)                                      |
 | toggleRowExpand        | Toggle row expand             | (rowKey, expand)                                          |
 | toggleExpandAll        | Toggle expand all             | boolean                                                   |
+| getExpandRowKeys       | Get expanded keys            | rowkeys[]                                                     |
 | clearSelection         | Clear selection               | —                                                         |
 | toggleRowSelection     | Toggle row selection          | row                                                       |
 | setSelectionByRows     | Set selection by rows         | (rows, selected)                                          |
 | setSelectionByRowKeys  | Set selection by row keys     | (rowKeys, selected)                                       |
 | getSelectionRows       | Get selected rows             | —                                                         |
+| setCurrentRow          | Highlight the current row by setting rowkey   |—                                          |
+| setCurrentRowByRowIndex| Highlight the current row by setting rowindex     |—                                      |
+| getCurrentRow          | Get Current Row          | —                                                     |
 | toggleAllSelection     | Toggle selection for all rows | —                                                         |
 | getPositionForRowIndex | Get position for row index    | —                                                         |
 | getCellValue           | Get cell value by rowKey and key | (rowKey, key)                                           |
@@ -233,6 +238,8 @@ type EVirtTableOptions = {
 | hide | Hide the column | boolean | — | false |
 | sort | Sort order of the column | number | — | 0 |
 | width | Width of the column | number | — | — |
+| minWidth | Min width of the column | number | —|
+| maxWidth | Max width of the column | number | —|
 | align | Horizontal alignment | string | `"left"`, `"center"`, `"right"` | — |
 | verticalAlign | Vertical alignment | string | `"top"`, `"middle"`, `"bottom"` | — |
 | fixed | Fix the column position | string | `"left"`, `"right"` | — |

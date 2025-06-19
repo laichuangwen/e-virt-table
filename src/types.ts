@@ -112,6 +112,11 @@ export type SelectionMap = {
     key: string;
     row: any;
 };
+export type ExpandMap = {
+    expand: boolean;
+    key: string;
+    row: any;
+};
 
 export interface Column {
     key: string;
@@ -123,6 +128,8 @@ export interface Column {
     hoverIconName?: string;
     placeholder?: string;
     width?: number;
+    minWidth?: number;
+    maxWidth?: number;
     widthFillDisable?: boolean;
     align?: Align;
     verticalAlign?: VerticalAlign;
@@ -168,6 +175,11 @@ export type CellParams = {
     colIndex: number;
     column: Column;
     value: any;
+};
+export type RowParams = {
+    row: any;
+    rowIndex: number;
+    rowKey: string;
 };
 export type CellHeaderParams = {
     colIndex: number;
