@@ -401,7 +401,6 @@ const eVirtTable = new EVirtTable(canvas, {
         // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
         ROW_KEY: 'id',
-        ENABLE_RESERVE_SELECTION: true,
         CELL_HEIGHT: 36,
         SELECTOR_AREA_MIN_X: 0,
         ENABLE_AUTOFILL: true,

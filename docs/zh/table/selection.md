@@ -14,7 +14,6 @@
 | ------------------------ | -------------- | --------------------------------------------------------------- | ------ |
 | SELECTABLE_METHOD        | 自定义选择禁用 | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean` | —      |
 | CHECKBOX_KEY             | 选择 key,合并时用       | string                                                          | —      |
-| ENABLE_RESERVE_SELECTION | 是否保留选项 ，需要设置`ROW_KEY`  | boolean                       | —      |
 
 ## Methods
 
@@ -117,8 +116,8 @@ h:625px
 
 ## 保留选项多选
 
--   `config.ENABLE_RESERVE_SELECTION` 保留选中开启
 -   `config.ROW_KEY` 必须声明
+-   默认是会保留选中的，如果不需要保留选中，请在加载数据中自行清除
 
 ::: demo
 

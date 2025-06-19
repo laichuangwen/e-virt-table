@@ -67,11 +67,6 @@ export default class Database {
         this.changedDataMap.clear();
         this.validationErrorMap.clear();
         this.itemRowKeyMap = new WeakMap();
-        const { ROW_KEY, ENABLE_RESERVE_SELECTION } = this.ctx.config;
-        // 没有跨页选时清除
-        if (!(ENABLE_RESERVE_SELECTION && ROW_KEY)) {
-            this.selectionMap.clear();
-        }
         this.initData(this.data);
         this.getData();
         this.bufferCheckState.buffer = false;
