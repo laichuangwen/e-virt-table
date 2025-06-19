@@ -424,6 +424,7 @@ const eVirtTable = new EVirtTable(canvas, {
         ROW_KEY: 'id',
         CELL_HEIGHT: 36,
         SELECTOR_AREA_MIN_X: 0,
+        DEFAULT_EXPAND_ALL: false,
         ENABLE_AUTOFILL: true,
         ENABLE_SELECTOR: true,
         ENABLE_KEYBOARD: true,
@@ -584,28 +585,28 @@ const eVirtTable = new EVirtTable(canvas, {
         //         }, 1000);
         //     });
         // },
-        EXPAND_LAZY_METHOD: (params: any) => {
-            const i = params.row.id;
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    const list = [
-                        {
-                            id: `${i}-1`,
-                            emp_no: `${i}-1`,
-                            emp_name: `张三${i}-1`,
-                            children: [],
-                            _hasChildren: true,
-                        },
-                        {
-                            id: `${i}-2`,
-                            emp_no: `${i}-2`,
-                            emp_name: `张三${i}-2`,
-                        },
-                    ];
-                    resolve(list);
-                }, 1000);
-            });
-        },
+        // EXPAND_LAZY_METHOD: (params: any) => {
+        //     const i = params.row.id;
+        //     return new Promise((resolve) => {
+        //         setTimeout(() => {
+        //             const list = [
+        //                 {
+        //                     id: `${i}-1`,
+        //                     emp_no: `${i}-1`,
+        //                     emp_name: `张三${i}-1`,
+        //                     children: [],
+        //                     _hasChildren: true,
+        //                 },
+        //                 {
+        //                     id: `${i}-2`,
+        //                     emp_no: `${i}-2`,
+        //                     emp_name: `张三${i}-2`,
+        //                 },
+        //             ];
+        //             resolve(list);
+        //         }, 1000);
+        //     });
+        // },
         BODY_CELL_STYLE_METHOD: (cell: any) => {
             const { rowIndex, column } = cell;
             if (rowIndex == 5 && column.key === 'phone')
@@ -917,7 +918,7 @@ document.getElementById('updateCssVar')?.addEventListener('click', () => {
 let falg = false;
 document.getElementById('expandAll')?.addEventListener('click', () => {
     falg = !falg;
-    eVirtTable.expandAll(falg)
+    eVirtTable.toggleExpandAll(falg)
 });
 document.getElementById('setValidator')?.addEventListener('click', () => {
     const errors = [
@@ -958,7 +959,7 @@ document.getElementById('setConfig')?.addEventListener('click', () => {
 });
 document.getElementById('loadData')?.addEventListener('click', () => {
     let data: any[] = [];
-    for (let i = 0; i < 10000; i += 1) {
+    for (let i = 0; i < 500; i += 1) {
         data.push({
             _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
             id: `1_${i}`,
