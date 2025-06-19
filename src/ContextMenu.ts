@@ -59,9 +59,12 @@ export default class ContextMenu {
     //创建右键菜单，绑定子项点击事件
     private createContextMenu() {
         this.contextMenuEl.className = 'e-virt-table-context-menu';
+        this.contextMenuEl.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        });
         this.ctx.containerElement.appendChild(this.contextMenuEl);
         // 如果是自定义右键菜单，则不创建默认子菜单
-        if(this.custom) return;
+        if (this.custom) return;
         const { CONTEXT_MENU } = this.ctx.config;
         this.createContextMenuItems(CONTEXT_MENU, (item: MenuItem) => {
             switch (item.value) {
