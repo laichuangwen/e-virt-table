@@ -112,11 +112,6 @@ export type SelectionMap = {
     key: string;
     row: any;
 };
-export type ExpandMap = {
-    expand: boolean;
-    key: string;
-    row: any;
-};
 
 export interface Column {
     key: string;

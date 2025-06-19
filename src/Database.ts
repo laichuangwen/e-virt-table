@@ -16,7 +16,6 @@ import type {
     SelectionMap,
     ErrorType,
     BeforeChangeItem,
-    ExpandMap,
 } from './types';
 import { generateShortUUID } from './util';
 import { HistoryItemData } from './History';
@@ -34,7 +33,7 @@ export default class Database {
     private rowKeyRowIndexMap = new Map<string, number>();
     private checkboxKeyMap = new Map<string, string[]>();
     private selectionMap = new Map<string, SelectionMap>();
-    private expandMap = new Map<string, ExpandMap>();
+    private expandMap = new Map<string, boolean>();
     private originalDataMap = new Map<string, any>();
     private changedDataMap = new Map<string, any>();
     private validationErrorMap = new Map<string, ValidateError[]>();
@@ -122,12 +121,8 @@ export default class Database {
                 row: item,
                 check: this.selectionMap.get(rowKey)?.check || false,
             });
-            const expand = DEFAULT_EXPAND_ALL || this.expandMap.get(rowKey)?.expand || item._expand || false;
-            this.expandMap.set(rowKey, {
-                key: rowKey,
-                row: item,
-                expand,
-            });
+            const expand = DEFAULT_EXPAND_ALL || this.expandMap.get(rowKey) || item._expand || false;
+            this.expandMap.set(rowKey, expand);
             this.rowKeyMap.set(rowKey, {
                 readonly,
                 index,
@@ -282,22 +277,15 @@ export default class Database {
     expandItem(rowKey: string, expand = false) {
         const row = this.rowKeyMap.get(rowKey);
         row.expand = expand;
-        this.expandMap.set(rowKey, {
-            key: rowKey,
-            row: row.item,
-            expand: expand,
-        });
+        this.expandMap.set(rowKey, expand);
         this.clearBufferData(); // 清除缓存数据
         this.ctx.emit('draw');
     }
     setExpandRowKeys(rowKeys: any[], expand = true) {
+        this.expandMap.clear();
         rowKeys.forEach((rowkey) => {
             const row = this.rowKeyMap.get(rowkey);
-            this.expandMap.set(rowkey, {
-                key: rowkey,
-                row: row.item,
-                expand: expand,
-            });
+            this.expandMap.set(rowkey, expand);
             row.expand = expand;
         });
         this.clearBufferData(); // 清除缓存数据
@@ -313,13 +301,10 @@ export default class Database {
         return list;
     }
     expandAll(expand: boolean) {
+        this.expandMap.clear();
         this.rowKeyMap.forEach((row: any) => {
             row.expand = expand;
-            this.expandMap.set(row.key, {
-                key: row.key,
-                row: row.item,
-                expand,
-            });
+            this.expandMap.set(row.key, expand);
         });
         this.clearBufferData(); // 清除缓存数据
         this.ctx.emit('draw');
@@ -333,11 +318,7 @@ export default class Database {
     setExpandChildren(rowKey: string, children: any[]) {
         const row = this.rowKeyMap.get(rowKey);
         row.expand = true;
-        this.expandMap.set(rowKey, {
-            key: rowKey,
-            row: row.item,
-            expand: true,
-        });
+        this.expandMap.set(rowKey, true);
         row.expandLazy = true;
         row.item.children = children;
         this.initData(row.item.children, row.level + 1);
@@ -816,8 +797,13 @@ export default class Database {
                 this.setRowSelection(rowKey, false, false);
             });
         } else {
-            this.selectionMap.forEach((_, rowKey: string) => {
-                this.setRowSelection(rowKey, false, false);
+            this.selectionMap.clear();
+            this.rowKeyMap.forEach((row, rowKey: string) => {
+                this.selectionMap.set(rowKey, {
+                    check: false,
+                    row: row.item,
+                    key: rowKey,
+                });
             });
         }
         const rows = this.getSelectionRows();
