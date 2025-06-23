@@ -148,7 +148,6 @@ let columns: Column[] = [
     {
         title: '手机号',
         key: 'phone',
-        fixed: 'right',
         readonly: false,
         formatterFooter: ({ value }) => {
             return `合：${value}`;
@@ -159,7 +158,6 @@ let columns: Column[] = [
         title: '性别',
         key: 'sex',
         // readonly: false,
-        fixed: 'right',
         // render: "sex",
         rules: [
             {
@@ -207,7 +205,6 @@ let columns: Column[] = [
         key: 'address',
         align: 'left',
         width: 250,
-        fixed: 'right',
         overflowTooltipShow: true,
         overflowTooltipMaxWidth: 200,
         overflowTooltipPlacement: 'top',
@@ -672,6 +669,15 @@ const eVirtTable = new EVirtTable(canvas, {
         },
     },
 });
+function getRandomString(minLen = 5, maxLen = 20) {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const len = Math.floor(Math.random() * (maxLen - minLen + 1)) + minLen;
+    let str = '';
+    for (let i = 0; i < len; i++) {
+        str += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return str;
+}
 eVirtTable.on('error', (error) => {
     console.error(error);
 });
@@ -787,7 +793,7 @@ eVirtTable.on('validateChangedData', (list) => {
     console.log('validateChangedData', list);
 });
 document.getElementById('instantiation')?.addEventListener('click', () => {
-    console.log(eVirtTable);
+    console.log(eVirtTable.getExpandRowKeys());
 });
 document.getElementById('validator')?.addEventListener('click', () => {
     eVirtTable.validate(true).then(() => {
@@ -918,7 +924,7 @@ document.getElementById('updateCssVar')?.addEventListener('click', () => {
 let falg = false;
 document.getElementById('expandAll')?.addEventListener('click', () => {
     falg = !falg;
-    eVirtTable.toggleExpandAll(falg)
+    eVirtTable.toggleExpandAll(falg);
 });
 document.getElementById('setValidator')?.addEventListener('click', () => {
     const errors = [

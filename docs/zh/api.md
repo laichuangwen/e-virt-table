@@ -112,6 +112,8 @@ type EVirtTableOptions = {
 | TOOLTIP_CUSTOM_STYLE | 提示样式 | ^[object]`CSSProperties` | true |
 | CONTEXT_MENU | 自定义右键菜单 | ^[array]`MenuItem[]` | CONTEXT_MENU |
 | PLACEHOLDER_COLOR | 占位文本颜色 | string | `#CDD0DC` |
+| CELL_HOVER_ICON_BG_COLOR | hover编辑图标背景色 | string | `#fff` |
+| CELL_HOVER_ICON_BORDER_COLOR | hover编辑图标边框 | string | `#DDE0EA` |
 | HEADER_CELL_STYLE_METHOD | 自定义表头单元格样式 | ^[Function]`({column,colIndex})=>CellStyleOptions` | — |
 | BODY_CELL_STYLE_METHOD | 自定义 body 单元格样式 | ^[Function]`({row, column, rowIndex, colIndex,value,isHasChanged})=>CellStyleOptions` | — |
 | FOOTER_CELL_STYLE_METHOD | 自定 footer 义单元格样式 | ^[Function]`({row, column, rowIndex, colIndex,value})=>CellStyleOptions` | — |

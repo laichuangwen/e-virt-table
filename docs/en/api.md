@@ -111,6 +111,8 @@ type EVirtTableOptions = {
 | TOOLTIP_CUSTOM_STYLE | Custom tooltip style | ^[object]`CSSProperties` | — | true |
 | CONTEXT_MENU | Custom context menu | ^[array]`MenuItem[]` | — | CONTEXT_MENU |
 | PLACEHOLDER_COLOR | Placeholder text color | string | `#CDD0DC` |
+| CELL_HOVER_ICON_BG_COLOR | Hover edit icon background color | string | `#fff` |
+| CELL_HOVER_ICON_BORDER_COLOR | Hover edit icon border | string | `#DDE0EA` |
 | HEADER_CELL_STYLE_METHOD | Custom header cell style | ^[Function]`({column,colIndex})=>CellStyleOptions` | — | — |
 | BODY_CELL_STYLE_METHOD | Custom body cell style | ^[Function]`({row, column, rowIndex, colIndex,value,isHasChanged})=>CellStyleOptions` | — | — |
 | FOOTER_CELL_STYLE_METHOD | Custom footer cell style | ^[Function]`({row, column, rowIndex, colIndex,value})=>CellStyleOptions` | — | — |
