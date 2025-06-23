@@ -136,6 +136,7 @@ export default class EVirtTable {
         this.editor.doneEdit();
         this.ctx.database.setData(data);
         this.header.init();
+        this.tooltip.hide();
         this.ctx.emit('draw');
     }
     loadFooterData(data: any[]) {

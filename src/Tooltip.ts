@@ -49,7 +49,7 @@ export default class Tooltip {
         this.ctx.on('mousemove', (e) => {
             // 鼠标移动时，判断是否在target上，不在则隐藏
             if (!this.ctx.isTarget(e)) {
-              return;
+                return;
             }
             const targetRect = this.ctx.containerElement.getBoundingClientRect();
             if (!targetRect) {
@@ -68,8 +68,8 @@ export default class Tooltip {
         this.ctx.on('startEdit', () => {
             this.hide();
         });
-        this.ctx.on('visibleCellHoverChange', (cell,e) => {
-            const contains = this.floatingEl.contains(e.target);;
+        this.ctx.on('visibleCellHoverChange', (cell, e) => {
+            const contains = this.floatingEl.contains(e.target);
             if (contains) {
                 return;
             }
@@ -78,8 +78,8 @@ export default class Tooltip {
                 this.show(cell);
             }
         });
-        this.ctx.on('visibleCellMouseleave', (_,e) => {
-            const contains = this.floatingEl.contains(e.target);;
+        this.ctx.on('visibleCellMouseleave', (_, e) => {
+            const contains = this.floatingEl.contains(e.target);
             if (contains) {
                 return;
             }
@@ -175,7 +175,7 @@ export default class Tooltip {
             }
         });
     }
-    private hide() {
+    hide() {
         if (!this.enable) {
             return;
         }
