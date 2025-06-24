@@ -126,3 +126,16 @@ h:350px
 readonly/value-change
 h:350px
 :::
+
+
+## Hover Editing Icon
+
+- Built-in icon-edit and icon-select icons, please configure config.ICONS for more
+- hoverIconName(column) or BODY_CELL_HOVER_ICON_METHOD(row and column)
+
+
+::: demo
+
+readonly/hover-icon
+h:350px
+:::

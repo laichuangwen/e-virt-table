@@ -230,3 +230,9 @@ V1.2.12
 ### Bug Fixes
 fix: 优化多选清除
 ---
+
+V1.2.13
+### Bug Fixes
+fix: 加载数据不清除提示
+docs: 添加hover编辑图标文档例子
+---
