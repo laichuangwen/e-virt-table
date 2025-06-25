@@ -319,8 +319,6 @@ export default class Editor {
         }
     }
     startEdit(ignoreValue = false) {
-        // 触发绘制，刷新
-        this.ctx.emit('draw');
         this.cancel = false;
         // 如果不启用点击选择器编辑
         const { ENABLE_EDIT_CLICK_SELECTOR } = this.ctx.config;
@@ -339,9 +337,11 @@ export default class Editor {
         if (this.enable) {
             return;
         }
+        // 触发绘制，刷新
+        this.ctx.emit('drawView');
         // 可视区可见
         const isVisible = focusCell.isVerticalVisible() && focusCell.isHorizontalVisible();
-        if(!isVisible){
+        if (!isVisible) {
             return;
         }
         const { rowKey, key, editorType } = focusCell;

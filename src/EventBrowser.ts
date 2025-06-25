@@ -27,11 +27,26 @@ export default class EventBrowser {
         this.bind(this.ctx.stageElement, 'dblclick', this.handleDblclick.bind(this));
         this.bind(this.ctx.stageElement, 'mouseover', this.handleMouseover.bind(this));
         this.bind(this.ctx.stageElement, 'mouseout', this.handleMouseout.bind(this));
+        document.addEventListener('selectionchange', this.selectionchange.bind(this));
+    }
+    private selectionchange() {
+        this.ctx.domSelectionStr = '';
+        const selection = window.getSelection();
+        if (selection && selection.toString()) {
+            this.ctx.domSelectionStr = selection.toString();
+        }
+    }
+    private clearDomSelection() {
+        const selection = window.getSelection();
+        if (selection && !selection.isCollapsed) {
+            selection.removeAllRanges();
+        }
     }
     destroy() {
         this.eventTasks.forEach((fn, event) => {
             this.unbind(window, event, fn);
         });
+        document.removeEventListener('selectionchange', this.selectionchange.bind(this));
         this.eventTasks.clear();
     }
     private handleResize(e: Event) {
@@ -39,6 +54,7 @@ export default class EventBrowser {
         this.ctx.emit('resize', e);
     }
     private handleMouseDown(e: Event) {
+        this.clearDomSelection();
         const _e = e as MouseEvent;
         if (_e.button === 0) {
             this.ctx.mousedown = true;
