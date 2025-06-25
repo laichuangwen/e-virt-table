@@ -24,6 +24,7 @@ export default class Body {
         this.ctx = ctx;
         this.init();
         this.initResizeRow();
+        this.initAutoRowHeight();
     }
     private init() {
         const {
@@ -247,6 +248,42 @@ export default class Body {
             }
         });
     }
+    // 初始化行高自适应
+    private initAutoRowHeight() {
+        this.ctx.on('autoRowHeightChange', ({ rowIndex, height }) => {
+            // 获取当前行的所有单元格中最大的计算高度
+            let maxHeight = height;
+            const currentRow = this.renderRows.find((row) => row.rowIndex === rowIndex);
+            if (currentRow) {
+                currentRow.cells.forEach((rowCell) => {
+                    // 检查单元格是否开启了自适应行高
+                    const isAutoRowHeight = rowCell.column.isAutoRowHeight === true;
+                    if (isAutoRowHeight && rowCell.calculatedHeight && rowCell.calculatedHeight > maxHeight) {
+                        maxHeight = rowCell.calculatedHeight;
+                    }
+                });
+
+                // 获取配置的最小行高
+                const minHeight = this.ctx.config.CELL_HEIGHT || 36;
+                const finalHeight = Math.max(maxHeight, minHeight);
+
+                // 如果计算出的最终高度与当前行高不同，则更新行高
+                if (finalHeight !== currentRow.height) {
+                    this.ctx.database.setRowHeight(rowIndex, finalHeight);
+                    this.init();
+                    this.ctx.emit('draw');
+                }
+            }
+        });
+
+        // 监听列宽调整事件，重新计算所有带自动行高的列
+        this.ctx.on('resizeColumnChange', ({ column }) => {
+            if (column.isAutoRowHeight) {
+                this.ctx.emit('draw');
+            }
+        });
+    }
+
     private resizeRow(row: Row, diff: number) {
         const { rowIndex, height, rowKey, data } = row;
         this.ctx.database.setRowHeight(rowIndex, height + diff);

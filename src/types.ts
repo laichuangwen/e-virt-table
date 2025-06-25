@@ -140,6 +140,7 @@ export interface Column {
     renderHeader?: Function | string;
     formatter?: FormatterMethod;
     formatterFooter?: FormatterMethod;
+    isAutoRowHeight?: boolean;
     overflowTooltipShow?: boolean;
     overflowTooltipMaxWidth?: number;
     overflowTooltipPlacement?: OverflowTooltipPlacement;

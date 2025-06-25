@@ -27,6 +27,7 @@ export type DrawTextOptions = {
     align?: Align;
     padding?: number;
     verticalAlign?: VerticalAlign;
+    isAutoRowHeight?: boolean;
 };
 export class Paint {
     private ctx: CanvasRenderingContext2D;
@@ -216,29 +217,227 @@ export class Paint {
         } = options;
         this.ctx.font = font;
         this.ctx.fillStyle = color;
-        this.ctx.textBaseline = verticalAlign;
         this.ctx.textAlign = align;
 
-        let yPos = 0;
-        if (verticalAlign === 'top') {
-            yPos = y + padding;
+        // 检查是否需要多行渲染
+        const availableWidth = width - padding * 2;
+        const textWidth = this.ctx.measureText(text).width;
+        const needsWrap = textWidth > availableWidth;
+        
+        if (needsWrap && options.isAutoRowHeight) {
+            // 多行文本渲染
+            this.drawMultilineText(text, x, y, width, height, options);
+            this.ctx.restore();
+            return false; // 自适应高度时不算溢出
+        } else {
+            // 单行文本渲染（原逻辑）
+            this.ctx.textBaseline = verticalAlign;
+            
+            let yPos = 0;
+            if (verticalAlign === 'top') {
+                yPos = y + padding;
+            } else if (verticalAlign === 'bottom') {
+                yPos = y + height - padding;
+            } else {
+                yPos = y + (height + 1) / 2;
+            }
+            let xPos = 0;
+            if (align === 'left') {
+                xPos = x + padding;
+            } else if (align === 'right') {
+                xPos = x + width - padding;
+            } else {
+                xPos = x + width / 2;
+            }
+            const { _text, ellipsis } = this.handleEllipsis(text, width, padding, font);
+            this.ctx.fillText(_text, xPos, yPos);
+            this.ctx.restore();
+            return ellipsis;
+        }
+    }
+    
+    /**
+     * 绘制多行文本
+     * @param text
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     * @param options
+     */
+    private drawMultilineText(
+        text: string,
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        options: DrawTextOptions = {},
+    ): void {
+        const {
+            font = '12px Arial',
+            align = 'center',
+            padding = 0,
+            verticalAlign = 'middle',
+        } = options;
+        
+        this.ctx.font = font;
+        const fontSize = parseInt(font.match(/\d+/)?.[0] || '12');
+        const lineHeight = fontSize * 1.2;
+        const availableWidth = width - padding * 2;
+        
+        // 将文本按可用宽度分割成行
+        const lines = this.wrapText(text, availableWidth);
+        
+        // 计算起始Y位置
+        let startY = y + padding;
+        if (verticalAlign === 'middle') {
+            const totalTextHeight = lines.length * lineHeight;
+            startY = y + (height - totalTextHeight) / 2;
         } else if (verticalAlign === 'bottom') {
-            yPos = y + height - padding;
-        } else {
-            yPos = y + (height + 1) / 2;
+            const totalTextHeight = lines.length * lineHeight;
+            startY = y + height - totalTextHeight - padding;
         }
-        let xPos = 0;
-        if (align === 'left') {
-            xPos = x + padding;
-        } else if (align === 'right') {
-            xPos = x + width - padding;
-        } else {
-            xPos = x + width / 2;
+        
+        // 绘制每一行
+        lines.forEach((line, index) => {
+            let xPos = x + padding;
+            if (align === 'center') {
+                xPos = x + width / 2;
+            } else if (align === 'right') {
+                xPos = x + width - padding;
+            }
+            
+            const lineY = startY + index * lineHeight;
+            this.ctx.textBaseline = 'top';
+            this.ctx.fillText(line, xPos, lineY);
+        });
+    }
+    
+    /**
+     * 将文本按宽度换行
+     * @param text
+     * @param maxWidth
+     * @returns
+     */
+    private wrapText(text: string, maxWidth: number): string[] {
+        if (!text) return [''];
+        
+        const lines: string[] = [];
+        const paragraphs = text.split('\n');
+        
+        for (const paragraph of paragraphs) {
+            if (paragraph === '') {
+                lines.push('');
+                continue;
+            }
+            
+            const words = paragraph.split('');
+            let currentLine = '';
+            
+            for (const word of words) {
+                const testLine = currentLine + word;
+                const testWidth = this.ctx.measureText(testLine).width;
+                
+                if (testWidth <= maxWidth) {
+                    currentLine = testLine;
+                } else {
+                    if (currentLine) {
+                        lines.push(currentLine);
+                        currentLine = word;
+                    } else {
+                        // 单个字符也超出宽度，强制换行
+                        lines.push(word);
+                        currentLine = '';
+                    }
+                }
+            }
+            
+            if (currentLine) {
+                lines.push(currentLine);
+            }
         }
-        const { _text, ellipsis } = this.handleEllipsis(text, width, padding, font);
-        this.ctx.fillText(_text, xPos, yPos);
+        
+        return lines.length > 0 ? lines : [''];
+    }
+    
+    /**
+     * 计算文本自适应高度
+     * @param text
+     * @param width
+     * @param options
+     * @returns 计算出的高度
+     */
+    calculateTextHeight(
+        text: string = '',
+        width: number,
+        options: DrawTextOptions = {},
+    ): number {
+        if (!text) return 0;
+        
+        const {
+            font = '12px Arial',
+            padding = 0,
+        } = options;
+        
+        this.ctx.save();
+        this.ctx.font = font;
+        
+        // 获取字体高度
+        const fontSize = parseInt(font.match(/\d+/)?.[0] || '12');
+        const lineHeight = fontSize * 1.2; // 默认行高为字体大小的1.2倍
+        
+        // 可用宽度
+        const availableWidth = width - padding * 2;
+        
+        // 按换行符分割文本
+        const lines = text.split('\n');
+        let totalLines = 0;
+        
+        for (const line of lines) {
+            if (line === '') {
+                totalLines += 1;
+                continue;
+            }
+            
+            const textWidth = this.ctx.measureText(line).width;
+            if (textWidth <= availableWidth) {
+                totalLines += 1;
+            } else {
+                // 需要换行，计算需要多少行
+                const words = line.split('');
+                let currentLine = '';
+                let lineCount = 0;
+                
+                for (const word of words) {
+                    const testLine = currentLine + word;
+                    const testWidth = this.ctx.measureText(testLine).width;
+                    
+                    if (testWidth <= availableWidth) {
+                        currentLine = testLine;
+                    } else {
+                        if (currentLine) {
+                            lineCount += 1;
+                            currentLine = word;
+                        } else {
+                            // 单个字符也超出宽度，强制换行
+                            lineCount += 1;
+                            currentLine = '';
+                        }
+                    }
+                }
+                
+                if (currentLine) {
+                    lineCount += 1;
+                }
+                
+                totalLines += lineCount;
+            }
+        }
+        
         this.ctx.restore();
-        return ellipsis;
+        
+        // 计算总高度：行数 * 行高 + 上下padding
+        return Math.max(totalLines * lineHeight + padding * 2, fontSize + padding * 2);
     }
     handleEllipsis(text: string, width: number, padding = 0, font = '12px Arial') {
         let ellipsis = false;
