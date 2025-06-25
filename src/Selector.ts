@@ -78,7 +78,11 @@ export default class Selector {
                 this.selectRows(cell);
                 return;
             }
-            e.preventDefault();
+            // 解决dom文档选中问题
+            const style = window.getComputedStyle(e.target);
+            if (style.userSelect !== 'text') {
+                e.preventDefault();
+            }
             this.isMultipleRow = false;
             this.click(e.shiftKey);
             this.ctx.emit('selectorClick', cell);
@@ -105,7 +109,11 @@ export default class Selector {
             if (this.ctx.isPointer) {
                 return;
             }
-            e.preventDefault();
+            // 解决dom文档选中问题
+            const style = window.getComputedStyle(e.target);
+            if (style.userSelect !== 'text') {
+                e.preventDefault();
+            }
             this.mousedownHeader = true;
             this.selectCols(cell);
         });
@@ -527,6 +535,10 @@ export default class Selector {
      */
     private copy() {
         if (!this.ctx.config.ENABLE_COPY) {
+            return;
+        }
+        // dom选中时会阻止复制
+        if (this.ctx.domSelectionStr) {
             return;
         }
         let { value, xArr, yArr } = this.ctx.getSelectedData();

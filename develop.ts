@@ -179,7 +179,7 @@ let columns: Column[] = [
             cellEl.style.display = 'flex';
             cellEl.style.justifyContent = 'center';
             cellEl.style.alignItems = 'center';
-
+            cellEl.style.userSelect = 'text';
             cellEl.innerHTML = cell.text;
             pEl.appendChild(cellEl);
         },
@@ -208,6 +208,7 @@ let columns: Column[] = [
         overflowTooltipShow: true,
         overflowTooltipMaxWidth: 200,
         overflowTooltipPlacement: 'top',
+        readonly: true,
         rules: {
             required: true,
             message: '该项必填哦！',
@@ -217,6 +218,14 @@ let columns: Column[] = [
             cellEl.addEventListener('click', () => {
                 console.log('点击了家庭地址');
             });
+            cellEl.addEventListener('selectionchange', () => {
+                console.log('selectionchange');
+                const selection = window.getSelection();
+                const text = selection ? selection.toString() : '';
+                if (text) {
+                    console.log('用户选中了文本:', text);
+                }
+            });
             cellEl.style.width = '100%';
             cellEl.style.height = '100%';
             cellEl.style.opacity = '0.5';
@@ -225,6 +234,7 @@ let columns: Column[] = [
             // cellEl.style.justifyContent = 'center';
             // cellEl.style.alignItems = 'center';
             cellEl.style.whiteSpace = 'pre-line';
+            cellEl.style.userSelect = 'text';
             cellEl.innerHTML = cell.text;
             pEl.appendChild(cellEl);
         },
