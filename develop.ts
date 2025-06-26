@@ -205,7 +205,8 @@ let columns: Column[] = [
         key: 'address',
         align: 'left',
         width: 250,
-        overflowTooltipShow: true,
+        isAutoRowHeight: true,
+        overflowTooltipShow: false,
         overflowTooltipMaxWidth: 200,
         overflowTooltipPlacement: 'top',
         readonly: true,
@@ -213,6 +214,24 @@ let columns: Column[] = [
             required: true,
             message: '该项必填哦！',
         },
+<<<<<<< 自动行高
+        // render: (pEl, cell) => {
+        //     const cellEl = document.createElement('div');
+        //     cellEl.addEventListener('click', () => {
+        //         console.log('点击了家庭地址');
+        //     });
+        //     cellEl.style.width = '100%';
+        //     cellEl.style.height = '100%';
+        //     cellEl.style.opacity = '0.5';
+        //     cellEl.style.backgroundColor = 'cyan';
+        //     cellEl.style.display = 'block';
+        //     // cellEl.style.justifyContent = 'center';
+        //     // cellEl.style.alignItems = 'center';
+        //     cellEl.style.whiteSpace = 'pre-line';
+        //     cellEl.innerHTML = cell.text;
+        //     pEl.appendChild(cellEl);
+        // },
+=======
         render: (pEl, cell) => {
             const cellEl = document.createElement('div');
             cellEl.addEventListener('click', () => {
@@ -238,6 +257,7 @@ let columns: Column[] = [
             cellEl.innerHTML = cell.text;
             pEl.appendChild(cellEl);
         },
+>>>>>>> feat/autoRowHeight
     },
     {
         title: '请假开始时间',
@@ -342,7 +362,7 @@ for (let i = 0; i < 10000; i += 1) {
         sex: i % 4 === 0 ? 1 : i === 3 ? null : 2,
         address:
             // eslint-disable-next-line no-nested-ternary
-            i === 1 ? `海淀区北京路海淀区北京路十分地${i}号` : i === 4 ? '' : `海淀区北京路${i}号`,
+            i === 1 ? `海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地${i}号` : i === 4 ? '' : `海淀区北京路${i}号`,
         work_type: `兼职${i}`,
         work_status: `在职${i}`,
         household_city: `深圳${i}`,
