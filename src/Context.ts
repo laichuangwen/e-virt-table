@@ -84,6 +84,7 @@ export default class Context {
     stageHeight = 0;
     paint: Paint;
     icons: Icons;
+    domSelectionStr = '';
     isMouseoverTargetContainer = false;
     mousedown = false;
     isPointer = false;

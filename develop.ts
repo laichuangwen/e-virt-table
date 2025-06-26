@@ -179,7 +179,7 @@ let columns: Column[] = [
             cellEl.style.display = 'flex';
             cellEl.style.justifyContent = 'center';
             cellEl.style.alignItems = 'center';
-
+            cellEl.style.userSelect = 'text';
             cellEl.innerHTML = cell.text;
             pEl.appendChild(cellEl);
         },
@@ -209,10 +209,12 @@ let columns: Column[] = [
         overflowTooltipShow: false,
         overflowTooltipMaxWidth: 200,
         overflowTooltipPlacement: 'top',
+        readonly: true,
         rules: {
             required: true,
             message: '该项必填哦！',
         },
+<<<<<<< 自动行高
         // render: (pEl, cell) => {
         //     const cellEl = document.createElement('div');
         //     cellEl.addEventListener('click', () => {
@@ -229,6 +231,33 @@ let columns: Column[] = [
         //     cellEl.innerHTML = cell.text;
         //     pEl.appendChild(cellEl);
         // },
+=======
+        render: (pEl, cell) => {
+            const cellEl = document.createElement('div');
+            cellEl.addEventListener('click', () => {
+                console.log('点击了家庭地址');
+            });
+            cellEl.addEventListener('selectionchange', () => {
+                console.log('selectionchange');
+                const selection = window.getSelection();
+                const text = selection ? selection.toString() : '';
+                if (text) {
+                    console.log('用户选中了文本:', text);
+                }
+            });
+            cellEl.style.width = '100%';
+            cellEl.style.height = '100%';
+            cellEl.style.opacity = '0.5';
+            cellEl.style.backgroundColor = 'cyan';
+            cellEl.style.display = 'block';
+            // cellEl.style.justifyContent = 'center';
+            // cellEl.style.alignItems = 'center';
+            cellEl.style.whiteSpace = 'pre-line';
+            cellEl.style.userSelect = 'text';
+            cellEl.innerHTML = cell.text;
+            pEl.appendChild(cellEl);
+        },
+>>>>>>> feat/autoRowHeight
     },
     {
         title: '请假开始时间',
