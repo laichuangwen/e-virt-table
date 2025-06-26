@@ -49,34 +49,46 @@ export default class Tooltip {
         this.ctx.on('mousemove', (e) => {
             // 鼠标移动时，判断是否在target上，不在则隐藏
             if (!this.ctx.isTarget(e)) {
+                this.hide();
                 return;
             }
             const targetRect = this.ctx.containerElement.getBoundingClientRect();
             if (!targetRect) {
                 return;
             }
+            // 鼠标不在target上或者在body上（即header区域）则隐藏，ps:后续可考虑将footer区域也剔除
             if (
                 e.clientX < targetRect.x ||
                 e.clientX > targetRect.x + targetRect.width ||
-                e.clientY < targetRect.y ||
+                e.clientY < targetRect.y + this.ctx.header.height ||
                 e.clientY > targetRect.y + targetRect.height
             ) {
-                this.hide();
+                // 如果鼠标已经到header区域了，且鼠标没有悬浮在tooltips上，则隐藏
+                if (!this.floatingEl.contains(e.target)) {
+                    this.hide();
+                }
+            } else {
+                const cell = this.ctx.hoverCell;
+                if (!this.enable && cell) {
+                    // 有移除或者有错误message时显示
+                    if (cell.ellipsis || cell.message) {
+                        this.show(cell);
+                    }
+                }
             }
         });
         // 开始编辑时隐藏
         this.ctx.on('startEdit', () => {
             this.hide();
         });
-        this.ctx.on('visibleCellHoverChange', (cell, e) => {
+        // 滚动时隐藏
+        this.ctx.on('onScroll', (_, e) => {
             const contains = this.floatingEl.contains(e.target);
-            if (contains) {
+            if (contains && this.enable) {
                 return;
             }
-            // 有移除或者有错误message时显示
-            if (cell.ellipsis || cell.message) {
-                this.show(cell);
-            }
+
+            this.hide();
         });
         this.ctx.on('visibleCellMouseleave', (_, e) => {
             const contains = this.floatingEl.contains(e.target);
