@@ -46,25 +46,18 @@ export default class Tooltip {
         this.init();
     }
     private init() {
-        this.ctx.on('mousemove', (e) => {
-            // 鼠标移动时，判断是否在target上，不在则隐藏
-            if (!this.ctx.isTarget(e)) {
-                return;
-            }
-            const targetRect = this.ctx.containerElement.getBoundingClientRect();
-            if (!targetRect) {
-                return;
-            }
-            if (
-                e.clientX < targetRect.x ||
-                e.clientX > targetRect.x + targetRect.width ||
-                e.clientY < targetRect.y ||
-                e.clientY > targetRect.y + targetRect.height
-            ) {
-                this.hide();
-            }
+        this.floatingEl.addEventListener('mouseleave', () => {
+            this.hide();
         });
-        // 开始编辑时隐藏
+        this.ctx.on('mouseout', (e) => {
+            if (this.floatingEl.contains(e.relatedTarget as Node)) {
+                return;
+            }
+            this.hide();
+        });
+        this.ctx.on('onScroll', () => {
+            this.hide();
+        });
         this.ctx.on('startEdit', () => {
             this.hide();
         });

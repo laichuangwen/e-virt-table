@@ -152,6 +152,7 @@ export default class EventTable {
                     return;
                 }
                 this.ctx.hoverCellHeader = cell;
+                this.visibleHoverCell = undefined; // 清除可视区hover
                 this.ctx.emit('cellHeaderHoverChange', cell);
             });
             // 可视区
@@ -166,6 +167,7 @@ export default class EventTable {
                     if (this.visibleHoverCell !== cell) {
                         this.ctx.emit('visibleCellMouseleave', cell, e);
                         this.visibleHoverCell = cell;
+                        this.ctx.hoverCellHeader = undefined; // 清除头部hover
                         this.ctx.emit('visibleCellHoverChange', cell, e);
                     }
                 },
