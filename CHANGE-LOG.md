@@ -241,3 +241,9 @@ V1.2.14
 ### Bug Fixes
 fix: 修复dom选中时不能复制
 ---
+
+V1.2.15
+### Bug Fixes
+fix: 修复初始化列宽为null时滚动条计算错误
+fix: 优化tooltip功能，添加表头tooltip
+---

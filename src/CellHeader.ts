@@ -72,7 +72,7 @@ export default class CellHeader extends BaseCell {
         this.readonly = column.readonly || false;
         this.required = column.required || false;
         this.rowKey = generateShortUUID();
-        this.overflowTooltipShow = column.overflowTooltipHeaderShow === true ? true : false;
+        this.overflowTooltipShow = column.overflowTooltipHeaderShow === false ? false : true;
         this.hasChildren = (column.children && column.children.length > 0) || false; // 是否有子
         this.render = column.renderHeader;
     }
