@@ -141,6 +141,7 @@ export interface Column {
     formatter?: FormatterMethod;
     formatterFooter?: FormatterMethod;
     overflowTooltipShow?: boolean;
+    overflowTooltipHeaderShow?: boolean;
     overflowTooltipMaxWidth?: number;
     overflowTooltipPlacement?: OverflowTooltipPlacement;
     required?: boolean;
