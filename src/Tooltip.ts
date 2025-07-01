@@ -78,6 +78,22 @@ export default class Tooltip {
             }
             this.hide();
         });
+        this.ctx.on('cellHeaderMouseleave', (_, e) => {
+            const contains = this.floatingEl.contains(e.target);
+            if (contains) {
+                return;
+            }
+            this.hide();
+        });
+        this.ctx.on('cellHeaderHoverChange', (cell, e) => {
+            const contains = this.floatingEl.contains(e.target);
+            if (contains) {
+                return;
+            }
+            if (cell.ellipsis) {
+                this.show(cell);
+            }
+        });
     }
     private show(cell: Cell) {
         // 如果没有设置overflowTooltipShow=true，则不显示

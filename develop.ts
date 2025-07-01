@@ -149,6 +149,7 @@ let columns: Column[] = [
         title: '手机号',
         key: 'phone',
         readonly: false,
+        overflowTooltipHeaderShow: true,
         formatterFooter: ({ value }) => {
             return `合：${value}`;
         },

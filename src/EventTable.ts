@@ -153,7 +153,7 @@ export default class EventTable {
                 }
                 this.ctx.hoverCellHeader = cell;
                 this.visibleHoverCell = undefined; // 清除可视区hover
-                this.ctx.emit('cellHeaderHoverChange', cell);
+                this.ctx.emit('cellHeaderHoverChange', cell, e);
             });
             // 可视区
             this.handleBodyEvent(
