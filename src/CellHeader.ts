@@ -21,6 +21,8 @@ export default class CellHeader extends BaseCell {
     key: string;
     required = false;
     readonly = false;
+    ellipsis = false;
+    overflowTooltipShow = true;
     children: Column[] = [];
     column: Column;
     colIndex: number;
@@ -31,6 +33,8 @@ export default class CellHeader extends BaseCell {
     style: Partial<CSSStyleDeclaration> = {};
     drawX = 0;
     drawY = 0;
+    visibleWidth = 0;
+    visibleHeight = 0;
     drawCellBgColor = '';
     drawTextColor = '';
     drawImageX = 0;
@@ -46,6 +50,8 @@ export default class CellHeader extends BaseCell {
         this.y = y;
         this.width = width;
         this.height = height;
+        this.visibleWidth = width;
+        this.visibleHeight = height;
         this.colIndex = colIndex;
         this.key = column.key;
         this.minWidth = column.minWidth;
@@ -66,6 +72,7 @@ export default class CellHeader extends BaseCell {
         this.readonly = column.readonly || false;
         this.required = column.required || false;
         this.rowKey = generateShortUUID();
+        this.overflowTooltipShow = column.overflowTooltipHeaderShow === true ? true : false;
         this.hasChildren = (column.children && column.children.length > 0) || false; // 是否有子
         this.render = column.renderHeader;
     }
@@ -125,7 +132,7 @@ export default class CellHeader extends BaseCell {
             borderColor: BORDER ? BORDER_COLOR : 'transparent',
             fillColor: this.drawCellBgColor,
         });
-        paint.drawText(displayText, drawX, drawY, this.width, this.height, {
+        this.ellipsis = paint.drawText(displayText, drawX, drawY, this.width, this.height, {
             font: HEADER_FONT,
             padding: CELL_PADDING,
             color: this.drawTextColor,
