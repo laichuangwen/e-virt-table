@@ -57,16 +57,19 @@ export default class Database {
         this.setLoading(true);
         this.init();
     }
-    init() {
+    // 初始化默认不忽略清空改变值和校验map
+    init(isClear = true) {
         this.clearBufferData();
         this.rowKeyMap.clear();
         this.checkboxKeyMap.clear();
         this.colIndexKeyMap.clear();
         this.rowIndexRowKeyMap.clear();
         this.rowKeyRowIndexMap.clear();
-        this.originalDataMap.clear();
-        this.changedDataMap.clear();
-        this.validationErrorMap.clear();
+        if (isClear) {
+            this.originalDataMap.clear();
+            this.changedDataMap.clear();
+            this.validationErrorMap.clear();
+        }
         this.itemRowKeyMap = new WeakMap();
         this.initData(this.data);
         this.getData();
@@ -83,16 +86,8 @@ export default class Database {
      * @param dataList
      * @param level
      */
-    private initData(dataList: any[], level: number = 0) {
+    private initData(dataList: any[], level: number = 0, parentRowKeys: string[] = []) {
         dataList.forEach((item, index) => {
-            let hasChildren = false;
-            if (Array.isArray(item.children)) {
-                hasChildren = item._hasChildren;
-                if (item.children.length) {
-                    hasChildren = true;
-                    this.initData(item.children, level + 1);
-                }
-            }
             const { ROW_KEY = '', DEFAULT_EXPAND_ALL, CELL_HEIGHT, SELECTABLE_METHOD, CHECKBOX_KEY } = this.ctx.config;
             const _rowKey = item[ROW_KEY]; // 行唯一标识,否则就rowKey
             const rowKey = _rowKey !== undefined && _rowKey !== null ? `${_rowKey}` : generateShortUUID();
@@ -133,10 +128,16 @@ export default class Database {
                 selectable,
                 expand,
                 expandLazy: false,
-                hasChildren,
+                hasChildren: item._hasChildren || (Array.isArray(item.children) ? item.children.length > 0 : false),
                 expandLoading: false,
                 item,
+                parentRowKeys,
             });
+            if (Array.isArray(item.children)) {
+                if (item.children.length) {
+                    this.initData(item.children, level + 1, [...parentRowKeys, rowKey]);
+                }
+            }
         });
     }
     /**
