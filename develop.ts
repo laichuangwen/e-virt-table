@@ -160,17 +160,17 @@ let columns: Column[] = [
         key: 'sex',
         // readonly: false,
         // render: "sex",
-        rules: [
-            {
-                validator: (rule, value, callback) => {
-                    if (!value) {
-                        callback('该项必填哦！');
-                    } else {
-                        callback();
-                    }
-                },
-            },
-        ],
+        // rules: [
+        //     {
+        //         validator: (rule, value, callback) => {
+        //             if (!value) {
+        //                 callback('该项必填哦！');
+        //             } else {
+        //                 callback();
+        //             }
+        //         },
+        //     },
+        // ],
         renderHeader: (pEl, cell) => {
             const cellEl = document.createElement('div');
             cellEl.style.width = '100%';
@@ -210,10 +210,10 @@ let columns: Column[] = [
         overflowTooltipMaxWidth: 200,
         overflowTooltipPlacement: 'top',
         readonly: true,
-        rules: {
-            required: true,
-            message: '该项必填哦！',
-        },
+        // rules: {
+        //     required: true,
+        //     message: '该项必填哦！',
+        // },
         render: (pEl, cell) => {
             const cellEl = document.createElement('div');
             cellEl.addEventListener('click', () => {
@@ -293,13 +293,13 @@ let columns: Column[] = [
         key: 'purchasePrice',
         fixed: 'right',
         type: 'number',
-        rules: [
-            {
-                required: true,
-                type: 'number',
-                message: '请输入销售价',
-            },
-        ],
+        // rules: [
+        //     {
+        //         required: true,
+        //         type: 'number',
+        //         message: '请输入销售价',
+        //     },
+        // ],
     },
     {
         title: '销售价(元)',
@@ -310,13 +310,13 @@ let columns: Column[] = [
         hoverIconName: 'icon-edit',
         placeholder: '请输入',
         // readonly: true,
-        rules: [
-            {
-                required: true,
-                type: 'number',
-                message: '请输入销售价',
-            },
-        ],
+        // rules: [
+        //     {
+        //         required: true,
+        //         type: 'number',
+        //         message: '请输入销售价',
+        //     },
+        // ],
     },
     {
         title: '操作',
@@ -325,7 +325,7 @@ let columns: Column[] = [
     },
 ];
 let data: any[] = [];
-for (let i = 0; i < 10000; i += 1) {
+for (let i = 0; i < 1000; i += 1) {
     data.push({
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
         id: `1_${i}`,
@@ -463,6 +463,18 @@ const eVirtTable = new EVirtTable(canvas, {
                 },
             },
         ],
+        BODY_CELL_RULES_METHOD: (params) => {
+            const { row, column } = params;
+            if (column.key === 'work_age') {
+                return [
+                    {
+                        required: false,
+                        pattern: /^(0|[1-9]\d*)$/,
+                        message: '请输入0或正整数',
+                    },
+                ];
+            }
+        },
         // SELECTABLE_METHOD: (params: SelectableParams) => {
         //     const { row, rowIndex } = params;
         //     if (rowIndex === 4) {
@@ -679,6 +691,9 @@ const eVirtTable = new EVirtTable(canvas, {
             // }
         },
     },
+});
+eVirtTable.filterMethod((list) => {
+    return list.filter((item) => item.id !== '1_3');
 });
 function getRandomString(minLen = 5, maxLen = 20) {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
