@@ -17,7 +17,7 @@ export type RuleParam = {
     key: string;
     rowKey: string;
 } & Rule;
-export type RuleValidator = (rule: Rule, value: any, callback: (message: string) => void) => void;
+export type RuleValidator = (rule: Rule, value: any, callback: (message?: string) => void) => void;
 export type Rules = Rule[];
 
 export type ValidateResult = RuleParam[];
