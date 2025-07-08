@@ -14,11 +14,11 @@ import type {
     CellHoverIconMethod,
     CellStyleMethod,
     OverflowTooltipPlacement,
-    Rules,
     SpanInfo,
 } from './types';
 import Context from './Context';
 import BaseCell from './BaseCell';
+import { Rule, Rules } from './Validator';
 export default class Cell extends BaseCell {
     formatter?: FormatterMethod;
     formatterFooter?: FormatterMethod;
@@ -48,7 +48,7 @@ export default class Cell extends BaseCell {
     render: Render;
     renderFooter: Render;
     style: any = {};
-    rules: Rules = [];
+    rules: Rules | Rule = [];
     message: string = '';
     text: string = '';
     displayText: string = '';

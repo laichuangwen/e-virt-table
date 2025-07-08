@@ -1,7 +1,8 @@
 import type Context from './Context';
 import { generateShortUUID } from './util';
-import type { Align, CellHeaderStyleMethod, Column, Fixed, Render, Rules, Type, VerticalAlign } from './types';
+import type { Align, CellHeaderStyleMethod, Column, Fixed, Render, Type, VerticalAlign } from './types';
 import BaseCell from './BaseCell';
+import { Rule, Rules } from './Validator';
 export default class CellHeader extends BaseCell {
     align: Align;
     verticalAlign: VerticalAlign = 'middle';
@@ -27,7 +28,7 @@ export default class CellHeader extends BaseCell {
     column: Column;
     colIndex: number;
     rowKey: string;
-    rules?: Rules;
+    rules?: Rules | Rule;
     hasChildren: boolean;
     render: Render;
     style: Partial<CSSStyleDeclaration> = {};
