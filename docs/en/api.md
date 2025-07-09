@@ -273,7 +273,17 @@ type EVirtTableOptions = {
 
 ## Rules
 
--   refer to [async-validator](https://github.com/yiminghe/async-validator)
+```ts
+
+type Rule = {
+    required?: boolean;
+    pattern?: RegExp;
+    validator?: RuleValidator;
+    message?: string;
+};
+type Rules = Rule[];
+
+```
 
 ## CONTEXT_MENU Default 
  

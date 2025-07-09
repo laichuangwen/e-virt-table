@@ -2,7 +2,19 @@
 
 ## Column
 
--   For more advanced usage of rules, refer to [async-validator](https://github.com/yiminghe/async-validator).
+## Rules
+
+```ts
+
+type Rule = {
+    required?: boolean;
+    pattern?: RegExp;
+    validator?: RuleValidator;
+    message?: string;
+};
+type Rules = Rule[];
+
+```
 
 | Parameter | Description             | Type   | Default |
 | --------- | ----------------------- | ------ | ------- |
@@ -41,7 +53,21 @@ h:350px
 :::
 
 ## Common Validation Rules
-> For more advanced usage of rules, refer to [async-validator](https://github.com/yiminghe/async-validator)
+
+## Rules
+
+```ts
+
+type Rule = {
+    required?: boolean;
+    pattern?: RegExp;
+    validator?: RuleValidator;
+    message?: string;
+};
+type Rules = Rule[];
+
+```
+
 1. Required
 
 ```js

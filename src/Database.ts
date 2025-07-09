@@ -1,5 +1,5 @@
-import Schema, { ValidateError } from 'async-validator';
 import type CellHeader from './CellHeader';
+import Validator, { RuleParam, ValidateResult } from './Validator';
 import type Context from './Context';
 import type {
     CellReadonlyMethod,
@@ -11,7 +11,6 @@ import type {
     SelectableMethod,
     EVirtTableOptions,
     BeforeCellValueChangeMethod,
-    Descriptor,
     SpanInfo,
     SelectionMap,
     ErrorType,
@@ -36,7 +35,7 @@ export default class Database {
     private expandMap = new Map<string, boolean>();
     private originalDataMap = new Map<string, any>();
     private changedDataMap = new Map<string, any>();
-    private validationErrorMap = new Map<string, ValidateError[]>();
+    private validationErrorMap = new Map<string, ValidateResult>();
     private itemRowKeyMap = new WeakMap();
     private bufferData: any[] = [];
     private bufferCheckState = {
@@ -1034,49 +1033,23 @@ export default class Database {
                 }
             }
             if (rules) {
-                let descriptor: Descriptor = {};
-                let data: any = {};
-                data[key] = this.getItemValue(rowKey, key);
-                if (Array.isArray(rules)) {
-                    const _rules = rules.map((item) => {
-                        return {
-                            ...item,
-                            row: row.item,
-                            column,
-                            rowIndex: row.rowIndex,
-                            colIndex: colHeader.colIndex,
-                        };
-                    });
-                    descriptor[key] = _rules;
-                } else {
-                    descriptor[key] = {
-                        ...rules,
-                        row: row.item,
-                        column,
-                        rowIndex: row.rowIndex,
-                        colIndex: colHeader.colIndex,
-                    };
-                }
-
-                const validator = new Schema(descriptor);
-                validator
-                    .validate(data)
-                    .then(() => {
-                        this.clearValidationError(rowKey, key);
-                        resolve([]);
-                    })
-                    .catch(({ errors }) => {
-                        const _errors = errors.map((error: any) => ({
-                            ...error,
-                            column,
-                            key,
-                            row: row.item,
-                            rowKey,
-                        }));
-                        this.setValidationError(rowKey, key, _errors);
-                        resolve(_errors);
-                    });
+                const ruleParam: RuleParam = {
+                    row: row.item,
+                    rowIndex: row.rowIndex,
+                    colIndex: colHeader.colIndex,
+                    column,
+                    key,
+                    rowKey,
+                    value: this.getItemValue(rowKey, key),
+                    field: key,
+                    fieldValue: this.getItemValue(rowKey, key),
+                };
+                const validator = new Validator(rules);
+                const _errors = validator.validate(ruleParam);
+                this.setValidationError(rowKey, key, _errors);
+                resolve(_errors);
             } else {
+                this.clearValidationError(rowKey, key);
                 resolve([]);
             }
         });
@@ -1270,14 +1243,29 @@ export default class Database {
     setValidationErrorByRowIndex(rowIndex: number, key: string, message: string) {
         const rowKey = this.rowIndexRowKeyMap.get(rowIndex);
         const _key = `${rowKey}\u200b_${key}`;
-        const errors: ValidateError[] = [
+        const row = this.getRowForRowIndex(rowIndex);
+        const cellHeader = this.getColumnByKey(key);
+        if (!rowKey || !cellHeader || !row) {
+            return;
+        }
+        const value = this.getItemValue(rowKey, key);
+        const errors: ValidateResult = [
             {
+                key,
+                rowKey,
+                rowIndex,
+                colIndex: cellHeader.colIndex,
+                column: cellHeader.column,
+                row,
+                value,
                 message,
+                field: key,
+                fieldValue: value,
             },
         ];
         this.validationErrorMap.set(_key, errors);
     }
-    setValidationError(rowKey: string, key: string, errors: any[]) {
+    setValidationError(rowKey: string, key: string, errors: ValidateResult) {
         const _key = `${rowKey}\u200b_${key}`;
         this.validationErrorMap.set(_key, errors);
     }
@@ -1291,7 +1279,7 @@ export default class Database {
         const _key = `${rowKey}\u200b_${key}`;
         return this.validationErrorMap.get(_key) || [];
     }
-    // 获取虚拟单元格
+    // 获取虚拟单元格,只针对可见的
     getVirtualBodyCell(rowIndex: number, colIndex: number) {
         const column = this.getColumnByColIndex(colIndex);
         const row = this.getRowForRowIndex(rowIndex);

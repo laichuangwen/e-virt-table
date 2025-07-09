@@ -110,7 +110,10 @@ let columns: Column[] = [
                         readonly: false,
                         width: 200,
                         rules: {
-                            validator(rule: any, value: any, callback: any) {
+                            required: true,
+                            message: '该项必填哦！',
+                            validator(rule, value, callback) {
+                                console.log(rule);
                                 if (!value) {
                                     callback('请输入岗位');
                                 } else if (value.length > 10) {
@@ -292,14 +295,19 @@ let columns: Column[] = [
         title: '采购价(元)',
         key: 'purchasePrice',
         fixed: 'right',
-        type: 'number',
-        // rules: [
-        //     {
-        //         required: true,
-        //         type: 'number',
-        //         message: '请输入销售价',
-        //     },
-        // ],
+        // type: 'number',
+        rules: [
+            {
+                required: true,
+                message: '请输入',
+            },
+            {
+                // required: false,
+                message: '请输入销售价',
+                // 只能输入数字或小数点，且小数点后最多两位
+                pattern: /^(\d+(\.\d{1,2})?|\.?\d{1,2})$/,
+            },
+        ],
     },
     {
         title: '销售价(元)',
