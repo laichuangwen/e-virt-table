@@ -2,7 +2,6 @@
 
 ## Column
 
--   更多 rules 高级用法可参考 [async-validator](https://github.com/yiminghe/async-validator)。
 
 | 参数  | 说明           | 类型   | 默认值 |
 | ----- | -------------- | ------ | ------ |
@@ -14,10 +13,24 @@
 | ---------------------- | -------------- | --------------------------------------------------------------- | ------ |
 | BODY_CELL_RULES_METHOD | 自定义校验规则 | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean` | —      |
 
+## Rules
+
+```ts
+
+type Rule = {
+    required?: boolean;
+    pattern?: RegExp;
+    validator?: RuleValidator;
+    message?: string;
+};
+type Rules = Rule[];
+
+```
+
 ## Events
 
-| 事件名称            | 说明                         | 回调参数       |
-| ------------------- | ---------------------------- | -------------- |
+| 事件名称            | 说明                         | 回调参数 |
+| ------------------- | ---------------------------- | -------- |
 | validateChangedData | 更改值后全部校验通过后的回调 | Array[]  |
 
 ## 校验器
@@ -41,7 +54,21 @@ h:350px
 :::
 
 ## 常用校验规则
-> 更多 rules 高级用法可参考  [async-validator](https://github.com/yiminghe/async-validator)
+
+## Rules
+
+```ts
+
+type Rule = {
+    required?: boolean;
+    pattern?: RegExp;
+    validator?: RuleValidator;
+    message?: string;
+};
+type Rules = Rule[];
+
+```
+
 1. 必填
 
 ```js

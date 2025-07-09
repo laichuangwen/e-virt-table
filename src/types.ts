@@ -1,6 +1,6 @@
 import type Cell from './Cell';
 import type CellHeader from './CellHeader';
-import type { RuleItem } from 'async-validator';
+import type { Rule, Rules } from './Validator';
 import Config from './Config';
 export type OptionalizeExcept<T, K extends keyof T> = Partial<Omit<T, K>> & Required<Pick<T, K>>;
 export type EVirtTableOptions = {
@@ -76,14 +76,7 @@ export type ContextmenuItem = {
     render: Function;
 };
 export type Render = Function | string | undefined;
-export interface Rule extends RuleItem {
-    column?: Column;
-    row?: any; // 这里可以定义更具体的类型，根据你的需求
-    rowIndex?: number;
-    colIndex?: number;
-}
-export type Rules = Rule | Rule[];
-export type Descriptor = Record<string, Rules>;
+
 export type ValidateItemError = {
     rowIndex: number;
     key: string;
@@ -149,7 +142,7 @@ export interface Column {
     readonly?: boolean;
     children?: Column[];
     column?: Column;
-    rules?: Rules;
+    rules?: Rules | Rule;
     options?: any;
 }
 export type OverlayerTooltip = {
