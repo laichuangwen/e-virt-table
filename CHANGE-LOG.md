@@ -253,3 +253,9 @@ V1.2.16
 fix: 修复loadConfig，filterMethod会清除校验错误信息及已经改变值
 fix: 修复tree校验错误时不回展开
 ---
+
+V1.2.17
+### Bug Fixes
+refactor:重构校验器，剔除async-validator
+fix: 添加config类型提示
+---

@@ -110,7 +110,10 @@ let columns: Column[] = [
                         readonly: false,
                         width: 200,
                         rules: {
-                            validator(rule: any, value: any, callback: any) {
+                            required: true,
+                            message: '该项必填哦！',
+                            validator(rule, value, callback) {
+                                console.log(rule);
                                 if (!value) {
                                     callback('请输入岗位');
                                 } else if (value.length > 10) {
