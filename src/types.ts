@@ -142,6 +142,7 @@ export interface Column {
     formatterFooter?: FormatterMethod;
     isAutoRowHeight?: boolean;
     overflowTooltipShow?: boolean;
+    overflowTooltipHeaderShow?: boolean;
     overflowTooltipMaxWidth?: number;
     overflowTooltipPlacement?: OverflowTooltipPlacement;
     required?: boolean;

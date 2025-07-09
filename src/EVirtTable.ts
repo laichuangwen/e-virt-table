@@ -118,7 +118,8 @@ export default class EVirtTable {
     }
     loadConfig(_config: ConfigType) {
         this.ctx.config.init(_config);
-        this.ctx.database.init();
+        //重新加载config，初始化表格，但是默认不清除用户操作
+        this.ctx.database.init(false);
         this.header.init();
         // 更新右键菜单，有可能配置项变化
         this.contextMenu.updated();
@@ -157,9 +158,9 @@ export default class EVirtTable {
         this.ctx.off(event, callback);
     }
     filterMethod(func: FilterMethod) {
-        this.scrollTo(0, 0);
         this.ctx.database.setFilterMethod(func);
-        this.ctx.database.init();
+        //重新初始化表格，但是默认不清除用户操作
+        this.ctx.database.init(false);
         this.header.init();
         this.ctx.emit('draw');
     }
@@ -257,6 +258,13 @@ export default class EVirtTable {
                     if (Array.isArray(err) && err.length) {
                         const [_err] = err;
                         const { rowKey, key } = _err;
+                        const targetRow = this.ctx.database.getRowForRowKey(rowKey);
+                        if (targetRow) {
+                            const { parentRowKeys = [] } = targetRow;
+                            if (parentRowKeys && parentRowKeys.length) {
+                                this.setExpandRowKeys(parentRowKeys, true);
+                            }
+                        }
                         this.scrollToRowkey(rowKey);
                         this.scrollToColkey(key);
                     }

@@ -56,7 +56,8 @@ export default class Header {
         const leafColumns = toLeaf(columns);
         this.height = HEADER_HEIGHT * maxHeaderRow;
         this.width = leafColumns.reduce((sum, _item) => {
-            const { width = 100, maxWidth, minWidth } = _item;
+            const width = _item.width || 100;
+            const { maxWidth, minWidth } = _item;
             if (maxWidth && width > maxWidth) {
                 return sum + maxWidth;
             }
