@@ -47,6 +47,7 @@ export default class Validator {
                     row,
                     key,
                     rowKey,
+                    ...rule,
                 };
                 rule.validator(ruleParam, value, (message) => {
                     if (message) {
