@@ -88,3 +88,13 @@ h:400px
 height/resize
 h:350px
 :::
+
+## Adaptive row height
+- Disabled by default
+- Note that overlays are not currently supported
+
+::: demo
+
+height/auto-height
+h:350px
+:::

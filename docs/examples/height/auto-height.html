@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+     <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        let data = [
+            {
+                date: '2016-05-03',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address:
+                    'No. 189, Grove St, Los AngelesNo. 189, Grove St, Los AngelesNo. 189, Grove St, Los AngelesNo. 189, Grove St, Los AngelesNo. 189, Grove St, Los AngelesNo. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-02',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address:
+                    'No. 189, Grove St, Los AngelesNo. 189, Grove St, Los AngelesNo. 189, Grove St, Los AngelesNo. 189, Grove St, Los AngelesNo. 189, Grove St, Los AngelesNo. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-04',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los AngelesLos AngelesLos AngelesLos AngelesLos AngelesLos AngelesLos AngelesLos Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+        ];
+        let columns = [
+            {
+                title: 'Date',
+                key: 'date',
+                readonly: true,
+                fixed: 'left',
+            },
+            {
+                title: 'Name',
+                key: 'name',
+                readonly: true,
+                width: 200,
+                fixed: 'left',
+            },
+            {
+                title: 'State',
+                key: 'state',
+                width: 200,
+                readonly: true,
+            },
+            {
+                title: 'City',
+                key: 'city',
+                width: 200,
+                isAutoRowHeight: true,
+                align: 'left',
+                headerAlign: 'center',
+                readonly: true,
+            },
+            {
+                title: 'Address',
+                key: 'address',
+                readonly: true,
+                align: 'left',
+                headerAlign: 'center',
+                isAutoRowHeight: true,
+                width: 300,
+            },
+            {
+                title: 'Zip',
+                key: 'zip',
+                width: 200,
+                readonly: true,
+                fixed: 'right',
+            },
+        ];
+        const target = document.getElementById('e-virt-table');
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+        });
+    </script>
+</html>

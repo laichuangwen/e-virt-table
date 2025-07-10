@@ -243,7 +243,9 @@ type EVirtTableOptions = {
 | minWidth | Min width of the column | number | —|
 | maxWidth | Max width of the column | number | —|
 | align | Horizontal alignment | string | `"left"`, `"center"`, `"right"` | — |
+| headerAlign |Header horizontal alignment | string | `"left"`, `"center"`, `"right"` | — |
 | verticalAlign | Vertical alignment | string | `"top"`, `"middle"`, `"bottom"` | — |
+| headerVerticalAlign |Header vertical alignment | string | `"top"`, `"middle"`, `"bottom"` | — |
 | fixed | Fix the column position | string | `"left"`, `"right"` | — |
 | render | Custom render method | string\|Function | — | — |
 | renderFooter | Custom footer render method | string\|Function | — | — |
@@ -255,6 +257,7 @@ type EVirtTableOptions = {
 | column | Current column object | Column | — | — |
 | hoverIconName | Hover icon name, ICONS configurable | string | — |
 | placeholder | Placeholder text | string | — |
+| isAutoRowHeight | Automatic row height | boolean | false |
 | overflowTooltipHeaderShow |Header show overflow tooltip | boolean | — | true |
 | overflowTooltipShow | Show overflow tooltip | boolean | — | true |
 | overflowTooltipMaxWidth | Max width of overflow tooltip | number | — | — |

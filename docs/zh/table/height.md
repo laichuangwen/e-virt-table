@@ -89,3 +89,13 @@ h:320px
 height/resize
 h:350px
 :::
+
+## 自适应行高
+- 默认是关闭的
+- 注意目前覆盖层不支持
+
+::: demo
+
+height/auto-height
+h:350px
+:::

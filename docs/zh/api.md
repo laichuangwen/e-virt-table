@@ -244,7 +244,9 @@ type EVirtTableOptions = {
 | minWidth | 列的最小宽度 | number | —|
 | maxWidth | 列的最大宽度 | number | —|
 | align | 水平对齐方式 | `"left"`, `"center"`, `"right"` | center |
+| headerAlign | 表头水平对齐方式 | `"left"`, `"center"`, `"right"` | center |
 | verticalAlign | 垂直对齐方式 | `"top"`, `"middle"`, `"bottom"` | middle |
+| headerVerticalAlign | 表头垂直对齐方式 | `"top"`, `"middle"`, `"bottom"` | middle |
 | fixed | 是否固定列 | `"left"`, `"right"` | — |
 | render | 自定义渲染方法 | string\|Function | — |
 | renderFooter | 自定义渲染底部方法 | string\|Function | — |
@@ -256,6 +258,7 @@ type EVirtTableOptions = {
 | column | 当前列对象 | Column | — |
 | hoverIconName | 悬浮图标名字，可ICONS配置 | string | — |
 | placeholder | 占位符文本 | string | — |
+| isAutoRowHeight | 格子自适应行高 | boolean | false |
 | overflowTooltipHeaderShow | 表头是否显示溢出提示 | boolean | true |
 | overflowTooltipShow | 是否显示溢出提示 | boolean | true |
 | overflowTooltipMaxWidth | 溢出提示的宽度 | number | 500 |
