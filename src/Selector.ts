@@ -759,6 +759,7 @@ export default class Selector {
                         rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
                     });
                     this.ctx.emit('pasteChange', changeList, rows);
+                    this.ctx.emit('draw');
                 })
                 .catch((error) => {
                     console.error('Failed to get the clipboard content:', error);

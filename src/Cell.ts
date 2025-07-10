@@ -114,6 +114,10 @@ export default class Cell extends BaseCell {
         this.value = this.getValue();
         this.render = column.render;
         this.overflowTooltipShow = column.overflowTooltipShow === false ? false : true;
+        this.isAutoRowHeight = column.isAutoRowHeight === true ? true : false;
+        if (this.isAutoRowHeight) {
+            this.overflowTooltipShow = false; // 自动行高不显示溢出提示
+        }
         this.overflowTooltipMaxWidth = column.overflowTooltipMaxWidth || 500;
         this.overflowTooltipPlacement = column.overflowTooltipPlacement || 'top';
         this.renderFooter = column.renderFooter;
@@ -554,6 +558,35 @@ export default class Cell extends BaseCell {
             this.drawImageSource = drawImageSource;
         }
     }
+    /**
+     * 获取自动高度
+     * @returns
+     */
+    getAutoHeight() {
+        if (this.cellType !== 'body') {
+            return -1;
+        }
+        if (!this.isAutoRowHeight) {
+            return -1;
+        }
+        if (!(this.displayText && typeof this.displayText === 'string')) {
+            return -1;
+        }
+        const { BODY_FONT, CELL_PADDING } = this.ctx.config;
+        const calculatedHeight = this.ctx.paint.calculateTextHeight(this.displayText, this.visibleWidth, {
+            font: BODY_FONT,
+            padding: CELL_PADDING,
+        });
+        if (this.mergeRow) {
+            if (this.visibleHeight < calculatedHeight) {
+                // 只会叠加在第一行
+                return calculatedHeight - (this.visibleHeight - this.height);
+            }
+            return this.height; // 保持原有高度
+        }
+        // 转成整数
+        return Math.round(calculatedHeight);
+    }
     // 过去跨度配置
     getSpanInfo(): SpanInfo {
         return this.ctx.database.getSpanInfo(this);
@@ -773,47 +806,6 @@ export default class Cell extends BaseCell {
             const offsetIconX = this.drawTextX - this.drawX;
             visibleWidth = this.visibleWidth - offsetIconX; // 减去树形图标的宽度
         }
-        
-        // 检查是否需要自适应高度
-        const isAutoRowHeight = this.column.isAutoRowHeight === true;
-        if (!this.overflowTooltipShow && isAutoRowHeight && this.cellType === 'body') {
-            // 计算文本需要的高度
-            const { placeholder } = this.column;
-            // todo  如果有render函数 应该获取render内部的文本和样式计算高度
-            let text = this.render ? this.text : this.displayText;
-            const isReadonly = this.ctx.database.getReadonly(this.rowKey, this.key);
-            if (
-                !isReadonly &&
-                placeholder &&
-                ['', null, undefined].includes(this.text) &&
-                !(this.rowspan === 0 || this.colspan === 0)
-            ) {
-                text = placeholder;
-            }
-            
-            // 确保text不为空才进行计算
-            if (text && typeof text === 'string') {
-                const calculatedHeight = this.ctx.paint.calculateTextHeight(text, visibleWidth, {
-                    font: BODY_FONT,
-                    padding: CELL_PADDING,
-                });
-                
-                // 更新计算高度并通知行高变化（无论高度增加还是减少）
-                const previousCalculatedHeight = this.calculatedHeight;
-                this.calculatedHeight = calculatedHeight;
-                
-                // 如果计算出的高度与之前不同，或者大于当前行高，则触发更新
-                if (calculatedHeight !== previousCalculatedHeight && calculatedHeight > 0) {
-                    this.ctx.emit('autoRowHeightChange', {
-                        rowIndex: this.rowIndex,
-                        rowKey: this.rowKey,
-                        height: calculatedHeight,
-                        cell: this,
-                    });
-                }
-            }
-        }
-        
         const { ellipsis } = this.ctx.paint.handleEllipsis(this.displayText, visibleWidth, CELL_PADDING, BODY_FONT);
         this.ellipsis = ellipsis;
         const { placeholder } = this.column;
@@ -837,7 +829,7 @@ export default class Cell extends BaseCell {
             align: this.align,
             verticalAlign: this.verticalAlign,
             color,
-            isAutoRowHeight: !this.overflowTooltipShow && isAutoRowHeight,
+            isAutoRowHeight: this.isAutoRowHeight,
         });
     }
     private drawImage() {

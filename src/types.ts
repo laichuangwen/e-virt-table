@@ -90,6 +90,7 @@ export type Position = {
     height: number;
     top: number;
     bottom: number;
+    calculatedHeight: number;
 };
 export type PastedDataOverflow = {
     maxY: number;

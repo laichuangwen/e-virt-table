@@ -123,6 +123,7 @@ export default class Database {
                 rowIndex: index,
                 level,
                 height,
+                calculatedHeight: -1,
                 check: false,
                 selectable,
                 expand,
@@ -152,6 +153,37 @@ export default class Database {
         const row = this.rowKeyMap.get(rowKey);
         row.height = height;
         row.item._height = height;
+        this.clearBufferData(); // 清除缓存数据
+    }
+    // 批量设置行高度
+    setBatchRowHeight(rowIndexHeightList: { rowIndex: number; height: number }[]) {
+        rowIndexHeightList.forEach(({ rowIndex, height }) => {
+            const rowKey = this.rowIndexRowKeyMap.get(rowIndex);
+            if (rowKey) {
+                const row = this.rowKeyMap.get(rowKey);
+                row.height = height;
+                row.item._height = height;
+            }
+        });
+        this.clearBufferData(); // 清除缓存数据
+    }
+    // 批量设置计算行高度
+    setBatchCalculatedRowHeight(rowIndexHeightList: { rowIndex: number; height: number }[]) {
+        // 判断是否需要更新
+        const isNeedUpdate = rowIndexHeightList.every(({ height, rowIndex }) => {
+            const position = this.getPositionForRowIndex(rowIndex);
+            return position.calculatedHeight === height;
+        });
+        if (isNeedUpdate) {
+            return;
+        }
+        rowIndexHeightList.forEach(({ rowIndex, height }) => {
+            const rowKey = this.rowIndexRowKeyMap.get(rowIndex);
+            if (rowKey) {
+                const row = this.rowKeyMap.get(rowKey);
+                row.calculatedHeight = height;
+            }
+        });
         this.clearBufferData(); // 清除缓存数据
     }
     /**
@@ -220,15 +252,18 @@ export default class Database {
             data.forEach((item) => {
                 list.push(item);
                 const rowKey = this.itemRowKeyMap.get(item);
-                const { expand, hasChildren, height } = this.rowKeyMap.get(rowKey);
+                const { expand, hasChildren, height, calculatedHeight } = this.rowKeyMap.get(rowKey);
                 const top = this.sumHeight;
-                this.sumHeight += height;
+                // 计算行高度和设置高度取最大
+                const _height = Math.max(calculatedHeight, height);
+                this.sumHeight += _height;
                 this.rowIndexRowKeyMap.set(rowIndex, rowKey);
                 this.rowKeyRowIndexMap.set(rowKey, rowIndex);
                 this.positions.push({
                     top,
-                    height,
+                    height: _height,
                     bottom: this.sumHeight,
+                    calculatedHeight: calculatedHeight,
                 });
                 rowIndex += 1;
                 if (expand && hasChildren) {
@@ -962,6 +997,7 @@ export default class Database {
             height: 0,
             top: 0,
             bottom: 0,
+            calculatedHeight: 0,
         };
     }
 

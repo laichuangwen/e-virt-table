@@ -235,6 +235,8 @@ export default class Autofill {
             rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
         });
         this.ctx.emit('autofillChange', changeList, rows);
+        // 触发绘制
+        this.ctx.emit('draw');
     }
     private mouseenter(cell: Cell) {
         if (['index', 'selection', 'index-selection'].includes(cell.type)) {

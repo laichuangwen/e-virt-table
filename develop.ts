@@ -53,6 +53,7 @@ let columns: Column[] = [
         fixed: 'left',
         align: 'left',
         hoverIconName: 'icon-edit',
+        // isAutoRowHeight: true,
         placeholder: '请输入',
         // editorType: 'none',
         verticalAlign: 'middle',
@@ -204,13 +205,14 @@ let columns: Column[] = [
         hoverIconName: 'icon-date',
         sort: 2,
     },
+    { title: '工作地址', key: 'work_address', isAutoRowHeight: true },
     {
         title: '家庭地址',
         key: 'address',
         align: 'left',
         width: 250,
         isAutoRowHeight: true,
-        overflowTooltipShow: false,
+        // overflowTooltipShow: false,
         overflowTooltipMaxWidth: 200,
         overflowTooltipPlacement: 'top',
         readonly: true,
@@ -218,31 +220,31 @@ let columns: Column[] = [
         //     required: true,
         //     message: '该项必填哦！',
         // },
-        render: (pEl, cell) => {
-            const cellEl = document.createElement('div');
-            cellEl.addEventListener('click', () => {
-                console.log('点击了家庭地址');
-            });
-            cellEl.addEventListener('selectionchange', () => {
-                console.log('selectionchange');
-                const selection = window.getSelection();
-                const text = selection ? selection.toString() : '';
-                if (text) {
-                    console.log('用户选中了文本:', text);
-                }
-            });
-            cellEl.style.width = '100%';
-            cellEl.style.height = '100%';
-            cellEl.style.opacity = '0.5';
-            cellEl.style.backgroundColor = 'cyan';
-            cellEl.style.display = 'block';
-            // cellEl.style.justifyContent = 'center';
-            // cellEl.style.alignItems = 'center';
-            cellEl.style.whiteSpace = 'pre-line';
-            cellEl.style.userSelect = 'text';
-            cellEl.innerHTML = cell.text;
-            pEl.appendChild(cellEl);
-        },
+        // render: (pEl, cell) => {
+        //     const cellEl = document.createElement('div');
+        //     cellEl.addEventListener('click', () => {
+        //         console.log('点击了家庭地址');
+        //     });
+        //     cellEl.addEventListener('selectionchange', () => {
+        //         console.log('selectionchange');
+        //         const selection = window.getSelection();
+        //         const text = selection ? selection.toString() : '';
+        //         if (text) {
+        //             console.log('用户选中了文本:', text);
+        //         }
+        //     });
+        //     cellEl.style.width = '100%';
+        //     cellEl.style.height = '100%';
+        //     cellEl.style.opacity = '0.5';
+        //     cellEl.style.backgroundColor = 'cyan';
+        //     cellEl.style.display = 'block';
+        //     // cellEl.style.justifyContent = 'center';
+        //     // cellEl.style.alignItems = 'center';
+        //     cellEl.style.whiteSpace = 'pre-line';
+        //     cellEl.style.userSelect = 'text';
+        //     cellEl.innerHTML = cell.text;
+        //     pEl.appendChild(cellEl);
+        // },
     },
     {
         title: '请假开始时间',
@@ -271,7 +273,7 @@ let columns: Column[] = [
     { title: '户籍城市', key: 'household_city' },
     { title: '户籍地址', key: 'household_address' },
     { title: '民族', key: 'nation' },
-    { title: '工作地址', key: 'work_address' },
+    // { title: '工作地址', key: 'work_address' },
     {
         title: '工作邮箱',
         key: 'work_email',
@@ -334,7 +336,7 @@ let columns: Column[] = [
     },
 ];
 let data: any[] = [];
-for (let i = 0; i < 1000; i += 1) {
+for (let i = 0; i < 1500; i += 1) {
     data.push({
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
         id: `1_${i}`,
@@ -352,7 +354,11 @@ for (let i = 0; i < 1000; i += 1) {
         sex: i % 4 === 0 ? 1 : i === 3 ? null : 2,
         address:
             // eslint-disable-next-line no-nested-ternary
-            i === 1 ? `海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地${i}号` : i === 4 ? '' : `海淀区北京路${i}号`,
+            i === 1
+                ? `海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地${i}号`
+                : i === 4
+                ? ''
+                : `海淀区北京路${i}号`,
         work_type: `兼职${i}`,
         work_status: `在职${i}`,
         household_city: `深圳${i}`,
