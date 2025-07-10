@@ -572,10 +572,11 @@ export default class Cell extends BaseCell {
         if (!(this.displayText && typeof this.displayText === 'string')) {
             return -1;
         }
-        const { BODY_FONT, CELL_PADDING } = this.ctx.config;
+        const { BODY_FONT, CELL_PADDING, CELL_LINE_HEIGHT } = this.ctx.config;
         const calculatedHeight = this.ctx.paint.calculateTextHeight(this.displayText, this.visibleWidth, {
             font: BODY_FONT,
             padding: CELL_PADDING,
+            lineHeight: CELL_LINE_HEIGHT,
         });
         if (this.mergeRow) {
             if (this.visibleHeight < calculatedHeight) {
@@ -800,7 +801,7 @@ export default class Cell extends BaseCell {
         return width;
     }
     private drawText() {
-        const { CELL_PADDING, BODY_FONT, PLACEHOLDER_COLOR } = this.ctx.config;
+        const { CELL_PADDING, BODY_FONT, PLACEHOLDER_COLOR, CELL_LINE_HEIGHT } = this.ctx.config;
         let visibleWidth = this.visibleWidth;
         if (this.type === 'tree') {
             const offsetIconX = this.drawTextX - this.drawX;
@@ -830,6 +831,7 @@ export default class Cell extends BaseCell {
             verticalAlign: this.verticalAlign,
             color,
             isAutoRowHeight: this.isAutoRowHeight,
+            lineHeight: CELL_LINE_HEIGHT,
         });
     }
     private drawImage() {

@@ -33,7 +33,7 @@ export default class Config {
     /** 行的唯一标识键 */
     ROW_KEY = '';
     /** 禁用编辑,优先等级最高 */
-    DISABLED = false; 
+    DISABLED = false;
     /** 表头字体 */
     HEADER_FONT = '12px normal Arial';
     /** 单元格字体 */
@@ -41,9 +41,9 @@ export default class Config {
     /** 边框 */
     BORDER = true;
     /** 斑马纹 */
-    STRIPE = false; 
+    STRIPE = false;
     /** 斑马纹颜色 */
-    STRIPE_COLOR = '#fafafa'; 
+    STRIPE_COLOR = '#fafafa';
     /** 区域边框颜色 */
     BORDER_COLOR = '#e1e6eb';
     /** 宽度为 0 表示自适应100% */
@@ -68,7 +68,7 @@ export default class Config {
     OFFSET_HEIGHT = 0;
     HEADER_HEIGHT = 36;
     /** 启用头部固定,需要外面实现覆盖层，或者所有表头都要是元素 */
-    ENABLE_HEADER_STICKY = false; 
+    ENABLE_HEADER_STICKY = false;
     /** 表头背景色 */
     HEADER_BG_COLOR = '#F8FAFF';
     /** body 背景色 */
@@ -102,6 +102,8 @@ export default class Config {
     CELL_WIDTH = 100;
     /** body 单元格默认行高 */
     CELL_HEIGHT = 36;
+    /** 格子多行文本行高,isAutoRowHeight才会生效 */
+    CELL_LINE_HEIGHT = 1.5;
     /** 表格 body 部分的 padding */
     CELL_PADDING = 8;
     /** hover编辑图标大小 */
@@ -161,21 +163,21 @@ export default class Config {
     /** 启用选择器 */
     ENABLE_SELECTOR = true;
     /** 启用单点击立马编辑 */
-    ENABLE_EDIT_SINGLE_CLICK = false; 
+    ENABLE_EDIT_SINGLE_CLICK = false;
     /** 启用点击选择器编辑 */
-    ENABLE_EDIT_CLICK_SELECTOR = true; 
+    ENABLE_EDIT_CLICK_SELECTOR = true;
     /** 选择器X最小范围 */
-    SELECTOR_AREA_MIN_X = 0; 
+    SELECTOR_AREA_MIN_X = 0;
     /** 选择器X最大范围colMax - offset */
     SELECTOR_AREA_MAX_X_OFFSET = 0;
     /** 选择器X最大范围,0默认最大colMax */
     SELECTOR_AREA_MAX_X = 0;
     /** 选择器Y最小范围 */
-    SELECTOR_AREA_MIN_Y = 0; 
+    SELECTOR_AREA_MIN_Y = 0;
     /** 选择器Y最大范围,0默认rowMax */
-    SELECTOR_AREA_MAX_Y = 0; 
+    SELECTOR_AREA_MAX_Y = 0;
     /** 选择器Y最大范围,0默认rowMax */
-    SELECTOR_AREA_MAX_Y_OFFSET = 0; 
+    SELECTOR_AREA_MAX_Y_OFFSET = 0;
     /** 启用自动主题 */
     ENABLE_AUTO_THEME = true;
     /** 启用选择器-选择器单选 */
