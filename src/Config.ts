@@ -103,7 +103,7 @@ export default class Config {
     /** body 单元格默认行高 */
     CELL_HEIGHT = 36;
     /** 格子多行文本行高,isAutoRowHeight才会生效 */
-    CELL_LINE_HEIGHT = 1.5;
+    CELL_LINE_HEIGHT = 1.3;
     /** 表格 body 部分的 padding */
     CELL_PADDING = 8;
     /** hover编辑图标大小 */
