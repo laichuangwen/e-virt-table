@@ -121,7 +121,9 @@ export interface Column {
     maxWidth?: number;
     widthFillDisable?: boolean;
     align?: Align;
+    headerAlign?: Align;
     verticalAlign?: VerticalAlign;
+    headerVerticalAlign?: VerticalAlign;
     fixed?: Fixed;
     level?: number;
     text?: string;

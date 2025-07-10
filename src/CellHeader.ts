@@ -59,8 +59,8 @@ export default class CellHeader extends BaseCell {
         this.maxWidth = column.maxWidth;
         this.type = column.type || '';
         this.editorType = column.editorType || 'text';
-        this.align = column.align || 'center';
-        this.verticalAlign = column.verticalAlign || 'middle';
+        this.align = column.headerAlign || column.align || 'center';
+        this.verticalAlign = column.headerVerticalAlign || column.verticalAlign || 'middle';
         this.fixed = column.fixed;
         this.level = column.level || 0;
         this.operation = column.operation || false;

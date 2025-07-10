@@ -209,6 +209,7 @@ let columns: Column[] = [
     {
         title: '家庭地址',
         key: 'address',
+        headerAlign: 'center',
         align: 'left',
         width: 250,
         isAutoRowHeight: true,
