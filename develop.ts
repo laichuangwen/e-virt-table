@@ -251,12 +251,13 @@ let columns: Column[] = [
         title: '物料编码',
         key: 'materialNo',
         align: 'right',
+        selectorCellValueType: 'displayText', // displayText | value
         formatter({ value }: { value: string }) {
             if (!value) {
                 return '';
             }
             const v = parseFloat(value);
-            return v.toFixed(2);
+            return `物料编码：${v}`;
         },
     },
     {
@@ -333,7 +334,7 @@ let columns: Column[] = [
     },
 ];
 let data: any[] = [];
-for (let i = 0; i < 1000; i += 1) {
+for (let i = 0; i < 100000; i += 1) {
     data.push({
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
         id: `1_${i}`,
@@ -448,13 +449,14 @@ const eVirtTable = new EVirtTable(canvas, {
         ENABLE_OFFSET_HEIGHT: true,
         HIGHLIGHT_SELECTED_ROW: false,
         HIGHLIGHT_HOVER_ROW: true,
-        ENABLE_MERGE_CELL_LINK: true,
+        ENABLE_MERGE_CELL_LINK: false,
         ENABLE_EDIT_SINGLE_CLICK: false,
         FOOTER_FIXED: true,
         ENABLE_COPY: true,
         ENABLE_PASTER: true,
         FOOTER_POSITION: 'bottom',
         OFFSET_HEIGHT: 16,
+        SELECTOR_CELL_VALUE_TYPE: 'displayText', // displayText | value
         // SELECTOR_AREA_MAX_X_OFFSET: 1,
         // SELECTOR_AREA_MAX_Y_OFFSET: 1,
         ENABLE_CONTEXT_MENU: true,

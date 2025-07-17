@@ -277,9 +277,15 @@ export default class Context {
             for (let ci = 0; ci <= xArr[1] - xArr[0]; ci++) {
                 const rowIndex = ri + yArr[0];
                 const colIndex = ci + xArr[0];
-                const item = this.database.getItemValueForRowIndexAndColIndex(rowIndex, colIndex);
-                if (item) {
-                    cellsData.push(item.value);
+                const cell = this.database.getVirtualBodyCell(rowIndex, colIndex);
+                if (cell) {
+                    // 选择器值类型
+                    if (cell.selectorCellValueType === 'displayText') {
+                        cellsData.push(cell.displayText);
+                    } else {
+                        // 默认value
+                        cellsData.push(cell.getValue());
+                    }
                 }
             }
             text += `${cellsData.join('\t')}\r`;
