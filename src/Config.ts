@@ -20,7 +20,7 @@ import {
     FormatterMethod,
     MenuItem,
     SelectableMethod,
-    SelectorValueType,
+    SelectorCellValueType,
     SpanMethod,
 } from './types';
 import { getCssVar } from './util';
@@ -178,7 +178,7 @@ export default class Config {
     /** 选择器Y最大范围,0默认rowMax */
     SELECTOR_AREA_MAX_Y_OFFSET = 0; 
     /** 选择器值类型，value，displayText,区别displayText受format影响 */
-    SELECTOR_CELL_VALUE_TYPE: SelectorValueType = 'value'; // displayText | value
+    SELECTOR_CELL_VALUE_TYPE: SelectorCellValueType = 'value'; // displayText | value
     /** 启用自动主题 */
     ENABLE_AUTO_THEME = true;
     /** 启用选择器-选择器单选 */
