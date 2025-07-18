@@ -432,7 +432,7 @@ export default class Database {
      * @param history
      * @returns
      */
-    async batchSetItemValue(_list: ChangeItem[], history = false) {
+    async batchSetItemValue(_list: ChangeItem[], history = false, checkReadonly = true) {
         let historyList: HistoryItemData[] = [];
         const rowKeyList: Set<string> = new Set();
         let errList: ChangeItem[] = [];
@@ -491,7 +491,7 @@ export default class Database {
         changeList.forEach((data) => {
             const { value, rowKey, key, oldValue } = data;
             rowKeyList.add(rowKey);
-            this.setItemValue(rowKey, key, value);
+            this.setItemValue(rowKey, key, value, false, false, false, checkReadonly);
             historyList.push({
                 rowKey,
                 key,
@@ -510,7 +510,9 @@ export default class Database {
                 this.ctx.emit('validateChangedData', this.getChangedData());
             }
         });
-        this.ctx.emit('change', changeList, rows);
+        if (checkReadonly) {
+            this.ctx.emit('change', changeList, rows);
+        }
         // 推历史记录
         if (history) {
             this.ctx.history.pushState({
@@ -530,9 +532,18 @@ export default class Database {
      * @param history 是否添加历史记录
      * @param reDraw 是否刷新重绘
      * @param isEditor 是否是编辑器
+     * @param checkReadonly 是否检查只读
      * @returns
      */
-    async setItemValue(rowKey: string, key: string, _value: any, history = false, reDraw = false, isEditor = false) {
+    async setItemValue(
+        rowKey: string,
+        key: string,
+        _value: any,
+        history = false,
+        reDraw = false,
+        isEditor = false,
+        checkReadonly = true,
+    ) {
         // 异常情况
         if (!this.rowKeyMap.has(rowKey)) {
             return {};
@@ -543,7 +554,7 @@ export default class Database {
         let value = _value;
 
         // 只读返回旧值
-        if (this.ctx.database.getReadonly(rowKey, key)) {
+        if (checkReadonly && this.ctx.database.getReadonly(rowKey, key)) {
             return {
                 oldValue,
                 newValue: oldValue,
@@ -625,7 +636,9 @@ export default class Database {
                     this.ctx.emit('validateChangedData', this.getChangedData());
                 }
             });
-            this.ctx.emit('change', [changeItem], [row]);
+            if (checkReadonly) {
+                this.ctx.emit('change', [changeItem], [row]);
+            }
             this.ctx.emit('editChange', {
                 rowKey,
                 key,

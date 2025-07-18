@@ -167,15 +167,29 @@ export default class EVirtTable {
     editCell(rowIndex: number, colIndex: number) {
         this.editor.editCell(rowIndex, colIndex);
     }
-    setItemValue(rowKey: string, key: string, value: any, history = true, reDraw = true, isEditor = false) {
-        this.ctx.database.setItemValue(rowKey, key, value, history, reDraw, isEditor);
+    setItemValue(
+        rowKey: string,
+        key: string,
+        value: any,
+        history = true,
+        reDraw = true,
+        isEditor = false,
+        checkReadonly = true,
+    ) {
+        this.ctx.database.setItemValue(rowKey, key, value, history, reDraw, isEditor, checkReadonly);
     }
-    batchSetItemValue(list: ChangeItem[], history = true) {
-        this.ctx.database.batchSetItemValue(list, history);
+    batchSetItemValue(list: ChangeItem[], history = true, checkReadonly = true) {
+        this.ctx.database.batchSetItemValue(list, history, checkReadonly);
     }
-    setItemValueByEditor(rowKey: string, key: string, value: any, history = true, reDraw = true) {
-        this.ctx.setItemValueByEditor(rowKey, key, value, history, reDraw);
+    setItemValueByEditor(rowKey: string, key: string, value: any, history = true, reDraw = true, checkReadonly = true) {
+        this.ctx.setItemValueByEditor(rowKey, key, value, history, reDraw, checkReadonly);
         this.editor.doneEdit();
+    }
+
+    clearEditableData(value = null) {
+        const xArr = [0, this.ctx.maxColIndex];
+        const yArr = [0, this.ctx.maxRowIndex];
+        return this.selector.clearSelectedData(xArr, yArr, false, value);
     }
     clearEditor() {
         this.editor.clearEditor();
