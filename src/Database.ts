@@ -504,13 +504,13 @@ export default class Database {
         rowKeyList.forEach((rowKey) => {
             rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
         });
-        const promsieValidators = changeList.map(({ rowKey, key }) => this.getValidator(rowKey, key));
-        Promise.all(promsieValidators).then(() => {
-            if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
-                this.ctx.emit('validateChangedData', this.getChangedData());
-            }
-        });
         if (checkReadonly) {
+            const promsieValidators = changeList.map(({ rowKey, key }) => this.getValidator(rowKey, key));
+            Promise.all(promsieValidators).then(() => {
+                if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
+                    this.ctx.emit('validateChangedData', this.getChangedData());
+                }
+            });
             this.ctx.emit('change', changeList, rows);
         }
         // 推历史记录
@@ -630,13 +630,13 @@ export default class Database {
                 value,
                 row,
             };
-            // 实时校验错误
-            this.getValidator(rowKey, key).then(() => {
-                if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
-                    this.ctx.emit('validateChangedData', this.getChangedData());
-                }
-            });
             if (checkReadonly) {
+                // 实时校验错误
+                this.getValidator(rowKey, key).then(() => {
+                    if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
+                        this.ctx.emit('validateChangedData', this.getChangedData());
+                    }
+                });
                 this.ctx.emit('change', [changeItem], [row]);
             }
             this.ctx.emit('editChange', {
