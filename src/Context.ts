@@ -98,6 +98,8 @@ export default class Context {
     editing = false; // 编辑中
     onlyMergeCell = false; // 只有合并单元格
     selectOnlyOne = false; // 只选择一个
+    hasSelection = false; // 是否有选中
+    hasTree = false; // 是否有树形结构
     scrollY = 0;
     scrollX = 0;
     fixedLeftWidth = 0;

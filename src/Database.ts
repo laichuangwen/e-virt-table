@@ -16,7 +16,7 @@ import type {
     ErrorType,
     BeforeChangeItem,
 } from './types';
-import { generateShortUUID } from './util';
+import { generateShortUUID, toLeaf } from './util';
 import { HistoryItemData } from './History';
 import Cell from './Cell';
 export default class Database {
@@ -64,10 +64,30 @@ export default class Database {
         this.colIndexKeyMap.clear();
         this.rowIndexRowKeyMap.clear();
         this.rowKeyRowIndexMap.clear();
+        // 判断是否有选择和树形结构
+        const _columns = this.getColumns();
+        const leafColumns = toLeaf(_columns);
+        this.ctx.hasSelection = leafColumns.some((item) => item.type === 'selection');
+        this.ctx.hasTree = leafColumns.some((item) => item.type === 'tree');
         if (isClear) {
             this.originalDataMap.clear();
             this.changedDataMap.clear();
             this.validationErrorMap.clear();
+            const { ROW_KEY } = this.ctx.config;
+            // 清除选中和展开状态，如果没有ROW_KEY清除
+            if (!ROW_KEY) {
+                // 无行主键时直接清除所有状态
+                this.selectionMap.clear();
+                this.expandMap.clear();
+            } else {
+                // 有行主键，根据上下文条件清除部分状态
+                if (!this.ctx.hasSelection) {
+                    this.selectionMap.clear();
+                }
+                if (!this.ctx.hasTree) {
+                    this.expandMap.clear();
+                }
+            }
         }
         this.itemRowKeyMap = new WeakMap();
         this.initData(this.data);
