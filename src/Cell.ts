@@ -15,6 +15,7 @@ import type {
     CellStyleMethod,
     OverflowTooltipPlacement,
     SpanInfo,
+    SelectorCellValueType,
 } from './types';
 import Context from './Context';
 import BaseCell from './BaseCell';
@@ -72,6 +73,7 @@ export default class Cell extends BaseCell {
     rowExpand = false;
     rowHasChildren = false;
     overflowTooltipShow = true;
+    selectorCellValueType: SelectorCellValueType = 'value';
     overflowTooltipMaxWidth = 500;
     overflowTooltipPlacement: OverflowTooltipPlacement = 'top';
 
@@ -95,6 +97,7 @@ export default class Cell extends BaseCell {
         this.key = column.key;
         this.type = column.type || '';
         this.editorType = column.editorType || 'text';
+        this.selectorCellValueType = column.selectorCellValueType || this.ctx.config.SELECTOR_CELL_VALUE_TYPE || 'value';
         this.editorProps = column.editorProps || {};
         this.cellType = cellType;
         this.align = column.align || 'center';

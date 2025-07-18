@@ -218,13 +218,14 @@ fix: 浏览器修复部分缩放canvas字体会糊
 
 V1.2.11
 ### Bug Fixes
-fix: 废除ENABLE_RESERVE_SELECTION属性，默认支持跨页选，如果不想跨页自行清除
+fix: 废除ENABLE_RESERVE_SELECTION属性，默认支持跨页选
 fix: 在handleContextMenu中添加preventDefault以防止默认右键菜单
 feat: 添加列宽度的最小和最大限制
 fix: 修复tree重新加载数据会恢复初始状态
 fix: 修复列宽调整后双击错乱
 feat: 添加获取高亮行功能并更新相关逻辑
 ---
+
 
 V1.2.12
 ### Bug Fixes
@@ -258,4 +259,10 @@ V1.2.17
 ### Bug Fixes
 refactor:重构校验器，剔除async-validator
 fix: 添加config类型提示
+---
+
+V1.2.18
+### Bug Fixes
+fix: 解决选择和tree导致的内存泄漏 #73
+feat: 添加选择器值类型支持，更新相关逻辑以处理displayText和value
 ---

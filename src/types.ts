@@ -143,7 +143,9 @@ export interface Column {
     column?: Column;
     rules?: Rules | Rule;
     options?: any;
+    selectorCellValueType?: SelectorCellValueType;
 }
+export type SelectorCellValueType = 'displayText' | 'value';
 export type OverlayerTooltip = {
     style: any;
     text: string;
