@@ -198,21 +198,21 @@ export default class Context {
     setConfig(config: Config) {
         this.config = new Config(config);
     }
-    setItemValueByEditor(rowKey: string, key: string, value: any, history = true, reDraw = true) {
+    setItemValueByEditor(rowKey: string, key: string, value: any, history = true, reDraw = true, checkReadonly = true) {
         // 启用合并单元格关联
         if (this.config.ENABLE_MERGE_CELL_LINK) {
             const cell = this.database.getVirtualBodyCellByKey(rowKey, key);
             if (cell && (cell.mergeRow || cell.mergeCol)) {
                 const { dataList } = cell.getSpanInfo();
                 const data = dataList.map((item: any) => ({ ...item, value }));
-                this.database.batchSetItemValue(data, history);
+                this.database.batchSetItemValue(data, history, checkReadonly);
                 return;
             }
         }
-        this.database.setItemValue(rowKey, key, value, history, reDraw, true);
+        this.database.setItemValue(rowKey, key, value, history, reDraw, true, checkReadonly);
     }
 
-    batchSetItemValueByEditor(_list: ChangeItem[], history = true) {
+    batchSetItemValueByEditor(_list: ChangeItem[], history = true, checkReadonly = true) {
         // 启用合并单元格关联
         if (this.config.ENABLE_MERGE_CELL_LINK) {
             const list: ChangeItem[] = [];
@@ -227,9 +227,9 @@ export default class Context {
                     list.push(...data);
                 }
             });
-            this.database.batchSetItemValue(list, history);
+            this.database.batchSetItemValue(list, history, checkReadonly);
         } else {
-            this.database.batchSetItemValue(_list, history);
+            this.database.batchSetItemValue(_list, history, checkReadonly);
         }
     }
     setFocusCell(cell: Cell) {

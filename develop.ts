@@ -113,7 +113,6 @@ let columns: Column[] = [
                             required: true,
                             message: '该项必填哦！',
                             validator(rule, value, callback) {
-                                console.log(rule);
                                 if (!value) {
                                     callback('请输入岗位');
                                 } else if (value.length > 10) {
@@ -334,7 +333,7 @@ let columns: Column[] = [
     },
 ];
 let data: any[] = [];
-for (let i = 0; i < 100000; i += 1) {
+for (let i = 0; i < 1000; i += 1) {
     data.push({
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
         id: `1_${i}`,
@@ -1067,6 +1066,36 @@ document.getElementById('loadData')?.addEventListener('click', () => {
     }
     eVirtTable.loadData(data);
 });
+
+document.getElementById('clearEditableData')?.addEventListener('click', () => {
+    const ll = eVirtTable.clearEditableData(111);
+    console.log('clearEditableData', ll);
+});
+
+document.getElementById('setReadOnly')?.addEventListener('click', () => {
+    const list = [
+        {
+            rowKey: '1_1',
+            key: 'emp_no',
+            value: '张三111',
+        },
+        {
+            rowKey: '1_2',
+            key: 'emp_no',
+            value: '张三222',
+        },
+        {
+            rowKey: '1_4',
+            key: 'emp_no',
+            value: '张三333',
+        },
+    ];
+    eVirtTable.batchSetItemValue(list, true, false);
+});
+document.getElementById('getChangedValues')?.addEventListener('click', () => {
+    console.log(eVirtTable.getChangedData());
+});
+
 // 销毁
 function destroy() {
     eVirtTable.destroy();
