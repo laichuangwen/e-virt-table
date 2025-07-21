@@ -145,6 +145,7 @@ export interface Column {
     options?: any;
     selectorCellValueType?: SelectorCellValueType;
 }
+export type HistoryAction = 'back' | 'forward' | 'none';
 export type SelectorCellValueType = 'displayText' | 'value';
 export type OverlayerTooltip = {
     style: any;
@@ -182,6 +183,13 @@ export type BeforeChangeItem = {
     value: any;
     oldValue: any;
     row: any;
+};
+export type BeforeValueChangeItem= {
+    rowKey: string;
+    key: string;
+    value: any;
+    oldValue?: any;
+    row?: any;
 };
 export type BeforeSetSelectorParams = {
     focusCell?: Cell;
@@ -257,8 +265,8 @@ export type SpanMethod = (params: SpanParams) => SpanType | void;
 export type SelectableMethod = (params: SelectableParams) => boolean | void;
 export type ExpandLazyMethod = (params: CellParams) => Promise<any[]>;
 export type BeforeCellValueChangeMethod = (
-    changeList: BeforeChangeItem[],
-) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
+    changeList: BeforeValueChangeItem[],
+) => BeforeValueChangeItem[] | Promise<BeforeValueChangeItem[]>;
 export type BeforePasteDataMethod = (
     changeList: BeforeChangeItem[],
     xArr: number[],

@@ -15,6 +15,8 @@ import type {
     SelectionMap,
     ErrorType,
     BeforeChangeItem,
+    HistoryAction,
+    BeforeValueChangeItem,
 } from './types';
 import { generateShortUUID, toLeaf } from './util';
 import { HistoryItemData } from './History';
@@ -432,11 +434,17 @@ export default class Database {
      * @param history
      * @returns
      */
-    async batchSetItemValue(_list: ChangeItem[], history = false, checkReadonly = true) {
+    async batchSetItemValue(
+        _list: ChangeItem[],
+        history = false,
+        checkReadonly = true,
+        historyAcion: HistoryAction = 'none',
+    ) {
         let historyList: HistoryItemData[] = [];
+        let _checkReadonly = checkReadonly;
         const rowKeyList: Set<string> = new Set();
         let errList: ChangeItem[] = [];
-        let changeList: BeforeChangeItem[] = _list.map((item) => {
+        let changeList: BeforeValueChangeItem[] = _list.map((item) => {
             const { rowKey, key } = item;
             let _value = item.value;
             let value = _value;
@@ -483,15 +491,18 @@ export default class Database {
             return;
         }
         const { BEFORE_VALUE_CHANGE_METHOD } = this.ctx.config;
-        if (typeof BEFORE_VALUE_CHANGE_METHOD === 'function') {
+        if (historyAcion === 'none' && typeof BEFORE_VALUE_CHANGE_METHOD === 'function') {
             const beforeCellValueChange: BeforeCellValueChangeMethod = BEFORE_VALUE_CHANGE_METHOD;
             const values = await beforeCellValueChange(changeList);
             changeList = values;
+            _checkReadonly = false; // 允许编辑只读
         }
         changeList.forEach((data) => {
-            const { value, rowKey, key, oldValue } = data;
+            const { value, rowKey, key } = data;
+            const oldValue = this.getItemValue(rowKey, key);
             rowKeyList.add(rowKey);
-            this.setItemValue(rowKey, key, value, false, false, false, checkReadonly);
+            // 不加历史，不重绘，不是编辑器，不检验只读
+            this.setItemValue(rowKey, key, value, false, false, false, _checkReadonly);
             historyList.push({
                 rowKey,
                 key,
@@ -504,15 +515,13 @@ export default class Database {
         rowKeyList.forEach((rowKey) => {
             rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
         });
-        if (checkReadonly) {
-            const promsieValidators = changeList.map(({ rowKey, key }) => this.getValidator(rowKey, key));
-            Promise.all(promsieValidators).then(() => {
-                if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
-                    this.ctx.emit('validateChangedData', this.getChangedData());
-                }
-            });
-            this.ctx.emit('change', changeList, rows);
-        }
+        const promsieValidators = changeList.map(({ rowKey, key }) => this.getValidator(rowKey, key));
+        Promise.all(promsieValidators).then(() => {
+            if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
+                this.ctx.emit('validateChangedData', this.getChangedData());
+            }
+        });
+        this.ctx.emit('change', changeList, rows);
         // 推历史记录
         if (history) {
             this.ctx.history.pushState({
@@ -604,41 +613,16 @@ export default class Database {
                     newValue: oldValue,
                 };
             }
-            const { BEFORE_VALUE_CHANGE_METHOD } = this.ctx.config;
-            if (typeof BEFORE_VALUE_CHANGE_METHOD === 'function') {
-                const beforeCellValueChange: BeforeCellValueChangeMethod = BEFORE_VALUE_CHANGE_METHOD;
-                const values = await beforeCellValueChange([
-                    {
-                        rowKey,
-                        key,
-                        value,
-                        oldValue: item[key],
-                        row,
-                    },
-                ]);
-                if (values && values.length) {
-                    value = values[0].value;
-                }
-            }
-            // 设置改变值
-            this.changedDataMap.set(changeKey, value);
-            item[key] = value;
-            const changeItem: ChangeItem = {
-                rowKey,
-                key,
-                oldValue,
-                value,
-                row,
-            };
-            if (checkReadonly) {
-                // 实时校验错误
-                this.getValidator(rowKey, key).then(() => {
-                    if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
-                        this.ctx.emit('validateChangedData', this.getChangedData());
-                    }
-                });
-                this.ctx.emit('change', [changeItem], [row]);
-            }
+            let changeList: BeforeChangeItem[] = [
+                {
+                    rowKey,
+                    key,
+                    value,
+                    oldValue,
+                    row,
+                },
+            ];
+            this.batchSetItemValue(changeList, history, false);
             this.ctx.emit('editChange', {
                 rowKey,
                 key,
@@ -662,23 +646,6 @@ export default class Database {
                 row,
             });
         }
-        // 添加历史记录
-        if (history) {
-            this.ctx.history.pushState({
-                type: 'single',
-                scrollX: this.ctx.scrollX,
-                scrollY: this.ctx.scrollY,
-                changeList: [
-                    {
-                        rowKey,
-                        key,
-                        oldValue,
-                        newValue: value,
-                    },
-                ],
-            });
-        }
-
         // 重绘
         if (reDraw) {
             this.ctx.emit('draw');
