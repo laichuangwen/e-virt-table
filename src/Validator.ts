@@ -36,6 +36,9 @@ export default class Validator {
             this.rules = [this.rules];
         }
         for (const rule of this.rules) {
+             if (!rule.required && (value === undefined || value === null || value === '')) {
+               return errors;
+            }
             if (rule.validator) {
                 const ruleParam: RuleParam = {
                     field,

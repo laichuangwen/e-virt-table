@@ -173,16 +173,15 @@ export default class EVirtTable {
         value: any,
         history = true,
         reDraw = true,
-        isEditor = false,
-        checkReadonly = true,
+        isEditor = false
     ) {
-        this.ctx.database.setItemValue(rowKey, key, value, history, reDraw, isEditor, checkReadonly);
+        this.ctx.database.setItemValue(rowKey, key, value, history, reDraw, isEditor);
     }
-    batchSetItemValue(list: ChangeItem[], history = true, checkReadonly = true) {
-        this.ctx.database.batchSetItemValue(list, history, checkReadonly);
+    batchSetItemValue(list: ChangeItem[], history = true) {
+        this.ctx.database.batchSetItemValue(list, history);
     }
-    setItemValueByEditor(rowKey: string, key: string, value: any, history = true, reDraw = true, checkReadonly = true) {
-        this.ctx.setItemValueByEditor(rowKey, key, value, history, reDraw, checkReadonly);
+    setItemValueByEditor(rowKey: string, key: string, value: any, history = true, reDraw = true) {
+        this.ctx.setItemValueByEditor(rowKey, key, value, history, reDraw);
         this.editor.doneEdit();
     }
 

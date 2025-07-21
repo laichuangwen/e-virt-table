@@ -1,5 +1,13 @@
 import EVirtTable from './src/EVirtTable';
-import { BeforeCopyParams, BeforeSetSelectorParams, Column, PastedDataOverflow, SelectableParams } from './src/types';
+import {
+    BeforeChangeItem,
+    BeforeCopyParams,
+    BeforeSetSelectorParams,
+    BeforeValueChangeItem,
+    Column,
+    PastedDataOverflow,
+    SelectableParams,
+} from './src/types';
 // import { mergeColCell, mergeRowCell } from './src/util';
 
 const canvas = document.getElementById('e-virt-table') as HTMLDivElement;
@@ -262,6 +270,20 @@ let columns: Column[] = [
     {
         title: '数量',
         key: 'requiredQuantity',
+        rules: [
+            {
+                required: true, // TODO:表格1.2.19有问题
+                pattern: /^(0|[1-9]\d*)$/,
+                message: '请输入0或正整数',
+                validator(rule, value, callback) {
+                    if (value > 10) {
+                        callback('数量不能大于10');
+                    } else {
+                        callback();
+                    }
+                },
+            },
+        ],
         align: 'right',
     },
     { title: '单位', key: 'unit' },
@@ -540,7 +562,16 @@ const eVirtTable = new EVirtTable(canvas, {
         // },
         // 改变前需要篡改数据
         BEFORE_VALUE_CHANGE_METHOD: (changeList) => {
-            return changeList;
+            let list: BeforeValueChangeItem[] = [
+                {
+                    rowKey: '1_0',
+                    key: 'emp_no',
+                    value: Math.random().toString(36).substring(2, 7),
+                },
+            ];
+            const data = [...changeList, ...list];
+            console.log('修改前数据', data);
+            return data;
             // if(changeList.some((item) => item.key !== 'requiredQuantity')) {
             //     return changeList.map(item=>{
             //       item.row.emp_name = '张三111';
