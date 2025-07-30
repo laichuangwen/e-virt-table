@@ -80,7 +80,7 @@ export default class EventTable {
                 this.ctx.clickCell = cell;
                 this.ctx.emit('cellClick', cell, e);
                 
-                // 对于 tree-selection 类型，需要区分点击的是 checkbox 还是树形图标
+                // 对于 tree-selection 类型，需要根据点击位置来决定触发哪个事件
                 if (cell.type === 'tree-selection') {
                     const { offsetY, offsetX } = this.ctx.getOffset(e);
                     const clickY = offsetY;
@@ -232,14 +232,8 @@ export default class EventTable {
      * @param cell
      */
     private selectionClick(cell: CellHeader | Cell) {
-        // 对于 tree-selection 类型，只有在点击 checkbox 时才处理
-        if (cell instanceof Cell && cell.type === 'tree-selection') {
-            // tree-selection 类型的 checkbox 点击已经在 click 事件中处理了
-            return;
-        }
-        
         // 鼠标移动到图标上会变成pointer，所以这里判断是否是pointer就能判断出是图标点击的
-        const isSelection = ['selection', 'index-selection'].includes(cell.type) && this.ctx.isPointer;
+        const isSelection = ['selection', 'index-selection', 'tree-selection'].includes(cell.type) && this.ctx.isPointer;
         if (!isSelection) {
             return;
         }
@@ -257,7 +251,7 @@ export default class EventTable {
             if (!selectable) {
                 return;
             }
-            this.ctx.database.toggleRowSelection(cell.rowKey);
+            this.ctx.database.toggleRowSelection(cell.rowKey, cell.type);
         }
     }
     /**
@@ -265,14 +259,8 @@ export default class EventTable {
      * @param cell
      */
     private treeClick(cell: Cell) {
-        // 对于 tree-selection 类型，只有在点击树形图标时才处理
-        if (cell.type === 'tree-selection') {
-            // tree-selection 类型的树形图标点击已经在 click 事件中处理了
-            return;
-        }
-        
         // 鼠标移动到图标上会变成pointer，所以这里判断是否是pointer就能判断出是图标点击的
-        if (cell.type === 'tree' && this.ctx.isPointer) {
+        if ((cell.type === 'tree' || cell.type === 'tree-selection') && this.ctx.isPointer) {
             const row = this.ctx.database.getRowForRowKey(cell.rowKey);
             const { expand = false, expandLazy = false } = row || {};
             const { EXPAND_LAZY, EXPAND_LAZY_METHOD } = this.ctx.config;
@@ -335,6 +323,20 @@ export default class EventTable {
                 x < cell.drawTreeImageX + cell.drawTreeImageWidth &&
                 y > cell.drawTreeImageY &&
                 y < cell.drawTreeImageY + cell.drawTreeImageHeight
+            ) {
+                this.ctx.stageElement.style.cursor = 'pointer';
+                this.ctx.isPointer = true;
+                return;
+            }
+        }
+        
+        // 检查树形图标（对 tree 类型）
+        if (cell instanceof Cell && cell.type === 'tree') {
+            if (
+                x > cell.drawImageX &&
+                x < cell.drawImageX + cell.drawImageWidth &&
+                y > cell.drawImageY &&
+                y < cell.drawImageY + cell.drawImageHeight
             ) {
                 this.ctx.stageElement.style.cursor = 'pointer';
                 this.ctx.isPointer = true;

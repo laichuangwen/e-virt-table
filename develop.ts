@@ -404,7 +404,6 @@ for (let i = 0; i < 1000; i += 1) {
                 emp_no: `${i}-1`,
                 emp_name: `张三${i}-1`,
                 children: [],
-                _hasChildren: true,
             },
             {
                 id: `${i}-2`,

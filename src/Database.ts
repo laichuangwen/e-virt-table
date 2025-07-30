@@ -695,7 +695,7 @@ export default class Database {
      * 根据rowKey 取反选中
      * @param rowKey
      */
-    toggleRowSelection(rowKey: string) {
+    toggleRowSelection(rowKey: string, cellType?: string) {
         const row = this.rowKeyMap.get(rowKey);
         const selection = this.selectionMap.get(rowKey);
         if (!selection) {
@@ -703,8 +703,7 @@ export default class Database {
         }
 
         // 检查是否是树形选择列
-        const column = this.getColumnByKey(selection.key);
-        if (column && column.type === 'tree-selection') {
+        if (cellType === 'tree-selection') {
             this.toggleTreeSelection(rowKey);
         } else {
             selection.check = !selection.check;
