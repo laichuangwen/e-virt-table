@@ -1133,3 +1133,221 @@ function destroy() {
     window.removeEventListener('beforeunload', destroy);
 }
 window.addEventListener('beforeunload', destroy);
+
+// Tree Selection 示例
+const treeCanvas = document.getElementById('e-virt-tree') as HTMLDivElement;
+if (treeCanvas) {
+    // 树形选择数据
+    const treeData = [
+        {
+            id: '1',
+            name: '技术部',
+            _hasChildren: true,
+            children: [
+                {
+                    id: '1-1',
+                    name: '前端组',
+                    _hasChildren: true,
+                    children: [
+                        { id: '1-1-1', name: '张三', role: '前端工程师' },
+                        { id: '1-1-2', name: '李四', role: '前端工程师' },
+                        { id: '1-1-3', name: '王五', role: '前端工程师' }
+                    ]
+                },
+                {
+                    id: '1-2',
+                    name: '后端组',
+                    _hasChildren: true,
+                    children: [
+                        { id: '1-2-1', name: '赵六', role: '后端工程师' },
+                        { id: '1-2-2', name: '钱七', role: '后端工程师' }
+                    ]
+                },
+                {
+                    id: '1-3',
+                    name: '测试组',
+                    _hasChildren: true,
+                    children: [
+                        { id: '1-3-1', name: '孙八', role: '测试工程师' },
+                        { id: '1-3-2', name: '周九', role: '测试工程师' }
+                    ]
+                }
+            ]
+        },
+        {
+            id: '2',
+            name: '产品部',
+            _hasChildren: true,
+            children: [
+                {
+                    id: '2-1',
+                    name: '产品组',
+                    _hasChildren: true,
+                    children: [
+                        { id: '2-1-1', name: '吴十', role: '产品经理' },
+                        { id: '2-1-2', name: '郑十一', role: '产品经理' }
+                    ]
+                },
+                {
+                    id: '2-2',
+                    name: '设计组',
+                    _hasChildren: true,
+                    children: [
+                        { id: '2-2-1', name: '王十二', role: 'UI设计师' },
+                        { id: '2-2-2', name: '李十三', role: 'UI设计师' }
+                    ]
+                }
+            ]
+        },
+        {
+            id: '3',
+            name: '运营部',
+            _hasChildren: true,
+            children: [
+                {
+                    id: '3-1',
+                    name: '市场组',
+                    _hasChildren: true,
+                    children: [
+                        { id: '3-1-1', name: '张十四', role: '市场专员' },
+                        { id: '3-1-2', name: '刘十五', role: '市场专员' }
+                    ]
+                }
+            ]
+        }
+    ];
+
+    // 树形选择列配置
+    const treeColumns: Column[] = [
+        {
+            title: '选择',
+            type: 'tree-selection',
+            key: 'selection',
+            width: 60,
+            widthFillDisable: true,
+            readonly: true,
+            fixed: 'left'
+        },
+        {
+            title: 'ID',
+            key: 'id',
+            width: 100,
+            readonly: true,
+            fixed: 'left'
+        },
+        {
+            title: '姓名',
+            key: 'name',
+            width: 150,
+            readonly: true
+        },
+        {
+            title: '职位',
+            key: 'role',
+            width: 200,
+            readonly: true
+        }
+    ];
+
+    // 创建树形选择表格
+    const treeTable = new EVirtTable(treeCanvas, {
+        columns: treeColumns,
+        data: treeData,
+        config: {
+            TREE_SELECT_MODE: 'auto', // auto | cautious | strictly
+            ROW_KEY: 'id',
+            ENABLE_SELECTOR: true,
+            ENABLE_KEYBOARD: true,
+            ENABLE_HISTORY: true,
+            CELL_HEIGHT: 36,
+            BORDER: true,
+            STRIPE: false,
+            HIGHLIGHT_HOVER_ROW: true,
+            DEFAULT_EXPAND_ALL: true,
+            ENABLE_CONTEXT_MENU: true,
+            CONTEXT_MENU: [
+                { label: '全选', value: 'selectAll' },
+                { label: '取消全选', value: 'unselectAll' },
+                { label: '展开全部', value: 'expandAll' },
+                { label: '收起全部', value: 'collapseAll' }
+            ]
+        }
+    });
+
+    // 监听选择变化
+    treeTable.on('selectionChange', (selectedRows) => {
+        console.log('树形选择 - 选中的行:', selectedRows);
+    });
+
+    // 监听展开变化
+    treeTable.on('expandChange', (expandedRows) => {
+        console.log('树形选择 - 展开的行:', expandedRows);
+    });
+
+    // 添加控制按钮
+    const treeControls = document.createElement('div');
+    treeControls.style.marginBottom = '10px';
+    treeControls.innerHTML = `
+        <button id="tree-select-all">全选</button>
+        <button id="tree-unselect-all">取消全选</button>
+        <button id="tree-expand-all">展开全部</button>
+        <button id="tree-collapse-all">收起全部</button>
+        <button id="tree-get-selected">获取选中</button>
+        <select id="tree-select-mode">
+            <option value="auto">Auto模式</option>
+            <option value="cautious">Cautious模式</option>
+            <option value="strictly">Strictly模式</option>
+        </select>
+    `;
+    treeCanvas.parentElement?.insertBefore(treeControls, treeCanvas);
+
+    // 绑定按钮事件
+    document.getElementById('tree-select-all')?.addEventListener('click', () => {
+        treeTable.toggleAllSelection();
+    });
+
+    document.getElementById('tree-unselect-all')?.addEventListener('click', () => {
+        treeTable.clearSelection();
+    });
+
+    document.getElementById('tree-expand-all')?.addEventListener('click', () => {
+        treeTable.toggleExpandAll(true);
+    });
+
+    document.getElementById('tree-collapse-all')?.addEventListener('click', () => {
+        treeTable.toggleExpandAll(false);
+    });
+
+    document.getElementById('tree-get-selected')?.addEventListener('click', () => {
+        const selectedRows = treeTable.getSelectionRows();
+        console.log('当前选中的行:', selectedRows);
+        alert(`选中了 ${selectedRows.length} 行数据`);
+    });
+
+    // 监听选择模式变化
+    document.getElementById('tree-select-mode')?.addEventListener('change', (event) => {
+        const mode = (event.target as HTMLSelectElement).value as 'auto' | 'cautious' | 'strictly';
+        treeTable.loadConfig({
+            TREE_SELECT_MODE: mode
+        });
+        console.log('切换树形选择模式:', mode);
+    });
+
+    // 添加右键菜单事件处理
+    treeTable.on('contextMenuClick', (menuItem) => {
+        switch (menuItem.value) {
+            case 'selectAll':
+                treeTable.toggleAllSelection();
+                break;
+            case 'unselectAll':
+                treeTable.clearSelection();
+                break;
+            case 'expandAll':
+                treeTable.toggleExpandAll(true);
+                break;
+            case 'collapseAll':
+                treeTable.toggleExpandAll(false);
+                break;
+        }
+    });
+}

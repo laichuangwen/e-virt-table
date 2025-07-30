@@ -727,8 +727,8 @@ export default class Database {
 
         if (mode === 'auto') {
             // auto模式：子项选中即是半选当做选中
-            if (treeState.checked) {
-                // 如果已选中，则取消选中
+            if (treeState.checked || treeState.indeterminate) {
+                // 如果已选中或半选，则取消选中
                 this.setRowSelection(rowKey, false, false);
                 // 取消所有子项
                 children.forEach(childKey => {
@@ -743,7 +743,7 @@ export default class Database {
                 });
             }
         } else if (mode === 'cautious') {
-            // cautious模式：只有子项全选时父项选中
+            // cautious模式：只有子项全选时父项选中，父项选中也会使子项全选，全选时父项点击则清空子项和父项取消勾选
             if (treeState.checked) {
                 // 如果已选中，则取消选中
                 this.setRowSelection(rowKey, false, false);
@@ -760,13 +760,17 @@ export default class Database {
                 });
             }
         } else if (mode === 'strictly') {
-            // strictly模式：父子项互不干扰
+            // strictly模式：父子项互不干扰各选各的
             const selection = this.selectionMap.get(rowKey);
             if (selection) {
                 selection.check = !selection.check;
                 this.setRowSelectionByCheckboxKey(rowKey, selection.check);
             }
         }
+        
+        // 触发选择变化事件
+        this.ctx.emit('selectionChange', this.getSelectionRows());
+        this.ctx.emit('draw');
     }
     /**
      * 根据rowKey 设置选中状态
@@ -828,18 +832,25 @@ export default class Database {
         const someChecked = childStates.some(state => state);
 
         let indeterminate = false;
+        let finalChecked = checked;
+        
         if (this.ctx.config.TREE_SELECT_MODE === 'auto') {
             // auto模式：子项选中即是半选当做选中
             indeterminate = someChecked && !allChecked;
+            // 如果有子项选中，父项也视为选中
+            finalChecked = checked || someChecked;
         } else if (this.ctx.config.TREE_SELECT_MODE === 'cautious') {
             // cautious模式：只有子项全选时父项选中
             indeterminate = someChecked && !allChecked;
+            // 只有所有子项都选中时，父项才选中
+            finalChecked = checked || allChecked;
         } else if (this.ctx.config.TREE_SELECT_MODE === 'strictly') {
             // strictly模式：父子项互不干扰
             indeterminate = false;
+            finalChecked = checked;
         }
 
-        return { checked, indeterminate };
+        return { checked: finalChecked, indeterminate };
     }
 
     // 获取树形子节点
