@@ -4,8 +4,8 @@ import type { RuleItem } from 'async-validator';
 import Config from './Config';
 export type OptionalizeExcept<T, K extends keyof T> = Partial<Omit<T, K>> & Required<Pick<T, K>>;
 export type EVirtTableOptions = {
-    data: any[];
-    footerData?: any[];
+    data: Record<string, any>[];
+    footerData?: Record<string, any>[];
     columns: Column[];
     config?: ConfigType;
     overlayerElement?: HTMLDivElement;

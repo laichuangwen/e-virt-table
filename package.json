@@ -54,5 +54,10 @@
     "dependencies": {
         "@floating-ui/dom": "^1.6.11",
         "async-validator": "^4.2.5"
+    },
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "esbuild"
+        ]
     }
 }
