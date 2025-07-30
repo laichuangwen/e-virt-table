@@ -1,3 +1,4 @@
 node_modules
 .vitepress/cache
 package-lock.json
+public/
