@@ -255,7 +255,8 @@ type EVirtTableOptions = {
 | column | Current column object | Column | — | — |
 | hoverIconName | Hover icon name, ICONS configurable | string | — |
 | placeholder | Placeholder text | string | — |
-| overflowTooltipShow | Show overflow tooltip | boolean | — | — |
+| overflowTooltipHeaderShow |Header show overflow tooltip | boolean | — | true |
+| overflowTooltipShow | Show overflow tooltip | boolean | — | true |
 | overflowTooltipMaxWidth | Max width of overflow tooltip | number | — | — |
 | overflowTooltipPlacement | Placement of overflow tooltip | OverflowTooltipPlacement |  ^[string]`top, top-start, top-end, right, right-start, right-end, left, left-start, left-end, bottom, bottom-start, bottom-end` | — |
 | rules | Validation rules | Rules | — | — |
@@ -272,7 +273,17 @@ type EVirtTableOptions = {
 
 ## Rules
 
--   refer to [async-validator](https://github.com/yiminghe/async-validator)
+```ts
+
+type Rule = {
+    required?: boolean;
+    pattern?: RegExp;
+    validator?: RuleValidator;
+    message?: string;
+};
+type Rules = Rule[];
+
+```
 
 ## CONTEXT_MENU Default 
  

@@ -1,5 +1,13 @@
 import EVirtTable from './src/EVirtTable';
-import { BeforeCopyParams, BeforeSetSelectorParams, Column, PastedDataOverflow, SelectableParams } from './src/types';
+import {
+    BeforeChangeItem,
+    BeforeCopyParams,
+    BeforeSetSelectorParams,
+    BeforeValueChangeItem,
+    Column,
+    PastedDataOverflow,
+    SelectableParams,
+} from './src/types';
 // import { mergeColCell, mergeRowCell } from './src/util';
 
 const canvas = document.getElementById('e-virt-table') as HTMLDivElement;
@@ -110,7 +118,9 @@ let columns: Column[] = [
                         readonly: false,
                         width: 200,
                         rules: {
-                            validator(rule: any, value: any, callback: any) {
+                            required: true,
+                            message: '该项必填哦！',
+                            validator(rule, value, callback) {
                                 if (!value) {
                                     callback('请输入岗位');
                                 } else if (value.length > 10) {
@@ -149,6 +159,7 @@ let columns: Column[] = [
         title: '手机号',
         key: 'phone',
         readonly: false,
+        overflowTooltipHeaderShow: true,
         formatterFooter: ({ value }) => {
             return `合：${value}`;
         },
@@ -159,17 +170,17 @@ let columns: Column[] = [
         key: 'sex',
         // readonly: false,
         // render: "sex",
-        rules: [
-            {
-                validator: (rule, value, callback) => {
-                    if (!value) {
-                        callback('该项必填哦！');
-                    } else {
-                        callback();
-                    }
-                },
-            },
-        ],
+        // rules: [
+        //     {
+        //         validator: (rule, value, callback) => {
+        //             if (!value) {
+        //                 callback('该项必填哦！');
+        //             } else {
+        //                 callback();
+        //             }
+        //         },
+        //     },
+        // ],
         renderHeader: (pEl, cell) => {
             const cellEl = document.createElement('div');
             cellEl.style.width = '100%';
@@ -209,10 +220,10 @@ let columns: Column[] = [
         overflowTooltipMaxWidth: 200,
         overflowTooltipPlacement: 'top',
         readonly: true,
-        rules: {
-            required: true,
-            message: '该项必填哦！',
-        },
+        // rules: {
+        //     required: true,
+        //     message: '该项必填哦！',
+        // },
         render: (pEl, cell) => {
             const cellEl = document.createElement('div');
             cellEl.addEventListener('click', () => {
@@ -247,17 +258,32 @@ let columns: Column[] = [
         title: '物料编码',
         key: 'materialNo',
         align: 'right',
+        selectorCellValueType: 'displayText', // displayText | value
         formatter({ value }: { value: string }) {
             if (!value) {
                 return '';
             }
             const v = parseFloat(value);
-            return v.toFixed(2);
+            return `物料编码：${v}`;
         },
     },
     {
         title: '数量',
         key: 'requiredQuantity',
+        rules: [
+            {
+                required: true, // TODO:表格1.2.19有问题
+                pattern: /^(0|[1-9]\d*)$/,
+                message: '请输入0或正整数',
+                validator(rule, value, callback) {
+                    if (value > 10) {
+                        callback('数量不能大于10');
+                    } else {
+                        callback();
+                    }
+                },
+            },
+        ],
         align: 'right',
     },
     { title: '单位', key: 'unit' },
@@ -291,12 +317,17 @@ let columns: Column[] = [
         title: '采购价(元)',
         key: 'purchasePrice',
         fixed: 'right',
-        type: 'number',
+        // type: 'number',
         rules: [
             {
                 required: true,
-                type: 'number',
+                message: '请输入',
+            },
+            {
+                // required: false,
                 message: '请输入销售价',
+                // 只能输入数字或小数点，且小数点后最多两位
+                pattern: /^(\d+(\.\d{1,2})?|\.?\d{1,2})$/,
             },
         ],
     },
@@ -309,13 +340,13 @@ let columns: Column[] = [
         hoverIconName: 'icon-edit',
         placeholder: '请输入',
         // readonly: true,
-        rules: [
-            {
-                required: true,
-                type: 'number',
-                message: '请输入销售价',
-            },
-        ],
+        // rules: [
+        //     {
+        //         required: true,
+        //         type: 'number',
+        //         message: '请输入销售价',
+        //     },
+        // ],
     },
     {
         title: '操作',
@@ -324,7 +355,7 @@ let columns: Column[] = [
     },
 ];
 let data: any[] = [];
-for (let i = 0; i < 10000; i += 1) {
+for (let i = 0; i < 1000; i += 1) {
     data.push({
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
         id: `1_${i}`,
@@ -439,13 +470,14 @@ const eVirtTable = new EVirtTable(canvas, {
         ENABLE_OFFSET_HEIGHT: true,
         HIGHLIGHT_SELECTED_ROW: false,
         HIGHLIGHT_HOVER_ROW: true,
-        ENABLE_MERGE_CELL_LINK: true,
+        ENABLE_MERGE_CELL_LINK: false,
         ENABLE_EDIT_SINGLE_CLICK: false,
         FOOTER_FIXED: true,
         ENABLE_COPY: true,
         ENABLE_PASTER: true,
         FOOTER_POSITION: 'bottom',
         OFFSET_HEIGHT: 16,
+        SELECTOR_CELL_VALUE_TYPE: 'displayText', // displayText | value
         // SELECTOR_AREA_MAX_X_OFFSET: 1,
         // SELECTOR_AREA_MAX_Y_OFFSET: 1,
         ENABLE_CONTEXT_MENU: true,
@@ -462,6 +494,18 @@ const eVirtTable = new EVirtTable(canvas, {
                 },
             },
         ],
+        BODY_CELL_RULES_METHOD: (params) => {
+            const { row, column } = params;
+            if (column.key === 'work_age') {
+                return [
+                    {
+                        required: false,
+                        pattern: /^(0|[1-9]\d*)$/,
+                        message: '请输入0或正整数',
+                    },
+                ];
+            }
+        },
         // SELECTABLE_METHOD: (params: SelectableParams) => {
         //     const { row, rowIndex } = params;
         //     if (rowIndex === 4) {
@@ -518,7 +562,16 @@ const eVirtTable = new EVirtTable(canvas, {
         // },
         // 改变前需要篡改数据
         BEFORE_VALUE_CHANGE_METHOD: (changeList) => {
-            return changeList;
+            let list: BeforeValueChangeItem[] = [
+                {
+                    rowKey: '1_0',
+                    key: 'emp_no',
+                    value: Math.random().toString(36).substring(2, 7),
+                },
+            ];
+            const data = [...changeList, ...list];
+            console.log('修改前数据', data);
+            return data;
             // if(changeList.some((item) => item.key !== 'requiredQuantity')) {
             //     return changeList.map(item=>{
             //       item.row.emp_name = '张三111';
@@ -678,6 +731,9 @@ const eVirtTable = new EVirtTable(canvas, {
             // }
         },
     },
+});
+eVirtTable.filterMethod((list) => {
+    return list.filter((item) => item.id !== '1_3');
 });
 function getRandomString(minLen = 5, maxLen = 20) {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -1041,6 +1097,36 @@ document.getElementById('loadData')?.addEventListener('click', () => {
     }
     eVirtTable.loadData(data);
 });
+
+document.getElementById('clearEditableData')?.addEventListener('click', () => {
+    const ll = eVirtTable.clearEditableData(111);
+    console.log('clearEditableData', ll);
+});
+
+document.getElementById('setReadOnly')?.addEventListener('click', () => {
+    const list = [
+        {
+            rowKey: '1_1',
+            key: 'emp_no',
+            value: '张三111',
+        },
+        {
+            rowKey: '1_2',
+            key: 'emp_no',
+            value: '张三222',
+        },
+        {
+            rowKey: '1_4',
+            key: 'emp_no',
+            value: '张三333',
+        },
+    ];
+    eVirtTable.batchSetItemValue(list, true, false);
+});
+document.getElementById('getChangedValues')?.addEventListener('click', () => {
+    console.log(eVirtTable.getChangedData());
+});
+
 // 销毁
 function destroy() {
     eVirtTable.destroy();

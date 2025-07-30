@@ -596,7 +596,7 @@ export default class Selector {
             console.error('current browser does not support the Clipboard API');
         }
     }
-    private clearSelectedData(xArr: number[], yArr: number[], ignoreSet = false) {
+    clearSelectedData(xArr: number[], yArr: number[], ignoreSet = false, value = null) {
         let changeList: ChangeItem[] = [];
         const rowKeyList: Set<string> = new Set();
         for (let ri = 0; ri <= yArr[1] - yArr[0]; ri++) {
@@ -612,7 +612,7 @@ export default class Selector {
                         changeList.push({
                             rowKey,
                             key,
-                            value: null,
+                            value,
                             row: {}, //内部有设置
                         });
                     }

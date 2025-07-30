@@ -1,6 +1,6 @@
 import type Cell from './Cell';
 import type CellHeader from './CellHeader';
-import type { RuleItem } from 'async-validator';
+import type { Rule, Rules } from './Validator';
 import Config from './Config';
 export type OptionalizeExcept<T, K extends keyof T> = Partial<Omit<T, K>> & Required<Pick<T, K>>;
 export type EVirtTableOptions = {
@@ -76,14 +76,7 @@ export type ContextmenuItem = {
     render: Function;
 };
 export type Render = Function | string | undefined;
-export interface Rule extends RuleItem {
-    column?: Column;
-    row?: any; // 这里可以定义更具体的类型，根据你的需求
-    rowIndex?: number;
-    colIndex?: number;
-}
-export type Rules = Rule | Rule[];
-export type Descriptor = Record<string, Rules>;
+
 export type ValidateItemError = {
     rowIndex: number;
     key: string;
@@ -141,15 +134,19 @@ export interface Column {
     formatter?: FormatterMethod;
     formatterFooter?: FormatterMethod;
     overflowTooltipShow?: boolean;
+    overflowTooltipHeaderShow?: boolean;
     overflowTooltipMaxWidth?: number;
     overflowTooltipPlacement?: OverflowTooltipPlacement;
     required?: boolean;
     readonly?: boolean;
     children?: Column[];
     column?: Column;
-    rules?: Rules;
+    rules?: Rules | Rule;
     options?: any;
+    selectorCellValueType?: SelectorCellValueType;
 }
+export type HistoryAction = 'back' | 'forward' | 'none';
+export type SelectorCellValueType = 'displayText' | 'value';
 export type OverlayerTooltip = {
     style: any;
     text: string;
@@ -186,6 +183,13 @@ export type BeforeChangeItem = {
     value: any;
     oldValue: any;
     row: any;
+};
+export type BeforeValueChangeItem= {
+    rowKey: string;
+    key: string;
+    value: any;
+    oldValue?: any;
+    row?: any;
 };
 export type BeforeSetSelectorParams = {
     focusCell?: Cell;
@@ -261,8 +265,8 @@ export type SpanMethod = (params: SpanParams) => SpanType | void;
 export type SelectableMethod = (params: SelectableParams) => boolean | void;
 export type ExpandLazyMethod = (params: CellParams) => Promise<any[]>;
 export type BeforeCellValueChangeMethod = (
-    changeList: BeforeChangeItem[],
-) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
+    changeList: BeforeValueChangeItem[],
+) => BeforeValueChangeItem[] | Promise<BeforeValueChangeItem[]>;
 export type BeforePasteDataMethod = (
     changeList: BeforeChangeItem[],
     xArr: number[],

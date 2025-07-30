@@ -256,6 +256,7 @@ type EVirtTableOptions = {
 | column | 当前列对象 | Column | — |
 | hoverIconName | 悬浮图标名字，可ICONS配置 | string | — |
 | placeholder | 占位符文本 | string | — |
+| overflowTooltipHeaderShow | 表头是否显示溢出提示 | boolean | true |
 | overflowTooltipShow | 是否显示溢出提示 | boolean | true |
 | overflowTooltipMaxWidth | 溢出提示的宽度 | number | 500 |
 | overflowTooltipPlacement | 溢出提示的位置|  ^[string]`top, top-start, top-end, right, right-start, right-end, left, left-start, left-end, bottom, bottom-start, bottom-end` | — |
@@ -273,7 +274,17 @@ type EVirtTableOptions = {
 
 ## Rules
 
--   可参考 [async-validator](https://github.com/yiminghe/async-validator)
+```ts
+
+type Rule = {
+    required?: boolean;
+    pattern?: RegExp;
+    validator?: RuleValidator;
+    message?: string;
+};
+type Rules = Rule[];
+
+```
 
 ## CONTEXT_MENU 默认值
  

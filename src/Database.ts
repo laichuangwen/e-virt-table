@@ -1,5 +1,5 @@
-import Schema, { ValidateError } from 'async-validator';
 import type CellHeader from './CellHeader';
+import Validator, { RuleParam, ValidateResult } from './Validator';
 import type Context from './Context';
 import type {
     CellReadonlyMethod,
@@ -11,13 +11,14 @@ import type {
     SelectableMethod,
     EVirtTableOptions,
     BeforeCellValueChangeMethod,
-    Descriptor,
     SpanInfo,
     SelectionMap,
     ErrorType,
     BeforeChangeItem,
+    HistoryAction,
+    BeforeValueChangeItem,
 } from './types';
-import { generateShortUUID } from './util';
+import { generateShortUUID, toLeaf } from './util';
 import { HistoryItemData } from './History';
 import Cell from './Cell';
 export default class Database {
@@ -36,7 +37,7 @@ export default class Database {
     private expandMap = new Map<string, boolean>();
     private originalDataMap = new Map<string, any>();
     private changedDataMap = new Map<string, any>();
-    private validationErrorMap = new Map<string, ValidateError[]>();
+    private validationErrorMap = new Map<string, ValidateResult>();
     private itemRowKeyMap = new WeakMap();
     private bufferData: any[] = [];
     private bufferCheckState = {
@@ -57,16 +58,39 @@ export default class Database {
         this.setLoading(true);
         this.init();
     }
-    init() {
+    // 初始化默认不忽略清空改变值和校验map
+    init(isClear = true) {
         this.clearBufferData();
         this.rowKeyMap.clear();
         this.checkboxKeyMap.clear();
         this.colIndexKeyMap.clear();
         this.rowIndexRowKeyMap.clear();
         this.rowKeyRowIndexMap.clear();
-        this.originalDataMap.clear();
-        this.changedDataMap.clear();
-        this.validationErrorMap.clear();
+        // 判断是否有选择和树形结构
+        const _columns = this.getColumns();
+        const leafColumns = toLeaf(_columns);
+        this.ctx.hasSelection = leafColumns.some((item) => item.type === 'selection');
+        this.ctx.hasTree = leafColumns.some((item) => item.type === 'tree');
+        if (isClear) {
+            this.originalDataMap.clear();
+            this.changedDataMap.clear();
+            this.validationErrorMap.clear();
+            const { ROW_KEY } = this.ctx.config;
+            // 清除选中和展开状态，如果没有ROW_KEY清除
+            if (!ROW_KEY) {
+                // 无行主键时直接清除所有状态
+                this.selectionMap.clear();
+                this.expandMap.clear();
+            } else {
+                // 有行主键，根据上下文条件清除部分状态
+                if (!this.ctx.hasSelection) {
+                    this.selectionMap.clear();
+                }
+                if (!this.ctx.hasTree) {
+                    this.expandMap.clear();
+                }
+            }
+        }
         this.itemRowKeyMap = new WeakMap();
         this.initData(this.data);
         this.getData();
@@ -83,16 +107,8 @@ export default class Database {
      * @param dataList
      * @param level
      */
-    private initData(dataList: any[], level: number = 0) {
+    private initData(dataList: any[], level: number = 0, parentRowKeys: string[] = []) {
         dataList.forEach((item, index) => {
-            let hasChildren = false;
-            if (Array.isArray(item.children)) {
-                hasChildren = item._hasChildren;
-                if (item.children.length) {
-                    hasChildren = true;
-                    this.initData(item.children, level + 1);
-                }
-            }
             const { ROW_KEY = '', DEFAULT_EXPAND_ALL, CELL_HEIGHT, SELECTABLE_METHOD, CHECKBOX_KEY } = this.ctx.config;
             const _rowKey = item[ROW_KEY]; // 行唯一标识,否则就rowKey
             const rowKey = _rowKey !== undefined && _rowKey !== null ? `${_rowKey}` : generateShortUUID();
@@ -133,10 +149,16 @@ export default class Database {
                 selectable,
                 expand,
                 expandLazy: false,
-                hasChildren,
+                hasChildren: item._hasChildren || (Array.isArray(item.children) ? item.children.length > 0 : false),
                 expandLoading: false,
                 item,
+                parentRowKeys,
             });
+            if (Array.isArray(item.children)) {
+                if (item.children.length) {
+                    this.initData(item.children, level + 1, [...parentRowKeys, rowKey]);
+                }
+            }
         });
     }
     /**
@@ -412,11 +434,17 @@ export default class Database {
      * @param history
      * @returns
      */
-    async batchSetItemValue(_list: ChangeItem[], history = false) {
+    async batchSetItemValue(
+        _list: ChangeItem[],
+        history = false,
+        checkReadonly = true,
+        historyAcion: HistoryAction = 'none',
+    ) {
         let historyList: HistoryItemData[] = [];
+        let _checkReadonly = checkReadonly;
         const rowKeyList: Set<string> = new Set();
         let errList: ChangeItem[] = [];
-        let changeList: BeforeChangeItem[] = _list.map((item) => {
+        let changeList: BeforeValueChangeItem[] = _list.map((item) => {
             const { rowKey, key } = item;
             let _value = item.value;
             let value = _value;
@@ -463,15 +491,18 @@ export default class Database {
             return;
         }
         const { BEFORE_VALUE_CHANGE_METHOD } = this.ctx.config;
-        if (typeof BEFORE_VALUE_CHANGE_METHOD === 'function') {
+        if (historyAcion === 'none' && typeof BEFORE_VALUE_CHANGE_METHOD === 'function') {
             const beforeCellValueChange: BeforeCellValueChangeMethod = BEFORE_VALUE_CHANGE_METHOD;
             const values = await beforeCellValueChange(changeList);
             changeList = values;
+            _checkReadonly = false; // 允许编辑只读
         }
         changeList.forEach((data) => {
-            const { value, rowKey, key, oldValue } = data;
+            const { value, rowKey, key } = data;
+            const oldValue = this.getItemValue(rowKey, key);
             rowKeyList.add(rowKey);
-            this.setItemValue(rowKey, key, value);
+            // 不加历史，不重绘，不是编辑器，不检验只读
+            this.setItemValue(rowKey, key, value, false, false, false, _checkReadonly);
             historyList.push({
                 rowKey,
                 key,
@@ -510,9 +541,18 @@ export default class Database {
      * @param history 是否添加历史记录
      * @param reDraw 是否刷新重绘
      * @param isEditor 是否是编辑器
+     * @param checkReadonly 是否检查只读
      * @returns
      */
-    async setItemValue(rowKey: string, key: string, _value: any, history = false, reDraw = false, isEditor = false) {
+    async setItemValue(
+        rowKey: string,
+        key: string,
+        _value: any,
+        history = false,
+        reDraw = false,
+        isEditor = false,
+        checkReadonly = true,
+    ) {
         // 异常情况
         if (!this.rowKeyMap.has(rowKey)) {
             return {};
@@ -523,7 +563,7 @@ export default class Database {
         let value = _value;
 
         // 只读返回旧值
-        if (this.ctx.database.getReadonly(rowKey, key)) {
+        if (checkReadonly && this.ctx.database.getReadonly(rowKey, key)) {
             return {
                 oldValue,
                 newValue: oldValue,
@@ -573,39 +613,16 @@ export default class Database {
                     newValue: oldValue,
                 };
             }
-            const { BEFORE_VALUE_CHANGE_METHOD } = this.ctx.config;
-            if (typeof BEFORE_VALUE_CHANGE_METHOD === 'function') {
-                const beforeCellValueChange: BeforeCellValueChangeMethod = BEFORE_VALUE_CHANGE_METHOD;
-                const values = await beforeCellValueChange([
-                    {
-                        rowKey,
-                        key,
-                        value,
-                        oldValue: item[key],
-                        row,
-                    },
-                ]);
-                if (values && values.length) {
-                    value = values[0].value;
-                }
-            }
-            // 设置改变值
-            this.changedDataMap.set(changeKey, value);
-            item[key] = value;
-            const changeItem: ChangeItem = {
-                rowKey,
-                key,
-                oldValue,
-                value,
-                row,
-            };
-            // 实时校验错误
-            this.getValidator(rowKey, key).then(() => {
-                if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
-                    this.ctx.emit('validateChangedData', this.getChangedData());
-                }
-            });
-            this.ctx.emit('change', [changeItem], [row]);
+            let changeList: BeforeChangeItem[] = [
+                {
+                    rowKey,
+                    key,
+                    value,
+                    oldValue,
+                    row,
+                },
+            ];
+            this.batchSetItemValue(changeList, history, false);
             this.ctx.emit('editChange', {
                 rowKey,
                 key,
@@ -629,23 +646,6 @@ export default class Database {
                 row,
             });
         }
-        // 添加历史记录
-        if (history) {
-            this.ctx.history.pushState({
-                type: 'single',
-                scrollX: this.ctx.scrollX,
-                scrollY: this.ctx.scrollY,
-                changeList: [
-                    {
-                        rowKey,
-                        key,
-                        oldValue,
-                        newValue: value,
-                    },
-                ],
-            });
-        }
-
         // 重绘
         if (reDraw) {
             this.ctx.emit('draw');
@@ -1033,49 +1033,23 @@ export default class Database {
                 }
             }
             if (rules) {
-                let descriptor: Descriptor = {};
-                let data: any = {};
-                data[key] = this.getItemValue(rowKey, key);
-                if (Array.isArray(rules)) {
-                    const _rules = rules.map((item) => {
-                        return {
-                            ...item,
-                            row: row.item,
-                            column,
-                            rowIndex: row.rowIndex,
-                            colIndex: colHeader.colIndex,
-                        };
-                    });
-                    descriptor[key] = _rules;
-                } else {
-                    descriptor[key] = {
-                        ...rules,
-                        row: row.item,
-                        column,
-                        rowIndex: row.rowIndex,
-                        colIndex: colHeader.colIndex,
-                    };
-                }
-
-                const validator = new Schema(descriptor);
-                validator
-                    .validate(data)
-                    .then(() => {
-                        this.clearValidationError(rowKey, key);
-                        resolve([]);
-                    })
-                    .catch(({ errors }) => {
-                        const _errors = errors.map((error: any) => ({
-                            ...error,
-                            column,
-                            key,
-                            row: row.item,
-                            rowKey,
-                        }));
-                        this.setValidationError(rowKey, key, _errors);
-                        resolve(_errors);
-                    });
+                const ruleParam: RuleParam = {
+                    row: row.item,
+                    rowIndex: row.rowIndex,
+                    colIndex: colHeader.colIndex,
+                    column,
+                    key,
+                    rowKey,
+                    value: this.getItemValue(rowKey, key),
+                    field: key,
+                    fieldValue: this.getItemValue(rowKey, key),
+                };
+                const validator = new Validator(rules);
+                const _errors = validator.validate(ruleParam);
+                this.setValidationError(rowKey, key, _errors);
+                resolve(_errors);
             } else {
+                this.clearValidationError(rowKey, key);
                 resolve([]);
             }
         });
@@ -1269,14 +1243,29 @@ export default class Database {
     setValidationErrorByRowIndex(rowIndex: number, key: string, message: string) {
         const rowKey = this.rowIndexRowKeyMap.get(rowIndex);
         const _key = `${rowKey}\u200b_${key}`;
-        const errors: ValidateError[] = [
+        const row = this.getRowForRowIndex(rowIndex);
+        const cellHeader = this.getColumnByKey(key);
+        if (!rowKey || !cellHeader || !row) {
+            return;
+        }
+        const value = this.getItemValue(rowKey, key);
+        const errors: ValidateResult = [
             {
+                key,
+                rowKey,
+                rowIndex,
+                colIndex: cellHeader.colIndex,
+                column: cellHeader.column,
+                row,
+                value,
                 message,
+                field: key,
+                fieldValue: value,
             },
         ];
         this.validationErrorMap.set(_key, errors);
     }
-    setValidationError(rowKey: string, key: string, errors: any[]) {
+    setValidationError(rowKey: string, key: string, errors: ValidateResult) {
         const _key = `${rowKey}\u200b_${key}`;
         this.validationErrorMap.set(_key, errors);
     }
@@ -1290,7 +1279,7 @@ export default class Database {
         const _key = `${rowKey}\u200b_${key}`;
         return this.validationErrorMap.get(_key) || [];
     }
-    // 获取虚拟单元格
+    // 获取虚拟单元格,只针对可见的
     getVirtualBodyCell(rowIndex: number, colIndex: number) {
         const column = this.getColumnByColIndex(colIndex);
         const row = this.getRowForRowIndex(rowIndex);
