@@ -701,14 +701,72 @@ export default class Database {
         if (!selection) {
             return;
         }
-        selection.check = !selection.check;
-        this.setRowSelectionByCheckboxKey(rowKey, selection.check);
+
+        // 检查是否是树形选择列
+        const column = this.getColumnByKey(selection.key);
+        if (column && column.type === 'tree-selection') {
+            this.toggleTreeSelection(rowKey);
+        } else {
+            selection.check = !selection.check;
+            this.setRowSelectionByCheckboxKey(rowKey, selection.check);
+        }
+
         this.ctx.emit('toggleRowSelection', row);
         const rows = this.getSelectionRows();
         this.ctx.emit('selectionChange', rows);
         // 清除缓存
         this.bufferCheckState.buffer = false;
         this.ctx.emit('draw');
+    }
+
+    // 切换树形选择状态
+    toggleTreeSelection(rowKey: string) {
+        const treeState = this.getTreeSelectionState(rowKey);
+        const children = this.getTreeChildren(rowKey);
+        const mode = this.ctx.config.TREE_SELECT_MODE;
+
+        if (mode === 'auto') {
+            // auto模式：子项选中即是半选当做选中
+            if (treeState.checked) {
+                // 如果已选中，则取消选中
+                this.setRowSelection(rowKey, false, false);
+                // 取消所有子项
+                children.forEach(childKey => {
+                    this.setRowSelection(childKey, false, false);
+                });
+            } else {
+                // 如果未选中，则选中
+                this.setRowSelection(rowKey, true, false);
+                // 选中所有子项
+                children.forEach(childKey => {
+                    this.setRowSelection(childKey, true, false);
+                });
+            }
+        } else if (mode === 'cautious') {
+            // cautious模式：只有子项全选时父项选中
+            if (treeState.checked) {
+                // 如果已选中，则取消选中
+                this.setRowSelection(rowKey, false, false);
+                // 取消所有子项
+                children.forEach(childKey => {
+                    this.setRowSelection(childKey, false, false);
+                });
+            } else {
+                // 如果未选中，则选中
+                this.setRowSelection(rowKey, true, false);
+                // 选中所有子项
+                children.forEach(childKey => {
+                    this.setRowSelection(childKey, true, false);
+                });
+            }
+        } else if (mode === 'strictly') {
+            // strictly模式：父子项互不干扰
+            const selection = this.selectionMap.get(rowKey);
+            if (selection) {
+                selection.check = !selection.check;
+                this.setRowSelectionByCheckboxKey(rowKey, selection.check);
+            }
+        }
     }
     /**
      * 根据rowKey 设置选中状态
@@ -747,6 +805,89 @@ export default class Database {
             return false;
         }
         return selection.check;
+    }
+
+    // 获取树形选择状态
+    getTreeSelectionState(rowKey: string) {
+        const row = this.getRowForRowKey(rowKey);
+        if (!row) {
+            return { checked: false, indeterminate: false };
+        }
+
+        const selectionMap = this.selectionMap.get(rowKey);
+        const checked = selectionMap?.check || false;
+        
+        // 计算半选状态
+        const children = this.getTreeChildren(rowKey);
+        if (children.length === 0) {
+            return { checked, indeterminate: false };
+        }
+
+        const childStates = children.map(childKey => this.getRowSelection(childKey));
+        const allChecked = childStates.every(state => state);
+        const someChecked = childStates.some(state => state);
+
+        let indeterminate = false;
+        if (this.ctx.config.TREE_SELECT_MODE === 'auto') {
+            // auto模式：子项选中即是半选当做选中
+            indeterminate = someChecked && !allChecked;
+        } else if (this.ctx.config.TREE_SELECT_MODE === 'cautious') {
+            // cautious模式：只有子项全选时父项选中
+            indeterminate = someChecked && !allChecked;
+        } else if (this.ctx.config.TREE_SELECT_MODE === 'strictly') {
+            // strictly模式：父子项互不干扰
+            indeterminate = false;
+        }
+
+        return { checked, indeterminate };
+    }
+
+    // 获取树形子节点
+    getTreeChildren(rowKey: string): string[] {
+        const row = this.getRowForRowKey(rowKey);
+        if (!row || !row.children) {
+            return [];
+        }
+
+        const children: string[] = [];
+        const collectChildren = (items: any[]) => {
+            for (const item of items) {
+                const itemKey = this.getRowKeyByItem(item);
+                if (itemKey) {
+                    children.push(itemKey);
+                }
+                if (item.children && item.children.length > 0) {
+                    collectChildren(item.children);
+                }
+            }
+        };
+
+        collectChildren(row.children);
+        return children;
+    }
+
+    // 获取树形父节点
+    getTreeParent(rowKey: string): string | null {
+        const findParent = (data: any[], targetKey: string): string | null => {
+            for (const item of data) {
+                const itemKey = this.getRowKeyByItem(item);
+                if (item.children) {
+                    for (const child of item.children) {
+                        const childKey = this.getRowKeyByItem(child);
+                        if (childKey === targetKey) {
+                            return itemKey;
+                        }
+                        const result = findParent(item.children, targetKey);
+                        if (result) {
+                            return result;
+                        }
+                    }
+                }
+            }
+            return null;
+        };
+
+        return findParent(this.data, rowKey);
     }
     /**
      * 根据rowKey 获取选中状态

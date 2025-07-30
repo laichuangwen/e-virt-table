@@ -53,7 +53,7 @@ export default class EVirtTable {
     
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
         // 深度克隆静态默认配置，避免引用类型污染
-        const mergedConfig: ConfigType = this.deepCloneConfig(EVirtTable.defaultConfig);
+        const mergedConfig: ConfigType = EVirtTable.deepCloneConfig(EVirtTable.defaultConfig);
         
         if (options.config) {
             // 合并普通配置项
@@ -476,7 +476,7 @@ export default class EVirtTable {
         this.ctx.destroy();
         this.ctx.containerElement.remove();
     }
-    private deepCloneConfig(config: ConfigType): ConfigType {
+    private static deepCloneConfig(config: ConfigType): ConfigType {
         const cloned: any = {};
         
         for (const key in config) {

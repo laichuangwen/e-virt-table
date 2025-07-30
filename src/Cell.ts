@@ -461,27 +461,48 @@ export default class Cell extends BaseCell {
             return;
         }
         // 选中框类型
-        if (['index-selection', 'selection'].includes(type)) {
-            const check = this.ctx.database.getRowSelection(rowKey);
+        if (['index-selection', 'selection', 'tree-selection'].includes(type)) {
             const selectable = this.ctx.database.getRowSelectable(rowKey);
             const { CHECKBOX_SIZE = 0 } = this.ctx.config;
             const _x = this.drawX + (visibleWidth - CHECKBOX_SIZE) / 2;
             const _y = this.drawY + (visibleHeight - CHECKBOX_SIZE) / 2;
             let checkboxImage: HTMLImageElement | undefined = this.ctx.icons.get('checkbox-uncheck');
             let checkboxName = 'checkbox-uncheck';
-            if (check && selectable) {
-                checkboxImage = this.ctx.icons.get('checkbox-check');
-                checkboxName = 'checkbox-check';
-            } else if (check && selectable) {
-                checkboxImage = this.ctx.icons.get('checkbox-check-disabled');
-                checkboxName = 'checkbox-check-disabled';
-            } else if (!check && selectable) {
-                checkboxImage = this.ctx.icons.get('checkbox-uncheck');
-                checkboxName = 'checkbox-uncheck';
+
+            if (type === 'tree-selection') {
+                // 树形选择逻辑
+                const treeState = this.ctx.database.getTreeSelectionState(rowKey);
+                if (treeState.checked && selectable) {
+                    checkboxImage = this.ctx.icons.get('checkbox-check');
+                    checkboxName = 'checkbox-check';
+                } else if (treeState.indeterminate && selectable) {
+                    checkboxImage = this.ctx.icons.get('checkbox-indeterminate');
+                    checkboxName = 'checkbox-indeterminate';
+                } else if (!treeState.checked && selectable) {
+                    checkboxImage = this.ctx.icons.get('checkbox-uncheck');
+                    checkboxName = 'checkbox-uncheck';
+                } else {
+                    checkboxImage = this.ctx.icons.get('checkbox-disabled');
+                    checkboxName = 'checkbox-disabled';
+                }
             } else {
-                checkboxImage = this.ctx.icons.get('checkbox-disabled');
-                checkboxName = 'checkbox-disabled';
+                // 普通选择逻辑
+                const check = this.ctx.database.getRowSelection(rowKey);
+                if (check && selectable) {
+                    checkboxImage = this.ctx.icons.get('checkbox-check');
+                    checkboxName = 'checkbox-check';
+                } else if (check && selectable) {
+                    checkboxImage = this.ctx.icons.get('checkbox-check-disabled');
+                    checkboxName = 'checkbox-check-disabled';
+                } else if (!check && selectable) {
+                    checkboxImage = this.ctx.icons.get('checkbox-uncheck');
+                    checkboxName = 'checkbox-uncheck';
+                } else {
+                    checkboxImage = this.ctx.icons.get('checkbox-disabled');
+                    checkboxName = 'checkbox-disabled';
+                }
             }
+
             if (checkboxImage && type == 'index-selection') {
                 if (
                     (this.ctx.hoverCell && this.ctx.hoverCell.rowIndex === rowIndex) ||
@@ -494,7 +515,7 @@ export default class Cell extends BaseCell {
                     this.drawImageName = checkboxName;
                     this.drawImageSource = checkboxImage;
                 }
-            } else if (checkboxImage && 'selection' === type) {
+            } else if (checkboxImage && ['selection', 'tree-selection'].includes(type)) {
                 this.drawImageX = _x;
                 this.drawImageY = _y;
                 this.drawImageWidth = CHECKBOX_SIZE;
