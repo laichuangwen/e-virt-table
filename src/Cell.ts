@@ -523,12 +523,12 @@ export default class Cell extends BaseCell {
             if (type === 'tree-selection') {
                 // 树形选择逻辑
                 const treeState = this.ctx.database.getTreeSelectionState(rowKey);
-                if (treeState.checked && selectable) {
-                    checkboxImage = this.ctx.icons.get('checkbox-check');
-                    checkboxName = 'checkbox-check';
-                } else if (treeState.indeterminate && selectable) {
+                if (treeState.indeterminate && selectable) {
                     checkboxImage = this.ctx.icons.get('checkbox-indeterminate');
                     checkboxName = 'checkbox-indeterminate';
+                } else if (treeState.checked && selectable) {
+                    checkboxImage = this.ctx.icons.get('checkbox-check');
+                    checkboxName = 'checkbox-check';
                 } else if (!treeState.checked && selectable) {
                     checkboxImage = this.ctx.icons.get('checkbox-uncheck');
                     checkboxName = 'checkbox-uncheck';
@@ -536,6 +536,10 @@ export default class Cell extends BaseCell {
                     checkboxImage = this.ctx.icons.get('checkbox-disabled');
                     checkboxName = 'checkbox-disabled';
                 }
+                
+
+                
+
             } else {
                 // 普通选择逻辑
                 const check = this.ctx.database.getRowSelection(rowKey);
