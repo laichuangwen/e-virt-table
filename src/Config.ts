@@ -164,6 +164,8 @@ export default class Config {
     ENABLE_SELECTOR = true;
     /** 树形选择模式 */
     TREE_SELECT_MODE: TreeSelectMode = 'auto';
+    /** 自动调整树形列宽度 */
+    AUTO_FIT_TREE_WIDTH = false;
     /** 启用单点击立马编辑 */
     ENABLE_EDIT_SINGLE_CLICK = false;
     /** 启用点击选择器编辑 */

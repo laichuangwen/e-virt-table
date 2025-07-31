@@ -171,6 +171,10 @@ export default class EVirtTable {
         // 先关闭编辑
         this.editor.doneEdit();
         this.ctx.database.setColumns(columns);
+        
+        // 重新计算树形列宽度
+        this.ctx.database.calculateTreeColumnWidth();
+        
         this.header.init();
         this.ctx.emit('draw');
     }

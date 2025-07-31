@@ -365,17 +365,23 @@ export default class Cell extends BaseCell {
                 this.drawTreeImageSource = undefined;
             }
             
+
+            
             // 更改文本距离
             this.align = 'left';
             // 对于 tree-selection 类型，需要考虑 checkbox 和树形图标的宽度
             if (this.type === 'tree-selection') {
                 const { CHECKBOX_SIZE = 0 } = this.ctx.config;
-                this.drawTextX = iconOffsetX + this.drawX + iconWidth + CHECKBOX_SIZE + 4 + 4 - 0.5; // checkbox + 间距 + 树形图标间距
+                // 文本位置 = 缩进 + 起始位置 + checkbox宽度 + 间距 + 树形图标宽度 + 间距
+                this.drawTextX = iconOffsetX + this.drawX + CELL_PADDING + CHECKBOX_SIZE + 4 + iconWidth + 4;
             } else {
-                this.drawTextX = iconOffsetX + this.drawX + iconWidth - 0.5;
+                this.drawTextX = iconOffsetX + this.drawX + CELL_PADDING + iconWidth + 4;
             }
         }
     }
+    
+
+    
     private updateContainer() {
         const {
             BODY_BG_COLOR,
