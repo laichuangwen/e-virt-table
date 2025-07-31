@@ -1275,12 +1275,12 @@ if (treeCanvas) {
 
     // 监听选择变化
     treeTable.on('selectionChange', (selectedRows) => {
-        console.log('树形选择 - 选中的行:', selectedRows);
+
     });
 
     // 监听展开变化
     treeTable.on('expandChange', (expandedRows) => {
-        console.log('树形选择 - 展开的行:', expandedRows);
+
     });
 
     // 添加控制按钮
@@ -1319,7 +1319,7 @@ if (treeCanvas) {
 
     document.getElementById('tree-get-selected')?.addEventListener('click', () => {
         const selectedRows = treeTable.getSelectionRows();
-        console.log('当前选中的行:', selectedRows);
+
         alert(`选中了 ${selectedRows.length} 行数据`);
     });
 
@@ -1329,7 +1329,7 @@ if (treeCanvas) {
         treeTable.loadConfig({
             TREE_SELECT_MODE: mode
         });
-        console.log('切换树形选择模式:', mode);
+
     });
 
     // 添加右键菜单事件处理

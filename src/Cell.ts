@@ -546,10 +546,10 @@ export default class Cell extends BaseCell {
                 if (check && selectable) {
                     checkboxImage = this.ctx.icons.get('checkbox-check');
                     checkboxName = 'checkbox-check';
-                } else if (check && selectable) {
+                } /* else if (check && selectable) {
                     checkboxImage = this.ctx.icons.get('checkbox-check-disabled');
                     checkboxName = 'checkbox-check-disabled';
-                } else if (!check && selectable) {
+                }  */else if (!check && selectable) {
                     checkboxImage = this.ctx.icons.get('checkbox-uncheck');
                     checkboxName = 'checkbox-uncheck';
                 } else {

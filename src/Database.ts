@@ -738,13 +738,13 @@ export default class Database {
             }
         } else if (mode === 'cautious') {
             // cautious模式：交互上相同，但是半选是不算在数据里面的
-            if (treeState.checked || treeState.indeterminate) {
-                // 如果已选中或半选，则取消选中
+            if (treeState.checked && !treeState.indeterminate) {
+                // 如果已全选，则取消选中
                 this.setRowSelection(rowKey, false, false);
                 // 递归取消所有子项
                 this.clearTreeSelectionRecursive(rowKey);
             } else {
-                // 如果未选中，则选中
+                // 如果未选中或半选，则选中
                 this.setRowSelection(rowKey, true, false);
                 // 递归选中所有子项
                 this.selectTreeSelectionRecursive(rowKey);
@@ -804,8 +804,14 @@ export default class Database {
                 // 所有子项都选中，父项应该选中
                 parentShouldBeChecked = true;
             } else {
-                // 部分子项选中，父项应该半选（在auto模式下算作选中）
-                parentShouldBeChecked = true;
+                // 部分子项选中，父项应该半选
+                if (this.ctx.config.TREE_SELECT_MODE === 'auto') {
+                    // auto模式下半选算作选中
+                    parentShouldBeChecked = true;
+                } else if (this.ctx.config.TREE_SELECT_MODE === 'cautious') {
+                    // cautious模式下半选不算作选中
+                    parentShouldBeChecked = false;
+                }
             }
         }
         
@@ -833,7 +839,7 @@ export default class Database {
         this.ctx.emit('setRowSelection', check, selection.row);
         
         // 如果是树形选择模式，需要向上递归更新父项状态
-        if (this.ctx.config.TREE_SELECT_MODE === 'auto') {
+        if (this.ctx.config.TREE_SELECT_MODE === 'auto' || this.ctx.config.TREE_SELECT_MODE === 'cautious') {
             this.updateParentTreeSelection(rowKey);
         }
         
@@ -935,10 +941,32 @@ export default class Database {
 
         } else if (this.ctx.config.TREE_SELECT_MODE === 'cautious') {
             // cautious模式：交互上相同，但是半选是不算在数据里面的
-            const someChecked = checkedChildren > 0;
-            const allChecked = checkedChildren === totalChildren;
+            // 递归计算所有后代的状态
+            const getAllDescendantsRecursive = (parentKey: string): string[] => {
+                const children = this.getTreeChildren(parentKey);
+                let allDescendants: string[] = [];
+                for (const childKey of children) {
+                    allDescendants.push(childKey);
+                    allDescendants.push(...getAllDescendantsRecursive(childKey));
+                }
+                return allDescendants;
+            };
+            
+            const allDescendants = getAllDescendantsRecursive(rowKey);
+            const descendantSelections = allDescendants.map(descKey => this.selectionMap.get(descKey));
+            const checkedDescendants = descendantSelections.filter(s => s?.check).length;
+            const totalDescendants = descendantSelections.length;
+            
+            const someChecked = checkedDescendants > 0;
+            const allChecked = checkedDescendants === totalDescendants;
             indeterminate = someChecked && !allChecked;
-            finalChecked = checked || allChecked; // 只有全选才算选中
+            finalChecked = checked || allChecked; // 只有全选才算选中，半选不算选中
+            
+            // 特殊处理：如果父项被选中但所有后代都被取消选中，则父项也取消选中
+            if (checked && totalDescendants > 0 && checkedDescendants === 0) {
+                finalChecked = false;
+                indeterminate = false;
+            }
         } else if (this.ctx.config.TREE_SELECT_MODE === 'strictly') {
             // strictly模式：父子各选各的互相不干扰，没有半选模式
             indeterminate = false;
