@@ -107,8 +107,8 @@ export default class EventTable {
                     }
                 } else {
                     // 其他类型的处理
-                    this.selectionClick(cell);
-                    this.treeClick(cell);
+                this.selectionClick(cell);
+                this.treeClick(cell);
                 }
                 
                 // hoverIcon事件

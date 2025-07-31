@@ -889,24 +889,6 @@ export default class Database {
             return { checked, indeterminate: false };
         }
 
-        // 递归获取所有子项的状态
-        const getAllChildrenRecursive = (parentKey: string): string[] => {
-            const directChildren = this.getTreeChildren(parentKey);
-            let allChildren: string[] = [];
-            directChildren.forEach(childKey => {
-                allChildren.push(childKey);
-                allChildren.push(...getAllChildrenRecursive(childKey));
-            });
-            return allChildren;
-        };
-
-        const allChildren = getAllChildrenRecursive(rowKey);
-        const childSelections = allChildren.map(childKey => this.selectionMap.get(childKey));
-        const checkedChildren = childSelections.filter(s => s?.check).length;
-        const totalChildren = childSelections.length;
-        
-        
-
         let indeterminate = false;
         let finalChecked = checked;
         
@@ -1046,18 +1028,44 @@ export default class Database {
      * @param rowKey
      */
     toggleAllSelection() {
-        this.rowKeyMap.forEach((row: any, rowKey: string) => {
-            let _selectable = row.selectable;
-            if (typeof _selectable === 'function') {
-                _selectable = _selectable({
-                    row: row.item,
-                    rowIndex: row.rowIndex,
-                });
-            }
-            if (_selectable) {
-                this.setRowSelection(rowKey, true, false);
-            }
-        });
+        // 检查是否是树形选择模式
+        const isTreeSelectionMode = this.ctx.config.TREE_SELECT_MODE === 'auto' || this.ctx.config.TREE_SELECT_MODE === 'cautious';
+        
+        if (isTreeSelectionMode) {
+            // 树形选择模式：只从上到下设置，跳过递归计算
+            this.rowKeyMap.forEach((row: any, rowKey: string) => {
+                let _selectable = row.selectable;
+                if (typeof _selectable === 'function') {
+                    _selectable = _selectable({
+                        row: row.item,
+                        rowIndex: row.rowIndex,
+                    });
+                }
+                if (_selectable) {
+                    // 直接设置选中状态，跳过递归计算
+                    const selection = this.selectionMap.get(rowKey);
+                    if (selection) {
+                        selection.check = true;
+                        this.setRowSelectionByCheckboxKey(rowKey, true);
+                    }
+                }
+            });
+        } else {
+            // 普通选择模式：使用原有逻辑
+            this.rowKeyMap.forEach((row: any, rowKey: string) => {
+                let _selectable = row.selectable;
+                if (typeof _selectable === 'function') {
+                    _selectable = _selectable({
+                        row: row.item,
+                        rowIndex: row.rowIndex,
+                    });
+                }
+                if (_selectable) {
+                    this.setRowSelection(rowKey, true, false);
+                }
+            });
+        }
+        
         const rows = this.getSelectionRows();
         this.ctx.emit('toggleAllSelection', rows);
         this.ctx.emit('selectionChange', rows);
@@ -1070,11 +1078,26 @@ export default class Database {
      * @param rowKey
      */
     clearSelection(ignoreReserve = false) {
+        // 检查是否是树形选择模式
+        const isTreeSelectionMode = this.ctx.config.TREE_SELECT_MODE === 'auto' || this.ctx.config.TREE_SELECT_MODE === 'cautious';
+        
         // 清除选中,点击表头清除时要忽略跨页选的
         if (ignoreReserve) {
-            this.rowKeyMap.forEach((_, rowKey: string) => {
-                this.setRowSelection(rowKey, false, false);
-            });
+            if (isTreeSelectionMode) {
+                // 树形选择模式：只从上到下设置，跳过递归计算
+                this.rowKeyMap.forEach((_, rowKey: string) => {
+                    const selection = this.selectionMap.get(rowKey);
+                    if (selection) {
+                        selection.check = false;
+                        this.setRowSelectionByCheckboxKey(rowKey, false);
+                    }
+                });
+            } else {
+                // 普通选择模式：使用原有逻辑
+                this.rowKeyMap.forEach((_, rowKey: string) => {
+                    this.setRowSelection(rowKey, false, false);
+                });
+            }
         } else {
             this.selectionMap.clear();
             this.rowKeyMap.forEach((row, rowKey: string) => {
@@ -1631,11 +1654,22 @@ export default class Database {
         // 总所需宽度 - 增加更多缓冲空间
         const requiredWidth = baseWidth + maxIndentWidth + 50; // 额外加50px缓冲
         
-        // 更新树形列的宽度
+        // 更新树形列的宽度，考虑对齐方式
         treeColumns.forEach(column => {
             const currentWidth = column.width || 100;
-            if (currentWidth < requiredWidth) {
-                column.width = requiredWidth;
+            let finalWidth = requiredWidth;
+            
+            // 根据对齐方式调整宽度
+            if (column.align === 'center') {
+                // 居中对齐需要更多宽度来容纳文本
+                finalWidth = Math.max(requiredWidth, 150); // 居中对齐至少150px
+            } else if (column.align === 'left' || column.align === 'right') {
+                // 左对齐或右对齐，使用计算出的宽度
+                finalWidth = requiredWidth;
+            }
+            
+            if (currentWidth < finalWidth) {
+                column.width = finalWidth;
             }
         });
         
