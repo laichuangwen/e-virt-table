@@ -79,10 +79,38 @@ export default class EventTable {
             this.handleBodyEvent(x, y, this.ctx.body.renderRows, (cell: Cell) => {
                 this.ctx.clickCell = cell;
                 this.ctx.emit('cellClick', cell, e);
-                // selection事件
+                
+                // 对于 tree-selection 类型，需要根据点击位置来决定触发哪个事件
+                if (cell.type === 'tree-selection') {
+                    const { offsetY, offsetX } = this.ctx.getOffset(e);
+                    const clickY = offsetY;
+                    const clickX = offsetX;
+                    
+                    // 检查是否点击了 checkbox
+                    if (
+                        clickX > cell.drawImageX &&
+                        clickX < cell.drawImageX + cell.drawImageWidth &&
+                        clickY > cell.drawImageY &&
+                        clickY < cell.drawImageY + cell.drawImageHeight
+                    ) {
+                        // 点击了 checkbox，触发选择事件
+                        this.selectionClick(cell);
+                    } else if (
+                        cell.drawTreeImageSource &&
+                        clickX > cell.drawTreeImageX &&
+                        clickX < cell.drawTreeImageX + cell.drawTreeImageWidth &&
+                        clickY > cell.drawTreeImageY &&
+                        clickY < cell.drawTreeImageY + cell.drawTreeImageHeight
+                    ) {
+                        // 点击了树形图标，触发树事件
+                        this.treeClick(cell);
+                    }
+                } else {
+                    // 其他类型的处理
                 this.selectionClick(cell);
-                // 树事件
                 this.treeClick(cell);
+                }
+                
                 // hoverIcon事件
                 this.hoverIconClick(cell);
             });
@@ -205,7 +233,7 @@ export default class EventTable {
      */
     private selectionClick(cell: CellHeader | Cell) {
         // 鼠标移动到图标上会变成pointer，所以这里判断是否是pointer就能判断出是图标点击的
-        const isSelection = ['selection', 'index-selection'].includes(cell.type) && this.ctx.isPointer;
+        const isSelection = ['selection', 'index-selection', 'tree-selection'].includes(cell.type) && this.ctx.isPointer;
         if (!isSelection) {
             return;
         }
@@ -223,7 +251,7 @@ export default class EventTable {
             if (!selectable) {
                 return;
             }
-            this.ctx.database.toggleRowSelection(cell.rowKey);
+            this.ctx.database.toggleRowSelection(cell.rowKey, cell.type);
         }
     }
     /**
@@ -232,7 +260,7 @@ export default class EventTable {
      */
     private treeClick(cell: Cell) {
         // 鼠标移动到图标上会变成pointer，所以这里判断是否是pointer就能判断出是图标点击的
-        if (cell.type === 'tree' && this.ctx.isPointer) {
+        if ((cell.type === 'tree' || cell.type === 'tree-selection') && this.ctx.isPointer) {
             const row = this.ctx.database.getRowForRowKey(cell.rowKey);
             const { expand = false, expandLazy = false } = row || {};
             const { EXPAND_LAZY, EXPAND_LAZY_METHOD } = this.ctx.config;
@@ -275,6 +303,8 @@ export default class EventTable {
         const { offsetY, offsetX } = this.ctx.getOffset(e);
         const y = offsetY;
         const x = offsetX;
+        
+        // 检查主要图标（checkbox 或 hover 图标）
         if (
             x > cell.drawImageX &&
             x < cell.drawImageX + cell.drawImageWidth &&
@@ -283,6 +313,35 @@ export default class EventTable {
         ) {
             this.ctx.stageElement.style.cursor = 'pointer';
             this.ctx.isPointer = true;
+            return;
+        }
+        
+        // 检查树形图标（仅对 tree-selection 类型）
+        if (cell instanceof Cell && cell.type === 'tree-selection' && cell.drawTreeImageSource) {
+            if (
+                x > cell.drawTreeImageX &&
+                x < cell.drawTreeImageX + cell.drawTreeImageWidth &&
+                y > cell.drawTreeImageY &&
+                y < cell.drawTreeImageY + cell.drawTreeImageHeight
+            ) {
+                this.ctx.stageElement.style.cursor = 'pointer';
+                this.ctx.isPointer = true;
+                return;
+            }
+        }
+        
+        // 检查树形图标（对 tree 类型）
+        if (cell instanceof Cell && cell.type === 'tree') {
+            if (
+                x > cell.drawImageX &&
+                x < cell.drawImageX + cell.drawImageWidth &&
+                y > cell.drawImageY &&
+                y < cell.drawImageY + cell.drawImageHeight
+            ) {
+                this.ctx.stageElement.style.cursor = 'pointer';
+                this.ctx.isPointer = true;
+                return;
+            }
         }
     }
     private selectionEnterAndLeave(cell: Cell | CellHeader, e: MouseEvent) {
@@ -296,7 +355,7 @@ export default class EventTable {
             y < cell.drawImageY + cell.drawImageHeight
         ) {
             // body cell 选中图标
-            if (cell instanceof Cell && ['selection', 'index-selection'].includes(cell.type)) {
+            if (cell instanceof Cell && ['selection', 'index-selection', 'tree-selection'].includes(cell.type)) {
                 this.ctx.stageElement.style.cursor = 'pointer';
                 this.ctx.isPointer = true;
                 // body cell 需要处理是否可选

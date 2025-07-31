@@ -4,8 +4,8 @@ import type { Rule, Rules } from './Validator';
 import Config from './Config';
 export type OptionalizeExcept<T, K extends keyof T> = Partial<Omit<T, K>> & Required<Pick<T, K>>;
 export type EVirtTableOptions = {
-    data: any[];
-    footerData?: any[];
+    data: Record<string, any>[];
+    footerData?: Record<string, any>[];
     columns: Column[];
     config?: ConfigType;
     overlayerElement?: HTMLDivElement;
@@ -39,7 +39,7 @@ export type OverflowTooltipPlacement =
 export type VerticalAlign = 'top' | 'middle' | 'bottom';
 export type Align = 'left' | 'center' | 'right';
 export type Fixed = 'left' | 'right';
-export type Type = 'index' | 'selection' | 'index-selection' | 'tree' | 'number';
+export type Type = 'index' | 'selection' | 'index-selection' | 'tree' | 'tree-selection' | 'number';
 
 export type TypeCheckbox =
     | 'checkbox-uncheck'
@@ -147,6 +147,8 @@ export interface Column {
 }
 export type HistoryAction = 'back' | 'forward' | 'none';
 export type SelectorCellValueType = 'displayText' | 'value';
+
+export type TreeSelectMode = 'auto' | 'cautious' | 'strictly';
 export type OverlayerTooltip = {
     style: any;
     text: string;

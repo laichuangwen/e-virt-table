@@ -69,6 +69,13 @@ export default class Cell extends BaseCell {
     drawImageHeight = 0;
     drawImageName = '';
     drawImageSource?: HTMLImageElement;
+    // 为 tree-selection 添加额外的图标支持
+    drawTreeImageX = 0;
+    drawTreeImageY = 0;
+    drawTreeImageWidth = 0;
+    drawTreeImageHeight = 0;
+    drawTreeImageName = '';
+    drawTreeImageSource?: HTMLImageElement;
     ellipsis = false;
     rowExpand = false;
     rowHasChildren = false;
@@ -97,7 +104,8 @@ export default class Cell extends BaseCell {
         this.key = column.key;
         this.type = column.type || '';
         this.editorType = column.editorType || 'text';
-        this.selectorCellValueType = column.selectorCellValueType || this.ctx.config.SELECTOR_CELL_VALUE_TYPE || 'value';
+        this.selectorCellValueType =
+            column.selectorCellValueType || this.ctx.config.SELECTOR_CELL_VALUE_TYPE || 'value';
         this.editorProps = column.editorProps || {};
         this.cellType = cellType;
         this.align = column.align || 'center';
@@ -297,43 +305,107 @@ export default class Cell extends BaseCell {
         let icon = undefined;
         let iconOffsetX = 0;
         let iconName = '';
-        if (this.type === 'tree' && cellType === 'body') {
+
+        // 处理树形渲染（包括 tree 和 tree-selection 类型）
+        if ((this.type === 'tree' || this.type === 'tree-selection') && cellType === 'body') {
             const row = this.ctx.database.getRowForRowKey(rowKey);
             const { expand = false, hasChildren = false, expandLoading = false, level = 0 } = row || {};
             this.rowExpand = expand;
             this.rowHasChildren = hasChildren;
+
+            // 计算树形图标的偏移量
+            iconOffsetX = level * 8;
+
             if (expandLoading) {
                 const loadingIcon = this.ctx.icons.get('loading');
                 iconName = 'loading';
                 icon = loadingIcon;
-                iconOffsetX = level * 8;
             } else if (hasChildren) {
                 const expandIcon = this.ctx.icons.get('expand');
                 const shrinkIcon = this.ctx.icons.get('shrink');
                 icon = !expand ? expandIcon : shrinkIcon;
                 iconName = !expand ? 'expand' : 'shrink';
-                iconOffsetX = level * 8;
-            } else {
-                iconOffsetX = level * 8;
             }
+
             let iconWidth = 20;
             let iconHeight = 20;
+
             if (icon) {
                 let iconX = this.drawX + iconOffsetX + CELL_PADDING;
                 let iconY = this.drawY + (this.visibleHeight - iconHeight) / 2;
-                this.ctx.paint.drawImage(icon, iconX, iconY, iconWidth, iconHeight);
-                this.drawImageX = iconX;
-                this.drawImageY = iconY;
-                this.drawImageWidth = iconWidth;
-                this.drawImageHeight = iconHeight;
-                this.drawImageName = iconName;
-                this.drawImageSource = icon;
+
+                // 对于 tree-selection 类型，树形图标应该在 checkbox 之后
+                if (this.type === 'tree-selection') {
+                    const { CHECKBOX_SIZE = 0 } = this.ctx.config;
+                    // 复选框居中位置
+                    const checkboxCenterX = this.drawX + (this.visibleWidth - CHECKBOX_SIZE) / 2;
+                    // 树形图标在复选框右侧，根据层级缩进
+                    iconX = checkboxCenterX + CHECKBOX_SIZE + 4 + iconOffsetX;
+                    this.drawTreeImageX = iconX;
+                    this.drawTreeImageY = iconY;
+                    this.drawTreeImageWidth = iconWidth;
+                    this.drawTreeImageHeight = iconHeight;
+                    this.drawTreeImageName = iconName;
+                    this.drawTreeImageSource = icon;
+                } else {
+                    // 对于普通 tree 类型，根据 align 属性调整位置
+                    if (this.align === 'center' || this.align === 'right') {
+                        // 居中对齐或右对齐：树形图标居中，文本在右侧
+                        iconX = this.drawX + (this.visibleWidth - iconWidth) / 2 + iconOffsetX;
+
+                    } else {
+                        // 左对齐：树形图标根据层级缩进
+                        iconX = this.drawX + iconOffsetX + CELL_PADDING;
+                    }
+
+                    this.ctx.paint.drawImage(icon, iconX, iconY, iconWidth, iconHeight);
+                    this.drawImageX = iconX;
+                    this.drawImageY = iconY;
+                    this.drawImageWidth = iconWidth;
+                    this.drawImageHeight = iconHeight;
+                    this.drawImageName = iconName;
+                    this.drawImageSource = icon;
+                }
+            } else if (this.type === 'tree-selection') {
+                // 对于 tree-selection 类型，即使没有树形图标也要设置位置，以便文本对齐
+                const { CHECKBOX_SIZE = 0 } = this.ctx.config;
+                // 复选框居中位置
+                const checkboxCenterX = this.drawX + (this.visibleWidth - CHECKBOX_SIZE) / 2;
+                const iconX = checkboxCenterX + CHECKBOX_SIZE + 4 + iconOffsetX;
+                const iconY = this.drawY + (this.visibleHeight - 20) / 2;
+                this.drawTreeImageX = iconX;
+                this.drawTreeImageY = iconY;
+                this.drawTreeImageWidth = 20;
+                this.drawTreeImageHeight = 20;
+                this.drawTreeImageName = '';
+                this.drawTreeImageSource = undefined;
             }
-            // 更改文本距离
-            this.align = 'left';
-            this.drawTextX = iconOffsetX + this.drawX + iconWidth - 0.5;
+
+            // 对于 tree-selection 类型，需要考虑 checkbox 和树形图标的宽度
+            if (this.type === 'tree-selection') {
+                const { CHECKBOX_SIZE = 0 } = this.ctx.config;
+                // 复选框居中位置
+                const checkboxCenterX = this.drawX + (this.visibleWidth - CHECKBOX_SIZE) / 2;
+                // 文本位置 = 复选框右侧 + 树形图标宽度 + 层级缩进
+                this.drawTextX = checkboxCenterX + CHECKBOX_SIZE + 4 + iconWidth + iconOffsetX;
+            } else {
+                // 对于普通 tree 类型，根据 align 属性调整文本位置
+                if (this.align === 'center' || this.align === 'right') {
+                    // 居中对齐或右对齐：文本紧贴树形图标右侧，固定间距
+                    // 计算图标位置：居中 + 层级缩进
+                    const iconCenterX = this.drawX + (this.visibleWidth - iconWidth) / 2 + iconOffsetX;
+                    // 文本位置：图标位置 + 图标宽度 + 固定间距
+                    this.drawTextX = iconCenterX + iconWidth + 1;
+
+                } else {
+                    // 左对齐：文本紧贴树形图标右侧
+                    this.drawTextX = iconOffsetX + this.drawX + CELL_PADDING + iconWidth;
+
+                }
+            }
         }
     }
+
     private updateContainer() {
         const {
             BODY_BG_COLOR,
@@ -461,27 +533,54 @@ export default class Cell extends BaseCell {
             return;
         }
         // 选中框类型
-        if (['index-selection', 'selection'].includes(type)) {
-            const check = this.ctx.database.getRowSelection(rowKey);
+        if (['index-selection', 'selection', 'tree-selection'].includes(type)) {
             const selectable = this.ctx.database.getRowSelectable(rowKey);
             const { CHECKBOX_SIZE = 0 } = this.ctx.config;
-            const _x = this.drawX + (visibleWidth - CHECKBOX_SIZE) / 2;
-            const _y = this.drawY + (visibleHeight - CHECKBOX_SIZE) / 2;
+            let _x = this.drawX + (visibleWidth - CHECKBOX_SIZE) / 2;
+            let _y = this.drawY + (visibleHeight - CHECKBOX_SIZE) / 2;
+
+            // 对于 tree-selection 类型，checkbox 应该居中显示
+            if (type === 'tree-selection') {
+                // 保持居中显示，不改变 _x 和 _y 的计算
+            }
+
             let checkboxImage: HTMLImageElement | undefined = this.ctx.icons.get('checkbox-uncheck');
             let checkboxName = 'checkbox-uncheck';
-            if (check && selectable) {
-                checkboxImage = this.ctx.icons.get('checkbox-check');
-                checkboxName = 'checkbox-check';
-            } else if (check && selectable) {
-                checkboxImage = this.ctx.icons.get('checkbox-check-disabled');
-                checkboxName = 'checkbox-check-disabled';
-            } else if (!check && selectable) {
-                checkboxImage = this.ctx.icons.get('checkbox-uncheck');
-                checkboxName = 'checkbox-uncheck';
+
+            if (type === 'tree-selection') {
+                // 树形选择逻辑
+                const treeState = this.ctx.database.getTreeSelectionState(rowKey);
+                if (treeState.indeterminate && selectable) {
+                    checkboxImage = this.ctx.icons.get('checkbox-indeterminate');
+                    checkboxName = 'checkbox-indeterminate';
+                } else if (treeState.checked && selectable) {
+                    checkboxImage = this.ctx.icons.get('checkbox-check');
+                    checkboxName = 'checkbox-check';
+                } else if (!treeState.checked && selectable) {
+                    checkboxImage = this.ctx.icons.get('checkbox-uncheck');
+                    checkboxName = 'checkbox-uncheck';
+                } else {
+                    checkboxImage = this.ctx.icons.get('checkbox-disabled');
+                    checkboxName = 'checkbox-disabled';
+                }
             } else {
-                checkboxImage = this.ctx.icons.get('checkbox-disabled');
-                checkboxName = 'checkbox-disabled';
+                // 普通选择逻辑
+                const check = this.ctx.database.getRowSelection(rowKey);
+                if (check && selectable) {
+                    checkboxImage = this.ctx.icons.get('checkbox-check');
+                    checkboxName = 'checkbox-check';
+                } /* else if (check && selectable) {
+                    checkboxImage = this.ctx.icons.get('checkbox-check-disabled');
+                    checkboxName = 'checkbox-check-disabled';
+                }  */ else if (!check && selectable) {
+                    checkboxImage = this.ctx.icons.get('checkbox-uncheck');
+                    checkboxName = 'checkbox-uncheck';
+                } else {
+                    checkboxImage = this.ctx.icons.get('checkbox-disabled');
+                    checkboxName = 'checkbox-disabled';
+                }
             }
+
             if (checkboxImage && type == 'index-selection') {
                 if (
                     (this.ctx.hoverCell && this.ctx.hoverCell.rowIndex === rowIndex) ||
@@ -494,7 +593,7 @@ export default class Cell extends BaseCell {
                     this.drawImageName = checkboxName;
                     this.drawImageSource = checkboxImage;
                 }
-            } else if (checkboxImage && 'selection' === type) {
+            } else if (checkboxImage && ['selection', 'tree-selection'].includes(type)) {
                 this.drawImageX = _x;
                 this.drawImageY = _y;
                 this.drawImageWidth = CHECKBOX_SIZE;
@@ -770,9 +869,9 @@ export default class Cell extends BaseCell {
     private drawText() {
         const { CELL_PADDING, BODY_FONT, PLACEHOLDER_COLOR } = this.ctx.config;
         let visibleWidth = this.visibleWidth;
-        if (this.type === 'tree') {
+        if (this.type === 'tree' || this.type === 'tree-selection') {
             const offsetIconX = this.drawTextX - this.drawX;
-            visibleWidth = this.visibleWidth - offsetIconX; // 减去树形图标的宽度
+            visibleWidth = this.visibleWidth - offsetIconX; // 减去图标的宽度
         }
         const { ellipsis } = this.ctx.paint.handleEllipsis(this.displayText, visibleWidth, CELL_PADDING, BODY_FONT);
         this.ellipsis = ellipsis;
@@ -794,37 +893,48 @@ export default class Cell extends BaseCell {
         return this.ctx.paint.drawText(text, this.drawTextX, this.drawTextY, visibleWidth, this.visibleHeight, {
             font: BODY_FONT,
             padding: CELL_PADDING,
-            align: this.align,
+            align: this.type === 'tree' || this.type === 'tree-selection' ? 'left' : this.align,
             verticalAlign: this.verticalAlign,
             color,
         });
     }
     private drawImage() {
-        if (!this.drawImageSource) {
-            return;
-        }
-        if (this.hoverIconName) {
-            const { CELL_HOVER_ICON_BG_COLOR, CELL_HOVER_ICON_BORDER_COLOR } = this.ctx.config;
-            this.ctx.paint.drawRect(
-                this.drawImageX - 2,
-                this.drawImageY - 2,
-                this.drawImageWidth + 4,
-                this.drawImageHeight + 4,
-                {
-                    borderColor: CELL_HOVER_ICON_BORDER_COLOR,
-                    radius: 4,
-                    borderWidth: 1,
-                    fillColor: CELL_HOVER_ICON_BG_COLOR,
-                },
+        // 绘制主要图标（checkbox 或 hover 图标）
+        if (this.drawImageSource) {
+            if (this.hoverIconName) {
+                const { CELL_HOVER_ICON_BG_COLOR, CELL_HOVER_ICON_BORDER_COLOR } = this.ctx.config;
+                this.ctx.paint.drawRect(
+                    this.drawImageX - 2,
+                    this.drawImageY - 2,
+                    this.drawImageWidth + 4,
+                    this.drawImageHeight + 4,
+                    {
+                        borderColor: CELL_HOVER_ICON_BORDER_COLOR,
+                        radius: 4,
+                        borderWidth: 1,
+                        fillColor: CELL_HOVER_ICON_BG_COLOR,
+                    },
+                );
+            }
+            this.ctx.paint.drawImage(
+                this.drawImageSource,
+                this.drawImageX,
+                this.drawImageY,
+                this.drawImageWidth,
+                this.drawImageHeight,
             );
         }
-        this.ctx.paint.drawImage(
-            this.drawImageSource,
-            this.drawImageX,
-            this.drawImageY,
-            this.drawImageWidth,
-            this.drawImageHeight,
-        );
+
+        // 绘制树形图标（仅对 tree-selection 类型）
+        if (this.type === 'tree-selection' && this.drawTreeImageSource) {
+            this.ctx.paint.drawImage(
+                this.drawTreeImageSource,
+                this.drawTreeImageX,
+                this.drawTreeImageY,
+                this.drawTreeImageWidth,
+                this.drawTreeImageHeight,
+            );
+        }
     }
     private drawSelector() {
         if (this.cellType === 'footer') {

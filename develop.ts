@@ -24,7 +24,7 @@ let columns: Column[] = [
         key: 'selection',
         type: 'selection',
         fixed: 'left',
-        maxWidth: 60,
+        maxWidth: 200,
         operation: true,
         // widthFillDisable: true,
     },
@@ -46,8 +46,9 @@ let columns: Column[] = [
         title: '工号',
         key: 'emp_no',
         // operation: true,
+        align: 'center',
         readonly: true,
-        width: 120,
+        width: 180,
         type: 'tree',
         fixed: 'left',
         sort: 4,
@@ -404,7 +405,6 @@ for (let i = 0; i < 1000; i += 1) {
                 emp_no: `${i}-1`,
                 emp_name: `张三${i}-1`,
                 children: [],
-                _hasChildren: true,
             },
             {
                 id: `${i}-2`,
@@ -419,6 +419,12 @@ for (let i = 0; i < 1000; i += 1) {
                         _hasChildren: true,
                     },
                 ],
+            },
+            {
+                id: `${i}-3`,
+                emp_no: `${i}-3`,
+                emp_name: `李三${i}-3`,
+                children: [],
             },
         ],
         _hasChildren: true,
@@ -800,6 +806,79 @@ eVirtTable.on('overlayerChange', (container) => {
     });
 });
 
+// 树形选择切换功能
+let isTreeSelectionMode = false;
+const toggleTreeSelectionBtn = document.getElementById('toggleTreeSelection') as HTMLButtonElement;
+
+toggleTreeSelectionBtn.addEventListener('click', () => {
+    if (!isTreeSelectionMode) {
+        // 切换到树形选择模式 - 使用原始配置，只替换 selection 和 tree 列为 tree-selection
+        const treeSelectionColumns = columns.map(col => {
+            if (col.key === 'selection') {
+                return {
+                    ...col,
+                    type: 'tree-selection' as any,
+                    title: '选择'
+                };
+            }
+            if (col.key === 'emp_no') {
+                return {
+                    ...col,
+                    type: undefined // 移除 tree 类型
+                };
+            }
+            return col;
+        });
+
+        // 重新加载列配置
+        eVirtTable.loadColumns(treeSelectionColumns);
+        
+        // 更新配置以支持树形选择
+        eVirtTable.loadConfig({
+            TREE_SELECT_MODE: 'auto',
+            AUTO_FIT_TREE_WIDTH: false, // 暂时关闭自动宽度调整，看看是否有影响
+            ENABLE_CONTEXT_MENU: true,
+            CONTEXT_MENU: [
+                { label: '全选', value: 'selectAll' },
+                { label: '取消全选', value: 'unselectAll' },
+                { label: '展开全部', value: 'expandAll' },
+                { label: '收起全部', value: 'collapseAll' }
+            ]
+        });
+        
+        // 更新按钮文字
+        toggleTreeSelectionBtn.textContent = '普通模式';
+        isTreeSelectionMode = true;
+    } else {
+        // 切换到普通模式 - 恢复原始配置
+        eVirtTable.loadColumns(columns);
+        
+        // 恢复原始配置
+        eVirtTable.loadConfig({
+            TREE_SELECT_MODE: 'auto',
+            AUTO_FIT_TREE_WIDTH: true,
+            ENABLE_CONTEXT_MENU: true,
+            CONTEXT_MENU: [
+                { label: '复制', value: 'copy' },
+                { label: '剪切', value: 'cut' },
+                { label: '粘贴', value: 'paste' },
+                { label: '清空选中内容', value: 'clearSelected' },
+                {
+                    label: '新增',
+                    value: 'add',
+                    event: () => {
+                        console.log('新增');
+                    },
+                },
+            ]
+        });
+        
+        // 更新按钮文字
+        toggleTreeSelectionBtn.textContent = '树形选择';
+        isTreeSelectionMode = false;
+    }
+});
+
 const dateEl = document.getElementById('e-virt-table-date') as HTMLInputElement;
 if (dateEl) {
     eVirtTable.on('startEdit', (cell) => {
@@ -1133,3 +1212,5 @@ function destroy() {
     window.removeEventListener('beforeunload', destroy);
 }
 window.addEventListener('beforeunload', destroy);
+
+

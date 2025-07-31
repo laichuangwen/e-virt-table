@@ -24,7 +24,19 @@ import Overlayer from './Overlayer';
 import ContextMenu from './ContextMenu';
 import { mergeColCell, mergeRowCell, getSpanArrByRow, getSpanObjByColumn } from './util';
 import './style.css';
+
 export default class EVirtTable {
+    // 静态默认配置
+    private static defaultConfig: ConfigType = {};
+    
+    /**
+     * 设置全局默认配置
+     * @param config 默认配置选项
+     */
+    static setup(config: ConfigType): void {
+        EVirtTable.defaultConfig = { ...EVirtTable.defaultConfig, ...config };
+    }
+
     private options: EVirtTableOptions;
     private scroller: Scroller;
     private header: Header;
@@ -38,9 +50,39 @@ export default class EVirtTable {
     private overlayer: Overlayer;
     private contextMenu: ContextMenu;
     ctx: Context;
+    
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
-        this.options = options;
-        const { overlayerElement, editorElement, emptyElement, contextMenuElement } = options;
+        // 深度克隆静态默认配置，避免引用类型污染
+        const mergedConfig: ConfigType = EVirtTable.deepCloneConfig(EVirtTable.defaultConfig);
+        
+        if (options.config) {
+            // 合并普通配置项
+            Object.assign(mergedConfig, options.config);
+            
+            // 特殊处理ICONS数组 - 使用concat而不是覆盖
+            if (EVirtTable.defaultConfig.ICONS && options.config.ICONS) {
+                mergedConfig.ICONS = [...EVirtTable.defaultConfig.ICONS, ...options.config.ICONS];
+            }
+            
+            // 特殊处理样式对象 - 深度合并
+            if (EVirtTable.defaultConfig.EMPTY_CUSTOM_STYLE && options.config.EMPTY_CUSTOM_STYLE) {
+                mergedConfig.EMPTY_CUSTOM_STYLE = {
+                    ...EVirtTable.defaultConfig.EMPTY_CUSTOM_STYLE,
+                    ...options.config.EMPTY_CUSTOM_STYLE
+                };
+            }
+            
+            if (EVirtTable.defaultConfig.TOOLTIP_CUSTOM_STYLE && options.config.TOOLTIP_CUSTOM_STYLE) {
+                mergedConfig.TOOLTIP_CUSTOM_STYLE = {
+                    ...EVirtTable.defaultConfig.TOOLTIP_CUSTOM_STYLE,
+                    ...options.config.TOOLTIP_CUSTOM_STYLE
+                };
+            }
+        }
+        
+        this.options = { ...options, config: mergedConfig };
+        
+        const { overlayerElement, editorElement, emptyElement, contextMenuElement } = this.options;
         const containerElement = this.createContainer(
             target,
             overlayerElement,
@@ -129,6 +171,10 @@ export default class EVirtTable {
         // 先关闭编辑
         this.editor.doneEdit();
         this.ctx.database.setColumns(columns);
+        
+        // 重新计算树形列宽度
+        this.ctx.database.calculateTreeColumnWidth();
+        
         this.header.init();
         this.ctx.emit('draw');
     }
@@ -145,8 +191,8 @@ export default class EVirtTable {
         this.ctx.emit('draw');
     }
 
-    setLoading(ladong: boolean) {
-        this.ctx.database.setLoading(ladong);
+    setLoading(loading: boolean) {
+        this.ctx.database.setLoading(loading);
     }
     on(event: string, callback: EventCallback) {
         this.ctx.on(event, callback);
@@ -433,5 +479,36 @@ export default class EVirtTable {
         this.contextMenu.destroy();
         this.ctx.destroy();
         this.ctx.containerElement.remove();
+    }
+    private static deepCloneConfig(config: ConfigType): ConfigType {
+        const cloned: any = {};
+        
+        for (const key in config) {
+            if (Object.prototype.hasOwnProperty.call(config, key)) {
+                const value = (config as any)[key];
+                
+                if (value === null || value === undefined) {
+                    cloned[key] = value;
+                } else if (typeof value === 'function') {
+                    // 函数直接引用，不需要克隆
+                    cloned[key] = value;
+                } else if (Array.isArray(value)) {
+                    // 数组深拷贝
+                    cloned[key] = value.map(item => 
+                        typeof item === 'object' && item !== null 
+                            ? { ...item } 
+                            : item
+                    );
+                } else if (typeof value === 'object') {
+                    // 对象深拷贝
+                    cloned[key] = { ...value };
+                } else {
+                    // 基本类型直接赋值
+                    cloned[key] = value;
+                }
+            }
+        }
+        
+        return cloned as ConfigType;
     }
 }
