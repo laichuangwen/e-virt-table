@@ -706,7 +706,7 @@ export default class Database {
         }
 
         // 检查是否是树形选择列
-        if (cellType === 'tree-selection') {
+        if (cellType === 'selection-tree' || cellType === 'tree-selection') {
             this.toggleTreeSelection(rowKey);
         } else {
             selection.check = !selection.check;
@@ -1625,7 +1625,7 @@ export default class Database {
         // 检查是否有树形列
         const columns = this.getColumns();
         const leafColumns = toLeaf(columns);
-        const treeColumns = leafColumns.filter(col => col.type === 'tree' || col.type === 'tree-selection');
+        const treeColumns = leafColumns.filter(col => col.type === 'tree' || col.type === 'selection-tree' || col.type === 'tree-selection');
         
         if (treeColumns.length === 0) {
             return;
@@ -1635,15 +1635,15 @@ export default class Database {
         const maxDepth = this.calculateMaxTreeDepth(this.data);
         
         // 计算所需宽度
-        const { CELL_PADDING = 0, CHECKBOX_SIZE = 0 } = this.ctx.config;
+        const { CELL_PADDING = 0, CHECKBOX_SIZE = 0, TREE_INDENT = 16 } = this.ctx.config;
         const iconWidth = 20; // 树形图标宽度
-        const levelIndent = 8; // 每层缩进宽度
+        const levelIndent = TREE_INDENT; // 每层缩进宽度
         
         // 基础宽度：padding + 图标宽度 + 间距
         let baseWidth = CELL_PADDING + iconWidth + 4; // 图标后加4px间距
         
-        // 对于 tree-selection 类型，还需要加上 checkbox 的宽度和间距
-        const hasTreeSelection = treeColumns.some(col => col.type === 'tree-selection');
+        // 对于 selection-tree 和 tree-selection 类型，还需要加上 checkbox 的宽度和间距
+        const hasTreeSelection = treeColumns.some(col => col.type === 'selection-tree' || col.type === 'tree-selection');
         if (hasTreeSelection) {
             baseWidth += CHECKBOX_SIZE + 4; // checkbox 宽度 + 间距
         }

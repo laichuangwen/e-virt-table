@@ -2,11 +2,11 @@
 
 ## Column
 
--   `type=tree-selection` 开启树形选择
+-   `type=tree-selection` 或者 `type=selection-tree` 开启树形选择
 
 | 参数 | 说明     | 类型                                   | 默认值 |
 | ---- | -------- | -------------------------------------- | ------ |
-| type | 选择类型 | `index,selection,index-selection,tree-selection` | —      |
+| type | 选择类型 | `index,selection,index-selection,tree-selection,selection-tree` | —      |
 
 ## Config
 
@@ -33,6 +33,16 @@
 ::: demo
 
 tree-selection/base
+h:320px
+:::
+
+## 使用 tree-selection 类型
+
+`tree-selection` 类型会先渲染树形图标，再渲染勾选框，适合需要树形层级优先显示的场景。
+
+::: demo
+
+tree-selection/tree-selection-type
 h:320px
 :::
 

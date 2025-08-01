@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>树形选择 - 基础示例</title>
+    <title>树形选择 - tree-selection 类型示例</title>
 </head>
 <body>
     <div id="e-virt-table"></div>
@@ -52,7 +52,7 @@
     let columns = [
         {
             title: '选择',
-            type: 'selection-tree',
+            type: 'tree-selection', // 使用 tree-selection 类型，先渲染树形图标，再渲染勾选框
             key: 'selection',
             width: 60,
             readonly: true
@@ -77,6 +77,7 @@
         columns,
         config: {
             TREE_SELECT_MODE: 'auto', // auto | cautious | strictly
+            TREE_INDENT: 16, // 树形缩进宽度
             ROW_KEY: 'id',
             ENABLE_SELECTOR: true,
             WIDTH: 800,
@@ -87,6 +88,11 @@
     // 监听选择变化
     table.on('selectionChange', (selectedRows) => {
         console.log('选中的行:', selectedRows);
+    });
+
+    // 监听展开变化
+    table.on('expandChange', (expandedRows) => {
+        console.log('展开的行:', expandedRows);
     });
 </script>
 </html> 

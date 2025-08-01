@@ -26,6 +26,7 @@
 | DEFAULT_EXPAND_ALL | 默认展开全部   | boolean                                                         | false  |
 | EXPAND_LAZY        | 是否开启懒加载 | boolean                                                         | false  |
 | EXPAND_LAZY_METHOD | 自定义选择禁用 | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean` | —      |
+| TREE_INDENT        | 树形缩进宽度   | number                                                          | 16     |
 
 ## 收起
 
@@ -68,5 +69,15 @@ h:550px
 ::: demo
 
 tree/lazy
+h:400px
+:::
+
+## 自定义缩进
+
+-   `config.TREE_INDENT` 设置树形缩进宽度，默认为 16px
+
+::: demo
+
+tree/indent
 h:400px
 :::

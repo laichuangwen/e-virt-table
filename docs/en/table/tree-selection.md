@@ -2,11 +2,11 @@
 
 ## Column
 
--   `type=tree-selection` enables tree selection
+-   `type=tree-selection` or `type=selection-tree` enables tree selection
 
 | Parameter | Description | Type | Default |
 |-----------|-------------|------|---------|
-| type | Selection type | `index,selection,index-selection,tree-selection` | — |
+| type | Selection type | `index,selection,index-selection,tree-selection,selection-tree` | — |
 
 ## Config
 
@@ -33,7 +33,17 @@ Parent and child items are independent of each other. Parent and child selection
 ::: demo
 
 tree-selection/base
-h:320px
+h:340px
+:::
+
+## Using tree-selection Type
+
+The `tree-selection` type renders the tree icon first, then the checkbox, suitable for scenarios where tree hierarchy display takes priority.
+
+::: demo
+
+tree-selection/tree-selection-type
+h:340px
 :::
 
 ## Auto Mode
@@ -41,7 +51,7 @@ h:320px
 ::: demo
 
 tree-selection/auto
-h:320px
+h:340px
 :::
 
 ## Cautious Mode
@@ -49,7 +59,7 @@ h:320px
 ::: demo
 
 tree-selection/cautious
-h:320px
+h:340px
 :::
 
 ## Strictly Mode
@@ -57,5 +67,5 @@ h:320px
 ::: demo
 
 tree-selection/strictly
-h:320px
+h:340px
 ::: 
