@@ -167,7 +167,9 @@ export default class Config {
     /** 自动调整树形列宽度 */
     AUTO_FIT_TREE_WIDTH = false;
     /** 树形缩进宽度 */
-    TREE_INDENT = 16;
+    TREE_INDENT = 20;
+    /** 树形图标大小 */
+    TREE_ICON_SIZE = 20;
     /** 启用单点击立马编辑 */
     ENABLE_EDIT_SINGLE_CLICK = false;
     /** 启用点击选择器编辑 */

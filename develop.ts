@@ -23,6 +23,17 @@ let columns: Column[] = [
         title: '',
         key: 'selection',
         type: 'selection',
+        align: 'left',
+        fixed: 'left',
+        maxWidth: 200,
+        operation: true,
+        // widthFillDisable: true,
+    },
+    {
+        title: '',
+        key: 'index-selection',
+        type: 'index-selection',
+        align: 'left',
         fixed: 'left',
         maxWidth: 200,
         operation: true,
@@ -43,13 +54,27 @@ let columns: Column[] = [
     //   fixed: "left",
     // },
     {
-        title: '工号',
+        title: '工号工号工号工号工号工号工号工号工号',
         key: 'emp_no',
         // operation: true,
         align: 'center',
-        readonly: true,
+        type: 'tree-selection',
+        // verticalAlign: 'bottom',
+        readonly: false,
         width: 180,
-        type: 'tree',
+        fixed: 'left',
+        sort: 4,
+        // hide: () => 3 > 2,
+    },
+    {
+        title: '工号工号',
+        key: 'emp_no1',
+        // operation: true,
+        align: 'left',
+        type: 'selection-tree',
+        // verticalAlign: 'bottom',
+        readonly: false,
+        width: 180,
         fixed: 'left',
         sort: 4,
         // hide: () => 3 > 2,
@@ -367,6 +392,7 @@ for (let i = 0; i < 1000; i += 1) {
         emp_name222: `张三${i % 5 ? 1 : 0}`,
         emp_name2: `张三${i % 5 ? 1 : 0}`,
         emp_no: i,
+        emp_no1: i,
         dep_name: ['zhinan', 'shejiyuanze', 'yizhi'],
         job_name: i === 5 ? '产品经理测试很长的名字' : `产品经理${i}`,
         phone: i === 4 ? '13159645561a' : `${13159645561 + i}`,
@@ -403,12 +429,14 @@ for (let i = 0; i < 1000; i += 1) {
             {
                 id: `${i}-1`,
                 emp_no: `${i}-1`,
+                emp_no1: `${i}-1`,
                 emp_name: `张三${i}-1`,
                 children: [],
             },
             {
                 id: `${i}-2`,
                 emp_no: `${i}-2`,
+                emp_no1: `${i}-2`,
                 emp_name: `张三${i}-2`,
                 children: [
                     {
@@ -423,6 +451,7 @@ for (let i = 0; i < 1000; i += 1) {
             {
                 id: `${i}-3`,
                 emp_no: `${i}-3`,
+                emp_no1: `${i}-3`,
                 emp_name: `李三${i}-3`,
                 children: [],
             },
@@ -826,69 +855,72 @@ if (modeRadioContainer) {
 
     // 监听 radio 变化
     const radioButtons = modeRadioContainer.querySelectorAll('input[name="mode"]');
-    radioButtons.forEach(radio => {
+    radioButtons.forEach((radio) => {
         radio.addEventListener('change', (e) => {
             const target = e.target as HTMLInputElement;
             const newMode = target.value;
-            
+
             if (newMode === currentMode) {
                 return;
             }
-            
+
             currentMode = newMode;
-            
+
             let newColumns: Column[];
-            
+
             switch (newMode) {
                 case 'selection-tree':
                     // 切换到勾选树模式
-                    newColumns = columns.map(col => {
+                    newColumns = columns.map((col) => {
                         if (col.key === 'selection') {
                             return {
                                 ...col,
                                 type: 'selection-tree',
-                                title: '选择'
+                                title: '选择',
+                                width: 200,
+                                align: 'left',
                             };
                         }
                         if (col.key === 'emp_no') {
                             return {
                                 ...col,
-                                type: undefined // 移除 tree 类型
+                                type: undefined, // 移除 tree 类型
                             };
                         }
                         return col;
                     });
                     break;
-                    
+
                 case 'tree-selection':
                     // 切换到树勾选模式
-                    newColumns = columns.map(col => {
+                    newColumns = columns.map((col) => {
                         if (col.key === 'selection') {
                             return {
                                 ...col,
                                 type: 'tree-selection',
-                                title: '选择'
+                                title: '选择',
+                                align: 'left',
                             };
                         }
                         if (col.key === 'emp_no') {
                             return {
                                 ...col,
-                                type: undefined // 移除 tree 类型
+                                type: undefined, // 移除 tree 类型
                             };
                         }
                         return col;
                     });
                     break;
-                    
+
                 default:
                     // 普通模式
                     newColumns = columns;
                     break;
             }
-            
+
             // 重新加载列配置
             eVirtTable.loadColumns(newColumns);
-            
+
             // 更新配置
             if (newMode === 'normal') {
                 eVirtTable.loadConfig({
@@ -907,7 +939,7 @@ if (modeRadioContainer) {
                                 console.log('新增');
                             },
                         },
-                    ]
+                    ],
                 });
             } else {
                 eVirtTable.loadConfig({
@@ -918,8 +950,8 @@ if (modeRadioContainer) {
                         { label: '全选', value: 'selectAll' },
                         { label: '取消全选', value: 'unselectAll' },
                         { label: '展开全部', value: 'expandAll' },
-                        { label: '收起全部', value: 'collapseAll' }
-                    ]
+                        { label: '收起全部', value: 'collapseAll' },
+                    ],
                 });
             }
         });
@@ -1065,6 +1097,7 @@ document.getElementById('next')?.addEventListener('click', () => {
             emp_name222: `张三${i % 5 ? 1 : 0}`,
             emp_name2: `张三${i % 5 ? 1 : 0}`,
             emp_no: i,
+            emp_no1: i,
             dep_name: ['zhinan', 'shejiyuanze', 'yizhi'],
             job_name: i === 5 ? '产品经理测试很长的名字' : `产品经理${i}`,
             phone: i === 4 ? '13159645561a' : `${13159645561 + i}`,
@@ -1259,5 +1292,3 @@ function destroy() {
     window.removeEventListener('beforeunload', destroy);
 }
 window.addEventListener('beforeunload', destroy);
-
-

@@ -44,6 +44,12 @@ export default class CellHeader extends BaseCell {
     drawImageHeight = 0;
     drawImageName = '';
     drawImageSource: HTMLImageElement | undefined;
+    drawSelectionImageX = 0;
+    drawSelectionImageY = 0;
+    drawSelectionImageWidth = 0;
+    drawSelectionImageHeight = 0;
+    drawSelectionImageName = '';
+    drawSelectionImageSource: HTMLImageElement | undefined;
     selectionTextX?: number;
     selectionTextWidth?: number;
     constructor(ctx: Context, colIndex: number, x: number, y: number, width: number, height: number, column: Column) {
@@ -127,7 +133,7 @@ export default class CellHeader extends BaseCell {
     draw() {
         const {
             paint,
-            config: { BORDER_COLOR, HEADER_FONT, BORDER },
+            config: { BORDER_COLOR, HEADER_FONT, BORDER, CELL_PADDING },
         } = this.ctx;
         const { drawX, drawY, displayText } = this;
         // 有边框的情况下，绘制边框
@@ -135,34 +141,35 @@ export default class CellHeader extends BaseCell {
             borderColor: BORDER ? BORDER_COLOR : 'transparent',
             fillColor: this.drawCellBgColor,
         });
-        
+
         // 先绘制复选框，再绘制文本
         this.drawSelection();
-        
+
         // 对于 selection 类型的列，文本在复选框右侧显示
         let textX = drawX;
         let textWidth = this.width;
-        let textAlign = this.align; // 默认使用原始对齐方式
-        
         if (['selection', 'index-selection', 'selection-tree', 'tree-selection'].includes(this.type)) {
-            const { CHECKBOX_SIZE = 0 } = this.ctx.config;
-            // 复选框居中位置
-            const checkboxCenterX = drawX + (this.width - CHECKBOX_SIZE) / 2;
-            textX = checkboxCenterX + CHECKBOX_SIZE + 1; // 复选框右侧，最小间距
-            // 确保文本有足够的显示空间
-            textWidth = this.width - textX + drawX;
-            // 对于有复选框的列，强制使用左对齐
-            textAlign = 'left';
+            const { CHECKBOX_SIZE } = this.ctx.config;
+            if (this.align === 'left' || this.align === 'right') {
+                textX = drawX + CHECKBOX_SIZE + 4;
+                textWidth = this.width - textX + drawX;
+            } else {
+                // 复选框居中位置
+                const checkboxCenterX = drawX + (this.width - CHECKBOX_SIZE) / 2;
+                textX = checkboxCenterX + CHECKBOX_SIZE + 1; // 复选框右侧，最小间距
+                // 确保文本有足够的显示空间
+                textWidth = this.width - textX + drawX;
+            }
         }
-        
+
         this.ellipsis = paint.drawText(displayText, textX, drawY, textWidth, this.height, {
             font: HEADER_FONT,
-            padding: 0, // 减少 padding，让文本有更多空间
+            padding: CELL_PADDING, // 减少 padding，让文本有更多空间
             color: this.drawTextColor,
-            align: textAlign, // 使用动态对齐方式
+            align: this.align, // 使用动态对齐方式
             verticalAlign: this.verticalAlign,
         });
-        
+
         this.drawSelector();
     }
     private drawSelector() {
@@ -185,12 +192,19 @@ export default class CellHeader extends BaseCell {
         // 选中框类型
         if (['index-selection', 'selection', 'selection-tree', 'tree-selection'].includes(type)) {
             const { indeterminate, check, selectable } = this.ctx.database.getCheckedState();
-            const { CHECKBOX_SIZE = 0 } = this.ctx.config;
-            
-            // 复选框居中显示
-            const _x = this.drawX + (width - CHECKBOX_SIZE) / 2;
-            const _y = this.drawY + (height - CHECKBOX_SIZE) / 2;
-            
+            const { CHECKBOX_SIZE = 0, CELL_PADDING } = this.ctx.config;
+            // 默认居中
+            let _x = this.drawX + (width - CHECKBOX_SIZE) / 2;
+            let _y = this.drawY + (height - CHECKBOX_SIZE) / 2;
+            if (this.align === 'left' || this.align === 'right') {
+                _x = this.drawX + CELL_PADDING;
+            }
+            if (this.verticalAlign === 'top') {
+                _y = this.drawY + CELL_PADDING / 2;
+            } else if (this.verticalAlign === 'bottom') {
+                _y = this.drawY + height - CHECKBOX_SIZE - CELL_PADDING / 2;
+            }
+
             let checkboxImage: HTMLImageElement | undefined = this.ctx.icons.get('checkbox-uncheck');
             let checkboxName = 'checkbox-uncheck';
             if (indeterminate) {
@@ -210,21 +224,21 @@ export default class CellHeader extends BaseCell {
                 checkboxName = 'checkbox-disabled';
             }
             if (checkboxImage) {
-                this.drawImageX = _x;
-                this.drawImageY = _y;
-                this.drawImageWidth = CHECKBOX_SIZE;
-                this.drawImageHeight = CHECKBOX_SIZE;
-                this.drawImageName = checkboxName;
-                this.drawImageSource = checkboxImage;
+                this.drawSelectionImageX = _x;
+                this.drawSelectionImageY = _y;
+                this.drawSelectionImageWidth = CHECKBOX_SIZE;
+                this.drawSelectionImageHeight = CHECKBOX_SIZE;
+                this.drawSelectionImageName = checkboxName;
+                this.drawSelectionImageSource = checkboxImage;
                 this.ctx.paint.drawImage(
-                    this.drawImageSource,
-                    this.drawImageX,
-                    this.drawImageY,
-                    this.drawImageWidth,
-                    this.drawImageHeight,
+                    this.drawSelectionImageSource,
+                    this.drawSelectionImageX,
+                    this.drawSelectionImageY,
+                    this.drawSelectionImageWidth,
+                    this.drawSelectionImageHeight,
                 );
             }
-            
+
             // 不再需要保存文本位置信息，直接在 draw 方法中计算
         }
     }
