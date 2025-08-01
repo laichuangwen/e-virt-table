@@ -24,6 +24,7 @@
 | DEFAULT_EXPAND_ALL  | Expand all by default | boolean                                                         | false   |
 | EXPAND_LAZY         | Enable lazy loading | boolean                                                         | false   |
 | EXPAND_LAZY_METHOD  | Custom lazy load method | ^[Function]`({row, column, rowIndex, colIndex,value})=>boolean` | —       |
+| TREE_INDENT         | Tree indent width   | number                                                          | 16      |
 
 ## Collapse
 
@@ -65,5 +66,15 @@ h:550px
 ::: demo
 
 tree/lazy
+h:400px
+:::
+
+## Custom Indent
+
+-   Set `config.TREE_INDENT` to customize tree indent width, default is 16px
+
+::: demo
+
+tree/indent
 h:400px
 :::

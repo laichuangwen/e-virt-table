@@ -322,7 +322,8 @@ export default class Cell extends BaseCell {
             this.rowHasChildren = hasChildren;
 
             // 计算树形图标的偏移量
-            iconOffsetX = level * 8;
+            const { TREE_INDENT = 16 } = this.ctx.config;
+            iconOffsetX = level * TREE_INDENT;
 
             if (expandLoading) {
                 const loadingIcon = this.ctx.icons.get('loading');

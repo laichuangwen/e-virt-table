@@ -36,6 +36,16 @@ tree-selection/base
 h:340px
 :::
 
+## Using tree-selection Type
+
+The `tree-selection` type renders the tree icon first, then the checkbox, suitable for scenarios where tree hierarchy display takes priority.
+
+::: demo
+
+tree-selection/tree-selection-type
+h:340px
+:::
+
 ## Auto Mode
 
 ::: demo

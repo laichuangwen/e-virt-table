@@ -36,6 +36,16 @@ tree-selection/base
 h:320px
 :::
 
+## 使用 tree-selection 类型
+
+`tree-selection` 类型会先渲染树形图标，再渲染勾选框，适合需要树形层级优先显示的场景。
+
+::: demo
+
+tree-selection/tree-selection-type
+h:320px
+:::
+
 ## Auto 模式
 
 ::: demo

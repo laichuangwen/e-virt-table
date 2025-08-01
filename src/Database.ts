@@ -1635,9 +1635,9 @@ export default class Database {
         const maxDepth = this.calculateMaxTreeDepth(this.data);
         
         // 计算所需宽度
-        const { CELL_PADDING = 0, CHECKBOX_SIZE = 0 } = this.ctx.config;
+        const { CELL_PADDING = 0, CHECKBOX_SIZE = 0, TREE_INDENT = 16 } = this.ctx.config;
         const iconWidth = 20; // 树形图标宽度
-        const levelIndent = 8; // 每层缩进宽度
+        const levelIndent = TREE_INDENT; // 每层缩进宽度
         
         // 基础宽度：padding + 图标宽度 + 间距
         let baseWidth = CELL_PADDING + iconWidth + 4; // 图标后加4px间距
