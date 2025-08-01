@@ -813,13 +813,13 @@ const modeRadioContainer = document.getElementById('modeRadioContainer') as HTML
 // 创建 radio 按钮
 if (modeRadioContainer) {
     modeRadioContainer.innerHTML = `
-        <label style="margin-right: 10px;">
+        <label>
             <input type="radio" name="mode" value="normal" checked> 勾选+树
         </label>
-        <label style="margin-right: 10px;">
+        <label>
             <input type="radio" name="mode" value="selection-tree"> 勾选树
         </label>
-        <label style="margin-right: 10px;">
+        <label>
             <input type="radio" name="mode" value="tree-selection"> 树勾选
         </label>
     `;
