@@ -144,7 +144,7 @@ export default class CellHeader extends BaseCell {
         let textWidth = this.width;
         let textAlign = this.align; // 默认使用原始对齐方式
         
-        if (['selection', 'index-selection', 'tree-selection'].includes(this.type)) {
+        if (['selection', 'index-selection', 'selection-tree', 'tree-selection'].includes(this.type)) {
             const { CHECKBOX_SIZE = 0 } = this.ctx.config;
             // 复选框居中位置
             const checkboxCenterX = drawX + (this.width - CHECKBOX_SIZE) / 2;
@@ -183,7 +183,7 @@ export default class CellHeader extends BaseCell {
     private drawSelection() {
         const { width, height, type } = this;
         // 选中框类型
-        if (['index-selection', 'selection', 'tree-selection'].includes(type)) {
+        if (['index-selection', 'selection', 'selection-tree', 'tree-selection'].includes(type)) {
             const { indeterminate, check, selectable } = this.ctx.database.getCheckedState();
             const { CHECKBOX_SIZE = 0 } = this.ctx.config;
             

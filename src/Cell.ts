@@ -69,7 +69,7 @@ export default class Cell extends BaseCell {
     drawImageHeight = 0;
     drawImageName = '';
     drawImageSource?: HTMLImageElement;
-    // 为 tree-selection 添加额外的图标支持
+    // 为 selection-tree 添加额外的图标支持
     drawTreeImageX = 0;
     drawTreeImageY = 0;
     drawTreeImageWidth = 0;
@@ -153,8 +153,16 @@ export default class Cell extends BaseCell {
         this.updateStyle();
         this.updateType();
         this.updateHoverIcon();
-        this.updateSelection();
-        this.updateTree();
+        // 根据类型决定渲染顺序
+        if (this.type === 'tree-selection') {
+            // tree-selection: 先渲染树形图标，再渲染勾选框
+            this.updateTree();
+            this.updateSelection();
+        } else {
+            // 其他类型: 先渲染勾选框，再渲染树形图标
+            this.updateSelection();
+            this.updateTree();
+        }
         this.updateEditor();
         this.updateRender();
         this.getValidationMessage();
@@ -306,8 +314,8 @@ export default class Cell extends BaseCell {
         let iconOffsetX = 0;
         let iconName = '';
 
-        // 处理树形渲染（包括 tree 和 tree-selection 类型）
-        if ((this.type === 'tree' || this.type === 'tree-selection') && cellType === 'body') {
+        // 处理树形渲染（包括 tree、selection-tree 和 tree-selection 类型）
+        if ((this.type === 'tree' || this.type === 'selection-tree' || this.type === 'tree-selection') && cellType === 'body') {
             const row = this.ctx.database.getRowForRowKey(rowKey);
             const { expand = false, hasChildren = false, expandLoading = false, level = 0 } = row || {};
             this.rowExpand = expand;
@@ -334,13 +342,23 @@ export default class Cell extends BaseCell {
                 let iconX = this.drawX + iconOffsetX + CELL_PADDING;
                 let iconY = this.drawY + (this.visibleHeight - iconHeight) / 2;
 
-                // 对于 tree-selection 类型，树形图标应该在 checkbox 之后
-                if (this.type === 'tree-selection') {
+                // 对于 selection-tree 类型，树形图标应该在 checkbox 之后
+                if (this.type === 'selection-tree') {
                     const { CHECKBOX_SIZE = 0 } = this.ctx.config;
                     // 复选框居中位置
                     const checkboxCenterX = this.drawX + (this.visibleWidth - CHECKBOX_SIZE) / 2;
                     // 树形图标在复选框右侧，根据层级缩进
                     iconX = checkboxCenterX + CHECKBOX_SIZE + 4 + iconOffsetX;
+                    this.drawTreeImageX = iconX;
+                    this.drawTreeImageY = iconY;
+                    this.drawTreeImageWidth = iconWidth;
+                    this.drawTreeImageHeight = iconHeight;
+                    this.drawTreeImageName = iconName;
+                    this.drawTreeImageSource = icon;
+                } else if (this.type === 'tree-selection') {
+                    // 对于 tree-selection 类型，树形图标应该在 checkbox 之前
+                    // 树形图标在左侧，根据层级缩进
+                    iconX = this.drawX + iconOffsetX + CELL_PADDING;
                     this.drawTreeImageX = iconX;
                     this.drawTreeImageY = iconY;
                     this.drawTreeImageWidth = iconWidth;
@@ -366,8 +384,8 @@ export default class Cell extends BaseCell {
                     this.drawImageName = iconName;
                     this.drawImageSource = icon;
                 }
-            } else if (this.type === 'tree-selection') {
-                // 对于 tree-selection 类型，即使没有树形图标也要设置位置，以便文本对齐
+            } else if (this.type === 'selection-tree') {
+                // 对于 selection-tree 类型，即使没有树形图标也要设置位置，以便文本对齐
                 const { CHECKBOX_SIZE = 0 } = this.ctx.config;
                 // 复选框居中位置
                 const checkboxCenterX = this.drawX + (this.visibleWidth - CHECKBOX_SIZE) / 2;
@@ -379,15 +397,35 @@ export default class Cell extends BaseCell {
                 this.drawTreeImageHeight = 20;
                 this.drawTreeImageName = '';
                 this.drawTreeImageSource = undefined;
+            } else if (this.type === 'tree-selection') {
+                // 对于 tree-selection 类型，即使没有树形图标也要设置位置，以便文本对齐
+                const iconX = this.drawX + iconOffsetX + CELL_PADDING;
+                const iconY = this.drawY + (this.visibleHeight - 20) / 2;
+                this.drawTreeImageX = iconX;
+                this.drawTreeImageY = iconY;
+                this.drawTreeImageWidth = 20;
+                this.drawTreeImageHeight = 20;
+                this.drawTreeImageName = '';
+                // 只有在没有树形图标时才设置为 undefined
+                if (!this.drawTreeImageSource) {
+                    this.drawTreeImageSource = undefined;
+                }
             }
 
-            // 对于 tree-selection 类型，需要考虑 checkbox 和树形图标的宽度
-            if (this.type === 'tree-selection') {
+            // 对于 selection-tree 类型，需要考虑 checkbox 和树形图标的宽度
+            if (this.type === 'selection-tree') {
                 const { CHECKBOX_SIZE = 0 } = this.ctx.config;
                 // 复选框居中位置
                 const checkboxCenterX = this.drawX + (this.visibleWidth - CHECKBOX_SIZE) / 2;
                 // 文本位置 = 复选框右侧 + 树形图标宽度 + 层级缩进
                 this.drawTextX = checkboxCenterX + CHECKBOX_SIZE + 4 + iconWidth + iconOffsetX;
+            } else if (this.type === 'tree-selection') {
+                // 对于 tree-selection 类型，需要考虑树形图标和 checkbox 的宽度
+                const { CHECKBOX_SIZE = 0 } = this.ctx.config;
+                // 树形图标在左侧，checkbox 在树形图标右侧
+                const treeIconX = this.drawX + iconOffsetX + CELL_PADDING;
+                // 文本位置 = 树形图标右侧 + checkbox 宽度 + 间距
+                this.drawTextX = treeIconX + iconWidth + 4 + CHECKBOX_SIZE + 4;
             } else {
                 // 对于普通 tree 类型，根据 align 属性调整文本位置
                 if (this.align === 'center' || this.align === 'right') {
@@ -533,21 +571,26 @@ export default class Cell extends BaseCell {
             return;
         }
         // 选中框类型
-        if (['index-selection', 'selection', 'tree-selection'].includes(type)) {
+        if (['index-selection', 'selection', 'selection-tree', 'tree-selection'].includes(type)) {
             const selectable = this.ctx.database.getRowSelectable(rowKey);
             const { CHECKBOX_SIZE = 0 } = this.ctx.config;
             let _x = this.drawX + (visibleWidth - CHECKBOX_SIZE) / 2;
             let _y = this.drawY + (visibleHeight - CHECKBOX_SIZE) / 2;
 
-            // 对于 tree-selection 类型，checkbox 应该居中显示
-            if (type === 'tree-selection') {
+            // 对于 selection-tree 类型，checkbox 应该居中显示
+            if (type === 'selection-tree') {
                 // 保持居中显示，不改变 _x 和 _y 的计算
+            } else if (type === 'tree-selection') {
+                // 对于 tree-selection 类型，checkbox 应该在树形图标右侧
+                // 使用 updateTree 方法中已经计算好的树形图标位置
+                _x = this.drawTreeImageX + this.drawTreeImageWidth + 4; // 树形图标右侧 + 间距
+                _y = this.drawY + (visibleHeight - CHECKBOX_SIZE) / 2;
             }
 
             let checkboxImage: HTMLImageElement | undefined = this.ctx.icons.get('checkbox-uncheck');
             let checkboxName = 'checkbox-uncheck';
 
-            if (type === 'tree-selection') {
+            if (type === 'selection-tree' || type === 'tree-selection') {
                 // 树形选择逻辑
                 const treeState = this.ctx.database.getTreeSelectionState(rowKey);
                 if (treeState.indeterminate && selectable) {
@@ -593,7 +636,7 @@ export default class Cell extends BaseCell {
                     this.drawImageName = checkboxName;
                     this.drawImageSource = checkboxImage;
                 }
-            } else if (checkboxImage && ['selection', 'tree-selection'].includes(type)) {
+            } else if (checkboxImage && ['selection', 'selection-tree', 'tree-selection'].includes(type)) {
                 this.drawImageX = _x;
                 this.drawImageY = _y;
                 this.drawImageWidth = CHECKBOX_SIZE;
@@ -869,7 +912,7 @@ export default class Cell extends BaseCell {
     private drawText() {
         const { CELL_PADDING, BODY_FONT, PLACEHOLDER_COLOR } = this.ctx.config;
         let visibleWidth = this.visibleWidth;
-        if (this.type === 'tree' || this.type === 'tree-selection') {
+        if (this.type === 'tree' || this.type === 'selection-tree' || this.type === 'tree-selection') {
             const offsetIconX = this.drawTextX - this.drawX;
             visibleWidth = this.visibleWidth - offsetIconX; // 减去图标的宽度
         }
@@ -893,7 +936,7 @@ export default class Cell extends BaseCell {
         return this.ctx.paint.drawText(text, this.drawTextX, this.drawTextY, visibleWidth, this.visibleHeight, {
             font: BODY_FONT,
             padding: CELL_PADDING,
-            align: this.type === 'tree' || this.type === 'tree-selection' ? 'left' : this.align,
+            align: this.type === 'tree' || this.type === 'selection-tree' || this.type === 'tree-selection' ? 'left' : this.align,
             verticalAlign: this.verticalAlign,
             color,
         });
@@ -925,8 +968,8 @@ export default class Cell extends BaseCell {
             );
         }
 
-        // 绘制树形图标（仅对 tree-selection 类型）
-        if (this.type === 'tree-selection' && this.drawTreeImageSource) {
+        // 绘制树形图标（仅对 selection-tree 和 tree-selection 类型）
+        if ((this.type === 'selection-tree' || this.type === 'tree-selection') && this.drawTreeImageSource) {
             this.ctx.paint.drawImage(
                 this.drawTreeImageSource,
                 this.drawTreeImageX,

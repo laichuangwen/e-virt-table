@@ -2,11 +2,11 @@
 
 ## Column
 
--   `type=tree-selection` 开启树形选择
+-   `type=tree-selection` 或者 `type=selection-tree` 开启树形选择
 
 | 参数 | 说明     | 类型                                   | 默认值 |
 | ---- | -------- | -------------------------------------- | ------ |
-| type | 选择类型 | `index,selection,index-selection,tree-selection` | —      |
+| type | 选择类型 | `index,selection,index-selection,tree-selection,selection-tree` | —      |
 
 ## Config
 
