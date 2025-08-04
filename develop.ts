@@ -61,7 +61,7 @@ let columns: Column[] = [
         type: 'tree-selection',
         // verticalAlign: 'bottom',
         readonly: false,
-        width: 180,
+        width: 100,
         fixed: 'left',
         sort: 4,
         // hide: () => 3 > 2,
@@ -443,7 +443,28 @@ for (let i = 0; i < 1000; i += 1) {
                         id: `${i}-2-1`,
                         emp_no: `${i}-2-1`,
                         emp_name: `张三${i}-2-1`,
-                        children: [],
+                        children: [
+                            {
+                                id: `${i}-2-1-1`,
+                                emp_no: `${i}-2-1-1`,
+                                emp_no1: `${i}-2-1-1`,
+                                emp_name: `张三${i}-2-1-1`,
+                                children: [
+                                    {
+                                        id: `${i}-2-1-1-1`,
+                                        emp_no: `${i}-2-1-1-1`,
+                                        emp_name: `张三${i}-2-1-1-1`,
+                                        children: [
+                                            {
+                                                id: `${i}-2-1-1-1-1`,
+                                                emp_no: `${i}-2-1-1-1-1`,
+                                                emp_name: `张三${i}-2-1-1-1-1`,
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        ],
                         _hasChildren: true,
                     },
                 ],
@@ -944,7 +965,7 @@ if (modeRadioContainer) {
             } else {
                 eVirtTable.loadConfig({
                     TREE_SELECT_MODE: 'auto',
-                    AUTO_FIT_TREE_WIDTH: false,
+                    AUTO_FIT_TREE_WIDTH: true,
                     ENABLE_CONTEXT_MENU: true,
                     CONTEXT_MENU: [
                         { label: '全选', value: 'selectAll' },
