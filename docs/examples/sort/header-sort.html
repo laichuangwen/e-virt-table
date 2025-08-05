@@ -167,7 +167,9 @@
                 key: 'status',
                 width: 100,
                 align: 'center',
-                sortBy: 'string',
+                sortBy: (a, b) => {
+                    return a.status === 'Active' ? -1 : 1;
+                },
                 readonly: true,
                 formatter: ({ value }) => {
                     return value === 'Active' ? '✅ Active' : '❌ Inactive';
