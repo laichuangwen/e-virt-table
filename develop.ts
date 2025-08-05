@@ -258,14 +258,13 @@ let columns: Column[] = [
         render: (pEl, cell) => {
             const cellEl = document.createElement('div');
             cellEl.addEventListener('click', () => {
-                console.log('点击了家庭地址');
+                // 点击了家庭地址
             });
             cellEl.addEventListener('selectionchange', () => {
-                console.log('selectionchange');
                 const selection = window.getSelection();
                 const text = selection ? selection.toString() : '';
                 if (text) {
-                    console.log('用户选中了文本:', text);
+                    // 用户选中了文本
                 }
             });
             cellEl.style.width = '100%';
@@ -539,7 +538,7 @@ const eVirtTable = new EVirtTable(canvas, {
                 label: '新增',
                 value: 'add',
                 event: () => {
-                    console.log('新增');
+                    // 新增
                 },
             },
         ],
@@ -619,7 +618,7 @@ const eVirtTable = new EVirtTable(canvas, {
                 },
             ];
             const data = [...changeList, ...list];
-            console.log('修改前数据', data);
+            // 修改前数据
             return data;
             // if(changeList.some((item) => item.key !== 'requiredQuantity')) {
             //     return changeList.map(item=>{
@@ -797,7 +796,7 @@ eVirtTable.on('error', (error) => {
     console.error(error);
 });
 eVirtTable.on('hoverIconClick', (cell) => {
-    console.log('hoverIconClick', cell);
+            // hoverIconClick
 });
 // eVirtTable.on('change', (changeList) => {
 //     eVirtTable.validate();
@@ -805,12 +804,12 @@ eVirtTable.on('hoverIconClick', (cell) => {
 eVirtTable.on('onPastedDataOverflow', (val: PastedDataOverflow) => {
     const { overflowColCount, overflowRowCount } = val;
     if (overflowRowCount > 0) {
-        console.log('粘贴数据超出行数', overflowRowCount);
+        // 粘贴数据超出行数
         data = data.concat(Array.from({ length: overflowRowCount }).map(() => ({})));
         eVirtTable.loadData(data);
     }
     if (overflowColCount > 0) {
-        console.log('粘贴数据超出列数', overflowColCount);
+        // 粘贴数据超出列数
         columns = columns.concat(
             Array.from({ length: overflowColCount }).map((_, index) => ({
                 title: `溢出表头${index}`,
@@ -950,7 +949,7 @@ if (modeRadioContainer) {
                             label: '新增',
                             value: 'add',
                             event: () => {
-                                console.log('新增');
+                                // 新增
                             },
                         },
                     ],
@@ -1196,7 +1195,7 @@ document.getElementById('setConfig')?.addEventListener('click', () => {
                 label: '新增',
                 value: 'add',
                 event: () => {
-                    console.log('新增');
+                    // 新增
                 },
             },
         ],
