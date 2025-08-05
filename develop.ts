@@ -48,26 +48,6 @@ let columns: Column[] = [
         maxWidth: 200,
         sortBy: 'string',
     },
-    // {
-    //   key: "selection",
-    //   type: "index-selection",
-    //   width: 100,
-    //   fixed: "left",
-    // },
-    {
-        title: '工号工号工号工号工号工号工号工号工号',
-        key: 'emp_no',
-        // operation: true,
-        align: 'center',
-        type: 'tree-selection',
-        // verticalAlign: 'bottom',
-        readonly: false,
-        width: 100,
-        fixed: 'left',
-        sort: 4,
-        sortBy: 'string',
-        // hide: () => 3 > 2,
-    },
     {
         title: '工号工号',
         key: 'emp_no1',
@@ -111,6 +91,26 @@ let columns: Column[] = [
         //     pEl.appendChild(cellEl);
         // },
         // render: "emp_name",
+    },
+    {
+        title: '数量',
+        key: 'requiredQuantity',
+        sortBy: 'number',
+        rules: [
+            {
+                required: true, // TODO:表格1.2.19有问题
+                pattern: /^(0|[1-9]\d*)$/,
+                message: '请输入0或正整数',
+                validator(rule, value, callback) {
+                    if (value > 10) {
+                        callback('数量不能大于10');
+                    } else {
+                        callback();
+                    }
+                },
+            },
+        ],
+        align: 'right',
     },
     // {
     //   title: '部门',
@@ -304,25 +304,7 @@ let columns: Column[] = [
             return `物料编码：${v}`;
         },
     },
-    {
-        title: '数量',
-        key: 'requiredQuantity',
-        rules: [
-            {
-                required: true, // TODO:表格1.2.19有问题
-                pattern: /^(0|[1-9]\d*)$/,
-                message: '请输入0或正整数',
-                validator(rule, value, callback) {
-                    if (value > 10) {
-                        callback('数量不能大于10');
-                    } else {
-                        callback();
-                    }
-                },
-            },
-        ],
-        align: 'right',
-    },
+    
     { title: '单位', key: 'unit' },
     { title: '工作性质', key: 'work_type' },
     { title: '工作状态', key: 'work_status' },
@@ -432,7 +414,7 @@ for (let i = 0; i < 1000; i += 1) {
         sn: `SDFSD${i}`,
         materialNo: `1231${i}`,
         unit: '个',
-        requiredQuantity: 10,
+        requiredQuantity: Math.ceil(Math.random() * 100),
         customerRemarks: `测试测试${i}`,
         purchasePrice: 10.2 + i,
         salePrice: 12.3 + i,
