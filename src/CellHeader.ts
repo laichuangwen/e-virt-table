@@ -52,6 +52,13 @@ export default class CellHeader extends BaseCell {
     drawSelectionImageSource: HTMLImageElement | undefined;
     selectionTextX?: number;
     selectionTextWidth?: number;
+    // 排序相关
+    sortIconX = 0;
+    sortIconY = 0;
+    sortIconWidth = 0;
+    sortIconHeight = 0;
+    sortIconName = '';
+    sortIconSource: HTMLImageElement | undefined;
     constructor(ctx: Context, colIndex: number, x: number, y: number, width: number, height: number, column: Column) {
         super(ctx, x, y, width, height, 'header', column.fixed);
         this.ctx = ctx;
@@ -162,6 +169,25 @@ export default class CellHeader extends BaseCell {
             }
         }
 
+        // 如果有排序图标，调整文本位置
+        if (this.column.sortBy) {
+            const iconSize = 16;
+            const iconMargin = 4;
+            
+            if (this.align === 'right') {
+                // 居右时，文本需要为图标留出空间
+                textWidth = this.width - CELL_PADDING - iconSize - iconMargin;
+                textX = drawX + CELL_PADDING;
+            } else if (this.align === 'center') {
+                // 居中时，文本宽度需要考虑图标
+                const textWidthNeeded = this.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
+                const totalWidth = textWidthNeeded + iconSize + iconMargin;
+                if (totalWidth > this.width - CELL_PADDING * 2) {
+                    textWidth = this.width - CELL_PADDING * 2 - iconSize - iconMargin;
+                }
+            }
+        }
+
         this.ellipsis = paint.drawText(displayText, textX, drawY, textWidth, this.height, {
             font: HEADER_FONT,
             padding: CELL_PADDING, // 减少 padding，让文本有更多空间
@@ -171,6 +197,7 @@ export default class CellHeader extends BaseCell {
         });
 
         this.drawSelector();
+        this.drawSortIcon();
     }
     private drawSelector() {
         // 选择区背景颜色
@@ -241,6 +268,95 @@ export default class CellHeader extends BaseCell {
 
             // 不再需要保存文本位置信息，直接在 draw 方法中计算
         }
+    }
+    private drawSortIcon() {
+        // 如果没有sortBy配置，不显示排序图标
+        if (!this.column.sortBy) {
+            return;
+        }
+
+        const { CELL_PADDING = 0 } = this.ctx.config;
+        const iconSize = 16;
+        const iconMargin = 4;
+
+        // 获取排序状态
+        const sortState = this.ctx.database.getSortState(this.key);
+        let iconName = 'sortable';
+
+        if (sortState.direction === 'asc') {
+            if (this.column.sortBy === 'number') {
+                iconName = 'sort-by-number-asc';
+            } else if (this.column.sortBy === 'string') {
+                iconName = 'sort-by-character-asc';
+            } else if (this.column.sortBy === 'date') {
+                iconName = 'sort-by-date-asc';
+            } else if (Array.isArray(this.column.sortBy) && this.column.sortBy[0] === 'date') {
+                iconName = 'sort-by-date-asc';
+            } else if (typeof this.column.sortBy === 'function') {
+                iconName = 'sort-asc';
+            }
+        } else if (sortState.direction === 'desc') {
+            if (this.column.sortBy === 'number') {
+                iconName = 'sort-by-number-desc';
+            } else if (this.column.sortBy === 'string') {
+                iconName = 'sort-by-character-desc';
+            } else if (this.column.sortBy === 'date') {
+                iconName = 'sort-by-date-desc';
+            } else if (Array.isArray(this.column.sortBy) && this.column.sortBy[0] === 'date') {
+                iconName = 'sort-by-date-desc';
+            } else if (typeof this.column.sortBy === 'function') {
+                iconName = 'sort-desc';
+            }
+        }
+
+        const icon = this.ctx.icons.get(iconName);
+        if (!icon) {
+            return;
+        }
+
+        // 计算图标位置
+        let iconX = 0;
+        let iconY = this.drawY + (this.height - iconSize) / 2;
+
+        if (this.align === 'left') {
+            // 居左：先绘制文字，图标紧跟文字
+            const textWidth = this.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
+            iconX = this.drawX + CELL_PADDING + textWidth + iconMargin;
+        } else if (this.align === 'center') {
+            // 居中：先居中绘制文字，然后图标紧跟文字
+            const textWidth = this.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
+            const textCenterX = this.drawX + this.width / 2;
+            const textStartX = textCenterX - textWidth / 2;
+            iconX = textStartX + textWidth + iconMargin;
+        } else if (this.align === 'right') {
+            // 居右：先绘制图标靠右，然后文字根据图标绘制后的位置紧贴在图标的左侧
+            iconX = this.drawX + this.width - CELL_PADDING - iconSize;
+        }
+
+        // 保存图标信息
+        this.sortIconX = iconX;
+        this.sortIconY = iconY;
+        this.sortIconWidth = iconSize;
+        this.sortIconHeight = iconSize;
+        this.sortIconName = iconName;
+        this.sortIconSource = icon;
+
+        // 绘制图标
+        this.ctx.paint.drawImage(
+            this.sortIconSource,
+            this.sortIconX,
+            this.sortIconY,
+            this.sortIconWidth,
+            this.sortIconHeight,
+        );
+    }
+    private measureTextWidth(text: string, font: string): number {
+        const canvas = this.ctx.canvasElement;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return 0;
+        
+        ctx.font = font;
+        return ctx.measureText(text).width;
     }
     getText() {
         if (this.render) {

@@ -214,6 +214,8 @@ export default class Config {
     ENABLE_RESIZE_ROW = true;
     /** 启用列宽可调整 */
     ENABLE_RESIZE_COLUMN = true;
+    /** 启用排序功能 */
+
     /** 行调整线颜色 */
     RESIZE_ROW_LINE_COLOR = '#e1e6eb';
     /** 列调整线颜色 */

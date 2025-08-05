@@ -46,6 +46,7 @@ let columns: Column[] = [
         fixed: 'left',
         minWidth: 80,
         maxWidth: 200,
+        sortBy: 'string',
     },
     // {
     //   key: "selection",
@@ -64,6 +65,7 @@ let columns: Column[] = [
         width: 100,
         fixed: 'left',
         sort: 4,
+        sortBy: 'string',
         // hide: () => 3 > 2,
     },
     {
@@ -88,6 +90,7 @@ let columns: Column[] = [
         align: 'left',
         hoverIconName: 'icon-edit',
         placeholder: '请输入',
+        sortBy: 'string',
         // editorType: 'none',
         verticalAlign: 'middle',
         // hide: true,
@@ -229,6 +232,7 @@ let columns: Column[] = [
         hoverIconName: 'icon-select',
         sort: 4,
         width: 200,
+        sortBy: 'date',
     },
     {
         title: '出生日期',
@@ -236,6 +240,7 @@ let columns: Column[] = [
         editorType: 'date',
         hoverIconName: 'icon-date',
         sort: 2,
+        sortBy: 'date',
     },
     {
         title: '家庭地址',
@@ -285,6 +290,12 @@ let columns: Column[] = [
         key: 'materialNo',
         align: 'right',
         selectorCellValueType: 'displayText', // displayText | value
+        sortBy: (a, b) => {
+            // 自定义排序：按物料编码的数字部分排序
+            const aValue = parseFloat(a.materialNo) || 0;
+            const bValue = parseFloat(b.materialNo) || 0;
+            return aValue - bValue;
+        },
         formatter({ value }: { value: string }) {
             if (!value) {
                 return '';

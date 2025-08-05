@@ -17,14 +17,17 @@ import type {
     BeforeChangeItem,
     HistoryAction,
     BeforeValueChangeItem,
+    SortByType,
 } from './types';
 import { generateShortUUID, toLeaf } from './util';
 import { HistoryItemData } from './History';
 import Cell from './Cell';
+import dayjs from 'dayjs';
 export default class Database {
     private loading = false;
     private ctx: Context;
     private data: any[];
+    private sortedData: any[] = []; // 新增：排序后的数据层
     private columns: Column[];
     private footerData: any[] = [];
     private rowKeyMap = new Map<string, any>();
@@ -49,6 +52,7 @@ export default class Database {
     private sumHeight = 0;
     private filterMethod: FilterMethod | undefined;
     private positions: Position[] = []; //虚拟滚动位置
+    private sortState: Map<string, { direction: 'asc' | 'desc' | 'none', timestamp: number }> = new Map();
     constructor(ctx: Context, options: EVirtTableOptions) {
         this.ctx = ctx;
         const { data = [], columns = [], footerData = [] } = options;
@@ -92,6 +96,8 @@ export default class Database {
             }
         }
         this.itemRowKeyMap = new WeakMap();
+        // 确保 sortedData 与 data 同步
+        this.sortedData = [...this.data];
         this.initData(this.data);
         this.getData();
         this.bufferCheckState.buffer = false;
@@ -180,7 +186,7 @@ export default class Database {
         this.clearBufferData(); // 清除缓存数据
     }
     /**
-     *
+     * 获取所有行数据（平铺）
      * @returns 获取转化平铺数据
      */
     getAllRowsData() {
@@ -193,7 +199,7 @@ export default class Database {
                 }
             });
         };
-        recursiveData(this.data);
+        recursiveData(this.sortedData); // 使用 sortedData 而不是 data
         return list;
     }
     private filterColumns(columns: Column[]) {
@@ -221,9 +227,9 @@ export default class Database {
     }
     setData(data: any[]) {
         this.data = data;
-        if (this.columns.length) {
-            this.init();
-        }
+        this.sortedData = [...data]; // 初始化 sortedData 为原始数据的副本
+        this.setLoading(true);
+        this.init();
     }
     /**
      * 统一转化数据，给画body使用，包括过滤树状等，统一入口
@@ -263,7 +269,7 @@ export default class Database {
         };
         this.rowIndexRowKeyMap.clear();
         this.rowKeyRowIndexMap.clear();
-        let _data = this.data;
+        let _data = this.sortedData; // 使用 sortedData 而不是 data
         if (typeof this.filterMethod === 'function') {
             _data = this.filterMethod(_data);
         }
@@ -293,6 +299,125 @@ export default class Database {
      */
     clearFilterMethod() {
         this.filterMethod = undefined;
+    }
+
+    /**
+     * 获取排序状态
+     */
+    getSortState(key: string) {
+        return this.sortState.get(key) || { direction: 'none' as const, timestamp: 0 };
+    }
+
+    /**
+     * 设置排序状态
+     */
+    setSortState(key: string, direction: 'asc' | 'desc' | 'none') {
+        const timestamp = Date.now();
+        this.sortState.set(key, { direction, timestamp });
+        this.applySorting();
+    }
+
+    /**
+     * 清除所有排序状态
+     */
+    clearSortState() {
+        this.sortState.clear();
+        this.applySorting();
+    }
+
+    /**
+     * 应用排序
+     */
+    private applySorting() {
+        if (this.sortState.size === 0) {
+            // 没有排序时，sortedData 等于原始数据
+            this.sortedData = [...this.data];
+            this.clearFilterMethod();
+            this.clearBufferData();
+            this.ctx.emit('draw');
+            return;
+        }
+
+        // 按时间戳排序，最早的先排序
+        const sortedEntries = Array.from(this.sortState.entries())
+            .sort((a, b) => a[1].timestamp - b[1].timestamp);
+
+        // 对 sortedData 进行排序
+        this.sortedData = this.sortDataRecursive([...this.data], sortedEntries);
+        
+        this.clearFilterMethod();
+        this.clearBufferData();
+        this.ctx.emit('draw');
+    }
+
+    /**
+     * 递归排序方法，支持树形数据
+     * @param data 要排序的数据
+     * @param sortedEntries 排序条目，按时间戳排序
+     * @returns 排序后的数据
+     */
+    private sortDataRecursive(data: any[], sortedEntries: [string, { direction: 'asc' | 'desc' | 'none', timestamp: number }][]): any[] {
+        // 对当前层级进行排序
+        let sortedData = [...data];
+        
+        // 逐层应用排序条件
+        for (const [key, { direction }] of sortedEntries) {
+            if (direction === 'none') continue;
+            
+            const cellHeader = this.getColumnByKey(key);
+            if (!cellHeader || !cellHeader.column.sortBy) continue;
+
+            // 对当前层级进行单列排序
+            sortedData = this.applySingleColumnSort(sortedData, key, direction, cellHeader.column.sortBy);
+        }
+
+        // 递归处理子节点
+        return sortedData.map(item => {
+            if (item.children && Array.isArray(item.children)) {
+                item.children = this.sortDataRecursive(item.children, sortedEntries);
+            }
+            return item;
+        });
+    }
+
+    /**
+     * 对数组进行单列排序
+     * @param data 要排序的数据
+     * @param key 排序的列键
+     * @param direction 排序方向
+     * @param sortBy 排序类型
+     * @returns 排序后的数据
+     */
+    private applySingleColumnSort(data: any[], key: string, direction: 'asc' | 'desc', sortBy: SortByType): any[] {
+        return data.sort((a, b) => {
+            const aValue = a[key];
+            const bValue = b[key];
+            
+            let comparison = 0;
+            
+            if (typeof sortBy === 'function') {
+                comparison = sortBy(aValue, bValue);
+            } else if (sortBy === 'number') {
+                const aNum = Number(aValue) || 0;
+                const bNum = Number(bValue) || 0;
+                comparison = aNum - bNum;
+            } else if (sortBy === 'string') {
+                const aStr = String(aValue || '');
+                const bStr = String(bValue || '');
+                comparison = aStr.localeCompare(bStr);
+            } else if (sortBy === 'date') {
+                const aDate = dayjs(aValue || 0);
+                const bDate = dayjs(bValue || 0);
+                comparison = aDate.isBefore(bDate) ? -1 : aDate.isAfter(bDate) ? 1 : 0;
+            } else if (Array.isArray(sortBy) && sortBy[0] === 'date' && typeof sortBy[1] === 'string') {
+                const formatter = sortBy[1];
+                const aDate = dayjs(aValue, formatter);
+                const bDate = dayjs(bValue, formatter);
+                comparison = aDate.isBefore(bDate) ? -1 : aDate.isAfter(bDate) ? 1 : 0;
+            }
+            
+            return direction === 'asc' ? comparison : -comparison;
+        });
     }
     /**
      * 根据rowKey,控制指定展开行
