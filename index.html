@@ -11,26 +11,158 @@
             --evt-header-font: 12x normal Arial;
             --evt-body-font: 12px normal Arial;
         }
+        
+        /* 按钮样式 */
+        .control-panel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .control-panel button {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            margin: 3px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .control-panel button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .control-panel button:active {
+            transform: translateY(0);
+        }
+        
+        /* Radio 样式 */
+        .radio-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 3px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: white;
+            font-weight: 500;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .radio-group label:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .radio-group input[type="radio"] {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .radio-group input[type="radio"]:checked {
+            border-color: #4facfe;
+            background: #4facfe;
+        }
+        
+        .radio-group input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+        }
+        
+        /* 输入框样式 */
+        .control-panel input[type="text"] {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin: 3px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .control-panel input[type="text"]:focus {
+            box-shadow: 0 0 0 2px rgba(79, 172, 254, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        /* 响应式布局 */
+        @media (max-width: 768px) {
+            .control-panel {
+                padding: 10px;
+            }
+            
+            .control-panel button {
+                padding: 5px 10px;
+                font-size: 11px;
+                margin: 2px;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
     </style>
     <body>
         <div id="app">
-            <div>
-                <button id="instantiation">获取实例</button>
-                <button id="validator">校验</button>
-                <button id="setValidator">设置错误</button>
-                <button id="expandAll">展开tree</button>
-                <button id="setConfig">设置config</button>
-                <button id="loadData">加载数据</button>
-                <input id="search-text" placeholder="请输入" type="text" />
-                <button id="search">搜素</button>
-                <button id="pre">上一页</button>
-                <button id="next">下一页</button>
-                <button id="clearSelection">清除选中</button>
-                <button id="updateCssVar">切换主题</button>
-                <button id="getCurrentRow">获取高亮行</button>
-                <button id="clearEditableData">清空</button>
-                <button id="setReadOnly">设置只读值</button>
-                <button id="getChangedValues">获取改变值</button>
+            <div class="control-panel">
+                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 5px;">
+                    <button id="instantiation">获取实例</button>
+                    <button id="validator">校验</button>
+                    <button id="setValidator">设置错误</button>
+                    <button id="expandAll">展开tree</button>
+                    <button id="setConfig">设置config</button>
+                    <button id="loadData">加载数据</button>
+                    <input id="search-text" placeholder="请输入搜索内容" type="text" />
+                    <button id="search">搜索</button>
+                    <button id="pre">上一页</button>
+                    <button id="next">下一页</button>
+                    <button id="clearSelection">清除选中</button>
+                    <button id="updateCssVar">切换主题</button>
+                    <button id="getCurrentRow">获取高亮行</button>
+                    <button id="clearEditableData">清空</button>
+                    <button id="setReadOnly">设置只读值</button>
+                    <button id="getChangedValues">获取改变值</button>
+                </div>
+                <div id="modeRadioContainer" class="radio-group"></div>
             </div>
             <div style="position: relative">
                 <div id="e-virt-table">
@@ -39,6 +171,7 @@
                         <input id="e-virt-table-date" style="display: none" type="date" />
                     </div>
                 </div>
+
             </div>
         </div>
         <script type="module" src="/develop.ts"></script>

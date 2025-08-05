@@ -69,6 +69,27 @@ export default class Cell extends BaseCell {
     drawImageHeight = 0;
     drawImageName = '';
     drawImageSource?: HTMLImageElement;
+    // 画tree图标
+    drawTreeImageX = 0;
+    drawTreeImageY = 0;
+    drawTreeImageWidth = 0;
+    drawTreeImageHeight = 0;
+    drawTreeImageName = '';
+    drawTreeImageSource?: HTMLImageElement;
+    // 画selection图标
+    drawSelectionImageX = 0;
+    drawSelectionImageY = 0;
+    drawSelectionImageWidth = 0;
+    drawSelectionImageHeight = 0;
+    drawSelectionImageName = '';
+    drawSelectionImageSource?: HTMLImageElement;
+    // 画hover图标
+    drawHoverImageX = 0;
+    drawHoverImageY = 0;
+    drawHoverImageWidth = 0;
+    drawHoverImageHeight = 0;
+    drawHoverImageName = '';
+    drawHoverImageSource?: HTMLImageElement;
     ellipsis = false;
     rowExpand = false;
     rowHasChildren = false;
@@ -97,7 +118,8 @@ export default class Cell extends BaseCell {
         this.key = column.key;
         this.type = column.type || '';
         this.editorType = column.editorType || 'text';
-        this.selectorCellValueType = column.selectorCellValueType || this.ctx.config.SELECTOR_CELL_VALUE_TYPE || 'value';
+        this.selectorCellValueType =
+            column.selectorCellValueType || this.ctx.config.SELECTOR_CELL_VALUE_TYPE || 'value';
         this.editorProps = column.editorProps || {};
         this.cellType = cellType;
         this.align = column.align || 'center';
@@ -147,6 +169,16 @@ export default class Cell extends BaseCell {
         this.updateHoverIcon();
         this.updateSelection();
         this.updateTree();
+        // 根据类型决定渲染顺序
+        // if (this.type === 'tree-selection') {
+        //     // tree-selection: 先渲染树形图标，再渲染勾选框
+        //     this.updateTree();
+        //     this.updateSelection();
+        // } else {
+        //     // 其他类型: 先渲染勾选框，再渲染树形图标
+        //     this.updateSelection();
+        //     this.updateTree();
+        // }
         this.updateEditor();
         this.updateRender();
         this.getValidationMessage();
@@ -297,43 +329,60 @@ export default class Cell extends BaseCell {
         let icon = undefined;
         let iconOffsetX = 0;
         let iconName = '';
-        if (this.type === 'tree' && cellType === 'body') {
-            const row = this.ctx.database.getRowForRowKey(rowKey);
-            const { expand = false, hasChildren = false, expandLoading = false, level = 0 } = row || {};
-            this.rowExpand = expand;
-            this.rowHasChildren = hasChildren;
-            if (expandLoading) {
-                const loadingIcon = this.ctx.icons.get('loading');
-                iconName = 'loading';
-                icon = loadingIcon;
-                iconOffsetX = level * 8;
-            } else if (hasChildren) {
-                const expandIcon = this.ctx.icons.get('expand');
-                const shrinkIcon = this.ctx.icons.get('shrink');
-                icon = !expand ? expandIcon : shrinkIcon;
-                iconName = !expand ? 'expand' : 'shrink';
-                iconOffsetX = level * 8;
-            } else {
-                iconOffsetX = level * 8;
-            }
-            let iconWidth = 20;
-            let iconHeight = 20;
-            if (icon) {
-                let iconX = this.drawX + iconOffsetX + CELL_PADDING;
-                let iconY = this.drawY + (this.visibleHeight - iconHeight) / 2;
-                this.ctx.paint.drawImage(icon, iconX, iconY, iconWidth, iconHeight);
-                this.drawImageX = iconX;
-                this.drawImageY = iconY;
-                this.drawImageWidth = iconWidth;
-                this.drawImageHeight = iconHeight;
-                this.drawImageName = iconName;
-                this.drawImageSource = icon;
-            }
-            // 更改文本距离
-            this.align = 'left';
-            this.drawTextX = iconOffsetX + this.drawX + iconWidth - 0.5;
+        if (!(['tree', 'selection-tree', 'tree-selection'].includes(this.type) && cellType === 'body')) {
+            return;
         }
+
+        const row = this.ctx.database.getRowForRowKey(rowKey);
+        const { expand = false, hasChildren = false, expandLoading = false, level = 0 } = row || {};
+        this.rowExpand = expand;
+        this.rowHasChildren = hasChildren;
+
+        // 计算树形图标的偏移量
+        const { TREE_INDENT = 16, CHECKBOX_SIZE, TREE_ICON_SIZE } = this.ctx.config;
+        iconOffsetX = level * TREE_INDENT;
+
+        if (expandLoading) {
+            const loadingIcon = this.ctx.icons.get('loading');
+            iconName = 'loading';
+            icon = loadingIcon;
+        } else if (hasChildren) {
+            const expandIcon = this.ctx.icons.get('expand');
+            const shrinkIcon = this.ctx.icons.get('shrink');
+            icon = !expand ? expandIcon : shrinkIcon;
+            iconName = !expand ? 'expand' : 'shrink';
+        }
+
+        let iconWidth = TREE_ICON_SIZE;
+        let iconHeight = TREE_ICON_SIZE;
+        let iconX = this.drawX + iconOffsetX + CELL_PADDING;
+        let iconY = this.drawY + (this.visibleHeight - iconHeight) / 2;
+        let drawTextX = iconOffsetX + this.drawX + iconWidth - 0.5;
+        if (this.type === 'selection-tree') {
+            // 树形图标在左侧，checkbox 在树形图标右侧
+            iconX = iconOffsetX + this.drawSelectionImageX + this.drawSelectionImageWidth + 2;
+            drawTextX = iconX + 16;
+        } else if (this.type === 'tree-selection') {
+            iconX = this.drawX + iconOffsetX + this.drawTreeImageX + this.drawTreeImageWidth + 2;
+            drawTextX = iconX + CHECKBOX_SIZE + 16;
+        } else {
+            // 普通tree
+            drawTextX = this.drawX + iconOffsetX + CELL_PADDING + iconWidth;
+        }
+
+        if (icon) {
+            // this.ctx.paint.drawImage(icon, iconX, iconY, iconWidth, iconHeight);
+            this.drawTreeImageX = iconX;
+            this.drawTreeImageY = iconY;
+            this.drawTreeImageWidth = iconWidth;
+            this.drawTreeImageHeight = iconHeight;
+            this.drawTreeImageName = iconName;
+            this.drawTreeImageSource = icon;
+        }
+        // 更改文本距离
+        this.drawTextX = drawTextX;
     }
+
     private updateContainer() {
         const {
             BODY_BG_COLOR,
@@ -460,19 +509,57 @@ export default class Cell extends BaseCell {
         if (cellType === 'footer') {
             return;
         }
-        // 选中框类型
-        if (['index-selection', 'selection'].includes(type)) {
+        if (!['index-selection', 'selection', 'selection-tree', 'tree-selection'].includes(type)) {
+            return;
+        }
+        const selectable = this.ctx.database.getRowSelectable(rowKey);
+        const { CHECKBOX_SIZE = 0, CELL_PADDING } = this.ctx.config;
+        let _x = this.drawX + (visibleWidth - CHECKBOX_SIZE) / 2;
+        let _y = this.drawY + (visibleHeight - CHECKBOX_SIZE) / 2;
+        // 只能左对齐及居中对齐
+        if (this.align === 'left' || this.align === 'right') {
+            _x = this.drawX + CELL_PADDING / 2;
+        }
+
+        // 对于 selection-tree 类型，checkbox 应该居中显示
+        if (type === 'selection-tree') {
+            // 保持居中显示，不改变 _x 和 _y 的计算
+        } else if (type === 'tree-selection') {
+            // 更新选择器的位置
+            const { TREE_INDENT = 16, CHECKBOX_SIZE, TREE_ICON_SIZE } = this.ctx.config;
+            const row = this.ctx.database.getRowForRowKey(rowKey);
+            const { level = 0 } = row || {};
+            const iconOffsetX = level * TREE_INDENT;
+            _x = this.drawX + TREE_ICON_SIZE + iconOffsetX + 2; // 树形图标右侧 + 间距
+            _y = this.drawY + (visibleHeight - CHECKBOX_SIZE) / 2;
+        }
+
+        let checkboxImage: HTMLImageElement | undefined = this.ctx.icons.get('checkbox-uncheck');
+        let checkboxName = 'checkbox-uncheck';
+
+        if (type === 'selection-tree' || type === 'tree-selection') {
+            // 树形选择逻辑
+            const treeState = this.ctx.database.getTreeSelectionState(rowKey);
+            if (treeState.indeterminate && selectable) {
+                checkboxImage = this.ctx.icons.get('checkbox-indeterminate');
+                checkboxName = 'checkbox-indeterminate';
+            } else if (treeState.checked && selectable) {
+                checkboxImage = this.ctx.icons.get('checkbox-check');
+                checkboxName = 'checkbox-check';
+            } else if (!treeState.checked && selectable) {
+                checkboxImage = this.ctx.icons.get('checkbox-uncheck');
+                checkboxName = 'checkbox-uncheck';
+            } else {
+                checkboxImage = this.ctx.icons.get('checkbox-disabled');
+                checkboxName = 'checkbox-disabled';
+            }
+        } else {
+            // 普通选择逻辑
             const check = this.ctx.database.getRowSelection(rowKey);
-            const selectable = this.ctx.database.getRowSelectable(rowKey);
-            const { CHECKBOX_SIZE = 0 } = this.ctx.config;
-            const _x = this.drawX + (visibleWidth - CHECKBOX_SIZE) / 2;
-            const _y = this.drawY + (visibleHeight - CHECKBOX_SIZE) / 2;
-            let checkboxImage: HTMLImageElement | undefined = this.ctx.icons.get('checkbox-uncheck');
-            let checkboxName = 'checkbox-uncheck';
             if (check && selectable) {
                 checkboxImage = this.ctx.icons.get('checkbox-check');
                 checkboxName = 'checkbox-check';
-            } else if (check && selectable) {
+            } else if (check && !selectable) {
                 checkboxImage = this.ctx.icons.get('checkbox-check-disabled');
                 checkboxName = 'checkbox-check-disabled';
             } else if (!check && selectable) {
@@ -482,26 +569,27 @@ export default class Cell extends BaseCell {
                 checkboxImage = this.ctx.icons.get('checkbox-disabled');
                 checkboxName = 'checkbox-disabled';
             }
-            if (checkboxImage && type == 'index-selection') {
-                if (
-                    (this.ctx.hoverCell && this.ctx.hoverCell.rowIndex === rowIndex) ||
-                    ['checkbox-disabled', 'checkbox-check'].includes(checkboxName)
-                ) {
-                    this.drawImageX = _x;
-                    this.drawImageY = _y;
-                    this.drawImageWidth = CHECKBOX_SIZE;
-                    this.drawImageHeight = CHECKBOX_SIZE;
-                    this.drawImageName = checkboxName;
-                    this.drawImageSource = checkboxImage;
-                }
-            } else if (checkboxImage && 'selection' === type) {
-                this.drawImageX = _x;
-                this.drawImageY = _y;
-                this.drawImageWidth = CHECKBOX_SIZE;
-                this.drawImageHeight = CHECKBOX_SIZE;
-                this.drawImageName = checkboxName;
-                this.drawImageSource = checkboxImage;
+        }
+
+        if (type === 'index-selection') {
+            if (
+                (this.ctx.hoverCell && this.ctx.hoverCell.rowIndex === rowIndex) ||
+                ['checkbox-disabled', 'checkbox-check'].includes(checkboxName)
+            ) {
+                this.drawSelectionImageX = _x;
+                this.drawSelectionImageY = _y;
+                this.drawSelectionImageWidth = CHECKBOX_SIZE;
+                this.drawSelectionImageHeight = CHECKBOX_SIZE;
+                this.drawSelectionImageName = checkboxName;
+                this.drawSelectionImageSource = checkboxImage;
             }
+        } else {
+            this.drawSelectionImageX = _x;
+            this.drawSelectionImageY = _y;
+            this.drawSelectionImageWidth = CHECKBOX_SIZE;
+            this.drawSelectionImageHeight = CHECKBOX_SIZE;
+            this.drawSelectionImageName = checkboxName;
+            this.drawSelectionImageSource = checkboxImage;
         }
     }
     private updateHoverIcon() {
@@ -547,12 +635,12 @@ export default class Cell extends BaseCell {
                 }
             }
             const drawImageSource = this.ctx.icons.get(this.hoverIconName);
-            this.drawImageX = _x;
-            this.drawImageY = _y;
-            this.drawImageWidth = CELL_HOVER_ICON_SIZE;
-            this.drawImageHeight = CELL_HOVER_ICON_SIZE;
-            this.drawImageName = this.hoverIconName;
-            this.drawImageSource = drawImageSource;
+            this.drawHoverImageX = _x;
+            this.drawHoverImageY = _y;
+            this.drawHoverImageWidth = CELL_HOVER_ICON_SIZE;
+            this.drawHoverImageHeight = CELL_HOVER_ICON_SIZE;
+            this.drawHoverImageName = this.hoverIconName;
+            this.drawHoverImageSource = drawImageSource;
         }
     }
     // 过去跨度配置
@@ -587,7 +675,7 @@ export default class Cell extends BaseCell {
             if (
                 this.type === 'index-selection' &&
                 ((this.ctx.hoverCell && this.ctx.hoverCell.rowIndex === this.rowIndex) ||
-                    ['checkbox-disabled', 'checkbox-check'].includes(this.drawImageName))
+                    ['checkbox-disabled', 'checkbox-check'].includes(this.drawSelectionImageName))
             ) {
                 return '';
             }
@@ -770,9 +858,9 @@ export default class Cell extends BaseCell {
     private drawText() {
         const { CELL_PADDING, BODY_FONT, PLACEHOLDER_COLOR } = this.ctx.config;
         let visibleWidth = this.visibleWidth;
-        if (this.type === 'tree') {
+        if (this.type === 'tree' || this.type === 'selection-tree' || this.type === 'tree-selection') {
             const offsetIconX = this.drawTextX - this.drawX;
-            visibleWidth = this.visibleWidth - offsetIconX; // 减去树形图标的宽度
+            visibleWidth = this.visibleWidth - offsetIconX; // 减去图标的宽度
         }
         const { ellipsis } = this.ctx.paint.handleEllipsis(this.displayText, visibleWidth, CELL_PADDING, BODY_FONT);
         this.ellipsis = ellipsis;
@@ -794,22 +882,41 @@ export default class Cell extends BaseCell {
         return this.ctx.paint.drawText(text, this.drawTextX, this.drawTextY, visibleWidth, this.visibleHeight, {
             font: BODY_FONT,
             padding: CELL_PADDING,
-            align: this.align,
+            align:
+                this.type === 'tree' || this.type === 'selection-tree' || this.type === 'tree-selection'
+                    ? 'left'
+                    : this.align,
             verticalAlign: this.verticalAlign,
             color,
         });
     }
     private drawImage() {
-        if (!this.drawImageSource) {
-            return;
+        if (this.drawSelectionImageSource) {
+            this.ctx.paint.drawImage(
+                this.drawSelectionImageSource,
+                this.drawSelectionImageX,
+                this.drawSelectionImageY,
+                this.drawSelectionImageWidth,
+                this.drawSelectionImageHeight,
+            );
         }
-        if (this.hoverIconName) {
+        if (this.drawTreeImageSource) {
+            this.ctx.paint.drawImage(
+                this.drawTreeImageSource,
+                this.drawTreeImageX,
+                this.drawTreeImageY,
+                this.drawTreeImageWidth,
+                this.drawTreeImageHeight,
+            );
+        }
+        if (this.drawHoverImageSource) {
+            // 绘制hover图标背景
             const { CELL_HOVER_ICON_BG_COLOR, CELL_HOVER_ICON_BORDER_COLOR } = this.ctx.config;
             this.ctx.paint.drawRect(
-                this.drawImageX - 2,
-                this.drawImageY - 2,
-                this.drawImageWidth + 4,
-                this.drawImageHeight + 4,
+                this.drawHoverImageX - 2,
+                this.drawHoverImageY - 2,
+                this.drawHoverImageWidth + 4,
+                this.drawHoverImageHeight + 4,
                 {
                     borderColor: CELL_HOVER_ICON_BORDER_COLOR,
                     radius: 4,
@@ -817,14 +924,14 @@ export default class Cell extends BaseCell {
                     fillColor: CELL_HOVER_ICON_BG_COLOR,
                 },
             );
+            this.ctx.paint.drawImage(
+                this.drawHoverImageSource,
+                this.drawHoverImageX,
+                this.drawHoverImageY,
+                this.drawHoverImageWidth,
+                this.drawHoverImageHeight,
+            );
         }
-        this.ctx.paint.drawImage(
-            this.drawImageSource,
-            this.drawImageX,
-            this.drawImageY,
-            this.drawImageWidth,
-            this.drawImageHeight,
-        );
     }
     private drawSelector() {
         if (this.cellType === 'footer') {

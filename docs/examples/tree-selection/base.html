@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>树形选择 - 基础示例</title>
+</head>
+<body>
+    <div id="e-virt-table"></div>
+</body>
+<script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+<script>
+    let data = [
+        {
+            id: '1',
+            name: '部门A',
+            children: [
+                {
+                    id: '1-1',
+                    name: '子部门A1',
+                    children: [
+                        { id: '1-1-1', name: '员工A1-1' },
+                        { id: '1-1-2', name: '员工A1-2' }
+                    ]
+                },
+                {
+                    id: '1-2',
+                    name: '子部门A2',
+                    children: [
+                        { id: '1-2-1', name: '员工A2-1' },
+                        { id: '1-2-2', name: '员工A2-2' }
+                    ]
+                }
+            ]
+        },
+        {
+            id: '2',
+            name: '部门B',
+            children: [
+                {
+                    id: '2-1',
+                    name: '子部门B1',
+                    children: [
+                        { id: '2-1-1', name: '员工B1-1' },
+                        { id: '2-1-2', name: '员工B1-2' }
+                    ]
+                }
+            ]
+        }
+    ];
+
+    let columns = [
+        {
+            title: '选择',
+            type: 'selection-tree',
+            key: 'selection',
+            width: 60,
+            readonly: true
+        },
+        {
+            title: 'ID',
+            key: 'id',
+            width: 100,
+            readonly: true
+        },
+        {
+            title: '名称',
+            key: 'name',
+            width: 200,
+            readonly: true
+        }
+    ];
+
+    const target = document.getElementById('e-virt-table');
+    const table = new EVirtTable(target, {
+        data,
+        columns,
+        config: {
+            TREE_SELECT_MODE: 'auto', // auto | cautious | strictly
+            ROW_KEY: 'id',
+            ENABLE_SELECTOR: true,
+            WIDTH: 800,
+            HEIGHT: 400
+        }
+    });
+
+    // 监听选择变化
+    table.on('selectionChange', (selectedRows) => {
+        console.log('选中的行:', selectedRows);
+    });
+</script>
+</html> 
