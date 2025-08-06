@@ -110,6 +110,42 @@ The sort icon positioning follows these rules based on text alignment:
 
 Sorting works with tree data structures. When sorting is applied, it recursively sorts all levels of the tree, maintaining the hierarchical structure.
 
+## Backend Sorting
+
+When a column is configured with `apiSortable: true`, backend sorting is enabled. Backend sorting does not process data on the frontend, but interacts with the backend through event mechanisms.
+::: demo
+
+sort/backend-sort-en
+h:400px
+:::
+### Usage
+
+```javascript
+{
+    title: 'Name',
+    key: 'name',
+    apiSortable: true
+}
+```
+
+### Event Listening
+
+```javascript
+// Listen for sort query events
+eVirtTable.on('sortQuery', (sortData) => {
+    // sortData format: [{ field: 'name', direction: 'asc' }, ...]
+    // Call backend API to get sorted data
+    fetchSortedData(sortData).then(data => {
+        eVirtTable.loadData(data);
+        eVirtTable.setSortQueryData(sortData);
+    });
+});
+```
+
+### API Methods
+
+- `setSortQueryData(sortData: { field: string, direction: 'asc' | 'desc' }[])`: Set backend sort state (won't trigger sortQuery event)
+
 ## API
 
 ### Database Methods

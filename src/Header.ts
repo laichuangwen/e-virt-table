@@ -219,7 +219,7 @@ export default class Header {
             // 检查是否点击在排序图标上
             const renderAllCellHeaders = [...this.renderFixedCellHeaders, ...this.renderCenterCellHeaders];
             for (const cellHeader of renderAllCellHeaders) {
-                if (!cellHeader.column.sortBy) continue;
+                if (!cellHeader.column.sortBy && !cellHeader.column.apiSortable) continue;
 
                 const { sortIconX, sortIconY, sortIconWidth, sortIconHeight } = cellHeader;
                 
@@ -235,19 +235,37 @@ export default class Header {
     }
 
     private handleSortClick(cellHeader: CellHeader) {
-        const currentState = this.ctx.database.getSortState(cellHeader.key);
-        let newDirection: 'asc' | 'desc' | 'none';
+        if (cellHeader.column.apiSortable) {
+            // 后端排序
+            const currentState = this.ctx.database.getBackendSortState(cellHeader.key);
+            let newDirection: 'asc' | 'desc' | 'none';
 
-        // 按照 不排序->升序->降序->不排序 的顺序循环
-        if (currentState.direction === 'none') {
-            newDirection = 'asc';
-        } else if (currentState.direction === 'asc') {
-            newDirection = 'desc';
+            // 按照 不排序->升序->降序->不排序 的顺序循环
+            if (currentState.direction === 'none') {
+                newDirection = 'asc';
+            } else if (currentState.direction === 'asc') {
+                newDirection = 'desc';
+            } else {
+                newDirection = 'none';
+            }
+
+            this.ctx.database.setBackendSortState(cellHeader.key, newDirection);
         } else {
-            newDirection = 'none';
-        }
+            // 前端排序
+            const currentState = this.ctx.database.getSortState(cellHeader.key);
+            let newDirection: 'asc' | 'desc' | 'none';
 
-        this.ctx.database.setSortState(cellHeader.key, newDirection);
+            // 按照 不排序->升序->降序->不排序 的顺序循环
+            if (currentState.direction === 'none') {
+                newDirection = 'asc';
+            } else if (currentState.direction === 'asc') {
+                newDirection = 'desc';
+            } else {
+                newDirection = 'none';
+            }
+
+            this.ctx.database.setSortState(cellHeader.key, newDirection);
+        }
     }
 
     private resizeColumn(cell: CellHeader, diff: number) {

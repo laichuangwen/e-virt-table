@@ -110,6 +110,42 @@ h:400px
 
 排序功能支持树形数据结构。当应用排序时，会递归地对树的所有层级进行排序，保持层次结构。
 
+## 服务端排序
+
+当列配置了 `apiSortable: true` 时，会启用服务端排序功能。服务端排序不会在前端进行数据处理，而是通过事件机制与后端进行交互。
+::: demo
+
+sort/backend-sort
+h:400px
+:::
+### 使用方法
+
+```javascript
+{
+    title: '姓名',
+    key: 'name',
+    apiSortable: true
+}
+```
+
+### 事件监听
+
+```javascript
+// 监听排序查询事件
+eVirtTable.on('sortQuery', (sortData) => {
+    // sortData 格式: [{ field: 'name', direction: 'asc' }, ...]
+    // 调用后端接口获取排序后的数据
+    fetchSortedData(sortData).then(data => {
+        eVirtTable.loadData(data);
+        eVirtTable.setSortQueryData(sortData);
+    });
+});
+```
+
+### API 方法
+
+- `setSortQueryData(sortData: { field: string, direction: 'asc' | 'desc' }[])`: 设置服务端排序状态（不会触发 sortQuery 事件）
+
 ## API
 
 ### Database 方法

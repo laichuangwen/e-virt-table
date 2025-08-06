@@ -130,6 +130,7 @@ export interface Column {
     rowspan?: number;
     sort?: number;
     sortBy?: SortByType;
+    apiSortable?: boolean;
     hide?: boolean | Function;
     render?: Function | string;
     renderFooter?: Function | string;

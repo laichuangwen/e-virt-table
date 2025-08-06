@@ -170,10 +170,10 @@ export default class CellHeader extends BaseCell {
         }
 
         // 如果有排序图标，调整文本位置
-        if (this.column.sortBy) {
+        if (this.column.sortBy || this.column.apiSortable) {
             const iconSize = 16;
             const iconMargin = 4;
-            
+
             if (this.align === 'right') {
                 // 居右时，文本需要为图标留出空间
                 textWidth = this.width - CELL_PADDING - iconSize - iconMargin;
@@ -240,7 +240,7 @@ export default class CellHeader extends BaseCell {
             } else if (check && selectable) {
                 checkboxImage = this.ctx.icons.get('checkbox-check');
                 checkboxName = 'checkbox-check';
-            } else if (check && selectable) {
+            } else if (check && !selectable) {
                 checkboxImage = this.ctx.icons.get('checkbox-check-disabled');
                 checkboxName = 'checkbox-check-disabled';
             } else if (!check && selectable) {
@@ -270,8 +270,8 @@ export default class CellHeader extends BaseCell {
         }
     }
     private drawSortIcon() {
-        // 如果没有sortBy配置，不显示排序图标
-        if (!this.column.sortBy) {
+        // 如果没有sortBy配置且不是后端排序，不显示排序图标
+        if (!this.column.sortBy && !this.column.apiSortable) {
             return;
         }
 
@@ -279,33 +279,45 @@ export default class CellHeader extends BaseCell {
         const iconSize = 16;
         const iconMargin = 4;
 
-        // 获取排序状态
-        const sortState = this.ctx.database.getSortState(this.key);
         let iconName = 'sortable';
 
-        if (sortState.direction === 'asc') {
-            if (this.column.sortBy === 'number') {
-                iconName = 'sort-by-number-asc';
-            } else if (this.column.sortBy === 'string') {
-                iconName = 'sort-by-character-asc';
-            } else if (this.column.sortBy === 'date') {
-                iconName = 'sort-by-date-asc';
-            } else if (Array.isArray(this.column.sortBy) && this.column.sortBy[0] === 'date') {
-                iconName = 'sort-by-date-asc';
-            } else if (typeof this.column.sortBy === 'function') {
-                iconName = 'sort-asc';
+        if (this.column.apiSortable) {
+            // 后端排序
+            const sortState = this.ctx.database.getBackendSortState(this.key);
+            if (sortState.direction === 'asc') {
+                iconName = 'sort-backend-asc';
+            } else if (sortState.direction === 'desc') {
+                iconName = 'sort-backend-desc';
+            } else {
+                iconName = 'sortable-backend';
             }
-        } else if (sortState.direction === 'desc') {
-            if (this.column.sortBy === 'number') {
-                iconName = 'sort-by-number-desc';
-            } else if (this.column.sortBy === 'string') {
-                iconName = 'sort-by-character-desc';
-            } else if (this.column.sortBy === 'date') {
-                iconName = 'sort-by-date-desc';
-            } else if (Array.isArray(this.column.sortBy) && this.column.sortBy[0] === 'date') {
-                iconName = 'sort-by-date-desc';
-            } else if (typeof this.column.sortBy === 'function') {
-                iconName = 'sort-desc';
+        } else {
+            // 前端排序
+            const sortState = this.ctx.database.getSortState(this.key);
+            if (sortState.direction === 'asc') {
+                if (this.column.sortBy === 'number') {
+                    iconName = 'sort-by-number-asc';
+                } else if (this.column.sortBy === 'string') {
+                    iconName = 'sort-by-character-asc';
+                } else if (this.column.sortBy === 'date') {
+                    iconName = 'sort-by-date-asc';
+                } else if (Array.isArray(this.column.sortBy) && this.column.sortBy[0] === 'date') {
+                    iconName = 'sort-by-date-asc';
+                } else if (typeof this.column.sortBy === 'function') {
+                    iconName = 'sort-asc';
+                }
+            } else if (sortState.direction === 'desc') {
+                if (this.column.sortBy === 'number') {
+                    iconName = 'sort-by-number-desc';
+                } else if (this.column.sortBy === 'string') {
+                    iconName = 'sort-by-character-desc';
+                } else if (this.column.sortBy === 'date') {
+                    iconName = 'sort-by-date-desc';
+                } else if (Array.isArray(this.column.sortBy) && this.column.sortBy[0] === 'date') {
+                    iconName = 'sort-by-date-desc';
+                } else if (typeof this.column.sortBy === 'function') {
+                    iconName = 'sort-desc';
+                }
             }
         }
 

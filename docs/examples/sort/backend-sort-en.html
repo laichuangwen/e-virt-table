@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table - Backend Sort</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        // Mock server data
+        let serverData = [
+            { id: 1, name: 'Alice', age: 25, salary: 50000, department: 'Engineering', joinDate: '2023-01-15', score: 85.5, status: 'Active' },
+            { id: 2, name: 'Bob', age: 30, salary: 65000, department: 'Marketing', joinDate: '2022-08-20', score: 92.3, status: 'Active' },
+            { id: 3, name: 'Charlie', age: 28, salary: 55000, department: 'Engineering', joinDate: '2023-03-10', score: 78.9, status: 'Inactive' },
+            { id: 4, name: 'Diana', age: 35, salary: 75000, department: 'Sales', joinDate: '2021-12-05', score: 88.7, status: 'Active' },
+            { id: 5, name: 'Eve', age: 27, salary: 48000, department: 'HR', joinDate: '2023-06-18', score: 95.2, status: 'Active' },
+            { id: 6, name: 'Frank', age: 32, salary: 70000, department: 'Engineering', joinDate: '2022-11-12', score: 82.1, status: 'Active' },
+            { id: 7, name: 'Grace', age: 29, salary: 58000, department: 'Marketing', joinDate: '2023-02-28', score: 90.5, status: 'Inactive' },
+            { id: 8, name: 'Henry', age: 33, salary: 72000, department: 'Sales', joinDate: '2022-05-15', score: 87.3, status: 'Active' }
+        ];
+
+        let columns = [
+            {
+                title: 'ID',
+                key: 'id',
+                width: 80,
+                align: 'center',
+                apiSortable: true,
+                readonly: true
+            },
+            {
+                title: 'Name',
+                key: 'name',
+                width: 120,
+                align: 'left',
+                apiSortable: true,
+                readonly: true
+            },
+            {
+                title: 'Age',
+                key: 'age',
+                width: 80,
+                align: 'center',
+                apiSortable: true,
+                readonly: true
+            },
+            {
+                title: 'Salary',
+                key: 'salary',
+                width: 100,
+                align: 'right',
+                apiSortable: true,
+                readonly: true,
+                formatter: ({ value }) => {
+                    return `$${value.toLocaleString()}`;
+                }
+            },
+            {
+                title: 'Department',
+                key: 'department',
+                width: 120,
+                align: 'left',
+                apiSortable: true,
+                readonly: true
+            },
+            {
+                title: 'Join Date',
+                key: 'joinDate',
+                width: 120,
+                align: 'center',
+                apiSortable: true,
+                readonly: true
+            },
+            {
+                title: 'Score',
+                key: 'score',
+                width: 100,
+                align: 'center',
+                apiSortable: true,
+                readonly: true,
+                formatter: ({ value }) => {
+                    return `${value.toFixed(1)}%`;
+                }
+            },
+            {
+                title: 'Status',
+                key: 'status',
+                width: 100,
+                align: 'center',
+                apiSortable: true,
+                readonly: true,
+                formatter: ({ value }) => {
+                    return value === 'Active' ? '✅ Active' : '❌ Inactive';
+                }
+            }
+        ];
+
+        const eVirtTable = new EVirtTable(document.getElementById('e-virt-table'), {
+            columns,
+            data: serverData,
+            config: {
+                BORDER: true,
+                STRIPE: true,
+                CELL_HEIGHT: 40,
+                HEADER_HEIGHT: 40,
+                ROW_KEY: 'id',
+                ENABLE_SELECTOR: true,
+                ENABLE_KEYBOARD: true,
+                HIGHLIGHT_HOVER_ROW: true
+            }
+        });
+
+        // Mock server sort API
+        function mockServerSort(sortData) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    let sortedData = [...serverData];
+                    
+                    // Sort data according to sort conditions
+                    sortData.forEach(({ field, direction }) => {
+                        sortedData.sort((a, b) => {
+                            let aValue = a[field];
+                            let bValue = b[field];
+                            
+                            // Sort by field type
+                            if (field === 'age' || field === 'salary' || field === 'score' || field === 'id') {
+                                // Number sort
+                                aValue = Number(aValue) || 0;
+                                bValue = Number(bValue) || 0;
+                                return direction === 'asc' ? aValue - bValue : bValue - aValue;
+                            } else if (field === 'joinDate') {
+                                // Date sort
+                                aValue = new Date(aValue).getTime();
+                                bValue = new Date(bValue).getTime();
+                                return direction === 'asc' ? aValue - bValue : bValue - aValue;
+                            } else {
+                                // String sort
+                                aValue = String(aValue || '');
+                                bValue = String(bValue || '');
+                                return direction === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+                            }
+                        });
+                    });
+                    
+                    resolve(sortedData);
+                }, 500); // Mock network delay
+            });
+        }
+
+        // Listen for sort query events
+        eVirtTable.on('sortQuery', async (sortData) => {
+            console.log('Sort query parameters:', sortData);
+            
+            try {
+                // Call server sort API
+                const sortedData = await mockServerSort(sortData);
+                
+                // Update table data
+                eVirtTable.loadData(sortedData);
+                
+                // Update sort state (won't trigger sortQuery event)
+                eVirtTable.setSortQueryData(sortData);
+                
+                console.log('Sort completed, data updated');
+            } catch (error) {
+                console.error('Sort failed:', error);
+            }
+        });
+
+        // Listen for selection changes
+        eVirtTable.on('selectionChange', (rowkeys) => {
+            console.log('Selected rows:', rowkeys);
+        });
+    </script>
+</html> 

@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import EVirtTable from './src/EVirtTable';
 import {
     BeforeChangeItem,
@@ -96,6 +97,7 @@ let columns: Column[] = [
         title: '数量',
         key: 'requiredQuantity',
         sortBy: 'number',
+        align: 'right',
         rules: [
             {
                 required: true, // TODO:表格1.2.19有问题
@@ -110,7 +112,6 @@ let columns: Column[] = [
                 },
             },
         ],
-        align: 'right',
     },
     // {
     //   title: '部门',
@@ -188,6 +189,8 @@ let columns: Column[] = [
         title: '手机号',
         key: 'phone',
         readonly: false,
+        align: 'right',
+        apiSortable: true,
         overflowTooltipHeaderShow: true,
         formatterFooter: ({ value }) => {
             return `合：${value}`;
@@ -283,6 +286,7 @@ let columns: Column[] = [
     {
         title: '请假开始时间',
         key: 'start_dt',
+        sortBy: 'date',
     },
     {
         title: '物料编码',
@@ -303,7 +307,7 @@ let columns: Column[] = [
             return `物料编码：${v}`;
         },
     },
-    
+
     { title: '单位', key: 'unit' },
     { title: '工作性质', key: 'work_type' },
     { title: '工作状态', key: 'work_status' },
@@ -355,6 +359,7 @@ let columns: Column[] = [
         key: 'salePrice',
         type: 'number',
         align: 'left',
+        apiSortable: true,
         hoverIconName: 'icon-edit',
         placeholder: '请输入',
         // readonly: true,
@@ -400,6 +405,9 @@ for (let i = 0; i < 1000; i += 1) {
         nation: `汉${i}`,
         work_address: `南京路${i}号`,
         work_email: `${28976633 + i}@qq.com`,
+        start_dt: dayjs(Math.ceil(new Date().getTime() * (0.9995 + Math.random() * 0.001))).format(
+            'YYYY-MM-DD HH:mm:ss',
+        ),
         email: `${4465566 + i}@qq.com`,
         work_age: 2 + i,
         company_age: 1 + i,
@@ -796,7 +804,7 @@ eVirtTable.on('error', (error) => {
     console.error(error);
 });
 eVirtTable.on('hoverIconClick', (cell) => {
-            // hoverIconClick
+    // hoverIconClick
 });
 // eVirtTable.on('change', (changeList) => {
 //     eVirtTable.validate();
@@ -848,6 +856,52 @@ eVirtTable.on('overlayerChange', (container) => {
     });
 });
 
+// 模拟服务端排序接口
+function mockServerSort(sortData) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            let sortedData = [...data];
+
+            // 根据排序条件对数据进行排序
+            sortData.forEach(({ field, direction }) => {
+                sortedData.sort((a, b) => {
+                    let aValue = a[field];
+                    let bValue = b[field];
+
+                    // 根据字段类型进行排序
+                    if (
+                        field === 'requiredQuantity' ||
+                        field === 'work_age' ||
+                        field === 'age' ||
+                        field === 'salePrice'
+                    ) {
+                        // 数字排序
+                        aValue = Number(aValue) || 0;
+                        bValue = Number(bValue) || 0;
+                        return direction === 'asc' ? aValue - bValue : bValue - aValue;
+                    } else if (field === 'birthday') {
+                        // 日期排序
+                        aValue = new Date(aValue).getTime();
+                        bValue = new Date(bValue).getTime();
+                        return direction === 'asc' ? aValue - bValue : bValue - aValue;
+                    } else {
+                        // 字符串排序
+                        aValue = String(aValue || '');
+                        bValue = String(bValue || '');
+                        return direction === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+                    }
+                });
+            });
+
+            resolve(sortedData);
+        }, 500); // 模拟网络延迟
+    });
+}
+
+eVirtTable.on('sortQuery', async (sortData) => {
+    const sortedData = await mockServerSort(sortData);
+    eVirtTable.loadData(sortedData);
+});
 // 三种模式切换功能
 let currentMode = 'normal'; // 'normal', 'selection-tree', 'tree-selection'
 const modeRadioContainer = document.getElementById('modeRadioContainer') as HTMLDivElement;
@@ -1297,6 +1351,14 @@ document.getElementById('setReadOnly')?.addEventListener('click', () => {
 });
 document.getElementById('getChangedValues')?.addEventListener('click', () => {
     console.log(eVirtTable.getChangedData());
+});
+document.getElementById('test')?.addEventListener('click', () => {
+    eVirtTable.setSortQueryData([
+        {
+            field: 'phone',
+            direction: 'desc',
+        },
+    ]);
 });
 
 // 销毁
