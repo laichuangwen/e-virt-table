@@ -43,12 +43,6 @@ export default class CellHeader extends BaseCell {
     drawTextHeight = 0;
     drawCellBgColor = '';
     drawTextColor = '';
-    drawImageX = 0;
-    drawImageY = 0;
-    drawImageWidth = 0;
-    drawImageHeight = 0;
-    drawImageName = '';
-    drawImageSource: HTMLImageElement | undefined;
     drawSelectionImageX = 0;
     drawSelectionImageY = 0;
     drawSelectionImageWidth = 0;

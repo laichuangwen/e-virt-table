@@ -65,12 +65,6 @@ export default class Cell extends BaseCell {
     drawTextY = 0;
     drawTextWidth = 0;
     drawTextHeight = 0;
-    drawImageX = 0;
-    drawImageY = 0;
-    drawImageWidth = 0;
-    drawImageHeight = 0;
-    drawImageName = '';
-    drawImageSource?: HTMLImageElement;
     // 画tree图标
     drawTreeImageX = 0;
     drawTreeImageY = 0;
