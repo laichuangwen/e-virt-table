@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tree Selection - 高级示例</title>
+    <title>Tree Selection - Advanced Example</title>
     <style>
         .container {
             max-width: 1200px;
@@ -104,35 +104,35 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Tree Selection - 高级示例</h1>
-            <p>支持三种选择模式：Auto、Cautious、Strictly</p>
+            <h1>Tree Selection - Advanced Example</h1>
+            <p>Supports three selection modes: Auto, Cautious, Strictly</p>
         </div>
         
         <div class="content">
             <div class="mode-description">
-                <h3>模式说明：</h3>
+                <h3>Mode Description:</h3>
                 <ul>
-                    <li><strong>Auto模式</strong>：常见的树形勾选模式，子项全不选→父项不勾选，子项全选→父项勾选，子项都有→父项半选，半选算在最终选择的数据里面</li>
-                    <li><strong>Cautious模式</strong>：交互上相同，但是半选是不算在数据里面的</li>
-                    <li><strong>Strictly模式</strong>：父子各选各的互相不干扰，没有半选模式</li>
+                    <li><strong>Auto Mode</strong>: Common tree selection mode, all children unselected → parent unselected, all children selected → parent selected, some children selected → parent partially selected, partial selection is included in final data</li>
+                    <li><strong>Cautious Mode</strong>: Same interaction, but partial selection is not included in data</li>
+                    <li><strong>Strictly Mode</strong>: Parent and child selections are independent, no partial selection mode</li>
                 </ul>
             </div>
             
             <div class="controls">
-                <button id="tree-select-all">全选</button>
-                <button id="tree-unselect-all">取消全选</button>
-                <button id="tree-expand-all">展开全部</button>
-                <button id="tree-collapse-all">收起全部</button>
-                <button id="tree-get-selected">获取选中</button>
+                <button id="tree-select-all">Select All</button>
+                <button id="tree-unselect-all">Unselect All</button>
+                <button id="tree-expand-all">Expand All</button>
+                <button id="tree-collapse-all">Collapse All</button>
+                <button id="tree-get-selected">Get Selected</button>
                 
                 <select id="tree-select-mode">
-                    <option value="auto">Auto模式</option>
-                    <option value="cautious">Cautious模式</option>
-                    <option value="strictly">Strictly模式</option>
+                    <option value="auto">Auto Mode</option>
+                    <option value="cautious">Cautious Mode</option>
+                    <option value="strictly">Strictly Mode</option>
                 </select>
                 
                 <label>
-                    <input type="checkbox" id="tree-auto-fit-width"> 自动调整列宽
+                    <input type="checkbox" id="tree-auto-fit-width"> Auto Adjust Column Width
                 </label>
             </div>
             
@@ -145,123 +145,123 @@
     <script type="module">
         import EVirtTable from '../../src/index.js';
 
-        // 树形数据
+        // Tree data
         const treeData = [
             {
                 id: '1',
-                name: '技术部',
+                name: 'Technology Department',
                 _hasChildren: true,
                 children: [
                     {
                         id: '1-1',
-                        name: '前端组',
+                        name: 'Frontend Group',
                         _hasChildren: true,
                         children: [
                             {
                                 id: '1-1-1',
-                                name: 'React团队',
+                                name: 'React Team',
                                 _hasChildren: true,
                                 children: [
                                     {
                                         id: '1-1-1-1',
-                                        name: '组件库组',
+                                        name: 'Component Library Group',
                                         _hasChildren: true,
                                         children: [
-                                            { id: '1-1-1-1-1', name: '张三', role: 'React工程师' },
-                                            { id: '1-1-1-1-2', name: '李四', role: 'React工程师' }
+                                            { id: '1-1-1-1-1', name: 'Zhang San', role: 'React Engineer' },
+                                            { id: '1-1-1-1-2', name: 'Li Si', role: 'React Engineer' }
                                         ]
                                     },
                                     {
                                         id: '1-1-1-2',
-                                        name: '状态管理组',
+                                        name: 'State Management Group',
                                         _hasChildren: true,
                                         children: [
-                                            { id: '1-1-1-2-1', name: '王五', role: '状态管理工程师' },
-                                            { id: '1-1-1-2-2', name: '赵六', role: '状态管理工程师' }
+                                            { id: '1-1-1-2-1', name: 'Wang Wu', role: 'State Management Engineer' },
+                                            { id: '1-1-1-2-2', name: 'Zhao Liu', role: 'State Management Engineer' }
                                         ]
                                     }
                                 ]
                             },
                             {
                                 id: '1-1-2',
-                                name: 'Vue团队',
+                                name: 'Vue Team',
                                 _hasChildren: true,
                                 children: [
                                     {
                                         id: '1-1-2-1',
-                                        name: 'Vue3开发组',
+                                        name: 'Vue3 Development Group',
                                         _hasChildren: true,
                                         children: [
-                                            { id: '1-1-2-1-1', name: '孙七', role: 'Vue工程师' },
-                                            { id: '1-1-2-1-2', name: '周八', role: 'Vue工程师' }
+                                            { id: '1-1-2-1-1', name: 'Sun Qi', role: 'Vue Engineer' },
+                                            { id: '1-1-2-1-2', name: 'Zhou Ba', role: 'Vue Engineer' }
                                         ]
                                     }
                                 ]
                             },
                             {
                                 id: '1-1-3',
-                                name: '工具链组',
+                                name: 'Toolchain Group',
                                 _hasChildren: true,
                                 children: [
-                                    { id: '1-1-3-1', name: '吴九', role: '工具链工程师' },
-                                    { id: '1-1-3-2', name: '郑十', role: '工具链工程师' }
+                                    { id: '1-1-3-1', name: 'Wu Jiu', role: 'Toolchain Engineer' },
+                                    { id: '1-1-3-2', name: 'Zheng Shi', role: 'Toolchain Engineer' }
                                 ]
                             }
                         ]
                     },
                     {
                         id: '1-2',
-                        name: '后端组',
+                        name: 'Backend Group',
                         _hasChildren: true,
                         children: [
                             {
                                 id: '1-2-1',
-                                name: 'Java团队',
+                                name: 'Java Team',
                                 _hasChildren: true,
                                 children: [
                                     {
                                         id: '1-2-1-1',
-                                        name: '微服务组',
+                                        name: 'Microservices Group',
                                         _hasChildren: true,
                                         children: [
-                                            { id: '1-2-1-1-1', name: '陈十一', role: 'Java工程师' },
-                                            { id: '1-2-1-1-2', name: '杨十二', role: 'Java工程师' }
+                                            { id: '1-2-1-1-1', name: 'Chen Shiyi', role: 'Java Engineer' },
+                                            { id: '1-2-1-1-2', name: 'Yang Shier', role: 'Java Engineer' }
                                         ]
                                     }
                                 ]
                             },
                             {
                                 id: '1-2-2',
-                                name: 'Go团队',
+                                name: 'Go Team',
                                 _hasChildren: true,
                                 children: [
-                                    { id: '1-2-2-1', name: '黄十三', role: 'Go工程师' },
-                                    { id: '1-2-2-2', name: '刘十四', role: 'Go工程师' }
+                                    { id: '1-2-2-1', name: 'Huang Shisan', role: 'Go Engineer' },
+                                    { id: '1-2-2-2', name: 'Liu Shisi', role: 'Go Engineer' }
                                 ]
                             }
                         ]
                     },
                     {
                         id: '1-3',
-                        name: '测试组',
+                        name: 'Testing Group',
                         _hasChildren: true,
                         children: [
                             {
                                 id: '1-3-1',
-                                name: '自动化测试组',
+                                name: 'Automated Testing Group',
                                 _hasChildren: true,
                                 children: [
-                                    { id: '1-3-1-1', name: '周十五', role: '自动化测试工程师' },
-                                    { id: '1-3-1-2', name: '吴十六', role: '自动化测试工程师' }
+                                    { id: '1-3-1-1', name: 'Zhou Shiwu', role: 'Automated Testing Engineer' },
+                                    { id: '1-3-1-2', name: 'Wu Shiliu', role: 'Automated Testing Engineer' }
                                 ]
                             },
                             {
                                 id: '1-3-2',
-                                name: '性能测试组',
+                                name: 'Performance Testing Group',
                                 _hasChildren: true,
                                 children: [
-                                    { id: '1-3-2-1', name: '郑十七', role: '性能测试工程师' },
-                                    { id: '1-3-2-2', name: '王十八', role: '性能测试工程师' }
+                                    { id: '1-3-2-1', name: 'Zheng Shiqi', role: 'Performance Testing Engineer' },
+                                    { id: '1-3-2-2', name: 'Wang Shiba', role: 'Performance Testing Engineer' }
                                 ]
                             }
                         ]
@@ -270,80 +270,73 @@
             },
             {
                 id: '2',
-                name: '产品部',
+                name: 'Product Department',
                 _hasChildren: true,
                 children: [
                     {
                         id: '2-1',
-                        name: '产品组',
+                        name: 'Product Group',
                         _hasChildren: true,
                         children: [
-                            { id: '2-1-1', name: '产品经理A', role: '产品经理' },
-                            { id: '2-1-2', name: '产品经理B', role: '产品经理' }
+                            { id: '2-1-1', name: 'Product Manager A', role: 'Product Manager' },
+                            { id: '2-1-2', name: 'Product Manager B', role: 'Product Manager' }
                         ]
                     },
                     {
                         id: '2-2',
-                        name: '设计组',
+                        name: 'Design Group',
                         _hasChildren: true,
                         children: [
-                            { id: '2-2-1', name: 'UI设计师A', role: 'UI设计师' },
-                            { id: '2-2-2', name: 'UI设计师B', role: 'UI设计师' }
+                            { id: '2-2-1', name: 'UI Designer A', role: 'UI Designer' },
+                            { id: '2-2-2', name: 'UI Designer B', role: 'UI Designer' }
                         ]
                     }
                 ]
             },
             {
                 id: '3',
-                name: '运营部',
+                name: 'Operations Department',
                 _hasChildren: true,
                 children: [
                     {
                         id: '3-1',
-                        name: '市场组',
+                        name: 'Marketing Group',
                         _hasChildren: true,
                         children: [
-                            { id: '3-1-1', name: '市场专员A', role: '市场专员' },
-                            { id: '3-1-2', name: '市场专员B', role: '市场专员' }
+                            { id: '3-1-1', name: 'Marketing Specialist A', role: 'Marketing Specialist' },
+                            { id: '3-1-2', name: 'Marketing Specialist B', role: 'Marketing Specialist' }
                         ]
                     }
                 ]
             }
         ];
 
-        // 树形选择列配置
+        // Tree selection column configuration
         const treeColumns = [
             {
-                title: '选择',
+                title: 'ID',
                 type: 'selection-tree',
-                key: 'selection',
-                width: 60,
+                key: 'id',
+                width: 100,
                 widthFillDisable: true,
                 readonly: true,
                 fixed: 'left'
             },
             {
-                title: 'ID',
-                key: 'id',
-                width: 100,
-                readonly: true,
-                fixed: 'left'
-            },
-            {
-                title: '姓名',
+                title: 'Name',
                 key: 'name',
                 width: 150,
                 readonly: true
             },
             {
-                title: '职位',
+                title: 'Role',
                 key: 'role',
                 width: 200,
                 readonly: true
             }
         ];
 
-        // 创建树形选择表格
+        // Create tree selection table
         const treeTable = new EVirtTable(document.getElementById('tree-table'), {
             columns: treeColumns,
             data: treeData,
@@ -359,17 +352,17 @@
                 HIGHLIGHT_HOVER_ROW: true,
                 DEFAULT_EXPAND_ALL: true,
                 ENABLE_CONTEXT_MENU: true,
-                AUTO_FIT_TREE_WIDTH: false, // 自动调整树形列宽度
+                AUTO_FIT_TREE_WIDTH: false, // Auto adjust tree column width
                 CONTEXT_MENU: [
-                    { label: '全选', value: 'selectAll' },
-                    { label: '取消全选', value: 'unselectAll' },
-                    { label: '展开全部', value: 'expandAll' },
-                    { label: '收起全部', value: 'collapseAll' }
+                    { label: 'Select All', value: 'selectAll' },
+                    { label: 'Unselect All', value: 'unselectAll' },
+                    { label: 'Expand All', value: 'expandAll' },
+                    { label: 'Collapse All', value: 'collapseAll' }
                 ]
             }
         });
 
-        // 绑定按钮事件
+        // Bind button events
         document.getElementById('tree-select-all').addEventListener('click', () => {
             treeTable.toggleAllSelection();
         });
@@ -388,10 +381,10 @@
 
         document.getElementById('tree-get-selected').addEventListener('click', () => {
             const selectedRows = treeTable.getSelectionRows();
-            alert(`选中了 ${selectedRows.length} 行数据`);
+            alert(`Selected ${selectedRows.length} rows`);
         });
 
-        // 监听选择模式变化
+        // Listen for selection mode changes
         document.getElementById('tree-select-mode').addEventListener('change', (event) => {
             const mode = event.target.value;
             treeTable.loadConfig({
@@ -399,7 +392,7 @@
             });
         });
         
-        // 自动调整列宽控制
+        // Auto adjust column width control
         document.getElementById('tree-auto-fit-width').addEventListener('change', (event) => {
             const autoFitWidth = event.target.checked;
             treeTable.loadConfig({
@@ -408,7 +401,7 @@
             treeTable.loadColumns(treeColumns);
         });
 
-        // 添加右键菜单事件处理
+        // Add right-click menu event handling
         treeTable.on('contextMenuClick', (menuItem) => {
             switch (menuItem.value) {
                 case 'selectAll':

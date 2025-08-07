@@ -15,7 +15,7 @@
         "build:docs": "pnpm run copy-dist && cd docs && npm run build",
         "build": "vite build && tsc",
         "preview": "vite preview",
-        "copy-dist": "node copy-dist-files.js"
+        "copy-dist": "node scripts/copy-dist.js"
     },
     "license": "MIT",
     "author": "laichuangwen",
@@ -48,6 +48,7 @@
         "dist"
     ],
     "devDependencies": {
+        "fs-extra": "^11.3.1",
         "typescript": "^5.5.3",
         "vite": "^5.4.1",
         "vite-plugin-css-injected-by-js": "^3.5.2"
