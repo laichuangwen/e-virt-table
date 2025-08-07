@@ -67,8 +67,8 @@ export default class CellHeader extends BaseCell {
         this.maxWidth = column.maxWidth;
         this.type = column.type || '';
         this.editorType = column.editorType || 'text';
-        this.align = column.align || 'center';
-        this.verticalAlign = column.verticalAlign || 'middle';
+        this.align = column.align || this.ctx.config.COLUMNS_ALIGN;
+        this.verticalAlign = column.verticalAlign || this.ctx.config.COLUMNS_VERTICAL_ALIGN;
         this.fixed = column.fixed;
         this.level = column.level || 0;
         this.operation = column.operation || false;

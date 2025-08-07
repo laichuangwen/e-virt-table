@@ -1,5 +1,6 @@
 import { IconType } from './Icons';
 import {
+    Align,
     BeforeAutofillDataMethod,
     BeforeCellValueChangeMethod,
     BeforeCopyMethod,
@@ -23,6 +24,7 @@ import {
     SelectorCellValueType,
     SpanMethod,
     TreeSelectMode,
+    VerticalAlign,
 } from './types';
 import { getCssVar } from './util';
 
@@ -96,6 +98,10 @@ export default class Config {
     ERROR_TIP_ICON_COLOR = 'red';
     /** 错误提示图标大小 */
     ERROR_TIP_ICON_SIZE = 6;
+    /** 所有列对齐方式 */
+    COLUMNS_ALIGN: Align = 'left';
+    /** 所有列垂直对齐方式 */
+    COLUMNS_VERTICAL_ALIGN: VerticalAlign = 'middle';
     /** 是否开启懒加载	 */
     EXPAND_LAZY = true;
     /** 默认展开全部	 */
