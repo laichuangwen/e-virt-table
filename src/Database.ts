@@ -95,9 +95,6 @@ export default class Database {
         this.initData(this.data);
         this.getData();
         this.bufferCheckState.buffer = false;
-        
-        // 计算树形列所需宽度
-        this.calculateTreeColumnWidth();
     }
     /**
      * 清除缓存数据
@@ -1611,73 +1608,6 @@ export default class Database {
             }
         }
         return hasMergeCell;
-    }
-    
-    /**
-     * 计算树形列所需宽度
-     */
-    public calculateTreeColumnWidth() {
-        const { AUTO_FIT_TREE_WIDTH = true } = this.ctx.config;
-        if (!AUTO_FIT_TREE_WIDTH) {
-            return;
-        }
-        
-        // 检查是否有树形列
-        const columns = this.getColumns();
-        const leafColumns = toLeaf(columns);
-        const treeColumns = leafColumns.filter(col => col.type === 'tree' || col.type === 'selection-tree' || col.type === 'tree-selection');
-        
-        if (treeColumns.length === 0) {
-            return;
-        }
-        
-        // 计算最大深度
-        const maxDepth = this.calculateMaxTreeDepth(this.data);
-        
-        // 计算所需宽度
-        const { CELL_PADDING = 0, CHECKBOX_SIZE = 0, TREE_INDENT = 16 } = this.ctx.config;
-        const iconWidth = 20; // 树形图标宽度
-        const levelIndent = TREE_INDENT; // 每层缩进宽度
-        
-        // 基础宽度：padding + 图标宽度 + 间距
-        let baseWidth = CELL_PADDING + iconWidth + 4; // 图标后加4px间距
-        
-        // 对于 selection-tree 和 tree-selection 类型，还需要加上 checkbox 的宽度和间距
-        const hasTreeSelection = treeColumns.some(col => col.type === 'selection-tree' || col.type === 'tree-selection');
-        if (hasTreeSelection) {
-            baseWidth += CHECKBOX_SIZE + 4; // checkbox 宽度 + 间距
-        }
-        
-        // 最大深度所需的缩进宽度
-        const maxIndentWidth = maxDepth * levelIndent;
-        
-        // 总所需宽度 - 增加更多缓冲空间
-        const requiredWidth = baseWidth + maxIndentWidth + 50; // 额外加50px缓冲
-        
-        // 更新树形列的宽度，考虑对齐方式
-        treeColumns.forEach(column => {
-            const currentWidth = column.width || 100;
-            let finalWidth = requiredWidth;
-            
-            // 根据对齐方式调整宽度
-            if (column.align === 'center') {
-                // 居中对齐需要更多宽度来容纳文本
-                finalWidth = Math.max(requiredWidth, 150); // 居中对齐至少150px
-            } else if (column.align === 'left' || column.align === 'right') {
-                // 左对齐或右对齐，使用计算出的宽度
-                finalWidth = requiredWidth;
-            }
-            
-            if (currentWidth < finalWidth) {
-                column.width = finalWidth;
-            }
-        });
-        
-        // 重新设置列配置，确保宽度生效
-        this.setColumns(columns);
-        
-        // 触发重新渲染
-        this.ctx.emit('draw');
     }
     
     /**

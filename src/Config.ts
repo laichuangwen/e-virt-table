@@ -170,8 +170,6 @@ export default class Config {
     ENABLE_SELECTOR = true;
     /** 树形选择模式 */
     TREE_SELECT_MODE: TreeSelectMode = 'auto';
-    /** 自动调整树形列宽度 */
-    AUTO_FIT_TREE_WIDTH = false;
     /** 树形缩进宽度 */
     TREE_INDENT = 20;
     /** 树形图标大小 */
