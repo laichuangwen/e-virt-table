@@ -351,7 +351,8 @@ export default class Cell extends BaseCell {
         let iconHeight = TREE_ICON_SIZE;
         let drawX = this.drawX;
         if (this.align === 'center' || this.align === 'right') {
-            drawX = this.drawX + (this.visibleWidth - iconWidth) / 2;
+            drawX = this.drawX + (this.visibleWidth - iconWidth - 2 * CELL_PADDING) / 2;
+            // 居中对齐，改成左对齐
             this.align = 'left';
         }
         let iconX = drawX + iconOffsetX + CELL_PADDING;
@@ -359,14 +360,14 @@ export default class Cell extends BaseCell {
         let drawTextX = iconOffsetX + this.drawX + iconWidth - 0.5;
         if (this.type === 'selection-tree') {
             // 树形图标在左侧，checkbox 在树形图标右侧
-            iconX = iconOffsetX + this.drawSelectionImageX + this.drawSelectionImageWidth + 2;
-            drawTextX = iconX + 16;
+            iconX = iconOffsetX + this.drawSelectionImageX + this.drawSelectionImageWidth;
+            drawTextX = iconX + iconWidth - CELL_PADDING / 2;
         } else if (this.type === 'tree-selection') {
-            iconX = drawX + iconOffsetX + this.drawTreeImageX + this.drawTreeImageWidth + 2;
-            drawTextX = iconX + CHECKBOX_SIZE + 16;
+            // 树形选择,两个图标宽度，文本已经有CELL_PADDING间距,/2看起来好看些
+            drawTextX = iconX + CHECKBOX_SIZE + iconWidth - CELL_PADDING / 2;
         } else {
-            // 普通tree
-            drawTextX = drawX + iconOffsetX + CELL_PADDING + iconWidth;
+            // 普通tree,文本已经有CELL_PADDING间距,/2看起来好看些
+            drawTextX = iconX + iconWidth - CELL_PADDING / 2;
         }
         // 更改文本距离
         this.drawTextX = drawTextX;
@@ -535,7 +536,7 @@ export default class Cell extends BaseCell {
             const row = this.ctx.database.getRowForRowKey(rowKey);
             const { level = 0 } = row || {};
             const iconOffsetX = level * TREE_INDENT;
-            iconX = drawX + TREE_ICON_SIZE + iconOffsetX + 2; // 树形图标右侧 + 间距
+            iconX = drawX + TREE_ICON_SIZE + iconOffsetX; // 树形图标右侧 + 间距
         }
 
         let checkboxImage: HTMLImageElement | undefined = this.ctx.icons.get('checkbox-uncheck');
