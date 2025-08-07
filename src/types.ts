@@ -121,6 +121,7 @@ export interface Column {
     widthFillDisable?: boolean;
     headerAlign?: Align;
     headerVerticalAlign?: VerticalAlign;
+    hideHeaderSelection?: boolean;
     align?: Align;
     verticalAlign?: VerticalAlign;
     fixed?: Fixed;

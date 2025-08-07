@@ -58,7 +58,8 @@ let columns: Column[] = [
         title: '工号工号工号工号工号工号工号工号工号',
         key: 'emp_no',
         // operation: true,
-        align: 'center',
+        align: 'left',
+        hideHeaderSelection: false,// 隐藏表头选中
         type: 'tree-selection',
         // verticalAlign: 'bottom',
         readonly: false,
