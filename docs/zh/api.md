@@ -31,6 +31,8 @@ type EVirtTableOptions = {
 | WIDTH | 宽度为 0 表示自适应100% | number | 0 |
 | RESIZE_MIN_WIDTH | 最小可调整宽度 | number | 40 |
 | HEIGHT | 高度，高度为 0 表示自适应 | number | 0 |
+| COLUMNS_ALIGN | 全局水平对齐方式 | `"left"`, `"center"`, `"right"` | left |
+| COLUMNS_VERTICAL_ALIGN | 全局垂直对齐方式 | `"top"`, `"middle"`, `"bottom"` | middle |
 | EMPTY_BODY_HEIGHT | 数据为空时表格体的高度 | number | 120 |
 | EMPTY_CUSTOM_STYLE | 自定义空数据样式 | ^[object]`CSSProperties` | — |
 | EMPTY_TEXT | 空数据文本 | string | 暂无数据 |
@@ -243,8 +245,11 @@ type EVirtTableOptions = {
 | width | 列的宽度 | number | 100 |
 | minWidth | 列的最小宽度 | number | —|
 | maxWidth | 列的最大宽度 | number | —|
-| align | 水平对齐方式 | `"left"`, `"center"`, `"right"` | center |
+| headerAlign | 表头水平对齐方式 | `"left"`, `"center"`, `"right"` | left |
+| headerVerticalAlign | 表头垂直对齐方式 | `"top"`, `"middle"`, `"bottom"` | middle |
+| align | 水平对齐方式 | `"left"`, `"center"`, `"right"` | left |
 | verticalAlign | 垂直对齐方式 | `"top"`, `"middle"`, `"bottom"` | middle |
+| hideHeaderSelection | 表头Selection是否隐藏 | boolean | false |
 | fixed | 是否固定列 | `"left"`, `"right"` | — |
 | render | 自定义渲染方法 | string\|Function | — |
 | renderFooter | 自定义渲染底部方法 | string\|Function | — |
