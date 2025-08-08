@@ -278,3 +278,14 @@ V1.2.20
 fix: 废除批量设置值支持只读，变更为通过BEFORE_VALUE_CHANGE_METHOD进行更改，支持只读值更改
 fix: 优化验证逻辑修复非必填时返回错误
 ---
+
+V1.2.21
+### Bug Fixes
+fix: 修复校验器自定义方法
+---
+
+V1.2.22
+### Bug Fixes
+feat: 添加tree-selection和selection-tree类型支持树形选择
+feat: 添加COLUMNS_ALIGN，COLUMNS_VERTICAL_ALIGN 全局可控制
+---
