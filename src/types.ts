@@ -106,6 +106,8 @@ export type SelectionMap = {
     row: any;
 };
 
+export type SortByType = 'number' | 'string' | 'date' | ['date', string] | ((a: any, b: any) => number);
+
 export interface Column {
     key: string;
     title: string;
@@ -130,6 +132,8 @@ export interface Column {
     colspan?: number;
     rowspan?: number;
     sort?: number;
+    sortBy?: SortByType;
+    apiSortable?: boolean;
     hide?: boolean | Function;
     render?: Function | string;
     renderFooter?: Function | string;

@@ -49,6 +49,15 @@ export default class CellHeader extends BaseCell {
     drawSelectionImageHeight = 0;
     drawSelectionImageName = '';
     drawSelectionImageSource: HTMLImageElement | undefined;
+    selectionTextX?: number;
+    selectionTextWidth?: number;
+    // 排序相关
+    sortIconX = 0;
+    sortIconY = 0;
+    sortIconWidth = 0;
+    sortIconHeight = 0;
+    sortIconName = '';
+    sortIconSource: HTMLImageElement | undefined;
     constructor(ctx: Context, colIndex: number, x: number, y: number, width: number, height: number, column: Column) {
         super(ctx, x, y, width, height, 'header', column.fixed);
         this.ctx = ctx;
@@ -134,21 +143,64 @@ export default class CellHeader extends BaseCell {
         this.updateStyle();
     }
     draw() {
+        this.drawEdge();
+        this.drawSelection();
+        this.recalculateTextPosition();
+        this.drawText();
+        this.drawSelector();
+        this.drawSortIcon();
+    }
+    private drawEdge() {
         const {
             paint,
-            config: { BORDER_COLOR, BORDER },
+            config: { BORDER_COLOR,  BORDER },
         } = this.ctx;
-        const { drawX, drawY } = this;
+        
         // 有边框的情况下，绘制边框
-        paint.drawRect(drawX, drawY, this.width, this.height, {
+        paint.drawRect(this.drawX, this.drawY, this.width, this.height, {
             borderColor: BORDER ? BORDER_COLOR : 'transparent',
             fillColor: this.drawCellBgColor,
         });
+    }
+    private recalculateTextPosition() {
+        
+        // 对于 selection 类型的列，文本在复选框右侧显示
+        let textX = this.drawX;
+        let textWidth = this.width;
+        if (['selection', 'index-selection', 'selection-tree', 'tree-selection'].includes(this.type)) {
+            const { CHECKBOX_SIZE } = this.ctx.config;
+            if (this.align === 'left' || this.align === 'right') {
+                textX = this.drawX + CHECKBOX_SIZE + 4;
+                textWidth = this.width - textX + this.drawX;
+            } else {
+                // 复选框居中位置
+                const checkboxCenterX = this.drawX + (this.width - CHECKBOX_SIZE) / 2;
+                textX = checkboxCenterX + CHECKBOX_SIZE + 1; // 复选框右侧，最小间距
+                // 确保文本有足够的显示空间
+                textWidth = this.width - textX + this.drawX;
+            }
+        }
 
-        // 先绘制复选框，再绘制文本
-        this.drawSelection();
-        this.drawText();
-        this.drawSelector();
+        // 如果有排序图标，调整文本位置
+        if (this.column.sortBy || this.column.apiSortable) {
+            const iconSize = 16;
+            const iconMargin = 4;
+
+            if (this.align === 'right') {
+                // 居右时，文本需要为图标留出空间
+                textWidth = this.width - this.ctx.config.CELL_PADDING - iconSize - iconMargin;
+                textX = this.drawX + this.ctx.config.CELL_PADDING;
+            } else if (this.align === 'center') {
+                // 居中时，文本宽度需要考虑图标
+                const textWidthNeeded = this.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
+                const totalWidth = textWidthNeeded + iconSize + iconMargin;
+                if (totalWidth > this.width - this.ctx.config.CELL_PADDING * 2) {
+                    textWidth = this.width - this.ctx.config.CELL_PADDING * 2 - iconSize - iconMargin;
+                }
+            }
+        }
+        this.drawTextX = textX;
+        this.drawTextWidth = textWidth
     }
     private drawText() {
         const {
@@ -189,14 +241,14 @@ export default class CellHeader extends BaseCell {
         if (this.hideHeaderSelection) {
             return;
         }
-        const { width, height, type } = this;
+        
         // 选中框类型
-        if (['index-selection', 'selection', 'selection-tree', 'tree-selection'].includes(type)) {
+        if (['index-selection', 'selection', 'selection-tree', 'tree-selection'].includes(this.type)) {
             const { indeterminate, check, selectable } = this.ctx.database.getCheckedState();
             const { CHECKBOX_SIZE = 0, CELL_PADDING } = this.ctx.config;
             // 默认居中
-            let iconX = this.drawX + (width - CHECKBOX_SIZE) / 2;
-            let iconY = this.drawY + (height - CHECKBOX_SIZE) / 2;
+            let iconX = this.drawX + (this.width - CHECKBOX_SIZE) / 2;
+            let iconY = this.drawY + (this.height - CHECKBOX_SIZE) / 2;
             this.drawTextX = iconX + CHECKBOX_SIZE - CELL_PADDING / 2;
             this.drawTextWidth = this.drawX + this.visibleWidth - this.drawTextX;
             if (this.align === 'left' || this.align === 'right') {
@@ -207,7 +259,7 @@ export default class CellHeader extends BaseCell {
             if (this.verticalAlign === 'top') {
                 iconY = this.drawY + CELL_PADDING / 2;
             } else if (this.verticalAlign === 'bottom') {
-                iconY = this.drawY + height - CHECKBOX_SIZE - CELL_PADDING / 2;
+                iconY = this.drawY + this.height - CHECKBOX_SIZE - CELL_PADDING / 2;
             }
 
             let checkboxImage: HTMLImageElement | undefined = this.ctx.icons.get('checkbox-uncheck');
@@ -218,7 +270,7 @@ export default class CellHeader extends BaseCell {
             } else if (check && selectable) {
                 checkboxImage = this.ctx.icons.get('checkbox-check');
                 checkboxName = 'checkbox-check';
-            } else if (check && selectable) {
+            } else if (check && !selectable) {
                 checkboxImage = this.ctx.icons.get('checkbox-check-disabled');
                 checkboxName = 'checkbox-check-disabled';
             } else if (!check && selectable) {
@@ -246,6 +298,107 @@ export default class CellHeader extends BaseCell {
 
             // 不再需要保存文本位置信息，直接在 draw 方法中计算
         }
+    }
+    private drawSortIcon() {
+        // 如果没有sortBy配置且不是后端排序，不显示排序图标
+        if (!this.column.sortBy && !this.column.apiSortable) {
+            return;
+        }
+
+        const { CELL_PADDING = 0 } = this.ctx.config;
+        const iconSize = 16;
+        const iconMargin = 4;
+
+        let iconName = 'sortable';
+
+        if (this.column.apiSortable) {
+            // 后端排序
+            const sortState = this.ctx.database.getBackendSortState(this.key);
+            if (sortState.direction === 'asc') {
+                iconName = 'sort-backend-asc';
+            } else if (sortState.direction === 'desc') {
+                iconName = 'sort-backend-desc';
+            } else {
+                iconName = 'sortable-backend';
+            }
+        } else {
+            // 前端排序
+            const sortState = this.ctx.database.getSortState(this.key);
+            if (sortState.direction === 'asc') {
+                if (this.column.sortBy === 'number') {
+                    iconName = 'sort-by-number-asc';
+                } else if (this.column.sortBy === 'string') {
+                    iconName = 'sort-by-character-asc';
+                } else if (this.column.sortBy === 'date') {
+                    iconName = 'sort-by-date-asc';
+                } else if (Array.isArray(this.column.sortBy) && this.column.sortBy[0] === 'date') {
+                    iconName = 'sort-by-date-asc';
+                } else if (typeof this.column.sortBy === 'function') {
+                    iconName = 'sort-asc';
+                }
+            } else if (sortState.direction === 'desc') {
+                if (this.column.sortBy === 'number') {
+                    iconName = 'sort-by-number-desc';
+                } else if (this.column.sortBy === 'string') {
+                    iconName = 'sort-by-character-desc';
+                } else if (this.column.sortBy === 'date') {
+                    iconName = 'sort-by-date-desc';
+                } else if (Array.isArray(this.column.sortBy) && this.column.sortBy[0] === 'date') {
+                    iconName = 'sort-by-date-desc';
+                } else if (typeof this.column.sortBy === 'function') {
+                    iconName = 'sort-desc';
+                }
+            }
+        }
+
+        const icon = this.ctx.icons.get(iconName);
+        if (!icon) {
+            return;
+        }
+
+        // 计算图标位置
+        let iconX = 0;
+        let iconY = this.drawY + (this.height - iconSize) / 2;
+
+        if (this.align === 'left') {
+            // 居左：先绘制文字，图标紧跟文字
+            const textWidth = this.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
+            iconX = this.drawX + CELL_PADDING + textWidth + iconMargin;
+        } else if (this.align === 'center') {
+            // 居中：先居中绘制文字，然后图标紧跟文字
+            const textWidth = this.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
+            const textCenterX = this.drawX + this.width / 2;
+            const textStartX = textCenterX - textWidth / 2;
+            iconX = textStartX + textWidth + iconMargin;
+        } else if (this.align === 'right') {
+            // 居右：先绘制图标靠右，然后文字根据图标绘制后的位置紧贴在图标的左侧
+            iconX = this.drawX + this.width - CELL_PADDING - iconSize;
+        }
+
+        // 保存图标信息
+        this.sortIconX = iconX;
+        this.sortIconY = iconY;
+        this.sortIconWidth = iconSize;
+        this.sortIconHeight = iconSize;
+        this.sortIconName = iconName;
+        this.sortIconSource = icon;
+
+        // 绘制图标
+        this.ctx.paint.drawImage(
+            this.sortIconSource,
+            this.sortIconX,
+            this.sortIconY,
+            this.sortIconWidth,
+            this.sortIconHeight,
+        );
+    }
+    private measureTextWidth(text: string, font: string): number {
+        const canvas = this.ctx.canvasElement;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return 0;
+        
+        ctx.font = font;
+        return ctx.measureText(text).width;
     }
     getText() {
         if (this.render) {

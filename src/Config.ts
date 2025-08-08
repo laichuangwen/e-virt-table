@@ -152,6 +152,21 @@ export default class Config {
     CHECKBOX_UNCHECK_SVG = '';
     /** 选择框半选中图标 */
     CHECKBOX_INDETERMINATE_SVG = '';
+
+    // 排序图标配置
+    SORT_CHARACTER_ASC = '';
+    SORT_CHARACTER_DESC = '';
+    SORT_NUMBER_ASC = '';
+    SORT_NUMBER_DESC = '';
+    SORT_DATE_ASC = '';
+    SORT_DATE_DESC = '';
+    SORT_ASC = '';
+    SORT_DESC = '';
+    SORTABLE = '';
+    SORTABLE_BACKEND = '';
+    SORT_BACKEND_ASC = '';
+    SORT_BACKEND_DESC = '';
+
     /** 单元格只读背景色 */
     READONLY_COLOR = '#fff';
     /** 单元格只读文本颜色 */
@@ -218,6 +233,8 @@ export default class Config {
     ENABLE_RESIZE_ROW = true;
     /** 启用列宽可调整 */
     ENABLE_RESIZE_COLUMN = true;
+    /** 启用排序功能 */
+
     /** 行调整线颜色 */
     RESIZE_ROW_LINE_COLOR = '#e1e6eb';
     /** 列调整线颜色 */
