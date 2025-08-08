@@ -24,6 +24,7 @@ import Overlayer from './Overlayer';
 import ContextMenu from './ContextMenu';
 import { mergeColCell, mergeRowCell, getSpanArrByRow, getSpanObjByColumn } from './util';
 import './style.css';
+
 export default class EVirtTable {
     private options: EVirtTableOptions;
     private scroller: Scroller;
@@ -38,9 +39,10 @@ export default class EVirtTable {
     private overlayer: Overlayer;
     private contextMenu: ContextMenu;
     ctx: Context;
+    
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
         this.options = options;
-        const { overlayerElement, editorElement, emptyElement, contextMenuElement } = options;
+        const { overlayerElement, editorElement, emptyElement, contextMenuElement } = this.options;
         const containerElement = this.createContainer(
             target,
             overlayerElement,
@@ -145,8 +147,8 @@ export default class EVirtTable {
         this.ctx.emit('draw');
     }
 
-    setLoading(ladong: boolean) {
-        this.ctx.database.setLoading(ladong);
+    setLoading(loading: boolean) {
+        this.ctx.database.setLoading(loading);
     }
     on(event: string, callback: EventCallback) {
         this.ctx.on(event, callback);

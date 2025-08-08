@@ -283,3 +283,9 @@ V1.2.21
 ### Bug Fixes
 fix: 修复校验器，非必填时自定义校验方法失效
 ---
+
+V1.2.22
+### Bug Fixes
+feat: 添加tree-selection和selection-tree类型支持树形选择
+feat: 添加COLUMNS_ALIGN，COLUMNS_VERTICAL_ALIGN 全局可控制
+---

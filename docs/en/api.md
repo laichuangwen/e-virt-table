@@ -31,6 +31,8 @@ type EVirtTableOptions = {
 | WIDTH | Width (0 means auto fit to 100%) | number | — | 0 |
 | RESIZE_MIN_WIDTH | Minimum resizable width | number | — | 40 |
 | HEIGHT | Height (0 means auto fit) | number | — | 0 |
+| COLUMNS_ALIGN | Horizontal alignment | `"left"`, `"center"`, `"right"` | left |
+| COLUMNS_VERTICAL_ALIGN | Vertical alignment | `"top"`, `"middle"`, `"bottom"` | middle |
 | EMPTY_BODY_HEIGHT | Height of the body when data is empty | number | — | 120 |
 | EMPTY_CUSTOM_STYLE | Custom style for empty data | ^[object]`CSSProperties` | — | — |
 | EMPTY_TEXT | Text for empty data | string | — | No data |
@@ -242,8 +244,11 @@ type EVirtTableOptions = {
 | width | Width of the column | number | — | — |
 | minWidth | Min width of the column | number | —|
 | maxWidth | Max width of the column | number | —|
-| align | Horizontal alignment | string | `"left"`, `"center"`, `"right"` | — |
-| verticalAlign | Vertical alignment | string | `"top"`, `"middle"`, `"bottom"` | — |
+| headerAlign | Header horizontal alignment | `"left"`, `"center"`, `"right"` | left |
+| headerVerticalAlign | Header vertical alignment | `"top"`, `"middle"`, `"bottom"` | middle |
+| align | Cell horizontal alignment | `"left"`, `"center"`, `"right"` | left |
+| verticalAlign | Cell vertical alignment | `"top"`, `"middle"`, `"bottom"` | middle |
+| hideHeaderSelection | Hide selection in header | boolean | false |
 | fixed | Fix the column position | string | `"left"`, `"right"` | — |
 | render | Custom render method | string\|Function | — | — |
 | renderFooter | Custom footer render method | string\|Function | — | — |
