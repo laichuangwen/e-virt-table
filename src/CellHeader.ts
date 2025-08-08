@@ -5,6 +5,7 @@ import BaseCell from './BaseCell';
 import { Rule, Rules } from './Validator';
 export default class CellHeader extends BaseCell {
     align: Align;
+    hideHeaderSelection = false;
     verticalAlign: VerticalAlign = 'middle';
     fixed?: Fixed;
     minWidth?: number;
@@ -36,14 +37,12 @@ export default class CellHeader extends BaseCell {
     drawY = 0;
     visibleWidth = 0;
     visibleHeight = 0;
+    drawTextX = 0;
+    drawTextY = 0;
+    drawTextWidth = 0;
+    drawTextHeight = 0;
     drawCellBgColor = '';
     drawTextColor = '';
-    drawImageX = 0;
-    drawImageY = 0;
-    drawImageWidth = 0;
-    drawImageHeight = 0;
-    drawImageName = '';
-    drawImageSource: HTMLImageElement | undefined;
     drawSelectionImageX = 0;
     drawSelectionImageY = 0;
     drawSelectionImageWidth = 0;
@@ -67,8 +66,10 @@ export default class CellHeader extends BaseCell {
         this.maxWidth = column.maxWidth;
         this.type = column.type || '';
         this.editorType = column.editorType || 'text';
-        this.align = column.align || 'center';
-        this.verticalAlign = column.verticalAlign || 'middle';
+        this.hideHeaderSelection = column.hideHeaderSelection || false;
+        this.align = column.headerAlign || column.align || this.ctx.config.COLUMNS_ALIGN;
+        this.verticalAlign =
+            column.headerVerticalAlign || column.verticalAlign || this.ctx.config.COLUMNS_VERTICAL_ALIGN;
         this.fixed = column.fixed;
         this.level = column.level || 0;
         this.operation = column.operation || false;
@@ -128,14 +129,18 @@ export default class CellHeader extends BaseCell {
         this.displayText = this.getText();
         this.drawX = this.getDrawX();
         this.drawY = this.getDrawY();
+        this.drawTextX = this.drawX;
+        this.drawTextY = this.drawY;
+        this.drawTextWidth = this.width;
+        this.drawTextHeight = this.height;
         this.updateStyle();
     }
     draw() {
         const {
             paint,
-            config: { BORDER_COLOR, HEADER_FONT, BORDER, CELL_PADDING },
+            config: { BORDER_COLOR, BORDER },
         } = this.ctx;
-        const { drawX, drawY, displayText } = this;
+        const { drawX, drawY } = this;
         // 有边框的情况下，绘制边框
         paint.drawRect(drawX, drawY, this.width, this.height, {
             borderColor: BORDER ? BORDER_COLOR : 'transparent',
@@ -144,33 +149,28 @@ export default class CellHeader extends BaseCell {
 
         // 先绘制复选框，再绘制文本
         this.drawSelection();
-
-        // 对于 selection 类型的列，文本在复选框右侧显示
-        let textX = drawX;
-        let textWidth = this.width;
-        if (['selection', 'index-selection', 'selection-tree', 'tree-selection'].includes(this.type)) {
-            const { CHECKBOX_SIZE } = this.ctx.config;
-            if (this.align === 'left' || this.align === 'right') {
-                textX = drawX + CHECKBOX_SIZE + 4;
-                textWidth = this.width - textX + drawX;
-            } else {
-                // 复选框居中位置
-                const checkboxCenterX = drawX + (this.width - CHECKBOX_SIZE) / 2;
-                textX = checkboxCenterX + CHECKBOX_SIZE + 1; // 复选框右侧，最小间距
-                // 确保文本有足够的显示空间
-                textWidth = this.width - textX + drawX;
-            }
-        }
-
-        this.ellipsis = paint.drawText(displayText, textX, drawY, textWidth, this.height, {
-            font: HEADER_FONT,
-            padding: CELL_PADDING, // 减少 padding，让文本有更多空间
-            color: this.drawTextColor,
-            align: this.align, // 使用动态对齐方式
-            verticalAlign: this.verticalAlign,
-        });
-
+        this.drawText();
         this.drawSelector();
+    }
+    private drawText() {
+        const {
+            paint,
+            config: { HEADER_FONT, CELL_PADDING },
+        } = this.ctx;
+        this.ellipsis = paint.drawText(
+            this.displayText,
+            this.drawTextX,
+            this.drawTextY,
+            this.drawTextWidth,
+            this.drawTextHeight,
+            {
+                font: HEADER_FONT,
+                padding: CELL_PADDING,
+                color: this.drawTextColor,
+                align: this.align,
+                verticalAlign: this.verticalAlign,
+            },
+        );
     }
     private drawSelector() {
         // 选择区背景颜色
@@ -188,21 +188,28 @@ export default class CellHeader extends BaseCell {
         }
     }
     private drawSelection() {
+        if (this.hideHeaderSelection) {
+            return;
+        }
         const { width, height, type } = this;
         // 选中框类型
         if (['index-selection', 'selection', 'selection-tree', 'tree-selection'].includes(type)) {
             const { indeterminate, check, selectable } = this.ctx.database.getCheckedState();
             const { CHECKBOX_SIZE = 0, CELL_PADDING } = this.ctx.config;
             // 默认居中
-            let _x = this.drawX + (width - CHECKBOX_SIZE) / 2;
-            let _y = this.drawY + (height - CHECKBOX_SIZE) / 2;
+            let iconX = this.drawX + (width - CHECKBOX_SIZE) / 2;
+            let iconY = this.drawY + (height - CHECKBOX_SIZE) / 2;
+            this.drawTextX = iconX + CHECKBOX_SIZE - CELL_PADDING / 2;
+            this.drawTextWidth = this.drawX + this.visibleWidth - this.drawTextX;
             if (this.align === 'left' || this.align === 'right') {
-                _x = this.drawX + CELL_PADDING;
+                iconX = this.drawX + CELL_PADDING;
+                this.drawTextX = iconX + CHECKBOX_SIZE - CELL_PADDING / 2;
+                this.drawTextWidth = this.drawX + this.visibleWidth - this.drawTextX;
             }
             if (this.verticalAlign === 'top') {
-                _y = this.drawY + CELL_PADDING / 2;
+                iconY = this.drawY + CELL_PADDING / 2;
             } else if (this.verticalAlign === 'bottom') {
-                _y = this.drawY + height - CHECKBOX_SIZE - CELL_PADDING / 2;
+                iconY = this.drawY + height - CHECKBOX_SIZE - CELL_PADDING / 2;
             }
 
             let checkboxImage: HTMLImageElement | undefined = this.ctx.icons.get('checkbox-uncheck');
@@ -224,8 +231,8 @@ export default class CellHeader extends BaseCell {
                 checkboxName = 'checkbox-disabled';
             }
             if (checkboxImage) {
-                this.drawSelectionImageX = _x;
-                this.drawSelectionImageY = _y;
+                this.drawSelectionImageX = iconX;
+                this.drawSelectionImageY = iconY;
                 this.drawSelectionImageWidth = CHECKBOX_SIZE;
                 this.drawSelectionImageHeight = CHECKBOX_SIZE;
                 this.drawSelectionImageName = checkboxName;
