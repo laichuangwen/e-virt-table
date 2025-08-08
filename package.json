@@ -10,9 +10,9 @@
     "scripts": {
         "dev": "vite",
         "dev:install": "cd docs && npm install",
-        "dev:docs": "pnpm build && pnpm copy-dist && cd docs && pnpm run dev",
+        "dev:docs": "npm run build && npm run copy-dist && cd docs && npm run dev",
         "install:docs": "cd docs && npm install",
-        "build:docs": "pnpm run copy-dist && cd docs && npm run build",
+        "build:docs": "cd docs && npm run build",
         "build": "vite build && tsc",
         "preview": "vite preview",
         "copy-dist": "node scripts/copy-dist.js"
