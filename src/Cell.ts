@@ -63,12 +63,8 @@ export default class Cell extends BaseCell {
     drawTextColor = '';
     drawTextX = 0;
     drawTextY = 0;
-    drawImageX = 0;
-    drawImageY = 0;
-    drawImageWidth = 0;
-    drawImageHeight = 0;
-    drawImageName = '';
-    drawImageSource?: HTMLImageElement;
+    drawTextWidth = 0;
+    drawTextHeight = 0;
     // 画tree图标
     drawTreeImageX = 0;
     drawTreeImageY = 0;
@@ -122,8 +118,8 @@ export default class Cell extends BaseCell {
             column.selectorCellValueType || this.ctx.config.SELECTOR_CELL_VALUE_TYPE || 'value';
         this.editorProps = column.editorProps || {};
         this.cellType = cellType;
-        this.align = column.align || 'center';
-        this.verticalAlign = column.verticalAlign || 'middle';
+        this.align = column.align || this.ctx.config.COLUMNS_ALIGN;
+        this.verticalAlign = column.verticalAlign || this.ctx.config.COLUMNS_VERTICAL_ALIGN;
         this.fixed = column.fixed;
         this.level = column.level || 0;
         this.operation = column.operation || false;
@@ -164,21 +160,13 @@ export default class Cell extends BaseCell {
         this.drawTextY = this.drawY;
         this.isHasChanged = this.ctx.database.isHasChangedData(this.rowKey, this.key);
         this.updateSpan();
+        this.drawTextWidth = this.visibleWidth;
+        this.drawTextHeight = this.visibleHeight;
         this.updateStyle();
         this.updateType();
         this.updateHoverIcon();
         this.updateSelection();
         this.updateTree();
-        // 根据类型决定渲染顺序
-        // if (this.type === 'tree-selection') {
-        //     // tree-selection: 先渲染树形图标，再渲染勾选框
-        //     this.updateTree();
-        //     this.updateSelection();
-        // } else {
-        //     // 其他类型: 先渲染勾选框，再渲染树形图标
-        //     this.updateSelection();
-        //     this.updateTree();
-        // }
         this.updateEditor();
         this.updateRender();
         this.getValidationMessage();
@@ -355,23 +343,38 @@ export default class Cell extends BaseCell {
 
         let iconWidth = TREE_ICON_SIZE;
         let iconHeight = TREE_ICON_SIZE;
-        let iconX = this.drawX + iconOffsetX + CELL_PADDING;
+        let drawX = this.drawX;
+        if (this.align === 'center' || this.align === 'right') {
+            drawX = this.drawX + (this.visibleWidth - iconWidth - 2 * CELL_PADDING) / 2;
+            // 居中对齐，改成左对齐
+            this.align = 'left';
+        }
+        let iconX = drawX + iconOffsetX + CELL_PADDING;
         let iconY = this.drawY + (this.visibleHeight - iconHeight) / 2;
         let drawTextX = iconOffsetX + this.drawX + iconWidth - 0.5;
         if (this.type === 'selection-tree') {
             // 树形图标在左侧，checkbox 在树形图标右侧
-            iconX = iconOffsetX + this.drawSelectionImageX + this.drawSelectionImageWidth + 2;
-            drawTextX = iconX + 16;
+            iconX = iconOffsetX + this.drawSelectionImageX + this.drawSelectionImageWidth;
+            drawTextX = iconX + iconWidth - CELL_PADDING / 2;
         } else if (this.type === 'tree-selection') {
-            iconX = this.drawX + iconOffsetX + this.drawTreeImageX + this.drawTreeImageWidth + 2;
-            drawTextX = iconX + CHECKBOX_SIZE + 16;
+            // 树形选择,两个图标宽度，文本已经有CELL_PADDING间距,/2看起来好看些
+            drawTextX = iconX + CHECKBOX_SIZE + iconWidth - CELL_PADDING / 2;
         } else {
-            // 普通tree
-            drawTextX = this.drawX + iconOffsetX + CELL_PADDING + iconWidth;
+            // 普通tree,文本已经有CELL_PADDING间距,/2看起来好看些
+            drawTextX = iconX + iconWidth - CELL_PADDING / 2;
+        }
+        // 更改文本距离
+        this.drawTextX = drawTextX;
+        this.drawTextWidth = this.drawX + this.visibleWidth - drawTextX; // 减去树形图标的宽度
+        // 判断是否溢出格子
+        if (iconX + iconWidth + CELL_PADDING > this.drawX + this.visibleWidth) {
+            return;
+        }
+        if (iconY + iconHeight + CELL_PADDING > this.drawY + this.visibleHeight) {
+            return;
         }
 
         if (icon) {
-            // this.ctx.paint.drawImage(icon, iconX, iconY, iconWidth, iconHeight);
             this.drawTreeImageX = iconX;
             this.drawTreeImageY = iconY;
             this.drawTreeImageWidth = iconWidth;
@@ -379,8 +382,6 @@ export default class Cell extends BaseCell {
             this.drawTreeImageName = iconName;
             this.drawTreeImageSource = icon;
         }
-        // 更改文本距离
-        this.drawTextX = drawTextX;
     }
 
     private updateContainer() {
@@ -514,24 +515,22 @@ export default class Cell extends BaseCell {
         }
         const selectable = this.ctx.database.getRowSelectable(rowKey);
         const { CHECKBOX_SIZE = 0, CELL_PADDING } = this.ctx.config;
-        let _x = this.drawX + (visibleWidth - CHECKBOX_SIZE) / 2;
-        let _y = this.drawY + (visibleHeight - CHECKBOX_SIZE) / 2;
-        // 只能左对齐及居中对齐
-        if (this.align === 'left' || this.align === 'right') {
-            _x = this.drawX + CELL_PADDING / 2;
+        let drawX = this.drawX + CELL_PADDING;
+        if (this.align === 'center' || this.align === 'right') {
+            drawX = this.drawX + (visibleWidth - CHECKBOX_SIZE) / 2;
         }
+        let iconX = drawX;
+        let iconY = this.drawY + (visibleHeight - CHECKBOX_SIZE) / 2;
 
         // 对于 selection-tree 类型，checkbox 应该居中显示
         if (type === 'selection-tree') {
-            // 保持居中显示，不改变 _x 和 _y 的计算
         } else if (type === 'tree-selection') {
             // 更新选择器的位置
-            const { TREE_INDENT = 16, CHECKBOX_SIZE, TREE_ICON_SIZE } = this.ctx.config;
+            const { TREE_INDENT = 16, TREE_ICON_SIZE } = this.ctx.config;
             const row = this.ctx.database.getRowForRowKey(rowKey);
             const { level = 0 } = row || {};
             const iconOffsetX = level * TREE_INDENT;
-            _x = this.drawX + TREE_ICON_SIZE + iconOffsetX + 2; // 树形图标右侧 + 间距
-            _y = this.drawY + (visibleHeight - CHECKBOX_SIZE) / 2;
+            iconX = drawX + TREE_ICON_SIZE + iconOffsetX; // 树形图标右侧 + 间距
         }
 
         let checkboxImage: HTMLImageElement | undefined = this.ctx.icons.get('checkbox-uncheck');
@@ -570,22 +569,28 @@ export default class Cell extends BaseCell {
                 checkboxName = 'checkbox-disabled';
             }
         }
-
+        // 判断是否溢出格子
+        if (iconX + CHECKBOX_SIZE + CELL_PADDING > this.drawX + this.visibleWidth) {
+            return;
+        }
+        if (iconY + CHECKBOX_SIZE + CELL_PADDING > this.drawY + this.visibleHeight) {
+            return;
+        }
         if (type === 'index-selection') {
             if (
                 (this.ctx.hoverCell && this.ctx.hoverCell.rowIndex === rowIndex) ||
                 ['checkbox-disabled', 'checkbox-check'].includes(checkboxName)
             ) {
-                this.drawSelectionImageX = _x;
-                this.drawSelectionImageY = _y;
+                this.drawSelectionImageX = iconX;
+                this.drawSelectionImageY = iconY;
                 this.drawSelectionImageWidth = CHECKBOX_SIZE;
                 this.drawSelectionImageHeight = CHECKBOX_SIZE;
                 this.drawSelectionImageName = checkboxName;
                 this.drawSelectionImageSource = checkboxImage;
             }
         } else {
-            this.drawSelectionImageX = _x;
-            this.drawSelectionImageY = _y;
+            this.drawSelectionImageX = iconX;
+            this.drawSelectionImageY = iconY;
             this.drawSelectionImageWidth = CHECKBOX_SIZE;
             this.drawSelectionImageHeight = CHECKBOX_SIZE;
             this.drawSelectionImageName = checkboxName;
@@ -857,12 +862,12 @@ export default class Cell extends BaseCell {
     }
     private drawText() {
         const { CELL_PADDING, BODY_FONT, PLACEHOLDER_COLOR } = this.ctx.config;
-        let visibleWidth = this.visibleWidth;
-        if (this.type === 'tree' || this.type === 'selection-tree' || this.type === 'tree-selection') {
-            const offsetIconX = this.drawTextX - this.drawX;
-            visibleWidth = this.visibleWidth - offsetIconX; // 减去图标的宽度
-        }
-        const { ellipsis } = this.ctx.paint.handleEllipsis(this.displayText, visibleWidth, CELL_PADDING, BODY_FONT);
+        const { ellipsis } = this.ctx.paint.handleEllipsis(
+            this.displayText,
+            this.drawTextWidth,
+            CELL_PADDING,
+            BODY_FONT,
+        );
         this.ellipsis = ellipsis;
         const { placeholder } = this.column;
         let text = this.displayText;
@@ -879,13 +884,10 @@ export default class Cell extends BaseCell {
             text = placeholder;
             color = PLACEHOLDER_COLOR;
         }
-        return this.ctx.paint.drawText(text, this.drawTextX, this.drawTextY, visibleWidth, this.visibleHeight, {
+        return this.ctx.paint.drawText(text, this.drawTextX, this.drawTextY, this.drawTextWidth, this.drawTextHeight, {
             font: BODY_FONT,
             padding: CELL_PADDING,
-            align:
-                this.type === 'tree' || this.type === 'selection-tree' || this.type === 'tree-selection'
-                    ? 'left'
-                    : this.align,
+            align: this.align,
             verticalAlign: this.verticalAlign,
             color,
         });

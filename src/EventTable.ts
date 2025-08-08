@@ -160,7 +160,6 @@ export default class EventTable {
                 this.ctx.body.renderRows,
                 (cell: Cell) => {
                     // selection移入移除事件
-                    this.selectionEnterAndLeave(cell, e);
                     //  this.ctx.emit("visibleCellHoverChange", cell, e);
                     if (this.visibleHoverCell !== cell) {
                         this.ctx.emit('visibleCellMouseleave', cell, e);
@@ -320,6 +319,13 @@ export default class EventTable {
         ) {
             this.ctx.stageElement.style.cursor = 'pointer';
             this.ctx.isPointer = true;
+            if (cell instanceof Cell) {
+                // body cell 需要处理是否禁用
+                const selectable = this.ctx.database.getRowSelectable(cell.rowKey);
+                if (!selectable) {
+                    this.ctx.stageElement.style.cursor = 'not-allowed';
+                }
+            }
             return;
         }
         // 检查hover图标
@@ -346,31 +352,6 @@ export default class EventTable {
                 this.ctx.stageElement.style.cursor = 'pointer';
                 this.ctx.isPointer = true;
                 return;
-            }
-        }
-    }
-    private selectionEnterAndLeave(cell: Cell | CellHeader, e: MouseEvent) {
-        const { offsetY, offsetX } = this.ctx.getOffset(e);
-        const y = offsetY;
-        const x = offsetX;
-        if (
-            x > cell.drawImageX &&
-            x < cell.drawImageX + cell.drawImageWidth &&
-            y > cell.drawImageY &&
-            y < cell.drawImageY + cell.drawImageHeight
-        ) {
-            // body cell 选中图标
-            if (
-                cell instanceof Cell &&
-                ['selection', 'index-selection', 'selection-tree', 'tree-selection'].includes(cell.type)
-            ) {
-                this.ctx.stageElement.style.cursor = 'pointer';
-                this.ctx.isPointer = true;
-                // body cell 需要处理是否可选
-                const selectable = this.ctx.database.getRowSelectable(cell.rowKey);
-                if (!selectable) {
-                    this.ctx.stageElement.style.cursor = 'not-allowed';
-                }
             }
         }
     }
