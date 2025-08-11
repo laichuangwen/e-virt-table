@@ -174,6 +174,8 @@ export default class Config {
     TREE_INDENT = 20;
     /** 树形图标大小 */
     TREE_ICON_SIZE = 20;
+    /**树形划线 */
+    TREE_LINE = false;
     /** 启用单点击立马编辑 */
     ENABLE_EDIT_SINGLE_CLICK = false;
     /** 启用点击选择器编辑 */

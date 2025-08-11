@@ -382,8 +382,14 @@ export default class Cell extends BaseCell {
             this.drawTreeImageName = iconName;
             this.drawTreeImageSource = icon;
         }
+        this.drawTreeLine();
     }
-
+    private drawTreeLine() {
+        const { TREE_LINE } = this.ctx.config;
+        if (TREE_LINE) {
+            //todo
+        }
+    }
     private updateContainer() {
         const {
             BODY_BG_COLOR,
