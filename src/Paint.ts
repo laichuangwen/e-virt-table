@@ -251,6 +251,13 @@ export class Paint {
             };
         }
         const ellipsesWidth = this.ctx.measureText('...').width;
+        // 如果宽度小于省略号宽度，则不进行省略，直接返回空字符串
+        if (width <= ellipsesWidth + padding * 2) {
+            return {
+                _text: '',
+                ellipsis: true,
+            };
+        }
         const textWidth = this.ctx.measureText(text).width;
 
         if (textWidth && textWidth + ellipsesWidth >= width - padding * 2) {

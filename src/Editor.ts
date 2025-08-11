@@ -159,6 +159,10 @@ export default class Editor {
             if (this.ctx.adjustPositioning) {
                 return;
             }
+            // 如果是选择器，不进入编辑模式
+            if (this.ctx.isPointer) {
+                return;
+            }
             // 不在区域内
             if (!this.isInSelectorRange(cell.rowIndex, cell.colIndex)) {
                 return;

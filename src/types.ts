@@ -39,7 +39,7 @@ export type OverflowTooltipPlacement =
 export type VerticalAlign = 'top' | 'middle' | 'bottom';
 export type Align = 'left' | 'center' | 'right';
 export type Fixed = 'left' | 'right';
-export type Type = 'index' | 'selection' | 'index-selection' | 'tree' | 'number';
+export type Type = 'index' | 'selection' | 'index-selection' | 'tree' | 'selection-tree' | 'tree-selection' | 'number';
 
 export type TypeCheckbox =
     | 'checkbox-uncheck'
@@ -119,6 +119,9 @@ export interface Column {
     minWidth?: number;
     maxWidth?: number;
     widthFillDisable?: boolean;
+    headerAlign?: Align;
+    headerVerticalAlign?: VerticalAlign;
+    hideHeaderSelection?: boolean;
     align?: Align;
     verticalAlign?: VerticalAlign;
     fixed?: Fixed;
@@ -147,6 +150,8 @@ export interface Column {
 }
 export type HistoryAction = 'back' | 'forward' | 'none';
 export type SelectorCellValueType = 'displayText' | 'value';
+
+export type TreeSelectMode = 'auto' | 'cautious' | 'strictly';
 export type OverlayerTooltip = {
     style: any;
     text: string;
