@@ -374,24 +374,23 @@ export default class Cell extends BaseCell {
             return;
         }
 
+        // 不论是否需要绘制图标，都更新图标的“基准位置”，供树线使用
+        this.drawTreeImageX = iconX;
+        this.drawTreeImageY = iconY;
+        this.drawTreeImageWidth = iconWidth;
+        this.drawTreeImageHeight = iconHeight;
         if (icon) {
-            this.drawTreeImageX = iconX;
-            this.drawTreeImageY = iconY;
-            this.drawTreeImageWidth = iconWidth;
-            this.drawTreeImageHeight = iconHeight;
             this.drawTreeImageName = iconName;
             this.drawTreeImageSource = icon;
+        } else {
+            this.drawTreeImageName = '';
+            this.drawTreeImageSource = undefined;
         }
         // 树连线仅在绘制阶段调用，避免在 update 阶段被清屏
     }
     private drawTreeLine() {
-        const {
-            TREE_LINE,
-            TREE_INDENT = 16,
-            TREE_ICON_SIZE = 16,
-            CELL_PADDING = 8,
-            BORDER_COLOR = '#e1e6eb',
-        } = this.ctx.config as any;
+        const { TREE_LINE, TREE_INDENT = 16, TREE_ICON_SIZE = 16, BORDER_COLOR = '#e1e6eb' } =
+            this.ctx.config as any;
         // 仅 body 且树类型才绘制
         if (!TREE_LINE || this.cellType !== 'body') return;
         if (!['tree', 'selection-tree', 'tree-selection'].includes(this.type)) return;
@@ -404,12 +403,9 @@ export default class Cell extends BaseCell {
         const iconCenterX = this.drawTreeImageX + this.drawTreeImageWidth / 2;
         const iconCenterY = this.drawTreeImageY + this.drawTreeImageHeight / 2;
 
-        // 计算缩进基准点
-        let baseX = this.drawX + CELL_PADDING;
-        if (this.type === 'selection-tree') {
-            // selection-tree 时，复选框在最左侧，树图标在其右侧，基准点为复选框右侧
-            baseX = this.drawSelectionImageX + this.drawSelectionImageWidth;
-        }
+        // 基于已计算的树图标位置反推基准点：当前图标左侧减去 level * TREE_INDENT
+        // 这样无论对齐方式如何（left/center/right），都以实际图标为基准定位所有竖线
+        let baseX = this.drawTreeImageX - level * TREE_INDENT;
 
         // 逐层画竖线（仅当 level > 0 才需要祖先连线）
         const parentRowKeys: string[] = Array.isArray(row.parentRowKeys) ? row.parentRowKeys : [];
@@ -423,7 +419,8 @@ export default class Cell extends BaseCell {
                 const nextRow = nextKey ? this.ctx.database.getRowForRowKey(nextKey) || {} : {};
                 const nextIsLast = !!nextRow.isLastChild;
                 if (nextIsLast) continue;
-                const vx = Math.round(baseX + i * TREE_INDENT + TREE_ICON_SIZE / 2);
+                // 以当前树图标 X 为基准向左回推
+                const vx = Math.round(this.drawTreeImageX - (level - i) * TREE_INDENT + TREE_ICON_SIZE / 2);
                 this.ctx.paint.drawLine([vx, this.drawY, vx, this.drawY + this.visibleHeight], {
                     borderColor: BORDER_COLOR,
                     borderWidth: 1,
@@ -432,7 +429,7 @@ export default class Cell extends BaseCell {
                 });
             }
             // 父层（level-1）：无论父是不是末尾，都需要连接当前节点形成 L 型
-            const vxParent = Math.round(baseX + (level - 1) * TREE_INDENT + TREE_ICON_SIZE / 2);
+            const vxParent = Math.round(this.drawTreeImageX - TREE_INDENT + TREE_ICON_SIZE / 2);
             const toCenter = !!row.isLastChild;
             const y2 = toCenter ? iconCenterY : this.drawY + this.visibleHeight;
             this.ctx.paint.drawLine([vxParent, this.drawY, vxParent, y2], {
