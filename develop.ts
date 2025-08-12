@@ -45,6 +45,7 @@ let columns: Column[] = [
     {
         title: '工号',
         key: 'emp_no',
+        align: 'left',
         // operation: true,
         readonly: true,
         width: 120,
@@ -404,7 +405,6 @@ for (let i = 0; i < 1000; i += 1) {
                 emp_no: `${i}-1`,
                 emp_name: `张三${i}-1`,
                 children: [],
-                _hasChildren: true,
             },
             {
                 id: `${i}-2`,
@@ -416,7 +416,25 @@ for (let i = 0; i < 1000; i += 1) {
                         emp_no: `${i}-2-1`,
                         emp_name: `张三${i}-2-1`,
                         children: [],
-                        _hasChildren: true,
+                    },
+                    {
+                        id: `${i}-2-2`,
+                        emp_no: `${i}-2-2`,
+                        emp_name: `张三${i}-2-2`,
+                        children: [
+                            {
+                                id: `${i}-2-2-1`,
+                                emp_no: `${i}-2-2-1`,
+                                emp_name: `张三${i}-2-2-1`,
+                                children: [],
+                            },
+                        ],
+                    },
+                    {
+                        id: `${i}-2-3`,
+                        emp_no: `${i}-2-3`,
+                        emp_name: `张三${i}-2-3`,
+                        children: [],
                     },
                 ],
             },
@@ -456,6 +474,7 @@ const eVirtTable = new EVirtTable(canvas, {
         ICONS: [],
         BORDER: true,
         STRIPE: false,
+        TREE_LINE: true,
         // DISABLED: true,
         // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
