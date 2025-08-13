@@ -44,6 +44,7 @@
     --evt-tooltip-text-color: #fff;
     --evt-resize-row-line-color: #e1e6eb;
     --evt-resize-column-line-color: #e1e6eb;
+    --evt-tree-line-color: #e1e6eb;
 }
 .dark {
     --evt-border-color: #363637;

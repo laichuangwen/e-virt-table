@@ -68,8 +68,11 @@ export default class Config {
     MAX_HEIGHT = 1000;
     /** 区域边框圆角 */
     BORDER_RADIUS = 8;
+    /** 启用偏移高度内部计算表格高度 */
     ENABLE_OFFSET_HEIGHT = false;
+    /** 偏移高度 */
     OFFSET_HEIGHT = 0;
+    /** 表头高度 */
     HEADER_HEIGHT = 36;
     /** 启用头部固定,需要外面实现覆盖层，或者所有表头都要是元素 */
     ENABLE_HEADER_STICKY = false;
@@ -176,6 +179,8 @@ export default class Config {
     TREE_ICON_SIZE = 20;
     /**树形划线 */
     TREE_LINE = false;
+    /** 树形划线颜色 */
+    TREE_LINE_COLOR = '#e1e6eb';
     /** 启用单点击立马编辑 */
     ENABLE_EDIT_SINGLE_CLICK = false;
     /** 启用点击选择器编辑 */
@@ -312,7 +317,9 @@ export default class Config {
             if (key.endsWith('_COLOR') || key.endsWith('_FONT')) {
                 const cssKey = `--evt-${key.toLocaleLowerCase().replace(/_/g, '-')}`;
                 const val = getCssVar(cssKey);
-                obj[key] = val;
+                if (val) {
+                    obj[key] = val;
+                }
             }
         });
         Object.assign(this, obj, this._config);

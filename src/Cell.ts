@@ -389,8 +389,8 @@ export default class Cell extends BaseCell {
         // 树连线仅在绘制阶段调用，避免在 update 阶段被清屏
     }
     private drawTreeLine() {
-        const { TREE_LINE, TREE_INDENT = 16, TREE_ICON_SIZE = 16, BORDER_COLOR = '#e1e6eb' } =
-            this.ctx.config as any;
+        const { TREE_LINE, TREE_INDENT = 16, TREE_ICON_SIZE = 16, TREE_LINE_COLOR = '#e1e6eb' } =
+            this.ctx.config;
         // 仅 body 且树类型才绘制
         if (!TREE_LINE || this.cellType !== 'body') return;
         if (!['tree', 'selection-tree', 'tree-selection'].includes(this.type)) return;
@@ -422,7 +422,7 @@ export default class Cell extends BaseCell {
                 // 以当前树图标 X 为基准向左回推
                 const vx = Math.round(this.drawTreeImageX - (level - i) * TREE_INDENT + TREE_ICON_SIZE / 2);
                 this.ctx.paint.drawLine([vx, this.drawY, vx, this.drawY + this.visibleHeight], {
-                    borderColor: BORDER_COLOR,
+                    borderColor: TREE_LINE_COLOR,
                     borderWidth: 1,
                     lineDash: [4, 4],
                     lineDashOffset: 0,
@@ -433,7 +433,7 @@ export default class Cell extends BaseCell {
             const toCenter = !!row.isLastChild;
             const y2 = toCenter ? iconCenterY : this.drawY + this.visibleHeight;
             this.ctx.paint.drawLine([vxParent, this.drawY, vxParent, y2], {
-                borderColor: BORDER_COLOR,
+                borderColor: TREE_LINE_COLOR,
                 borderWidth: 1,
                 lineDash: [4, 4],
                 lineDashOffset: 0,
@@ -441,7 +441,7 @@ export default class Cell extends BaseCell {
             // 当前层的横线：从当前层竖线到图标中心
             const currVX = Math.round(baseX + (level - 1) * TREE_INDENT + TREE_ICON_SIZE / 2);
             this.ctx.paint.drawLine([currVX, iconCenterY, iconCenterX, iconCenterY], {
-                borderColor: BORDER_COLOR,
+                borderColor: TREE_LINE_COLOR,
                 borderWidth: 1,
                 lineDash: [4, 4],
                 lineDashOffset: 0,
@@ -453,7 +453,7 @@ export default class Cell extends BaseCell {
             const shortTop = this.drawTreeImageY + this.drawTreeImageHeight;
             const shortBottom = shortTop + Math.min(this.visibleHeight / 2, Math.max(8, TREE_ICON_SIZE / 2));
             this.ctx.paint.drawLine([iconCenterX, shortTop, iconCenterX, shortBottom], {
-                borderColor: BORDER_COLOR,
+                borderColor: TREE_LINE_COLOR,
                 borderWidth: 1,
                 lineDash: [4, 4],
                 lineDashOffset: 0,
