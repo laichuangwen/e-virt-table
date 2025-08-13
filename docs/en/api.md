@@ -52,6 +52,9 @@ type EVirtTableOptions = {
 | ERROR_TIP_ICON_COLOR | Error tip color | string | — | red |
 | ERROR_TIP_ICON_SIZE | Error tip icon size | number | — | 6 |
 | DEFAULT_EXPAND_ALL | Default tree expansion all | boolean | — | false |
+| TREE_INDENT        | Tree indent width         | number   | 20        |
+| TREE_LINE          | Show tree hierarchy lines | boolean  | false     |
+| TREE_LINE_COLOR    | Tree line color           | string   | '#e1e6eb' |
 | CELL_WIDTH | Cell width | number | — | 100 |
 | CELL_HEIGHT | Cell height | number | — | 36 |
 | CELL_PADDING | Padding of the table body | number | — | 8 |

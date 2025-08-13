@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tree Selection - Cautious Mode</title>
+    <title>Tree Selection - Auto Mode</title>
 </head>
 <body>
     <div id="e-virt-table"></div>
@@ -52,7 +52,7 @@
     let columns = [
         {
             title: 'ID',
-            type: 'selection-tree',
+            type: 'tree-selection',
             key: 'id',
             width: 100,
             readonly: true
@@ -70,7 +70,7 @@
         data,
         columns,
         config: {
-            TREE_SELECT_MODE: 'cautious', // auto | cautious | strictly
+            TREE_SELECT_MODE: 'auto', // auto | cautious | strictly
             ROW_KEY: 'id',
             ENABLE_SELECTOR: true,
             HEIGHT: 300

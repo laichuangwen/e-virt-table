@@ -1,150 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tree Selection - Advanced Example</title>
-    <style>
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        .header {
-            background: #2c3e50;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        .content {
-            padding: 20px;
-        }
-        .controls {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            border: 1px solid #e9ecef;
-        }
-        .controls button {
-            margin-right: 10px;
-            padding: 8px 16px;
-            border: 1px solid #007bff;
-            background: #007bff;
-            color: white;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .controls button:hover {
-            background: #0056b3;
-        }
-        .controls select {
-            padding: 8px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            margin-right: 10px;
-        }
-        .controls label {
-            margin-left: 10px;
-            font-size: 14px;
-        }
-        .table-container {
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-        .info {
-            margin-top: 20px;
-            padding: 15px;
-            background: #e7f3ff;
-            border: 1px solid #b3d9ff;
-            border-radius: 6px;
-            min-height: auto;
-            overflow: visible;
-            height: auto;
-            max-height: none;
-        }
-        .info h3 {
-            margin-top: 0;
-            color: #0056b3;
-        }
-        .info ul {
-            margin: 10px 0;
-            padding-left: 20px;
-        }
-        .info li {
-            margin: 5px 0;
-        }
-        .mode-description {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-        }
-        .mode-description h3 {
-            margin-top: 0;
-            color: #495057;
-            font-size: 16px;
-        }
-        .mode-description ul {
-            margin: 10px 0;
-            padding-left: 20px;
-        }
-        .mode-description li {
-            margin: 8px 0;
-            line-height: 1.5;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Tree Selection - Advanced Example</h1>
-            <p>Supports three selection modes: Auto, Cautious, Strictly</p>
-        </div>
-        
-        <div class="content">
-            <div class="mode-description">
-                <h3>Mode Description:</h3>
-                <ul>
-                    <li><strong>Auto Mode</strong>: Common tree selection mode, all children unselected → parent unselected, all children selected → parent selected, some children selected → parent partially selected, partial selection is included in final data</li>
-                    <li><strong>Cautious Mode</strong>: Same interaction, but partial selection is not included in data</li>
-                    <li><strong>Strictly Mode</strong>: Parent and child selections are independent, no partial selection mode</li>
-                </ul>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tree Selection - Advanced Example</title>
+        <style>
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+            }
+            .header {
+                background: #2c3e50;
+                color: white;
+                padding: 20px;
+                text-align: center;
+            }
+            .content {
+                padding: 20px;
+            }
+            .controls {
+                margin-bottom: 20px;
+                padding: 15px;
+                background: #f8f9fa;
+                border-radius: 6px;
+                border: 1px solid #e9ecef;
+            }
+            .controls button {
+                margin-right: 10px;
+                padding: 8px 16px;
+                border: 1px solid #007bff;
+                background: #007bff;
+                color: white;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+            }
+            .controls button:hover {
+                background: #0056b3;
+            }
+            .controls select {
+                padding: 8px;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                margin-right: 10px;
+            }
+            .controls label {
+                margin-left: 10px;
+                font-size: 14px;
+            }
+            .table-container {
+                border: 1px solid #dee2e6;
+                border-radius: 6px;
+                overflow: hidden;
+            }
+            .info {
+                margin-top: 20px;
+                padding: 15px;
+                background: #e7f3ff;
+                border: 1px solid #b3d9ff;
+                border-radius: 6px;
+                min-height: auto;
+                overflow: visible;
+                height: auto;
+                max-height: none;
+            }
+            .info h3 {
+                margin-top: 0;
+                color: #0056b3;
+            }
+            .info ul {
+                margin: 10px 0;
+                padding-left: 20px;
+            }
+            .info li {
+                margin: 5px 0;
+            }
+            .mode-description {
+                margin-bottom: 20px;
+                padding: 15px;
+                background: #f8f9fa;
+                border: 1px solid #e9ecef;
+                border-radius: 6px;
+            }
+            .mode-description h3 {
+                margin-top: 0;
+                color: #495057;
+                font-size: 16px;
+            }
+            .mode-description ul {
+                margin: 10px 0;
+                padding-left: 20px;
+            }
+            .mode-description li {
+                margin: 8px 0;
+                line-height: 1.5;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>Tree Selection - Advanced Example</h1>
+                <p>Supports three selection modes: Auto, Cautious, Strictly</p>
             </div>
-            
-            <div class="controls">
-                <button id="tree-select-all">Select All</button>
-                <button id="tree-unselect-all">Unselect All</button>
-                <button id="tree-expand-all">Expand All</button>
-                <button id="tree-collapse-all">Collapse All</button>
-                <button id="tree-get-selected">Get Selected</button>
-                
-                <select id="tree-select-mode">
-                    <option value="auto">Auto Mode</option>
-                    <option value="cautious">Cautious Mode</option>
-                    <option value="strictly">Strictly Mode</option>
-                </select>
-                
-                <label>
-                    <input type="checkbox" id="tree-auto-fit-width"> Auto Adjust Column Width
-                </label>
-            </div>
-            
-            <div class="table-container">
-                <div id="tree-table"></div>
-            </div>
-        </div>
-    </div>
 
-    <script type="module">
-        import EVirtTable from '../../src/index.js';
+            <div class="content">
+                <div class="mode-description">
+                    <h3>Mode Description:</h3>
+                    <ul>
+                        <li>
+                            <strong>Auto Mode</strong>: Common tree selection mode, all children unselected → parent
+                            unselected, all children selected → parent selected, some children selected → parent
+                            partially selected, partial selection is included in final data
+                        </li>
+                        <li>
+                            <strong>Cautious Mode</strong>: Same interaction, but partial selection is not included in
+                            data
+                        </li>
+                        <li>
+                            <strong>Strictly Mode</strong>: Parent and child selections are independent, no partial
+                            selection mode
+                        </li>
+                    </ul>
+                </div>
 
+                <div class="controls">
+                    <button id="tree-select-all">Select All</button>
+                    <button id="tree-unselect-all">Unselect All</button>
+                    <button id="tree-expand-all">Expand All</button>
+                    <button id="tree-collapse-all">Collapse All</button>
+                    <button id="tree-get-selected">Get Selected</button>
+
+                    <select id="tree-select-mode">
+                        <option value="auto">Auto Mode</option>
+                        <option value="cautious">Cautious Mode</option>
+                        <option value="strictly">Strictly Mode</option>
+                    </select>
+
+                    <label> <input type="checkbox" id="tree-auto-fit-width" /> Auto Adjust Column Width </label>
+                </div>
+
+                <div class="table-container">
+                    <div id="tree-table"></div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <script>
         // Tree data
         const treeData = [
             {
@@ -168,8 +175,8 @@
                                         _hasChildren: true,
                                         children: [
                                             { id: '1-1-1-1-1', name: 'Zhang San', role: 'React Engineer' },
-                                            { id: '1-1-1-1-2', name: 'Li Si', role: 'React Engineer' }
-                                        ]
+                                            { id: '1-1-1-1-2', name: 'Li Si', role: 'React Engineer' },
+                                        ],
                                     },
                                     {
                                         id: '1-1-1-2',
@@ -177,10 +184,14 @@
                                         _hasChildren: true,
                                         children: [
                                             { id: '1-1-1-2-1', name: 'Wang Wu', role: 'State Management Engineer' },
-                                            { id: '1-1-1-2-2', name: 'Zhao Liu', role: 'State Management Engineer' }
-                                        ]
-                                    }
-                                ]
+                                            {
+                                                id: '1-1-1-2-2',
+                                                name: 'Zhao Liu',
+                                                role: 'State Management Engineer',
+                                            },
+                                        ],
+                                    },
+                                ],
                             },
                             {
                                 id: '1-1-2',
@@ -193,10 +204,10 @@
                                         _hasChildren: true,
                                         children: [
                                             { id: '1-1-2-1-1', name: 'Sun Qi', role: 'Vue Engineer' },
-                                            { id: '1-1-2-1-2', name: 'Zhou Ba', role: 'Vue Engineer' }
-                                        ]
-                                    }
-                                ]
+                                            { id: '1-1-2-1-2', name: 'Zhou Ba', role: 'Vue Engineer' },
+                                        ],
+                                    },
+                                ],
                             },
                             {
                                 id: '1-1-3',
@@ -204,10 +215,10 @@
                                 _hasChildren: true,
                                 children: [
                                     { id: '1-1-3-1', name: 'Wu Jiu', role: 'Toolchain Engineer' },
-                                    { id: '1-1-3-2', name: 'Zheng Shi', role: 'Toolchain Engineer' }
-                                ]
-                            }
-                        ]
+                                    { id: '1-1-3-2', name: 'Zheng Shi', role: 'Toolchain Engineer' },
+                                ],
+                            },
+                        ],
                     },
                     {
                         id: '1-2',
@@ -225,10 +236,10 @@
                                         _hasChildren: true,
                                         children: [
                                             { id: '1-2-1-1-1', name: 'Chen Shiyi', role: 'Java Engineer' },
-                                            { id: '1-2-1-1-2', name: 'Yang Shier', role: 'Java Engineer' }
-                                        ]
-                                    }
-                                ]
+                                            { id: '1-2-1-1-2', name: 'Yang Shier', role: 'Java Engineer' },
+                                        ],
+                                    },
+                                ],
                             },
                             {
                                 id: '1-2-2',
@@ -236,10 +247,10 @@
                                 _hasChildren: true,
                                 children: [
                                     { id: '1-2-2-1', name: 'Huang Shisan', role: 'Go Engineer' },
-                                    { id: '1-2-2-2', name: 'Liu Shisi', role: 'Go Engineer' }
-                                ]
-                            }
-                        ]
+                                    { id: '1-2-2-2', name: 'Liu Shisi', role: 'Go Engineer' },
+                                ],
+                            },
+                        ],
                     },
                     {
                         id: '1-3',
@@ -252,8 +263,8 @@
                                 _hasChildren: true,
                                 children: [
                                     { id: '1-3-1-1', name: 'Zhou Shiwu', role: 'Automated Testing Engineer' },
-                                    { id: '1-3-1-2', name: 'Wu Shiliu', role: 'Automated Testing Engineer' }
-                                ]
+                                    { id: '1-3-1-2', name: 'Wu Shiliu', role: 'Automated Testing Engineer' },
+                                ],
                             },
                             {
                                 id: '1-3-2',
@@ -261,12 +272,12 @@
                                 _hasChildren: true,
                                 children: [
                                     { id: '1-3-2-1', name: 'Zheng Shiqi', role: 'Performance Testing Engineer' },
-                                    { id: '1-3-2-2', name: 'Wang Shiba', role: 'Performance Testing Engineer' }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                                    { id: '1-3-2-2', name: 'Wang Shiba', role: 'Performance Testing Engineer' },
+                                ],
+                            },
+                        ],
+                    },
+                ],
             },
             {
                 id: '2',
@@ -279,8 +290,8 @@
                         _hasChildren: true,
                         children: [
                             { id: '2-1-1', name: 'Product Manager A', role: 'Product Manager' },
-                            { id: '2-1-2', name: 'Product Manager B', role: 'Product Manager' }
-                        ]
+                            { id: '2-1-2', name: 'Product Manager B', role: 'Product Manager' },
+                        ],
                     },
                     {
                         id: '2-2',
@@ -288,10 +299,10 @@
                         _hasChildren: true,
                         children: [
                             { id: '2-2-1', name: 'UI Designer A', role: 'UI Designer' },
-                            { id: '2-2-2', name: 'UI Designer B', role: 'UI Designer' }
-                        ]
-                    }
-                ]
+                            { id: '2-2-2', name: 'UI Designer B', role: 'UI Designer' },
+                        ],
+                    },
+                ],
             },
             {
                 id: '3',
@@ -304,11 +315,11 @@
                         _hasChildren: true,
                         children: [
                             { id: '3-1-1', name: 'Marketing Specialist A', role: 'Marketing Specialist' },
-                            { id: '3-1-2', name: 'Marketing Specialist B', role: 'Marketing Specialist' }
-                        ]
-                    }
-                ]
-            }
+                            { id: '3-1-2', name: 'Marketing Specialist B', role: 'Marketing Specialist' },
+                        ],
+                    },
+                ],
+            },
         ];
 
         // Tree selection column configuration
@@ -320,20 +331,20 @@
                 width: 100,
                 widthFillDisable: true,
                 readonly: true,
-                fixed: 'left'
+                fixed: 'left',
             },
             {
                 title: 'Name',
                 key: 'name',
                 width: 150,
-                readonly: true
+                readonly: true,
             },
             {
                 title: 'Role',
                 key: 'role',
                 width: 200,
-                readonly: true
-            }
+                readonly: true,
+            },
         ];
 
         // Create tree selection table
@@ -357,9 +368,9 @@
                     { label: 'Select All', value: 'selectAll' },
                     { label: 'Unselect All', value: 'unselectAll' },
                     { label: 'Expand All', value: 'expandAll' },
-                    { label: 'Collapse All', value: 'collapseAll' }
-                ]
-            }
+                    { label: 'Collapse All', value: 'collapseAll' },
+                ],
+            },
         });
 
         // Bind button events
@@ -388,15 +399,15 @@
         document.getElementById('tree-select-mode').addEventListener('change', (event) => {
             const mode = event.target.value;
             treeTable.loadConfig({
-                TREE_SELECT_MODE: mode
+                TREE_SELECT_MODE: mode,
             });
         });
-        
+
         // Auto adjust column width control
         document.getElementById('tree-auto-fit-width').addEventListener('change', (event) => {
             const autoFitWidth = event.target.checked;
             treeTable.loadConfig({
-                AUTO_FIT_TREE_WIDTH: autoFitWidth
+                AUTO_FIT_TREE_WIDTH: autoFitWidth,
             });
             treeTable.loadColumns(treeColumns);
         });
@@ -419,5 +430,4 @@
             }
         });
     </script>
-</body>
-</html> 
+</html>

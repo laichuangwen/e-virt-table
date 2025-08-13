@@ -51,7 +51,11 @@ type EVirtTableOptions = {
 | EXPAND_ICON_COLOR | 展开图标颜色 | string | #4E5969 |
 | ERROR_TIP_ICON_COLOR | 错误提示颜色 | string | red |
 | ERROR_TIP_ICON_SIZE | 错误提示图标大小 | number | 6 |
+| EXPAND_LAZY | tree 是否开启懒加载	 | boolean | false |
 | DEFAULT_EXPAND_ALL | tree 默认是否全部展开 | boolean | false |
+| TREE_INDENT | 树形缩进宽度	 | number | 20 |
+| TREE_LINE          | tree是否划线   | boolean  | false  |
+| TREE_LINE_COLOR    | tree的划线颜色   | string  | '#e1e6eb'  |
 | CELL_WIDTH | 表格 body 部分的宽度 | number | 100 |
 | CELL_HEIGHT | 表格 body 部分的行高 | number | 36 |
 | CELL_PADDING | 表格 body 部分的 padding | number | 8 |

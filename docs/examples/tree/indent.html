@@ -76,10 +76,9 @@
         data,
         columns,
         config: {
-            TREE_INDENT: 16, // 默认树形缩进宽度
+            TREE_INDENT: 20, // 默认树形缩进宽度
             ROW_KEY: 'id',
-            WIDTH: 800,
-            HEIGHT: 400
+            HEIGHT: 300
         }
     });
 
@@ -87,19 +86,14 @@
     function updateIndent() {
         const indentValue = document.getElementById('indent-slider').value;
         document.getElementById('indent-value').textContent = indentValue + 'px';
-        
-        // 重新创建表格以应用新的缩进配置
-        table.destroy();
-        table = new EVirtTable(target, {
-            data,
-            columns,
-            config: {
-                TREE_INDENT: parseInt(indentValue),
-                ROW_KEY: 'id',
-                WIDTH: 800,
-                HEIGHT: 400
-            }
-        });
+        console.log(indentValue);
+
+        table.loadConfig({
+            TREE_INDENT: parseInt(indentValue),
+            ROW_KEY: 'id',
+            WIDTH: 800,
+            HEIGHT: 400
+        })
     }
 
     // 监听滑块变化
