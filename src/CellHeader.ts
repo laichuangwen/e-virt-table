@@ -195,7 +195,7 @@ export default class CellHeader extends BaseCell {
                 textX = this.drawX + this.ctx.config.CELL_PADDING;
             } else if (this.align === 'center') {
                 // 居中时，文本宽度需要考虑图标
-                const textWidthNeeded = this.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
+                const textWidthNeeded = this.ctx.paint.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
                 const totalWidth = textWidthNeeded + iconSize + iconMargin;
                 if (totalWidth > this.width - this.ctx.config.CELL_PADDING * 2) {
                     textWidth = this.width - this.ctx.config.CELL_PADDING * 2 - iconSize - iconMargin;
@@ -329,11 +329,11 @@ export default class CellHeader extends BaseCell {
 
         if (this.align === 'left') {
             // 居左：先绘制文字，图标紧跟文字
-            const textWidth = this.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
+            const textWidth = this.ctx.paint.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
             iconX = this.drawX + CELL_PADDING + textWidth + iconMargin;
         } else if (this.align === 'center') {
             // 居中：先居中绘制文字，然后图标紧跟文字
-            const textWidth = this.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
+            const textWidth = this.ctx.paint.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
             const textCenterX = this.drawX + this.width / 2;
             const textStartX = textCenterX - textWidth / 2;
             iconX = textStartX + textWidth + iconMargin;
@@ -359,14 +359,7 @@ export default class CellHeader extends BaseCell {
             this.drawSortImageHeight,
         );
     }
-    private measureTextWidth(text: string, font: string): number {
-        const canvas = this.ctx.canvasElement;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return 0;
-
-        ctx.font = font;
-        return ctx.measureText(text).width;
-    }
+    
     getText() {
         if (this.render) {
             return '';

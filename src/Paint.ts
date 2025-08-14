@@ -40,6 +40,10 @@ export class Paint {
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.ctx.scale(dpr, dpr);
     }
+    measureTextWidth(text: string, font: string) {
+        this.ctx.font = font;
+        return this.ctx.measureText(text).width;
+    }
     save() {
         this.ctx.save();
     }

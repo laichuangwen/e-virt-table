@@ -27,7 +27,6 @@ export default class Database {
     private loading = false;
     private ctx: Context;
     private data: any[];
-    private sortedData: any[] = []; // 新增：排序后的数据层
     private columns: Column[];
     private footerData: any[] = [];
     private rowKeyMap = new Map<string, any>();
@@ -96,8 +95,6 @@ export default class Database {
             }
         }
         this.itemRowKeyMap = new WeakMap();
-        // 确保 sortedData 与 data 同步
-        this.sortedData = [...this.data];
         this.initData(this.data);
         this.getData();
         this.bufferCheckState.buffer = false;
@@ -199,7 +196,6 @@ export default class Database {
                 }
             });
         };
-        recursiveData(this.sortedData); // 使用 sortedData 而不是 data
         return list;
     }
     private filterColumns(columns: Column[]) {
@@ -227,7 +223,6 @@ export default class Database {
     }
     setData(data: any[]) {
         this.data = data;
-        this.sortedData = [...data]; // 初始化 sortedData 为原始数据的副本
         this.setLoading(true);
         this.init();
     }
