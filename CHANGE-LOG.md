@@ -297,3 +297,9 @@ feat: 添加tree层级线
 fix: 修复默认没有设置css变量时导致传递config空
 docs: 更新文档
 ---
+
+V1.2.24
+### Bug Fixes
+feat: 添加表头排序功能
+docs: 更新文档
+---
