@@ -106,7 +106,15 @@ export type SelectionMap = {
     row: any;
 };
 
-export type SortByType = 'number' | 'string' | 'date' | ['date', string] | ((a: any, b: any) => number);
+export type SortDirection = 'asc' | 'desc' | 'none';
+export type SortStateMapItem = { direction: SortDirection; timestamp: number };
+export type SortStateMap = Map<string, SortStateMapItem>;
+export type SortByType =
+    | 'number'
+    | 'string'
+    | 'date'
+    | 'api'
+    | ((a: any, b: any) => number);
 
 export interface Column {
     key: string;
@@ -133,7 +141,9 @@ export interface Column {
     rowspan?: number;
     sort?: number;
     sortBy?: SortByType;
-    apiSortable?: boolean;
+    sortIconName?: string; // 默认排序图标
+    sortAscIconName?: string; // 升序排序图标
+    sortDescIconName?: string; // 降序排序图标
     hide?: boolean | Function;
     render?: Function | string;
     renderFooter?: Function | string;
@@ -193,7 +203,7 @@ export type BeforeChangeItem = {
     oldValue: any;
     row: any;
 };
-export type BeforeValueChangeItem= {
+export type BeforeValueChangeItem = {
     rowKey: string;
     key: string;
     value: any;

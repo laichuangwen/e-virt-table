@@ -18,11 +18,11 @@ import type {
     HistoryAction,
     BeforeValueChangeItem,
     SortByType,
+    SortStateMap,
 } from './types';
-import { generateShortUUID, toLeaf } from './util';
+import { generateShortUUID, toLeaf, compareDates } from './util';
 import { HistoryItemData } from './History';
 import Cell from './Cell';
-import dayjs from 'dayjs';
 export default class Database {
     private loading = false;
     private ctx: Context;
@@ -52,8 +52,7 @@ export default class Database {
     private sumHeight = 0;
     private filterMethod: FilterMethod | undefined;
     private positions: Position[] = []; //虚拟滚动位置
-    private sortState: Map<string, { direction: 'asc' | 'desc' | 'none'; timestamp: number }> = new Map();
-    private backendSortState: Map<string, { direction: 'asc' | 'desc' | 'none'; timestamp: number }> = new Map();
+    private sortState: SortStateMap = new Map();
     constructor(ctx: Context, options: EVirtTableOptions) {
         this.ctx = ctx;
         const { data = [], columns = [], footerData = [] } = options;
@@ -267,9 +266,16 @@ export default class Database {
         };
         this.rowIndexRowKeyMap.clear();
         this.rowKeyRowIndexMap.clear();
-        let _data = this.sortedData; // 使用 sortedData 而不是 data
+        let _data = this.data;
         if (typeof this.filterMethod === 'function') {
             _data = this.filterMethod(_data);
+        }
+        // 说明需要排序
+        if (this.sortState.size) {
+            // 按时间戳排序，最早的先排序
+            const sortedEntries = Array.from(this.sortState.entries()).sort((a, b) => a[1].timestamp - b[1].timestamp);
+            // 对 sortedData 进行排序
+            _data = this.sortDataRecursive(_data, sortedEntries);
         }
         recursiveData(_data);
         this.bufferData = list;
@@ -311,78 +317,27 @@ export default class Database {
      */
     setSortState(key: string, direction: 'asc' | 'desc' | 'none') {
         const timestamp = Date.now();
-        this.sortState.set(key, { direction, timestamp });
-        this.applySorting();
+        if (this.ctx.config.SORT_STRICTLY) {
+            // 严格排序，清除所有排序状态
+            this.sortState.clear();
+        }
+        if (direction === 'none') {
+            // 清除排序状态
+            this.sortState.delete(key);
+        } else {
+            this.sortState.set(key, { direction, timestamp });
+        }
+        this.ctx.emit('sortChange', this.sortState);
+        this.clearBufferData();
+        this.ctx.emit('draw');
     }
 
     /**
      * 清除所有排序状态
      */
-    clearSortState() {
+    clearSort() {
         this.sortState.clear();
-        this.applySorting();
-    }
-
-    // 后端排序相关方法
-    getBackendSortState(key: string) {
-        return this.backendSortState.get(key) || { direction: 'none', timestamp: 0 };
-    }
-
-    setBackendSortState(key: string, direction: 'asc' | 'desc' | 'none') {
-        if (direction === 'none') {
-            this.backendSortState.delete(key);
-        } else {
-            this.backendSortState.set(key, { direction, timestamp: Date.now() });
-        }
-        this.triggerSortQuery();
-        this.ctx.emit('draw');
-    }
-
-    clearBackendSortState() {
-        this.backendSortState.clear();
-        this.triggerSortQuery();
-    }
-
-    private triggerSortQuery() {
-        const sortData = Array.from(this.backendSortState.entries())
-            .filter(([_, state]) => state.direction !== 'none')
-            .sort((a, b) => a[1].timestamp - b[1].timestamp)
-            .map(([field, state]) => ({ field, direction: state.direction }));
-
-        this.ctx.emit('sortQuery', sortData);
-    }
-
-    setSortQueryData(sortData: { field: string; direction: 'asc' | 'desc' }[]) {
-        this.backendSortState.clear();
-        sortData.forEach((item, index) => {
-            this.backendSortState.set(item.field, {
-                direction: item.direction,
-                timestamp: index - sortData.length,
-            });
-        });
-        this.ctx.emit('draw');
-    }
-
-    /**
-     * 应用排序
-     */
-    private applySorting() {
-        if (this.sortState.size === 0) {
-            // 没有排序时，sortedData 等于原始数据
-            this.sortedData = [...this.data];
-            this.clearFilterMethod();
-            this.clearBufferData();
-            this.ctx.emit('draw');
-            return;
-        }
-
-        // 按时间戳排序，最早的先排序
-        const sortedEntries = Array.from(this.sortState.entries()).sort((a, b) => a[1].timestamp - b[1].timestamp);
-
-        // 对 sortedData 进行排序
-        this.sortedData = this.sortDataRecursive([...this.data], sortedEntries);
-
-        this.clearFilterMethod();
+        this.ctx.emit('sortChange', this.sortState);
         this.clearBufferData();
         this.ctx.emit('draw');
     }
@@ -436,7 +391,7 @@ export default class Database {
             let comparison = 0;
 
             if (typeof sortBy === 'function') {
-                comparison = sortBy(aValue, bValue);
+                comparison = sortBy(a, b);
             } else if (sortBy === 'number') {
                 const aNum = Number(aValue) || 0;
                 const bNum = Number(bValue) || 0;
@@ -446,16 +401,8 @@ export default class Database {
                 const bStr = String(bValue || '');
                 comparison = aStr.localeCompare(bStr);
             } else if (sortBy === 'date') {
-                const aDate = dayjs(aValue || 0);
-                const bDate = dayjs(bValue || 0);
-                comparison = aDate.isBefore(bDate) ? -1 : aDate.isAfter(bDate) ? 1 : 0;
-            } else if (Array.isArray(sortBy) && sortBy[0] === 'date' && typeof sortBy[1] === 'string') {
-                const formatter = sortBy[1];
-                const aDate = dayjs(aValue, formatter);
-                const bDate = dayjs(bValue, formatter);
-                comparison = aDate.isBefore(bDate) ? -1 : aDate.isAfter(bDate) ? 1 : 0;
+                comparison = compareDates(aValue, bValue);
             }
-
             return direction === 'asc' ? comparison : -comparison;
         });
     }

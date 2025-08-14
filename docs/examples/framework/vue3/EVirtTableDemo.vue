@@ -1,9 +1,40 @@
 <script lang="ts" setup>
 import { faker } from '@faker-js/faker';
-import dayjs from 'dayjs';
 import EVirtTable, { Column, ConfigType } from 'e-virt-table';
 import EVirtTableVue from './EVirtTableVue.vue';
 import { ref } from 'vue';
+
+// 简单的日期格式化函数
+function formatDate(date: Date, format: string): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+    // 获取周数
+    const getWeekNumber = (date: Date): string => {
+        const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+        const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
+        return String(Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7)).padStart(2, '0');
+    };
+    
+    switch (format) {
+        case 'YYYY-MM-DD':
+            return `${year}-${month}-${day}`;
+        case 'YYYY':
+            return String(year);
+        case 'YYYY-MM':
+            return `${year}-${month}`;
+        case 'ww':
+            return getWeekNumber(date);
+        case 'HH:mm:ss':
+            return `${hours}:${minutes}:${seconds}`;
+        default:
+            return date.toISOString();
+    }
+}
 const editorTypes = ['text', 'select', 'date'];
 let columns = ref<Column[]>([
     {
@@ -145,11 +176,11 @@ const users = faker.helpers.multiple(
             customType: editorTypes[faker.number.int({ min: 0, max: editorTypes.length - 1 })],
             select: faker.person.sex(),
             number: faker.number.int({ min: 24, max: 66 }),
-            date: dayjs(faker.date.recent()).format('YYYY-MM-DD'),
-            years: dayjs(faker.date.anytime()).format('YYYY'),
-            month: dayjs(faker.date.anytime()).format('YYYY-MM'),
-            week: dayjs(faker.date.anytime()).format('ww'),
-            time: dayjs(faker.date.anytime()).format('HH:mm:ss'),
+            date: formatDate(faker.date.recent(), 'YYYY-MM-DD'),
+            years: formatDate(faker.date.anytime(), 'YYYY'),
+            month: formatDate(faker.date.anytime(), 'YYYY-MM'),
+            week: formatDate(faker.date.anytime(), 'ww'),
+            time: formatDate(faker.date.anytime(), 'HH:mm:ss'),
             cascader: faker.number.int({ min: 1, max: 4 }),
             email: faker.internet.email(),
         };

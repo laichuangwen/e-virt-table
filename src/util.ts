@@ -342,6 +342,109 @@ function getCssVar(name: string, el: HTMLElement = document.documentElement): st
     const styles = getComputedStyle(el);
     return styles.getPropertyValue(key).trim();
 }
+
+/**
+ * 解析日期字符串，支持多种常见格式
+ * @param dateStr 日期字符串
+ * @returns Date 对象
+ */
+function parseDate(dateStr: any): Date {
+    if (!dateStr) return new Date(0);
+    
+    // 如果是数字（时间戳），直接创建Date对象
+    if (typeof dateStr === 'number') {
+        return new Date(dateStr);
+    }
+    
+    const str = String(dateStr).trim();
+    
+    // 尝试直接解析
+    const directDate = new Date(str);
+    if (!isNaN(directDate.getTime())) {
+        return directDate;
+    }
+    
+    // 支持多种常见格式
+    const patterns = [
+        // YYYY-MM-DD
+        /^(\d{4})-(\d{1,2})-(\d{1,2})$/,
+        // YYYY/MM/DD
+        /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/,
+        // YYYY.MM.DD
+        /^(\d{4})\.(\d{1,2})\.(\d{1,2})$/,
+        // DD-MM-YYYY
+        /^(\d{1,2})-(\d{1,2})-(\d{4})$/,
+        // DD/MM/YYYY
+        /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/,
+        // DD.MM.YYYY
+        /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/,
+        // MM-DD-YYYY
+        /^(\d{1,2})-(\d{1,2})-(\d{4})$/,
+        // MM/DD/YYYY
+        /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/,
+        // MM.DD.YYYY
+        /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/,
+        // YYYYMMDD
+        /^(\d{4})(\d{2})(\d{2})$/,
+        // 带时间的格式 YYYY-MM-DD HH:mm:ss
+        /^(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/,
+        // 带时间的格式 YYYY/MM/DD HH:mm:ss
+        /^(\d{4})\/(\d{1,2})\/(\d{1,2})\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/,
+    ];
+    
+    for (const pattern of patterns) {
+        const match = str.match(pattern);
+        if (match) {
+            const groups = match.slice(1).map(Number);
+            
+            if (pattern.source.includes('YYYY-MM-DD') || pattern.source.includes('YYYY/MM/DD') || pattern.source.includes('YYYY.MM.DD')) {
+                // YYYY-MM-DD 格式
+                const [year, month, day, hour = 0, minute = 0, second = 0] = groups;
+                return new Date(year, month - 1, day, hour, minute, second);
+            } else if (pattern.source.includes('DD-MM-YYYY') || pattern.source.includes('DD/MM/YYYY') || pattern.source.includes('DD.MM.YYYY')) {
+                // DD-MM-YYYY 格式
+                const [day, month, year, hour = 0, minute = 0, second = 0] = groups;
+                return new Date(year, month - 1, day, hour, minute, second);
+            } else if (pattern.source.includes('MM-DD-YYYY') || pattern.source.includes('MM/DD/YYYY') || pattern.source.includes('MM.DD.YYYY')) {
+                // MM-DD-YYYY 格式
+                const [month, day, year, hour = 0, minute = 0, second = 0] = groups;
+                return new Date(year, month - 1, day, hour, minute, second);
+            } else if (pattern.source.includes('YYYYMMDD')) {
+                // YYYYMMDD 格式
+                const [year, month, day] = groups;
+                return new Date(year, month - 1, day);
+            }
+        }
+    }
+    
+    // 如果都不匹配，返回无效日期
+    return new Date(NaN);
+}
+
+/**
+ * 比较两个日期值，支持多种常见格式
+ * @param a 第一个日期值
+ * @param b 第二个日期值
+ * @returns 比较结果：-1 表示 a < b，0 表示 a = b，1 表示 a > b
+ */
+function compareDates(a: any, b: any): number {
+    const aDate = parseDate(a);
+    const bDate = parseDate(b);
+    
+    if (isNaN(aDate.getTime()) && isNaN(bDate.getTime())) {
+        return 0; // 都是无效日期
+    }
+    if (isNaN(aDate.getTime())) {
+        return -1; // a 是无效日期，排在前面
+    }
+    if (isNaN(bDate.getTime())) {
+        return 1; // b 是无效日期，排在前面
+    }
+    
+    return aDate.getTime() - bDate.getTime();
+}
+
+
 export {
     debounce,
     throttle,
@@ -357,4 +460,6 @@ export {
     getSpanArrByRow,
     getSpanObjByColumn,
     getCssVar,
+    parseDate,
+    compareDates
 };

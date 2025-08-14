@@ -74,6 +74,7 @@ export default class EventTable {
                 this.ctx.emit('cellHeaderClick', cell, e);
                 // selection事件
                 this.selectionClick(cell, e);
+                this.sortClick(cell, e);
             });
 
             this.handleBodyEvent(x, y, this.ctx.body.renderRows, (cell: Cell) => {
@@ -213,11 +214,13 @@ export default class EventTable {
         const clickY = offsetY;
         const clickX = offsetX;
         if (
-            !(
-                clickX > cell.drawSelectionImageX &&
-                clickX < cell.drawSelectionImageX + cell.drawSelectionImageWidth &&
-                clickY > cell.drawSelectionImageY &&
-                clickY < cell.drawSelectionImageY + cell.drawSelectionImageHeight
+            !this.isInsideElement(
+                clickX,
+                clickY,
+                cell.drawSelectionImageX,
+                cell.drawSelectionImageY,
+                cell.drawSelectionImageWidth,
+                cell.drawSelectionImageHeight,
             )
         ) {
             return;
@@ -257,11 +260,13 @@ export default class EventTable {
         const clickY = offsetY;
         const clickX = offsetX;
         if (
-            !(
-                clickX > cell.drawTreeImageX &&
-                clickX < cell.drawTreeImageX + cell.drawTreeImageWidth &&
-                clickY > cell.drawTreeImageY &&
-                clickY < cell.drawTreeImageY + cell.drawTreeImageHeight
+            !this.isInsideElement(
+                clickX,
+                clickY,
+                cell.drawTreeImageX,
+                cell.drawTreeImageY,
+                cell.drawTreeImageWidth,
+                cell.drawTreeImageHeight,
             )
         ) {
             return;
@@ -299,6 +304,67 @@ export default class EventTable {
             this.ctx.emit('expandChange', this.ctx.database.getExpandRowKeys());
         }
     }
+
+    private sortClick(cellHeader: CellHeader, e: MouseEvent) {
+        const { offsetY, offsetX } = this.ctx.getOffset(e);
+        const clickY = offsetY;
+        const clickX = offsetX;
+        if (
+            !this.isInsideElement(
+                clickX,
+                clickY,
+                cellHeader.drawSortImageX,
+                cellHeader.drawSortImageY,
+                cellHeader.drawSortImageWidth,
+                cellHeader.drawSortImageHeight,
+            )
+        ) {
+            return;
+        }
+        // 前端排序
+        const currentState = this.ctx.database.getSortState(cellHeader.key);
+        let newDirection: 'asc' | 'desc' | 'none';
+        // 按照 不排序->升序->降序->不排序 的顺序循环
+        if (currentState.direction === 'none') {
+            newDirection = 'asc';
+        } else if (currentState.direction === 'asc') {
+            newDirection = 'desc';
+        } else {
+            newDirection = 'none';
+        }
+        this.ctx.database.setSortState(cellHeader.key, newDirection);
+        // if (cellHeader.column.apiSortable) {
+        //     // 后端排序
+        //     const currentState = this.ctx.database.getBackendSortState(cellHeader.key);
+        //     let newDirection: 'asc' | 'desc' | 'none';
+
+        //     // 按照 不排序->升序->降序->不排序 的顺序循环
+        //     if (currentState.direction === 'none') {
+        //         newDirection = 'asc';
+        //     } else if (currentState.direction === 'asc') {
+        //         newDirection = 'desc';
+        //     } else {
+        //         newDirection = 'none';
+        //     }
+
+        //     // this.ctx.database.setBackendSortState(cellHeader.key, newDirection);
+        // } else {
+        //     // 前端排序
+        //     const currentState = this.ctx.database.getSortState(cellHeader.key);
+        //     let newDirection: 'asc' | 'desc' | 'none';
+
+        //     // 按照 不排序->升序->降序->不排序 的顺序循环
+        //     if (currentState.direction === 'none') {
+        //         newDirection = 'asc';
+        //     } else if (currentState.direction === 'asc') {
+        //         newDirection = 'desc';
+        //     } else {
+        //         newDirection = 'none';
+        //     }
+
+        //     this.ctx.database.setSortState(cellHeader.key, newDirection);
+        // }
+    }
     /**
      * 图标进入和离开事件，包括选中，展开，提示图标等
      * @param cell
@@ -308,46 +374,91 @@ export default class EventTable {
         const { offsetY, offsetX } = this.ctx.getOffset(e);
         const y = offsetY;
         const x = offsetX;
-
-        // 检查checkbox图标
-        if (
-            (cell instanceof Cell || cell instanceof CellHeader) &&
-            x > cell.drawSelectionImageX &&
-            x < cell.drawSelectionImageX + cell.drawSelectionImageWidth &&
-            y > cell.drawSelectionImageY &&
-            y < cell.drawSelectionImageY + cell.drawSelectionImageHeight
-        ) {
-            this.ctx.stageElement.style.cursor = 'pointer';
-            this.ctx.isPointer = true;
-            if (cell instanceof Cell) {
-                // body cell 需要处理是否禁用
-                const selectable = this.ctx.database.getRowSelectable(cell.rowKey);
-                if (!selectable) {
-                    this.ctx.stageElement.style.cursor = 'not-allowed';
-                }
-            }
-            return;
-        }
-        // 检查hover图标
-        if (cell instanceof Cell && cell.drawHoverImageSource) {
+        // 检查头部图标
+        if (cell instanceof CellHeader) {
+            // 选中图标
             if (
-                x > cell.drawHoverImageX &&
-                x < cell.drawHoverImageX + cell.drawHoverImageWidth &&
-                y > cell.drawHoverImageY &&
-                y < cell.drawHoverImageY + cell.drawHoverImageHeight
+                cell.drawSelectionImageSource &&
+                this.isInsideElement(
+                    x,
+                    y,
+                    cell.drawSelectionImageX,
+                    cell.drawSelectionImageY,
+                    cell.drawSelectionImageWidth,
+                    cell.drawSelectionImageHeight,
+                )
+            ) {
+                this.ctx.stageElement.style.cursor = 'pointer';
+                this.ctx.isPointer = true;
+                return;
+            }
+            // 排序图标
+            if (
+                cell.drawSortImageSource &&
+                this.isInsideElement(
+                    x,
+                    y,
+                    cell.drawSortImageX,
+                    cell.drawSortImageY,
+                    cell.drawSortImageWidth,
+                    cell.drawSortImageHeight,
+                )
             ) {
                 this.ctx.stageElement.style.cursor = 'pointer';
                 this.ctx.isPointer = true;
                 return;
             }
         }
-        // 检查tree图标
-        if (cell instanceof Cell && cell.drawTreeImageSource) {
+        // 检查body图标
+        if (cell instanceof Cell) {
+            // 选中图标
             if (
-                x > cell.drawTreeImageX &&
-                x < cell.drawTreeImageX + cell.drawTreeImageWidth &&
-                y > cell.drawTreeImageY &&
-                y < cell.drawTreeImageY + cell.drawTreeImageHeight
+                cell.drawSelectionImageSource &&
+                this.isInsideElement(
+                    x,
+                    y,
+                    cell.drawSelectionImageX,
+                    cell.drawSelectionImageY,
+                    cell.drawSelectionImageWidth,
+                    cell.drawSelectionImageHeight,
+                )
+            ) {
+                this.ctx.stageElement.style.cursor = 'pointer';
+                this.ctx.isPointer = true;
+                // body cell 需要处理是否禁用
+                const selectable = this.ctx.database.getRowSelectable(cell.rowKey);
+                if (!selectable) {
+                    this.ctx.stageElement.style.cursor = 'not-allowed';
+                }
+                return;
+            }
+            // hover图标
+            if (
+                cell.drawHoverImageSource &&
+                this.isInsideElement(
+                    x,
+                    y,
+                    cell.drawHoverImageX,
+                    cell.drawHoverImageY,
+                    cell.drawHoverImageWidth,
+                    cell.drawHoverImageHeight,
+                )
+            ) {
+                this.ctx.stageElement.style.cursor = 'pointer';
+                this.ctx.isPointer = true;
+                return;
+            }
+            // tree图标
+            if (
+                cell.drawTreeImageSource &&
+                this.isInsideElement(
+                    x,
+                    y,
+                    cell.drawTreeImageX,
+                    cell.drawTreeImageY,
+                    cell.drawTreeImageWidth,
+                    cell.drawTreeImageHeight,
+                )
             ) {
                 this.ctx.stageElement.style.cursor = 'pointer';
                 this.ctx.isPointer = true;
@@ -355,7 +466,19 @@ export default class EventTable {
             }
         }
     }
-
+    private isInsideElement(
+        x: number,
+        y: number,
+        xElement: number,
+        yElement: number,
+        widthElement: number,
+        heightElement: number,
+    ) {
+        if (x > xElement && x < xElement + widthElement && y > yElement && y < yElement + heightElement) {
+            return true;
+        }
+        return false;
+    }
     private isBusy(e: MouseEvent) {
         const { offsetY, offsetX } = this.ctx.getOffset(e);
         const y = offsetY;

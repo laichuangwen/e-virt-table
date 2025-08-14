@@ -1,26 +1,31 @@
-# Header Sort
+# Table Header Sorting
+
+## Config
+
+| Parameter      | Description                                    | Type     | Default |
+| -------------- | ---------------------------------------------- | -------- | ------- |
+| SORT_STRICTLY  | Enable strict sorting, true supports multi-column sorting | boolean | true    |
 
 ## Column
 
-| Parameter | Description | Type | Default |
-| --------- | ----------- | ---- | ------- |
-| sortBy | Sort type | `'number'`, `'string'`, `'date'`, `['date', string]`, `(a: any, b: any) => number` | - |
+| Parameter         | Description      | Type                                                                   | Default |
+| ----------------- | ---------------- | ---------------------------------------------------------------------- | ------- |
+| sortBy            | Sorting type     | `'number'`, `'string'`, `'date'`, `(a: rowData, b: rowData) => number` | -       |
+| sortIconName      | Default sort icon | `string`                                                               | -       |
+| sortAscIconName   | Ascending sort icon | `string`                                                               | -       |
+| sortDescIconName  | Descending sort icon | `string`                                                               | -       |
 
-## Basic Usage
+## Events
 
-When a column has the `sortBy` property, a sort icon will appear in the header. Click the icon to cycle through: unsorted → ascending → descending → unsorted.
+| Event Name   | Description                                    | Callback Parameters                    |
+| ------------ | ---------------------------------------------- | -------------------------------------- |
+| sortChange   | Triggered when table sorting conditions change | Map<string, SortStateMapItem>         |
 
-::: demo
+## Sorting Types
 
-sort/header-sort
-h:400px
-:::
+### Number Sorting
 
-## Sort Types
-
-### Number Sort
-
-Use `sortBy: 'number'` for numeric columns. The comparison uses standard numeric comparison.
+Use `sortBy: 'number'` for numeric column sorting. Comparison uses standard numeric comparison.
 
 ```javascript
 {
@@ -30,9 +35,9 @@ Use `sortBy: 'number'` for numeric columns. The comparison uses standard numeric
 }
 ```
 
-### String Sort
+### String Sorting
 
-Use `sortBy: 'string'` for text columns. The comparison uses `localeCompare()` for proper string sorting.
+Use `sortBy: 'string'` for text column sorting. Comparison uses `localeCompare()` for proper string sorting.
 
 ```javascript
 {
@@ -42,9 +47,26 @@ Use `sortBy: 'string'` for text columns. The comparison uses `localeCompare()` f
 }
 ```
 
-### Date Sort
+### Date Sorting
 
-Use `sortBy: 'date'` for date columns. The comparison uses dayjs for date comparison.
+Use `sortBy: 'date'` for date column sorting.
+> Built-in universal time format conversion sorting, not all formats are supported. For other formats, please use custom sorting!
+
+| Format Type      | Example Format       | Description        |
+| ---------------- | -------------------- | ------------------ |
+| Date             | Date                 | Date format        |
+| Year-Month-Day   | YYYY-MM-DD           | Standard ISO format |
+| Year/Month/Day   | YYYY/MM/DD           | Slash separated format |
+| Year.Month.Day   | YYYY.MM.DD           | Dot separated format |
+| Day-Month-Year   | DD-MM-YYYY           | European date format |
+| Day/Month/Year   | DD/MM/YYYY           | European slash format |
+| Day.Month.Year   | DD.MM.YYYY           | European dot format |
+| Month-Day-Year   | MM-DD-YYYY           | US date format |
+| Month/Day/Year   | MM/DD/YYYY           | US slash format |
+| Month.Day.Year   | MM.DD.YYYY           | US dot format |
+| Pure Numbers     | YYYYMMDD             | Continuous number format |
+| With Time        | YYYY-MM-DD HH:mm:ss  | Including hours, minutes, seconds |
+| With Time Slash  | YYYY/MM/DD HH:mm:ss  | Slash format with time |
 
 ```javascript
 {
@@ -54,25 +76,13 @@ Use `sortBy: 'date'` for date columns. The comparison uses dayjs for date compar
 }
 ```
 
-### Date with Format
+### Custom Sorting Function
 
-Use `sortBy: ['date', 'YYYY-MM-DD']` for dates with specific formats.
-
-```javascript
-{
-    title: 'Birth Date',
-    key: 'birthDate',
-    sortBy: ['date', 'YYYY-MM-DD']
-}
-```
-
-### Custom Sort Function
-
-Use a custom function for complex sorting logic.
+Use custom functions for complex sorting logic.
 
 ```javascript
 {
-    title: 'Score',
+    title: 'Rating',
     key: 'score',
     sortBy: (a, b) => {
         // Custom sorting logic
@@ -84,72 +94,52 @@ Use a custom function for complex sorting logic.
 }
 ```
 
+## Basic Usage
+
+When a column is configured with the `sortBy` property, the table header will display a sort icon. Clicking the icon cycles through: no sorting → ascending → descending → no sorting.
+
+::: demo
+
+sort/base
+h:400px
+:::
+
 ## Multi-Column Sorting
 
-The table supports multi-column sorting. When multiple columns are sorted, they are applied in the order they were clicked (timestamp-based priority).
+When `SORT_STRICTLY=false`, the table supports multi-column sorting. When multiple columns are sorted, they are applied in order of click (priority based on timestamp).
+
+::: demo
+
+sort/multiple
+h:400px
+:::
 
 ## Sort Icons
 
-Different sort types display different icons:
+Different sorting types display different icons. You need to configure SVG icons yourself.
 
-- **Number**: `sort-by-number-asc`, `sort-by-number-desc`
-- **String**: `sort-by-character-asc`, `sort-by-character-desc`
-- **Date**: `sort-by-date-asc`, `sort-by-date-desc`
-- **Custom Function**: `sort-asc`, `sort-desc`
-- **Unsorted**: `sortable`
+::: demo
 
-## Icon Positioning
-
-The sort icon positioning follows these rules based on text alignment:
-
-- **Left-aligned**: Text first, icon immediately follows text
-- **Center-aligned**: Text centered, icon immediately follows text
-- **Right-aligned**: Icon right-aligned, text immediately to the left of the icon
+sort/icon
+h:400px
+:::
 
 ## Tree Data Support
 
-Sorting works with tree data structures. When sorting is applied, it recursively sorts all levels of the tree, maintaining the hierarchical structure.
+The sorting feature supports tree data structures. When sorting is applied, it recursively sorts all levels of the tree while maintaining the hierarchical structure.
 
-## Backend Sorting
-
-When a column is configured with `apiSortable: true`, backend sorting is enabled. Backend sorting does not process data on the frontend, but interacts with the backend through event mechanisms.
 ::: demo
 
-sort/backend-sort-en
+sort/tree
 h:400px
 :::
-### Usage
 
-```javascript
-{
-    title: 'Name',
-    key: 'name',
-    apiSortable: true
-}
-```
+## Server-Side Sorting
 
-### Event Listening
+When a column is configured with `sortBy: api`, server-side sorting is enabled. Server-side sorting does not process data on the frontend, but interacts with the backend through the `sortChange` event. The backend returns data directly to loadData.
 
-```javascript
-// Listen for sort query events
-eVirtTable.on('sortQuery', (sortData) => {
-    // sortData format: [{ field: 'name', direction: 'asc' }, ...]
-    // Call backend API to get sorted data
-    fetchSortedData(sortData).then(data => {
-        eVirtTable.loadData(data);
-        eVirtTable.setSortQueryData(sortData);
-    });
-});
-```
+::: demo
 
-### API Methods
-
-- `setSortQueryData(sortData: { field: string, direction: 'asc' | 'desc' }[])`: Set backend sort state (won't trigger sortQuery event)
-
-## API
-
-### Database Methods
-
-- `getSortState(key: string)`: Get current sort state for a column
-- `setSortState(key: string, direction: 'asc' | 'desc' | 'none')`: Set sort state for a column
-- `clearSortState()`: Clear all sort states
+sort/api
+h:400px
+:::

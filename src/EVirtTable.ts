@@ -408,6 +408,9 @@ export default class EVirtTable {
     getCellValueByIndex(rowIndex: number, colIndex: number) {
         return this.ctx.database.getItemValueForRowIndexAndColIndex(rowIndex, colIndex);
     }
+    clearSort() {
+        this.ctx.database.clearSort();
+    }
     contextMenuHide() {
         this.contextMenu.hide();
     }
@@ -421,11 +424,6 @@ export default class EVirtTable {
     }
     getColumnByKey(key: string) {
         return this.ctx.database.getColumnByKey(key)?.column;
-    }
-
-    // 后端排序相关方法
-    setSortQueryData(sortData: { field: string, direction: 'asc' | 'desc' }[]) {
-        this.ctx.database.setSortQueryData(sortData);
     }
 
     /**
