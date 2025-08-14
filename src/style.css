@@ -45,6 +45,7 @@
     --evt-resize-row-line-color: #e1e6eb;
     --evt-resize-column-line-color: #e1e6eb;
     --evt-tree-line-color: #e1e6eb;
+    --evt-sort-icon-color: rgb(82, 146, 247);
 }
 .dark {
     --evt-border-color: #363637;

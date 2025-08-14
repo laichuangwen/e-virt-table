@@ -163,7 +163,8 @@ export default class Config {
     SORT_DESC_ICON_SVG = '';
     /** 排序默认图标 */
     SORTABLE_ICON_SVG = '';
-
+    /** 排序图标颜色 */
+    SORT_ICON_COLOR = 'rgb(82,146,247)';
     /** 单元格只读背景色 */
     READONLY_COLOR = '#fff';
     /** 单元格只读文本颜色 */
