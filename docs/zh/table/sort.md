@@ -82,14 +82,11 @@
 
 ```javascript
 {
-    title: '评分',
-    key: 'score',
+    title: '状态',
+    key: 'status',
     sortBy: (a, b) => {
         // 自定义排序逻辑
-        if (a.status !== b.status) {
-            return a.status === '在职' ? -1 : 1;
-        }
-        return a.score - b.score;
+        return (a.status === '在职' ? -1 : 1) - (b.status === '在职' ? -1 : 1);
     }
 }
 ```
@@ -107,7 +104,7 @@ h:400px
 
 ## 多列排序
 
-`SORT_STRICTLY=false`表格支持多列排序。当多个列被排序时，会按照点击顺序（基于时间戳的优先级）依次应用排序。
+`SORT_STRICTLY=false`表格支持多列排序。当多个列被排序时，会按照点击顺序（越晚的升降序越是主要排序依据）依次应用排序。
 
 ::: demo
 
