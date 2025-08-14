@@ -4,7 +4,7 @@
 
 | Parameter      | Description                                    | Type     | Default |
 | -------------- | ---------------------------------------------- | -------- | ------- |
-| SORT_STRICTLY  | Enable strict sorting, true supports multi-column sorting | boolean | true    |
+| SORT_STRICTLY  | Enable strict sorting, false supports multi-column sorting | boolean | true    |
 
 ## Column
 

@@ -106,6 +106,7 @@ type EVirtTableOptions = {
 | ENABLE_KEYBOARD | Enable keyboard | boolean | — | true |
 | ENABLE_HISTORY | Enable history (undo/redo) | boolean | — | true |
 | HISTORY_NUM | Number of history records | number | — | 50 |
+| SORT_STRICTLY | Enable strict sorting, false supports multi-column sorting | boolean | — | true |
 | HIGHLIGHT_HOVER_ROW | Highlight the current row on hover | boolean | — | false |
 | HIGHLIGHT_HOVER_ROW_COLOR | Highlight color of the current row on hover | string | — | `rgba(186,203,231,0.1)` |
 | HIGHLIGHT_SELECTED_ROW | Highlight the selected row | boolean | — | true |
@@ -178,6 +179,7 @@ type EVirtTableOptions = {
 | keydown | Callback for key down | — |
 | hoverIconClick | Callback for hoverIcon click | — |
 | onPastedDataOverflow | Callback when paste overflows | `PastedDataOverflow` |
+| sortChange | Triggered when table sorting conditions change | Map<string, SortStateMapItem> |
 | error | Error callback | — |
 
 ## Methods
@@ -229,6 +231,7 @@ type EVirtTableOptions = {
 | getPositionForRowIndex | Get position for row index    | —                                                         |
 | getCellValue           | Get cell value by rowKey and key | (rowKey, key)                                           |
 | getUtils               | Get utility methods, such as built-in merge row and column methods | —                     
+| clearSort              | Clear sorting                  | —                                                         |
 | contextMenuHide        | Hide context menu             | —                                                         |
 | destroy                | Destroy                       | —                                                         |
 
@@ -267,6 +270,10 @@ type EVirtTableOptions = {
 | overflowTooltipShow | Show overflow tooltip | boolean | — | true |
 | overflowTooltipMaxWidth | Max width of overflow tooltip | number | — | — |
 | overflowTooltipPlacement | Placement of overflow tooltip | OverflowTooltipPlacement |  ^[string]`top, top-start, top-end, right, right-start, right-end, left, left-start, left-end, bottom, bottom-start, bottom-end` | — |
+| sortBy | Sorting type | `'number'`, `'string'`, `'date'`, `(a: rowData, b: rowData) => number` | — | — |
+| sortIconName | Default sort icon | `string` | — | — |
+| sortAscIconName | Ascending sort icon | `string` | — | — |
+| sortDescIconName | Descending sort icon | `string` | — | — |
 | rules | Validation rules | Rules | — | — |
 
 ## Row
@@ -376,4 +383,8 @@ type PastedDataOverflow = {
     overflowColCount: number;
     textArr: string[][];
 };
+
+type SortDirection = 'asc' | 'desc' | 'none';
+type SortStateMapItem = { direction: SortDirection; timestamp: number };
+type SortStateMap = Map<string, SortStateMapItem>;
 ```

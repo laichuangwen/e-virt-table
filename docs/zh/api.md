@@ -108,6 +108,7 @@ type EVirtTableOptions = {
 | ENABLE_KEYBOARD | 启用键盘 | boolean | true |
 | ENABLE_HISTORY | 启用历史记录，可回退 | boolean | true |
 | HISTORY_NUM | 启用历史记录数量 | number | 50 |
+| SORT_STRICTLY | 启用严格排序，false支持多列排序 | boolean | true |
 | HIGHLIGHT_HOVER_ROW | hover 高亮当前行 | boolean | false |
 | HIGHLIGHT_HOVER_ROW_COLOR | hover 高亮当前行颜色 | string | `rgba(186,203,231,0.1)` |
 | HIGHLIGHT_SELECTED_ROW | 高亮选中当前行 | boolean | true |
@@ -180,6 +181,7 @@ type EVirtTableOptions = {
 | keydown | keydown回调 | — |
 | hoverIconClick | hoverIcon点击回调 | — |
 | onPastedDataOverflow | 粘贴溢出时回调 | `PastedDataOverflow`  |
+| sortChange | 当表格的排序条件发生变化的时候会触发该事件 | Map<string, SortStateMapItem> |
 | error | error回调 | — |
 
 ## Methods
@@ -232,6 +234,7 @@ type EVirtTableOptions = {
 | getPositionForRowIndex | 获取当前行的高度定位          | —                                                         |
 | getCellValue           | 通过 rowKey 和 key 获取格子值 | (rowKey, key)                                             |
 | getUtils               | 获取工具类方法，如内置合并行列方法                  | —                                     |
+| clearSort              | 清除排序                      | —                                                         |
 | contextMenuHide        | 隐藏右键菜单                  | —                                                         |
 | destroy                | 销毁                          | —                                                         |
 
@@ -269,6 +272,10 @@ type EVirtTableOptions = {
 | overflowTooltipShow | 是否显示溢出提示 | boolean | true |
 | overflowTooltipMaxWidth | 溢出提示的宽度 | number | 500 |
 | overflowTooltipPlacement | 溢出提示的位置|  ^[string]`top, top-start, top-end, right, right-start, right-end, left, left-start, left-end, bottom, bottom-start, bottom-end` | — |
+| sortBy | 排序类型 | `'number'`, `'string'`, `'date'`, `(a: rowData, b: rowData) => number` | — |
+| sortIconName | 默认排序图标 | `string` | — |
+| sortAscIconName | 升序排序图标 | `string` | — |
+| sortDescIconName | 降序排序图标 | `string` | — |
 | rules | 校验规则 | Rules | — |
 
 ## Row
@@ -379,5 +386,9 @@ type PastedDataOverflow = {
     overflowColCount: number;
     textArr: string[][];
 };
+
+type SortDirection = 'asc' | 'desc' | 'none';
+type SortStateMapItem = { direction: SortDirection; timestamp: number };
+type SortStateMap = Map<string, SortStateMapItem>;
 
 ```
