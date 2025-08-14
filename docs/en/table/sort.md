@@ -105,8 +105,8 @@ h:400px
 :::
 
 ## Multi-Column Sorting
-
-When `SORT_STRICTLY=false`, the table supports multi-column sorting. When multiple columns are sorted, they are applied in order of click (priority based on timestamp).
+<!-- 表格支持多列排序。当多个列被排序时，会按照点击顺序（越晚的升降序越是主要排序依据）依次应用排序 -->
+When `SORT_STRICTLY=false`, the table support multi-column sorting. When multiple columns are sorted, sorting will be applied in order of clicking (the later ascending and descending order is more stronger)..
 
 ::: demo
 
