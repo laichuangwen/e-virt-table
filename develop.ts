@@ -35,17 +35,6 @@ let columns: Column[] = [
         fixed: 'left',
         minWidth: 80,
         maxWidth: 200,
-        sortBy: 'string',
-    },
-    {
-        title: '工号工号',
-        key: 'emp_no1',
-        // operation: true,
-        align: 'left',
-        type: 'selection-tree',
-        // verticalAlign: 'bottom',
-        readonly: false,
-        width: 180,
     },
     // {
     //   key: "selection",
@@ -56,6 +45,7 @@ let columns: Column[] = [
     {
         title: '工号',
         key: 'emp_no',
+        align: 'left',
         // operation: true,
         readonly: true,
         width: 120,
@@ -70,10 +60,9 @@ let columns: Column[] = [
         width: 100,
         sort: 7,
         fixed: 'left',
-        align: 'center',
+        align: 'left',
         hoverIconName: 'icon-edit',
         placeholder: '请输入',
-        sortBy: 'string',
         // editorType: 'none',
         verticalAlign: 'middle',
         // hide: true,
@@ -94,26 +83,6 @@ let columns: Column[] = [
         //     pEl.appendChild(cellEl);
         // },
         // render: "emp_name",
-    },
-    {
-        title: '数量',
-        key: 'requiredQuantity',
-        sortBy: 'number',
-        align: 'right',
-        rules: [
-            {
-                required: true, // TODO:表格1.2.19有问题
-                pattern: /^(0|[1-9]\d*)$/,
-                message: '请输入0或正整数',
-                validator(rule, value, callback) {
-                    if (value > 10) {
-                        callback('数量不能大于10');
-                    } else {
-                        callback();
-                    }
-                },
-            },
-        ],
     },
     // {
     //   title: '部门',
@@ -191,7 +160,6 @@ let columns: Column[] = [
         title: '手机号',
         key: 'phone',
         readonly: false,
-        align: 'right',
         overflowTooltipHeaderShow: true,
         formatterFooter: ({ value }) => {
             return `合：${value}`;
@@ -236,7 +204,6 @@ let columns: Column[] = [
         hoverIconName: 'icon-select',
         sort: 4,
         width: 200,
-        sortBy: 'date',
     },
     {
         title: '出生日期',
@@ -244,7 +211,6 @@ let columns: Column[] = [
         editorType: 'date',
         hoverIconName: 'icon-date',
         sort: 2,
-        sortBy: 'date',
     },
     {
         title: '家庭地址',
@@ -262,13 +228,14 @@ let columns: Column[] = [
         render: (pEl, cell) => {
             const cellEl = document.createElement('div');
             cellEl.addEventListener('click', () => {
-                // 点击了家庭地址
+                console.log('点击了家庭地址');
             });
             cellEl.addEventListener('selectionchange', () => {
+                console.log('selectionchange');
                 const selection = window.getSelection();
                 const text = selection ? selection.toString() : '';
                 if (text) {
-                    // 用户选中了文本
+                    console.log('用户选中了文本:', text);
                 }
             });
             cellEl.style.width = '100%';
@@ -287,19 +254,12 @@ let columns: Column[] = [
     {
         title: '请假开始时间',
         key: 'start_dt',
-        sortBy: 'date',
     },
     {
         title: '物料编码',
         key: 'materialNo',
         align: 'right',
         selectorCellValueType: 'displayText', // displayText | value
-        sortBy: (a, b) => {
-            // 自定义排序：按物料编码的数字部分排序
-            const aValue = parseFloat(a.materialNo) || 0;
-            const bValue = parseFloat(b.materialNo) || 0;
-            return aValue - bValue;
-        },
         formatter({ value }: { value: string }) {
             if (!value) {
                 return '';
@@ -308,7 +268,25 @@ let columns: Column[] = [
             return `物料编码：${v}`;
         },
     },
-
+    {
+        title: '数量',
+        key: 'requiredQuantity',
+        rules: [
+            {
+                required: true, // TODO:表格1.2.19有问题
+                pattern: /^(0|[1-9]\d*)$/,
+                message: '请输入0或正整数',
+                validator(rule, value, callback) {
+                    if (value > 10) {
+                        callback('数量不能大于10');
+                    } else {
+                        callback();
+                    }
+                },
+            },
+        ],
+        align: 'right',
+    },
     { title: '单位', key: 'unit' },
     { title: '工作性质', key: 'work_type' },
     { title: '工作状态', key: 'work_status' },
@@ -360,10 +338,6 @@ let columns: Column[] = [
         key: 'salePrice',
         type: 'number',
         align: 'left',
-        sortBy: 'api',
-        sortIconName: 'sortable-backend',
-        sortAscIconName: 'sort-backend-asc',
-        sortDescIconName: 'sort-backend-desc',
         hoverIconName: 'icon-edit',
         placeholder: '请输入',
         // readonly: true,
@@ -408,7 +382,6 @@ for (let i = 0; i < 1000; i += 1) {
         nation: `汉${i}`,
         work_address: `南京路${i}号`,
         work_email: `${28976633 + i}@qq.com`,
-        start_dt: new Date(Math.ceil(new Date().getTime() * (0.9995 + Math.random() * 0.001))).toISOString().slice(0, 19).replace('T', ' '),
         email: `${4465566 + i}@qq.com`,
         work_age: 2 + i,
         company_age: 1 + i,
@@ -422,7 +395,7 @@ for (let i = 0; i < 1000; i += 1) {
         sn: `SDFSD${i}`,
         materialNo: `1231${i}`,
         unit: '个',
-        requiredQuantity: Math.ceil(Math.random() * 100),
+        requiredQuantity: 10,
         customerRemarks: `测试测试${i}`,
         purchasePrice: 10.2 + i,
         salePrice: 12.3 + i,
@@ -432,7 +405,6 @@ for (let i = 0; i < 1000; i += 1) {
                 emp_no: `${i}-1`,
                 emp_name: `张三${i}-1`,
                 children: [],
-                _hasChildren: true,
             },
             {
                 id: `${i}-2`,
@@ -443,29 +415,26 @@ for (let i = 0; i < 1000; i += 1) {
                         id: `${i}-2-1`,
                         emp_no: `${i}-2-1`,
                         emp_name: `张三${i}-2-1`,
+                        children: [],
+                    },
+                    {
+                        id: `${i}-2-2`,
+                        emp_no: `${i}-2-2`,
+                        emp_name: `张三${i}-2-2`,
                         children: [
                             {
-                                id: `${i}-2-1-1`,
-                                emp_no: `${i}-2-1-1`,
-                                emp_no1: `${i}-2-1-1`,
-                                emp_name: `张三${i}-2-1-1`,
-                                children: [
-                                    {
-                                        id: `${i}-2-1-1-1`,
-                                        emp_no: `${i}-2-1-1-1`,
-                                        emp_name: `张三${i}-2-1-1-1`,
-                                        children: [
-                                            {
-                                                id: `${i}-2-1-1-1-1`,
-                                                emp_no: `${i}-2-1-1-1-1`,
-                                                emp_name: `张三${i}-2-1-1-1-1`,
-                                            },
-                                        ],
-                                    },
-                                ],
+                                id: `${i}-2-2-1`,
+                                emp_no: `${i}-2-2-1`,
+                                emp_name: `张三${i}-2-2-1`,
+                                children: [],
                             },
                         ],
-                        _hasChildren: true,
+                    },
+                    {
+                        id: `${i}-2-3`,
+                        emp_no: `${i}-2-3`,
+                        emp_name: `张三${i}-2-3`,
+                        children: [],
                     },
                 ],
             },
@@ -481,20 +450,6 @@ for (let i = 0; i < 0; i += 1) {
         align: 'right',
     });
 }
-const svgSelect =
-    '<svg t="1724122044148" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4551" width="32" height="32"><path d="M707.648 401.28L489.28 560.704l22.656 30.976 22.656-30.976L316.16 401.216q-3.072-2.24-6.464-3.84-3.456-1.536-7.104-2.432-3.712-0.896-7.488-1.088-3.776-0.128-7.488 0.448-3.776 0.64-7.296 1.92-3.584 1.28-6.784 3.2-3.2 1.984-6.016 4.544-2.816 2.56-5.056 5.632-2.176 3.072-3.84 6.464-1.536 3.456-2.432 7.104-0.896 3.712-1.088 7.488-0.128 3.776 0.448 7.488 0.64 3.776 1.92 7.296 1.28 3.584 3.2 6.784 1.984 3.2 4.544 6.016 2.56 2.752 5.632 4.992l218.368 159.552q4.928 3.584 10.752 5.504 5.76 1.92 11.904 1.92 6.08 0 11.904-1.92 5.76-1.92 10.752-5.504l218.368-159.552q3.008-2.24 5.568-4.992 2.56-2.816 4.544-6.016 1.92-3.2 3.264-6.784 1.28-3.52 1.92-7.296 0.576-3.712 0.384-7.488-0.128-3.84-1.024-7.488-0.896-3.648-2.496-7.04-1.6-3.456-3.84-6.528-2.24-3.072-4.992-5.632-2.816-2.56-6.016-4.48-3.2-1.984-6.784-3.328-3.584-1.28-7.296-1.856-3.712-0.64-7.488-0.448-3.84 0.192-7.488 1.088-3.648 0.896-7.04 2.496-3.456 1.536-6.528 3.84z m61.056 30.976q0-3.84-0.768-7.488-0.704-3.712-2.176-7.232-1.472-3.456-3.52-6.656-2.112-3.136-4.8-5.76-2.688-2.688-5.76-4.8-3.2-2.112-6.72-3.584-3.456-1.408-7.168-2.176-3.712-0.704-7.488-0.704-3.84 0-7.488 0.704-3.712 0.768-7.232 2.176-3.456 1.472-6.656 3.584-3.136 2.112-5.76 4.8-2.688 2.624-4.8 5.76-2.112 3.2-3.584 6.656-1.408 3.52-2.176 7.232-0.704 3.712-0.704 7.488 0 3.776 0.704 7.488 0.768 3.712 2.176 7.168 1.472 3.52 3.584 6.656 2.112 3.2 4.8 5.824 2.624 2.688 5.76 4.8 3.2 2.112 6.656 3.52 3.52 1.472 7.232 2.176 3.712 0.768 7.488 0.768 3.776 0 7.488-0.768 3.712-0.704 7.168-2.176 3.52-1.408 6.656-3.52 3.2-2.112 5.824-4.8 2.688-2.688 4.8-5.76 2.048-3.2 3.52-6.72 1.472-3.456 2.176-7.168 0.768-3.712 0.768-7.488z m-436.736 0q0-3.84-0.768-7.488-0.704-3.712-2.176-7.232-1.408-3.456-3.52-6.656-2.112-3.136-4.8-5.76-2.688-2.688-5.76-4.8-3.2-2.112-6.656-3.584-3.52-1.408-7.232-2.176-3.712-0.704-7.488-0.704-3.84 0-7.488 0.704-3.712 0.768-7.232 2.176-3.456 1.472-6.592 3.584-3.2 2.112-5.824 4.8-2.688 2.624-4.8 5.76-2.112 3.2-3.52 6.656-1.472 3.52-2.24 7.232-0.704 3.712-0.704 7.488 0 3.776 0.704 7.488 0.768 3.712 2.24 7.168 1.408 3.52 3.52 6.656 2.112 3.2 4.8 5.824 2.624 2.688 5.76 4.8 3.2 2.112 6.656 3.52 3.52 1.472 7.232 2.176 3.712 0.768 7.488 0.768 3.776 0 7.488-0.768 3.712-0.704 7.232-2.176 3.456-1.408 6.592-3.52 3.2-2.112 5.824-4.8 2.688-2.688 4.8-5.76 2.112-3.2 3.52-6.72 1.472-3.456 2.176-7.168 0.768-3.712 0.768-7.488z" p-id="4552"></path></svg>';
-const svgCharacterAsc = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" fillRule="evenodd"><path d="m12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036q-.016-.004-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"></path><path fill="currentColor" d="M4.664 11.942a1 1 0 0 0 1.278-.606L6.419 10h3.162l.477 1.336a1 1 0 0 0 1.884-.672L9.61 4.134a1.71 1.71 0 0 0-3.22 0l-2.332 6.53a1 1 0 0 0 .606 1.278M8 5.573L8.867 8H7.133zm8.293-1.28a1 1 0 0 1 1.414 0l2.829 2.828a1 1 0 0 1-1.415 1.415L18 7.414V20a1 1 0 1 1-2 0V7.414l-1.121 1.122a1 1 0 1 1-1.415-1.415zM5 13a1 1 0 1 0 0 2h3.586l-4.122 4.122C3.77 19.815 4.26 21 5.24 21H11a1 1 0 1 0 0-2H7.414l4.122-4.122c.693-.693.203-1.878-.777-1.878z"></path></g></svg>`;
-const svgCharacterDesc = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"></path><path fill="currentColor" d="M8 12c.674 0 1.28.396 1.556 1.002l.054.132l2.332 6.53a1 1 0 0 1-1.838.78l-.046-.108L9.581 19H6.419l-.477 1.336a1 1 0 0 1-1.917-.56l.033-.112l2.332-6.53A1.71 1.71 0 0 1 8 12m9-8a1 1 0 0 1 1 1v12.414l1.121-1.121a1 1 0 0 1 1.415 1.414l-2.829 2.828a1 1 0 0 1-1.414 0l-2.828-2.828a1 1 0 0 1 1.414-1.414L16 17.414V5a1 1 0 0 1 1-1M8 14.573L7.133 17h1.734zM10.759 3c.94 0 1.43 1.092.855 1.792l-.078.086L7.414 9H11a1 1 0 0 1 .117 1.993L11 11H5.241c-.94 0-1.43-1.092-.855-1.792l.078-.086L8.586 5H5a1 1 0 0 1-.117-1.993L5 3z"></path></g></svg>`;
-const svgNumberAsc = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" fillRule="evenodd"><path d="m12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036q-.016-.004-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"></path><path fill="currentColor" d="M5 6a3 3 0 0 1 6 0v2a3 3 0 0 1-6 0zm3-1a1 1 0 0 0-1 1v2a1 1 0 0 0 2 0V6a1 1 0 0 0-1-1m9.707-.707a1 1 0 0 0-1.414 0L13.465 7.12a1 1 0 0 0 1.414 1.415L16 7.414V20a1 1 0 1 0 2 0V7.414l1.121 1.122a1 1 0 1 0 1.415-1.415zM5 15a3 3 0 0 1 5.995-.176l.005.186c0 .408-.039.799-.107 1.171c-.264 1.433-.964 2.58-1.57 3.352c-.307.39-.598.694-.815.904c-.124.12-.25.238-.385.345a1 1 0 0 1-1.34-1.479L7.118 19l.224-.228A7 7 0 0 0 7.971 18A3 3 0 0 1 5 15m3-1a1 1 0 1 0 0 2a1 1 0 0 0 0-2"></path></g></svg>`;
-const svgNumberDesc = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" fillRule="evenodd"><path d="m12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036q-.016-.004-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"></path><path fill="currentColor" d="M5 6a3 3 0 0 1 5.995-.176L11 6.01c0 .408-.039.799-.107 1.171c-.264 1.433-.964 2.58-1.57 3.352c-.307.39-.598.694-.815.904c-.124.12-.25.238-.385.345a1 1 0 0 1-1.34-1.479L7.118 10l.224-.228A7 7 0 0 0 7.971 9A3 3 0 0 1 5 6m3-1a1 1 0 1 0 0 2a1 1 0 0 0 0-2m10 0a1 1 0 1 0-2 0v12.414l-1.121-1.121a1 1 0 0 0-1.415 1.414l2.829 2.828a1 1 0 0 0 1.414 0l2.828-2.828a1 1 0 1 0-1.414-1.414L18 17.413zM8 13a3 3 0 0 0-3 3v2a3 3 0 1 0 6 0v-2a3 3 0 0 0-3-3m-1 3a1 1 0 1 1 2 0v2a1 1 0 1 1-2 0z"></path></g></svg>`;
-const svgDateAsc = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M19 7h-3l4-4l4 4h-3v14h-2zM8 16h3v-3H8zm5-11h-1V3h-2v2H6V3H4v2H3c-1.11 0-2 .89-2 2v11c0 1.11.89 2 2 2h10c1.11 0 2-.89 2-2V7c0-1.11-.89-2-2-2M3 18v-7h10v7z"></path></svg>`;
-const svgDateDesc = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M21 17h3l-4 4l-4-4h3V3h2zM8 16h3v-3H8zm5-11h-1V3h-2v2H6V3H4v2H3c-1.11 0-2 .89-2 2v11c0 1.11.89 2 2 2h10c1.11 0 2-.89 2-2V7c0-1.11-.89-2-2-2M3 18v-7h10v7z"></path></svg>`;
-const svgSortAsc = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M18.5 17.25a.75.75 0 0 1-1.5 0V7.56l-2.22 2.22a.75.75 0 1 1-1.06-1.06l3.5-3.5a.75.75 0 0 1 1.06 0l3.5 3.5a.75.75 0 0 1-1.06 1.06L18.5 7.56zm-15.75.25a.75.75 0 0 1 0-1.5h9.5a.75.75 0 0 1 0 1.5zm0-5a.75.75 0 0 1 0-1.5h5.5a.75.75 0 0 1 0 1.5zm0-5a.75.75 0 0 1 0-1.5h3.5a.75.75 0 0 1 0 1.5z"></path></svg>`;
-const svgSortDesc = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M18.5 16.44V6.75a.75.75 0 0 0-1.5 0v9.69l-2.22-2.22a.75.75 0 1 0-1.06 1.06l3.5 3.5a.75.75 0 0 0 1.06 0l3.5-3.5a.75.75 0 1 0-1.06-1.06zM2 7.25a.75.75 0 0 1 .75-.75h9.5a.75.75 0 0 1 0 1.5h-9.5A.75.75 0 0 1 2 7.25m0 5a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5h-5.5a.75.75 0 0 1-.75-.75m0 5a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 0 1.5h-3.5a.75.75 0 0 1-.75-.75"></path></svg>`;
-const svgSortBackendAsc = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="m15 7.674l1.409-1.487C17.159 5.396 17.534 5 18 5s.841.396 1.591 1.187L21 7.674m-3-2.587v4.375c0 2.234 0 3.35-.447 4.335s-1.287 1.72-2.968 3.191L14 17.5M3 6.5c0-1.225 0-1.838.238-2.306c.21-.411.545-.746.956-.956C4.662 3 5.274 3 6.5 3s1.838 0 2.306.238c.411.21.746.545.956.956C10 4.662 10 5.274 10 6.5s0 1.838-.238 2.306c-.21.411-.545.746-.956.956C8.338 10 7.726 10 6.5 10s-1.838 0-2.306-.238a2.2 2.2 0 0 1-.956-.956C3 8.338 3 7.726 3 6.5m0 11c0-1.225 0-1.838.238-2.306c.21-.411.545-.746.956-.956C4.662 14 5.274 14 6.5 14s1.838 0 2.306.238c.411.21.746.545.956.956c.238.468.238 1.08.238 2.306s0 1.838-.238 2.306c-.21.411-.545.746-.956.956C8.338 21 7.726 21 6.5 21s-1.838 0-2.306-.238a2.2 2.2 0 0 1-.956-.956C3 19.338 3 18.726 3 17.5"></path></svg>`;
-const svgSortBackendDesc = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="m15 16.327l1.409 1.486C17.159 18.604 17.534 19 18 19s.841-.396 1.591-1.187L21 16.327m-3 2.586v-4.375c0-2.234 0-3.35-.447-4.335s-1.287-1.72-2.968-3.191L14 6.5m-11 0c0-1.225 0-1.838.238-2.306c.21-.411.545-.746.956-.956C4.662 3 5.274 3 6.5 3s1.838 0 2.306.238c.411.21.746.545.956.956C10 4.662 10 5.274 10 6.5s0 1.838-.238 2.306c-.21.411-.545.746-.956.956C8.338 10 7.726 10 6.5 10s-1.838 0-2.306-.238a2.2 2.2 0 0 1-.956-.956C3 8.338 3 7.726 3 6.5m0 11c0-1.225 0-1.838.238-2.306c.21-.411.545-.746.956-.956C4.662 14 5.274 14 6.5 14s1.838 0 2.306.238c.411.21.746.545.956.956c.238.468.238 1.08.238 2.306s0 1.838-.238 2.306c-.21.411-.545.746-.956.956C8.338 21 7.726 21 6.5 21s-1.838 0-2.306-.238a2.2 2.2 0 0 1-.956-.956C3 19.338 3 18.726 3 17.5"></path></svg>`;
-const svgSortable = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="m17.25 4l-.1.007a.75.75 0 0 0-.65.743v12.692l-3.22-3.218l-.084-.072a.75.75 0 0 0-.976 1.134l4.504 4.5l.084.072a.75.75 0 0 0 .976-.073l4.497-4.5l.072-.084a.75.75 0 0 0-.073-.977l-.084-.072a.75.75 0 0 0-.977.073L18 17.446V4.75l-.006-.102A.75.75 0 0 0 17.251 4m-11.036.22L1.72 8.715l-.073.084a.75.75 0 0 0 .073.976l.084.073a.75.75 0 0 0 .976-.073l3.217-3.218v12.698l.008.102a.75.75 0 0 0 .743.648l.101-.007a.75.75 0 0 0 .649-.743L7.497 6.559l3.223 3.217l.084.072a.75.75 0 0 0 .975-1.134L7.275 4.22l-.085-.072a.75.75 0 0 0-.976.073"></path></svg>`;
-const svgSortableBackend = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="#bec4c7" stroke-width="1.5"><path d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 8v8m0 0L7 13.25M9.5 16l2.5-2.75M14.5 16V8m0 0L12 10.75M14.5 8l2.5 2.75"/></g></svg>`;
 const overlayerEl = document.getElementById('e-virt-table-overlayer') as HTMLDivElement;
 const editorEl = document.getElementById('e-virt-table-editor') as HTMLDivElement;
 const eVirtTable = new EVirtTable(canvas, {
@@ -516,70 +471,10 @@ const eVirtTable = new EVirtTable(canvas, {
         },
     ],
     config: {
-        ICONS: [
-            // {
-            //     name: 'sort-by-character-asc',
-            //     svg: svgCharacterAsc,
-            //     color: '#4E5969',
-            // },
-            // {
-            //     name: 'sort-by-character-desc',
-            //     svg: svgCharacterDesc,
-            //     color: '#4E5969',
-            // },
-            // {
-            //     name: 'sort-by-number-asc',
-            //     svg: svgNumberAsc,
-            //     color: '#4E5969',
-            // },
-            // {
-            //     name: 'sort-by-number-desc',
-            //     svg: svgNumberDesc,
-            //     color: '#4E5969',
-            // },
-            // {
-            //     name: 'sort-by-date-asc',
-            //     svg: svgDateAsc,
-            //     color: '#4E5969',
-            // },
-            // {
-            //     name: 'sort-by-date-desc',
-            //     svg: svgDateDesc,
-            //     color: '#4E5969',
-            // },
-            // {
-            //     name: 'sort-asc',
-            //     svg: svgSortAsc,
-            //     color: '#4E5969',
-            // },
-            // {
-            //     name: 'sort-desc',
-            //     svg: svgSortDesc,
-            //     color: '#4E5969',
-            // },
-            // {
-            //     name: 'sortable',
-            //     svg: svgSortable,
-            //     color: '#bec4c7',
-            // },
-            // {
-            //     name: 'sort-backend-asc',
-            //     svg: svgSortBackendAsc,
-            //     color: '',
-            // },
-            // {
-            //     name: 'sort-backend-desc',
-            //     svg: svgSortBackendDesc,
-            //     color: '',
-            // },
-            // {
-            //     name: 'sortable-backend',
-            //     svg: svgSortableBackend,
-            //     color: '',
-            // },
-        ],
+        ICONS: [],
         BORDER: true,
         STRIPE: false,
+        TREE_LINE: true,
         // DISABLED: true,
         // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
@@ -614,7 +509,7 @@ const eVirtTable = new EVirtTable(canvas, {
                 label: '新增',
                 value: 'add',
                 event: () => {
-                    // 新增
+                    console.log('新增');
                 },
             },
         ],
@@ -694,7 +589,7 @@ const eVirtTable = new EVirtTable(canvas, {
                 },
             ];
             const data = [...changeList, ...list];
-            // 修改前数据
+            console.log('修改前数据', data);
             return data;
             // if(changeList.some((item) => item.key !== 'requiredQuantity')) {
             //     return changeList.map(item=>{
@@ -872,7 +767,7 @@ eVirtTable.on('error', (error) => {
     console.error(error);
 });
 eVirtTable.on('hoverIconClick', (cell) => {
-    // hoverIconClick
+    console.log('hoverIconClick', cell);
 });
 // eVirtTable.on('change', (changeList) => {
 //     eVirtTable.validate();
@@ -880,12 +775,12 @@ eVirtTable.on('hoverIconClick', (cell) => {
 eVirtTable.on('onPastedDataOverflow', (val: PastedDataOverflow) => {
     const { overflowColCount, overflowRowCount } = val;
     if (overflowRowCount > 0) {
-        // 粘贴数据超出行数
+        console.log('粘贴数据超出行数', overflowRowCount);
         data = data.concat(Array.from({ length: overflowRowCount }).map(() => ({})));
         eVirtTable.loadData(data);
     }
     if (overflowColCount > 0) {
-        // 粘贴数据超出列数
+        console.log('粘贴数据超出列数', overflowColCount);
         columns = columns.concat(
             Array.from({ length: overflowColCount }).map((_, index) => ({
                 title: `溢出表头${index}`,
@@ -923,181 +818,6 @@ eVirtTable.on('overlayerChange', (container) => {
         overlayerEl.appendChild(typeDiv);
     });
 });
-
-// 模拟服务端排序接口
-function mockServerSort(sortData) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            let sortedData = [...data];
-
-            // 根据排序条件对数据进行排序
-            sortData.forEach(({ field, direction }) => {
-                sortedData.sort((a, b) => {
-                    let aValue = a[field];
-                    let bValue = b[field];
-
-                    // 根据字段类型进行排序
-                    if (
-                        field === 'requiredQuantity' ||
-                        field === 'work_age' ||
-                        field === 'age' ||
-                        field === 'salePrice'
-                    ) {
-                        // 数字排序
-                        aValue = Number(aValue) || 0;
-                        bValue = Number(bValue) || 0;
-                        return direction === 'asc' ? aValue - bValue : bValue - aValue;
-                    } else if (field === 'birthday') {
-                        // 日期排序
-                        aValue = new Date(aValue).getTime();
-                        bValue = new Date(bValue).getTime();
-                        return direction === 'asc' ? aValue - bValue : bValue - aValue;
-                    } else {
-                        // 字符串排序
-                        aValue = String(aValue || '');
-                        bValue = String(bValue || '');
-                        return direction === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
-                    }
-                });
-            });
-
-            resolve(sortedData);
-        }, 500); // 模拟网络延迟
-    });
-}
-
-eVirtTable.on('sortChange', async (sortMap) => {
-    const sortData = (Array.from(sortMap.entries()) as [any, any][]).map(([key, value]) => ({
-        field: key,
-        direction: value.direction,
-    }));
-    console.log();
-    
-    // const sortedData = await mockServerSort(sortData);
-    // eVirtTable.loadData(sortedData);
-});
-// 三种模式切换功能
-let currentMode = 'normal'; // 'normal', 'selection-tree', 'tree-selection'
-const modeRadioContainer = document.getElementById('modeRadioContainer') as HTMLDivElement;
-
-// 创建 radio 按钮
-if (modeRadioContainer) {
-    modeRadioContainer.innerHTML = `
-        <label>
-            <input type="radio" name="mode" value="normal" checked> 勾选+树
-        </label>
-        <label>
-            <input type="radio" name="mode" value="selection-tree"> 勾选树
-        </label>
-        <label>
-            <input type="radio" name="mode" value="tree-selection"> 树勾选
-        </label>
-    `;
-
-    // 监听 radio 变化
-    const radioButtons = modeRadioContainer.querySelectorAll('input[name="mode"]');
-    radioButtons.forEach((radio) => {
-        radio.addEventListener('change', (e) => {
-            const target = e.target as HTMLInputElement;
-            const newMode = target.value;
-
-            if (newMode === currentMode) {
-                return;
-            }
-
-            currentMode = newMode;
-
-            let newColumns: Column[];
-
-            switch (newMode) {
-                case 'selection-tree':
-                    // 切换到勾选树模式
-                    newColumns = columns.map((col) => {
-                        if (col.key === 'selection') {
-                            return {
-                                ...col,
-                                type: 'selection-tree',
-                                title: '选择',
-                                width: 200,
-                                align: 'left',
-                            };
-                        }
-                        if (col.key === 'emp_no') {
-                            return {
-                                ...col,
-                                type: undefined, // 移除 tree 类型
-                            };
-                        }
-                        return col;
-                    });
-                    break;
-
-                case 'tree-selection':
-                    // 切换到树勾选模式
-                    newColumns = columns.map((col) => {
-                        if (col.key === 'selection') {
-                            return {
-                                ...col,
-                                type: 'tree-selection',
-                                title: '选择',
-                                align: 'left',
-                            };
-                        }
-                        if (col.key === 'emp_no') {
-                            return {
-                                ...col,
-                                type: undefined, // 移除 tree 类型
-                            };
-                        }
-                        return col;
-                    });
-                    break;
-
-                default:
-                    // 普通模式
-                    newColumns = columns;
-                    break;
-            }
-
-            // 重新加载列配置
-            eVirtTable.loadColumns(newColumns);
-
-            // 更新配置
-            if (newMode === 'normal') {
-                eVirtTable.loadConfig({
-                    TREE_SELECT_MODE: 'auto',
-                    AUTO_FIT_TREE_WIDTH: true,
-                    ENABLE_CONTEXT_MENU: true,
-                    CONTEXT_MENU: [
-                        { label: '复制', value: 'copy' },
-                        { label: '剪切', value: 'cut' },
-                        { label: '粘贴', value: 'paste' },
-                        { label: '清空选中内容', value: 'clearSelected' },
-                        {
-                            label: '新增',
-                            value: 'add',
-                            event: () => {
-                                // 新增
-                            },
-                        },
-                    ],
-                });
-            } else {
-                eVirtTable.loadConfig({
-                    TREE_SELECT_MODE: 'auto',
-                    AUTO_FIT_TREE_WIDTH: true,
-                    ENABLE_CONTEXT_MENU: true,
-                    CONTEXT_MENU: [
-                        { label: '全选', value: 'selectAll' },
-                        { label: '取消全选', value: 'unselectAll' },
-                        { label: '展开全部', value: 'expandAll' },
-                        { label: '收起全部', value: 'collapseAll' },
-                    ],
-                });
-            }
-        });
-    });
-}
 
 const dateEl = document.getElementById('e-virt-table-date') as HTMLInputElement;
 if (dateEl) {
@@ -1322,7 +1042,7 @@ document.getElementById('setConfig')?.addEventListener('click', () => {
                 label: '新增',
                 value: 'add',
                 event: () => {
-                    // 新增
+                    console.log('新增');
                 },
             },
         ],
@@ -1424,14 +1144,6 @@ document.getElementById('setReadOnly')?.addEventListener('click', () => {
 });
 document.getElementById('getChangedValues')?.addEventListener('click', () => {
     console.log(eVirtTable.getChangedData());
-});
-document.getElementById('test')?.addEventListener('click', () => {
-    eVirtTable.setSortQueryData([
-        {
-            field: 'phone',
-            direction: 'desc',
-        },
-    ]);
 });
 
 // 销毁

@@ -289,3 +289,11 @@ V1.2.22
 feat: 添加tree-selection和selection-tree类型支持树形选择
 feat: 添加COLUMNS_ALIGN，COLUMNS_VERTICAL_ALIGN 全局可控制
 ---
+
+
+V1.2.23
+### Bug Fixes
+feat: 添加tree层级线
+fix: 修复默认没有设置css变量时导致传递config空
+docs: 更新文档
+---
