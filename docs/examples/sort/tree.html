@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        let data = [
+            {
+                id: '1',
+                date: '2016-05-02',
+                name: 'John Smith',
+                state: 'California',
+                city: 'Los Angeles',
+                address: '123 Main Street, Los Angeles, CA 90210',
+                zip: 90210,
+                children: [], // Indicates there are child nodes, no children means no child nodes
+                _hasChildren: true, // Indicates there are child nodes
+            },
+            {
+                id: '2',
+                date: '2016-05-04',
+                name: 'Jane Doe',
+                state: 'New York',
+                city: 'Manhattan',
+                address: '456 Broadway, New York, NY 10001',
+                zip: 10001,
+            },
+            {
+                id: '3',
+                date: '2016-05-01',
+                name: 'Mike Johnson',
+                state: 'Texas',
+                city: 'Houston',
+                address: '789 Oak Drive, Houston, TX 77001',
+                zip: 77001,
+            },
+            {
+                id: '4',
+                date: '2016-05-03',
+                name: 'Sarah Wilson',
+                state: 'Florida',
+                city: 'Miami',
+                address: '321 Beach Road, Miami, FL 33101',
+                zip: 33101,
+            },
+        ];
+        let columns = [
+            {
+                title: 'ID',
+                key: 'id',
+                readonly: true,
+                width: 120,
+            },
+            {
+                type: 'tree',
+                title: 'Date',
+                key: 'date',
+                readonly: true,
+                sortBy: 'date',
+                width: 120,
+            },
+            {
+                title: 'Name',
+                key: 'name',
+                readonly: true,
+            },
+            {
+                title: 'State',
+                key: 'state',
+                readonly: true,
+            },
+            {
+                title: 'City',
+                key: 'city',
+                readonly: true,
+            },
+            {
+                title: 'Address',
+                key: 'address',
+                readonly: true,
+                width: 200,
+            },
+            {
+                title: 'Zip',
+                key: 'zip',
+                readonly: true,
+            },
+        ];
+        const target = document.getElementById('e-virt-table');
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                ROW_KEY: 'id', // Set row unique identifier
+                EXPAND_LAZY: true,
+                EXPAND_LAZY_METHOD: function (params) {
+                    const id = params.row.id; // Get current row id
+                    return new Promise((resolve) => {
+                        setTimeout(() => {
+                            const list = [
+                                {
+                                    id: `${id}-1`,
+                                    date: '2016-05-04',
+                                    name: 'Alice Brown',
+                                    state: 'California',
+                                    city: 'San Francisco',
+                                    address: '555 Market Street, San Francisco, CA 94105',
+                                    children: [], // Indicates there are child nodes, no children means no child nodes
+                                    _hasChildren: true, // Indicates there are child nodes
+                                    zip: 94105,
+                                },
+                                {
+                                    id: `${id}-2`,
+                                    date: '2016-05-01',
+                                    name: 'Bob Davis',
+                                    state: 'Washington',
+                                    city: 'Seattle',
+                                    address: '777 Pine Street, Seattle, WA 98101',
+                                    children: [], // No _hasChildren means no child nodes
+                                    zip: 98101,
+                                },
+                                {
+                                    id: `${id}-3`,
+                                    date: '2016-05-03',
+                                    name: 'Carol Miller',
+                                    state: 'Illinois',
+                                    city: 'Chicago',
+                                    address: '999 Michigan Avenue, Chicago, IL 60601',
+                                    zip: 60601,
+                                },
+                            ];
+                            resolve(list);
+                        }, 1000);
+                    });
+                },
+            },
+        });
+    </script>
+</html>

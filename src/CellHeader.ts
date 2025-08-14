@@ -35,6 +35,9 @@ export default class CellHeader extends BaseCell {
     style: Partial<CSSStyleDeclaration> = {};
     drawX = 0;
     drawY = 0;
+    sortIconName = 'sort-default';
+    sortAscIconName = 'sort-asc';
+    sortDescIconName = 'sort-desc';
     visibleWidth = 0;
     visibleHeight = 0;
     drawTextX = 0;
@@ -48,16 +51,14 @@ export default class CellHeader extends BaseCell {
     drawSelectionImageWidth = 0;
     drawSelectionImageHeight = 0;
     drawSelectionImageName = '';
-    drawSelectionImageSource: HTMLImageElement | undefined;
-    selectionTextX?: number;
-    selectionTextWidth?: number;
+    drawSelectionImageSource?: HTMLImageElement;
     // 排序相关
-    sortIconX = 0;
-    sortIconY = 0;
-    sortIconWidth = 0;
-    sortIconHeight = 0;
-    sortIconName = '';
-    sortIconSource: HTMLImageElement | undefined;
+    drawSortImageX = 0;
+    drawSortImageY = 0;
+    drawSortImageWidth = 0;
+    drawSortImageHeight = 0;
+    drawSortImageName = '';
+    drawSortImageSource?: HTMLImageElement;
     constructor(ctx: Context, colIndex: number, x: number, y: number, width: number, height: number, column: Column) {
         super(ctx, x, y, width, height, 'header', column.fixed);
         this.ctx = ctx;
@@ -88,6 +89,9 @@ export default class CellHeader extends BaseCell {
         this.rules = column.rules;
         this.readonly = column.readonly || false;
         this.required = column.required || false;
+        this.sortIconName = column.sortIconName || 'sort-default';
+        this.sortAscIconName = column.sortAscIconName || 'sort-asc';
+        this.sortDescIconName = column.sortDescIconName || 'sort-desc';
         this.rowKey = generateShortUUID();
         this.overflowTooltipShow = column.overflowTooltipHeaderShow === false ? false : true;
         this.hasChildren = (column.children && column.children.length > 0) || false; // 是否有子
@@ -153,9 +157,9 @@ export default class CellHeader extends BaseCell {
     private drawEdge() {
         const {
             paint,
-            config: { BORDER_COLOR,  BORDER },
+            config: { BORDER_COLOR, BORDER },
         } = this.ctx;
-        
+
         // 有边框的情况下，绘制边框
         paint.drawRect(this.drawX, this.drawY, this.width, this.height, {
             borderColor: BORDER ? BORDER_COLOR : 'transparent',
@@ -163,7 +167,6 @@ export default class CellHeader extends BaseCell {
         });
     }
     private recalculateTextPosition() {
-        
         // 对于 selection 类型的列，文本在复选框右侧显示
         let textX = this.drawX;
         let textWidth = this.width;
@@ -182,7 +185,7 @@ export default class CellHeader extends BaseCell {
         }
 
         // 如果有排序图标，调整文本位置
-        if (this.column.sortBy || this.column.apiSortable) {
+        if (this.column.sortBy) {
             const iconSize = 16;
             const iconMargin = 4;
 
@@ -200,7 +203,7 @@ export default class CellHeader extends BaseCell {
             }
         }
         this.drawTextX = textX;
-        this.drawTextWidth = textWidth
+        this.drawTextWidth = textWidth;
     }
     private drawText() {
         const {
@@ -241,7 +244,7 @@ export default class CellHeader extends BaseCell {
         if (this.hideHeaderSelection) {
             return;
         }
-        
+
         // 选中框类型
         if (['index-selection', 'selection', 'selection-tree', 'tree-selection'].includes(this.type)) {
             const { indeterminate, check, selectable } = this.ctx.database.getCheckedState();
@@ -301,61 +304,25 @@ export default class CellHeader extends BaseCell {
     }
     private drawSortIcon() {
         // 如果没有sortBy配置且不是后端排序，不显示排序图标
-        if (!this.column.sortBy && !this.column.apiSortable) {
+        if (!this.column.sortBy) {
             return;
         }
 
         const { CELL_PADDING = 0 } = this.ctx.config;
         const iconSize = 16;
         const iconMargin = 4;
-
-        let iconName = 'sortable';
-
-        if (this.column.apiSortable) {
-            // 后端排序
-            const sortState = this.ctx.database.getBackendSortState(this.key);
-            if (sortState.direction === 'asc') {
-                iconName = 'sort-backend-asc';
-            } else if (sortState.direction === 'desc') {
-                iconName = 'sort-backend-desc';
-            } else {
-                iconName = 'sortable-backend';
-            }
-        } else {
-            // 前端排序
-            const sortState = this.ctx.database.getSortState(this.key);
-            if (sortState.direction === 'asc') {
-                if (this.column.sortBy === 'number') {
-                    iconName = 'sort-by-number-asc';
-                } else if (this.column.sortBy === 'string') {
-                    iconName = 'sort-by-character-asc';
-                } else if (this.column.sortBy === 'date') {
-                    iconName = 'sort-by-date-asc';
-                } else if (Array.isArray(this.column.sortBy) && this.column.sortBy[0] === 'date') {
-                    iconName = 'sort-by-date-asc';
-                } else if (typeof this.column.sortBy === 'function') {
-                    iconName = 'sort-asc';
-                }
-            } else if (sortState.direction === 'desc') {
-                if (this.column.sortBy === 'number') {
-                    iconName = 'sort-by-number-desc';
-                } else if (this.column.sortBy === 'string') {
-                    iconName = 'sort-by-character-desc';
-                } else if (this.column.sortBy === 'date') {
-                    iconName = 'sort-by-date-desc';
-                } else if (Array.isArray(this.column.sortBy) && this.column.sortBy[0] === 'date') {
-                    iconName = 'sort-by-date-desc';
-                } else if (typeof this.column.sortBy === 'function') {
-                    iconName = 'sort-desc';
-                }
-            }
+        let iconName = this.sortIconName;
+        // 前端排序
+        const sortState = this.ctx.database.getSortState(this.key);
+        if (sortState.direction === 'asc') {
+            iconName = this.sortAscIconName;
+        } else if (sortState.direction === 'desc') {
+            iconName = this.sortDescIconName;
         }
-
         const icon = this.ctx.icons.get(iconName);
         if (!icon) {
             return;
         }
-
         // 计算图标位置
         let iconX = 0;
         let iconY = this.drawY + (this.height - iconSize) / 2;
@@ -376,27 +343,27 @@ export default class CellHeader extends BaseCell {
         }
 
         // 保存图标信息
-        this.sortIconX = iconX;
-        this.sortIconY = iconY;
-        this.sortIconWidth = iconSize;
-        this.sortIconHeight = iconSize;
-        this.sortIconName = iconName;
-        this.sortIconSource = icon;
+        this.drawSortImageX = iconX;
+        this.drawSortImageY = iconY;
+        this.drawSortImageWidth = iconSize;
+        this.drawSortImageHeight = iconSize;
+        this.drawSortImageName = iconName;
+        this.drawSortImageSource = icon;
 
         // 绘制图标
         this.ctx.paint.drawImage(
-            this.sortIconSource,
-            this.sortIconX,
-            this.sortIconY,
-            this.sortIconWidth,
-            this.sortIconHeight,
+            this.drawSortImageSource,
+            this.drawSortImageX,
+            this.drawSortImageY,
+            this.drawSortImageWidth,
+            this.drawSortImageHeight,
         );
     }
     private measureTextWidth(text: string, font: string): number {
         const canvas = this.ctx.canvasElement;
         const ctx = canvas.getContext('2d');
         if (!ctx) return 0;
-        
+
         ctx.font = font;
         return ctx.measureText(text).width;
     }

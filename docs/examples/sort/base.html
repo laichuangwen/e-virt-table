@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>e-virt-table - 表头排序</title>
+        <title>e-virt-table - Header Sorting</title>
     </head>
     <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
     <body>
@@ -13,168 +13,163 @@
         let data = [
             {
                 id: 1,
-                name: '张三',
+                name: 'John Smith',
                 age: 25,
                 salary: 50000,
-                department: '技术部',
+                department: 'Technology',
                 joinDate: '2023-01-15',
                 score: 85.5,
-                status: '在职'
+                status: 'Active',
             },
             {
                 id: 2,
-                name: '李四',
+                name: 'Sarah Johnson',
                 age: 30,
                 salary: 65000,
-                department: '市场部',
+                department: 'Marketing',
                 joinDate: '2022-08-20',
                 score: 92.3,
-                status: '在职'
+                status: 'Active',
             },
             {
                 id: 3,
-                name: '王五',
+                name: 'Michael Brown',
                 age: 28,
                 salary: 55000,
-                department: '技术部',
+                department: 'Technology',
                 joinDate: '2023-03-10',
                 score: 78.9,
-                status: '离职'
+                status: 'Inactive',
             },
             {
                 id: 4,
-                name: '赵六',
+                name: 'Emily Davis',
                 age: 35,
                 salary: 75000,
-                department: '销售部',
+                department: 'Sales',
                 joinDate: '2021-12-05',
                 score: 88.7,
-                status: '在职'
+                status: 'Active',
             },
             {
                 id: 5,
-                name: '钱七',
+                name: 'David Wilson',
                 age: 27,
                 salary: 48000,
-                department: '人事部',
+                department: 'HR',
                 joinDate: '2023-06-18',
                 score: 95.2,
-                status: '在职'
+                status: 'Active',
             },
             {
                 id: 6,
-                name: '孙八',
+                name: 'Lisa Anderson',
                 age: 32,
                 salary: 70000,
-                department: '技术部',
+                department: 'Technology',
                 joinDate: '2022-11-12',
                 score: 82.1,
-                status: '在职'
+                status: 'Active',
             },
             {
                 id: 7,
-                name: '周九',
+                name: 'Robert Taylor',
                 age: 29,
                 salary: 58000,
-                department: '市场部',
+                department: 'Marketing',
                 joinDate: '2023-02-28',
                 score: 90.5,
-                status: '离职'
+                status: 'Inactive',
             },
             {
                 id: 8,
-                name: '吴十',
+                name: 'Jennifer Martinez',
                 age: 33,
                 salary: 72000,
-                department: '销售部',
+                department: 'Sales',
                 joinDate: '2022-05-15',
                 score: 87.3,
-                status: '在职'
-            }
+                status: 'Active',
+            },
         ];
 
         let columns = [
             {
-                title: '编号',
+                title: 'ID',
                 key: 'id',
                 width: 80,
                 align: 'center',
-                sortBy: 'number',
-                readonly: true
+                readonly: true,
             },
             {
-                title: '姓名',
+                title: 'Name',
                 key: 'name',
                 width: 120,
                 align: 'left',
                 sortBy: 'string',
-                readonly: true
+                readonly: true,
             },
             {
-                title: '年龄',
+                title: 'Age',
                 key: 'age',
                 width: 80,
                 align: 'center',
                 sortBy: 'number',
-                readonly: true
+                readonly: true,
             },
             {
-                title: '薪资',
+                title: 'Salary',
                 key: 'salary',
                 width: 100,
                 align: 'right',
                 sortBy: 'number',
                 readonly: true,
                 formatter: ({ value }) => {
-                    return `¥${value.toLocaleString()}`;
-                }
+                    return `$${value.toLocaleString()}`;
+                },
             },
             {
-                title: '部门',
+                title: 'Department',
                 key: 'department',
                 width: 120,
                 align: 'left',
                 sortBy: 'string',
-                readonly: true
+                readonly: true,
             },
             {
-                title: '入职日期',
+                title: 'Join Date',
                 key: 'joinDate',
                 width: 120,
                 align: 'center',
                 sortBy: 'date',
-                readonly: true
+                readonly: true,
             },
             {
-                title: '评分',
+                title: 'Score',
                 key: 'score',
                 width: 100,
                 align: 'center',
                 sortBy: (a, b) => {
-                    // 自定义排序：按评分排序，但优先考虑状态
-                    if (a.status !== b.status) {
-                        return a.status === '在职' ? -1 : 1;
-                    }
                     return a.score - b.score;
                 },
                 readonly: true,
                 formatter: ({ value }) => {
-                    return `${value.toFixed(1)}分`;
-                }
+                    return `${value.toFixed(1)} pts`;
+                },
             },
             {
-                title: '状态',
+                title: 'Status',
                 key: 'status',
                 width: 100,
                 align: 'center',
                 sortBy: (a, b) => {
-                    return a.status === '在职' ? -1 : 1;
+                    return a.status === 'Active' ? -1 : 1;
                 },
                 readonly: true,
                 formatter: ({ value }) => {
-                    return value === '在职' ? '✅ 在职' : '❌ 离职';
-                }
-            }
+                    return value === 'Active' ? '✅ Active' : '❌ Inactive';
+                },
+            },
         ];
 
         const eVirtTable = new EVirtTable(document.getElementById('e-virt-table'), {
@@ -188,13 +183,13 @@
                 ROW_KEY: 'id',
                 ENABLE_SELECTOR: true,
                 ENABLE_KEYBOARD: true,
-                HIGHLIGHT_HOVER_ROW: true
-            }
+                HIGHLIGHT_HOVER_ROW: true,
+            },
         });
 
-        // 监听排序状态变化
+        // Listen for selection changes
         eVirtTable.on('selectionChange', (rowkeys) => {
-            console.log('选中的行:', rowkeys);
+            console.log('Selected rows:', rowkeys);
         });
     </script>
-</html> 
+</html>

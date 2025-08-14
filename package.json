@@ -15,7 +15,8 @@
         "build:docs": "cd docs && npm run build",
         "build": "vite build && tsc",
         "preview": "vite preview",
-        "copy-dist": "node scripts/copy-dist.js"
+        "copy-dist": "node scripts/copy-dist.js",
+        "update-docs-dist": "npm run build && npm run copy-dist"
     },
     "license": "MIT",
     "author": "laichuangwen",

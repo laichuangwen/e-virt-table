@@ -40,8 +40,6 @@ export default class Header {
         this.init();
         // 初始化调整列大小ENABLE_RESIZE_COLUMN
         this.initResizeColumn();
-        // 初始化排序功能
-        this.initSorting();
     }
     init() {
         const {
@@ -202,70 +200,6 @@ export default class Header {
                 }
             }
         });
-    }
-    private initSorting() {
-        this.ctx.on('click', (e) => {
-            if (!this.ctx.isTarget(e)) {
-                return;
-            }
-
-            const { offsetX, offsetY } = this.ctx.getOffset(e);
-            
-            // 检查是否点击在表头区域
-            if (offsetY > this.height) {
-                return;
-            }
-
-            // 检查是否点击在排序图标上
-            const renderAllCellHeaders = [...this.renderFixedCellHeaders, ...this.renderCenterCellHeaders];
-            for (const cellHeader of renderAllCellHeaders) {
-                if (!cellHeader.column.sortBy && !cellHeader.column.apiSortable) continue;
-
-                const { sortIconX, sortIconY, sortIconWidth, sortIconHeight } = cellHeader;
-                
-                if (offsetX >= sortIconX && offsetX <= sortIconX + sortIconWidth &&
-                    offsetY >= sortIconY && offsetY <= sortIconY + sortIconHeight) {
-                    
-                    // 处理排序点击
-                    this.handleSortClick(cellHeader);
-                    break;
-                }
-            }
-        });
-    }
-
-    private handleSortClick(cellHeader: CellHeader) {
-        if (cellHeader.column.apiSortable) {
-            // 后端排序
-            const currentState = this.ctx.database.getBackendSortState(cellHeader.key);
-            let newDirection: 'asc' | 'desc' | 'none';
-
-            // 按照 不排序->升序->降序->不排序 的顺序循环
-            if (currentState.direction === 'none') {
-                newDirection = 'asc';
-            } else if (currentState.direction === 'asc') {
-                newDirection = 'desc';
-            } else {
-                newDirection = 'none';
-            }
-
-            this.ctx.database.setBackendSortState(cellHeader.key, newDirection);
-        } else {
-            // 前端排序
-            const currentState = this.ctx.database.getSortState(cellHeader.key);
-            let newDirection: 'asc' | 'desc' | 'none';
-
-            // 按照 不排序->升序->降序->不排序 的顺序循环
-            if (currentState.direction === 'none') {
-                newDirection = 'asc';
-            } else if (currentState.direction === 'asc') {
-                newDirection = 'desc';
-            } else {
-                newDirection = 'none';
-            }
-
-            this.ctx.database.setSortState(cellHeader.key, newDirection);
-        }
     }
 
     private resizeColumn(cell: CellHeader, diff: number) {
