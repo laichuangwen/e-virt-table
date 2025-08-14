@@ -3,6 +3,7 @@ import { Align, VerticalAlign } from './types';
 export type LineOptions = {
     lineCap?: CanvasLineCap;
     lineDash?: number[];
+    lineDashOffset?: number;
     lineJoin?: CanvasLineJoin;
     borderWidth?: number;
     borderColor?: string | CanvasGradient | CanvasPattern;
@@ -123,7 +124,7 @@ export class Paint {
         this.ctx.strokeStyle = borderColor;
         this.ctx.lineWidth = borderWidth;
         if (options.lineDash) {
-            this.ctx.lineDashOffset = 4;
+            this.ctx.lineDashOffset = options.lineDashOffset ?? 0;
             this.ctx.setLineDash(options.lineDash);
         }
 

@@ -115,6 +115,7 @@ export default class Database {
      * @param level
      */
     private initData(dataList: any[], level: number = 0, parentRowKeys: string[] = []) {
+        const siblingsLength = dataList.length;
         dataList.forEach((item, index) => {
             const { ROW_KEY = '', DEFAULT_EXPAND_ALL, CELL_HEIGHT, SELECTABLE_METHOD, CHECKBOX_KEY } = this.ctx.config;
             const _rowKey = item[ROW_KEY]; // 行唯一标识,否则就rowKey
@@ -160,6 +161,8 @@ export default class Database {
                 expandLoading: false,
                 item,
                 parentRowKeys,
+                parentRowKey: parentRowKeys[parentRowKeys.length - 1] || '',
+                isLastChild: index === siblingsLength - 1,
             });
             if (Array.isArray(item.children)) {
                 if (item.children.length) {

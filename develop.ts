@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import EVirtTable from './src/EVirtTable';
 import {
     BeforeChangeItem,
@@ -36,17 +35,6 @@ let columns: Column[] = [
         fixed: 'left',
         minWidth: 80,
         maxWidth: 200,
-        sortBy: 'string',
-    },
-    {
-        title: '工号工号',
-        key: 'emp_no1',
-        // operation: true,
-        align: 'left',
-        type: 'selection-tree',
-        // verticalAlign: 'bottom',
-        readonly: false,
-        width: 180,
     },
     // {
     //   key: "selection",
@@ -57,6 +45,7 @@ let columns: Column[] = [
     {
         title: '工号',
         key: 'emp_no',
+        align: 'left',
         // operation: true,
         readonly: true,
         width: 120,
@@ -74,7 +63,6 @@ let columns: Column[] = [
         align: 'left',
         hoverIconName: 'icon-edit',
         placeholder: '请输入',
-        sortBy: 'string',
         // editorType: 'none',
         verticalAlign: 'middle',
         // hide: true,
@@ -95,26 +83,6 @@ let columns: Column[] = [
         //     pEl.appendChild(cellEl);
         // },
         // render: "emp_name",
-    },
-    {
-        title: '数量',
-        key: 'requiredQuantity',
-        sortBy: 'number',
-        align: 'right',
-        rules: [
-            {
-                required: true, // TODO:表格1.2.19有问题
-                pattern: /^(0|[1-9]\d*)$/,
-                message: '请输入0或正整数',
-                validator(rule, value, callback) {
-                    if (value > 10) {
-                        callback('数量不能大于10');
-                    } else {
-                        callback();
-                    }
-                },
-            },
-        ],
     },
     // {
     //   title: '部门',
@@ -192,8 +160,6 @@ let columns: Column[] = [
         title: '手机号',
         key: 'phone',
         readonly: false,
-        align: 'right',
-        apiSortable: true,
         overflowTooltipHeaderShow: true,
         formatterFooter: ({ value }) => {
             return `合：${value}`;
@@ -238,7 +204,6 @@ let columns: Column[] = [
         hoverIconName: 'icon-select',
         sort: 4,
         width: 200,
-        sortBy: 'date',
     },
     {
         title: '出生日期',
@@ -246,7 +211,6 @@ let columns: Column[] = [
         editorType: 'date',
         hoverIconName: 'icon-date',
         sort: 2,
-        sortBy: 'date',
     },
     {
         title: '家庭地址',
@@ -264,13 +228,14 @@ let columns: Column[] = [
         render: (pEl, cell) => {
             const cellEl = document.createElement('div');
             cellEl.addEventListener('click', () => {
-                // 点击了家庭地址
+                console.log('点击了家庭地址');
             });
             cellEl.addEventListener('selectionchange', () => {
+                console.log('selectionchange');
                 const selection = window.getSelection();
                 const text = selection ? selection.toString() : '';
                 if (text) {
-                    // 用户选中了文本
+                    console.log('用户选中了文本:', text);
                 }
             });
             cellEl.style.width = '100%';
@@ -289,19 +254,12 @@ let columns: Column[] = [
     {
         title: '请假开始时间',
         key: 'start_dt',
-        sortBy: 'date',
     },
     {
         title: '物料编码',
         key: 'materialNo',
         align: 'right',
         selectorCellValueType: 'displayText', // displayText | value
-        sortBy: (a, b) => {
-            // 自定义排序：按物料编码的数字部分排序
-            const aValue = parseFloat(a.materialNo) || 0;
-            const bValue = parseFloat(b.materialNo) || 0;
-            return aValue - bValue;
-        },
         formatter({ value }: { value: string }) {
             if (!value) {
                 return '';
@@ -310,7 +268,25 @@ let columns: Column[] = [
             return `物料编码：${v}`;
         },
     },
-
+    {
+        title: '数量',
+        key: 'requiredQuantity',
+        rules: [
+            {
+                required: true, // TODO:表格1.2.19有问题
+                pattern: /^(0|[1-9]\d*)$/,
+                message: '请输入0或正整数',
+                validator(rule, value, callback) {
+                    if (value > 10) {
+                        callback('数量不能大于10');
+                    } else {
+                        callback();
+                    }
+                },
+            },
+        ],
+        align: 'right',
+    },
     { title: '单位', key: 'unit' },
     { title: '工作性质', key: 'work_type' },
     { title: '工作状态', key: 'work_status' },
@@ -362,7 +338,6 @@ let columns: Column[] = [
         key: 'salePrice',
         type: 'number',
         align: 'left',
-        apiSortable: true,
         hoverIconName: 'icon-edit',
         placeholder: '请输入',
         // readonly: true,
@@ -407,9 +382,6 @@ for (let i = 0; i < 1000; i += 1) {
         nation: `汉${i}`,
         work_address: `南京路${i}号`,
         work_email: `${28976633 + i}@qq.com`,
-        start_dt: dayjs(Math.ceil(new Date().getTime() * (0.9995 + Math.random() * 0.001))).format(
-            'YYYY-MM-DD HH:mm:ss',
-        ),
         email: `${4465566 + i}@qq.com`,
         work_age: 2 + i,
         company_age: 1 + i,
@@ -423,7 +395,7 @@ for (let i = 0; i < 1000; i += 1) {
         sn: `SDFSD${i}`,
         materialNo: `1231${i}`,
         unit: '个',
-        requiredQuantity: Math.ceil(Math.random() * 100),
+        requiredQuantity: 10,
         customerRemarks: `测试测试${i}`,
         purchasePrice: 10.2 + i,
         salePrice: 12.3 + i,
@@ -433,7 +405,6 @@ for (let i = 0; i < 1000; i += 1) {
                 emp_no: `${i}-1`,
                 emp_name: `张三${i}-1`,
                 children: [],
-                _hasChildren: true,
             },
             {
                 id: `${i}-2`,
@@ -444,29 +415,26 @@ for (let i = 0; i < 1000; i += 1) {
                         id: `${i}-2-1`,
                         emp_no: `${i}-2-1`,
                         emp_name: `张三${i}-2-1`,
+                        children: [],
+                    },
+                    {
+                        id: `${i}-2-2`,
+                        emp_no: `${i}-2-2`,
+                        emp_name: `张三${i}-2-2`,
                         children: [
                             {
-                                id: `${i}-2-1-1`,
-                                emp_no: `${i}-2-1-1`,
-                                emp_no1: `${i}-2-1-1`,
-                                emp_name: `张三${i}-2-1-1`,
-                                children: [
-                                    {
-                                        id: `${i}-2-1-1-1`,
-                                        emp_no: `${i}-2-1-1-1`,
-                                        emp_name: `张三${i}-2-1-1-1`,
-                                        children: [
-                                            {
-                                                id: `${i}-2-1-1-1-1`,
-                                                emp_no: `${i}-2-1-1-1-1`,
-                                                emp_name: `张三${i}-2-1-1-1-1`,
-                                            },
-                                        ],
-                                    },
-                                ],
+                                id: `${i}-2-2-1`,
+                                emp_no: `${i}-2-2-1`,
+                                emp_name: `张三${i}-2-2-1`,
+                                children: [],
                             },
                         ],
-                        _hasChildren: true,
+                    },
+                    {
+                        id: `${i}-2-3`,
+                        emp_no: `${i}-2-3`,
+                        emp_name: `张三${i}-2-3`,
+                        children: [],
                     },
                 ],
             },
@@ -506,6 +474,7 @@ const eVirtTable = new EVirtTable(canvas, {
         ICONS: [],
         BORDER: true,
         STRIPE: false,
+        TREE_LINE: true,
         // DISABLED: true,
         // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
@@ -540,7 +509,7 @@ const eVirtTable = new EVirtTable(canvas, {
                 label: '新增',
                 value: 'add',
                 event: () => {
-                    // 新增
+                    console.log('新增');
                 },
             },
         ],
@@ -620,7 +589,7 @@ const eVirtTable = new EVirtTable(canvas, {
                 },
             ];
             const data = [...changeList, ...list];
-            // 修改前数据
+            console.log('修改前数据', data);
             return data;
             // if(changeList.some((item) => item.key !== 'requiredQuantity')) {
             //     return changeList.map(item=>{
@@ -798,7 +767,7 @@ eVirtTable.on('error', (error) => {
     console.error(error);
 });
 eVirtTable.on('hoverIconClick', (cell) => {
-    // hoverIconClick
+    console.log('hoverIconClick', cell);
 });
 // eVirtTable.on('change', (changeList) => {
 //     eVirtTable.validate();
@@ -806,12 +775,12 @@ eVirtTable.on('hoverIconClick', (cell) => {
 eVirtTable.on('onPastedDataOverflow', (val: PastedDataOverflow) => {
     const { overflowColCount, overflowRowCount } = val;
     if (overflowRowCount > 0) {
-        // 粘贴数据超出行数
+        console.log('粘贴数据超出行数', overflowRowCount);
         data = data.concat(Array.from({ length: overflowRowCount }).map(() => ({})));
         eVirtTable.loadData(data);
     }
     if (overflowColCount > 0) {
-        // 粘贴数据超出列数
+        console.log('粘贴数据超出列数', overflowColCount);
         columns = columns.concat(
             Array.from({ length: overflowColCount }).map((_, index) => ({
                 title: `溢出表头${index}`,
@@ -849,175 +818,6 @@ eVirtTable.on('overlayerChange', (container) => {
         overlayerEl.appendChild(typeDiv);
     });
 });
-
-// 模拟服务端排序接口
-function mockServerSort(sortData) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            let sortedData = [...data];
-
-            // 根据排序条件对数据进行排序
-            sortData.forEach(({ field, direction }) => {
-                sortedData.sort((a, b) => {
-                    let aValue = a[field];
-                    let bValue = b[field];
-
-                    // 根据字段类型进行排序
-                    if (
-                        field === 'requiredQuantity' ||
-                        field === 'work_age' ||
-                        field === 'age' ||
-                        field === 'salePrice'
-                    ) {
-                        // 数字排序
-                        aValue = Number(aValue) || 0;
-                        bValue = Number(bValue) || 0;
-                        return direction === 'asc' ? aValue - bValue : bValue - aValue;
-                    } else if (field === 'birthday') {
-                        // 日期排序
-                        aValue = new Date(aValue).getTime();
-                        bValue = new Date(bValue).getTime();
-                        return direction === 'asc' ? aValue - bValue : bValue - aValue;
-                    } else {
-                        // 字符串排序
-                        aValue = String(aValue || '');
-                        bValue = String(bValue || '');
-                        return direction === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
-                    }
-                });
-            });
-
-            resolve(sortedData);
-        }, 500); // 模拟网络延迟
-    });
-}
-
-eVirtTable.on('sortQuery', async (sortData) => {
-    const sortedData = await mockServerSort(sortData);
-    eVirtTable.loadData(sortedData);
-});
-// 三种模式切换功能
-let currentMode = 'normal'; // 'normal', 'selection-tree', 'tree-selection'
-const modeRadioContainer = document.getElementById('modeRadioContainer') as HTMLDivElement;
-
-// 创建 radio 按钮
-if (modeRadioContainer) {
-    modeRadioContainer.innerHTML = `
-        <label>
-            <input type="radio" name="mode" value="normal" checked> 勾选+树
-        </label>
-        <label>
-            <input type="radio" name="mode" value="selection-tree"> 勾选树
-        </label>
-        <label>
-            <input type="radio" name="mode" value="tree-selection"> 树勾选
-        </label>
-    `;
-
-    // 监听 radio 变化
-    const radioButtons = modeRadioContainer.querySelectorAll('input[name="mode"]');
-    radioButtons.forEach((radio) => {
-        radio.addEventListener('change', (e) => {
-            const target = e.target as HTMLInputElement;
-            const newMode = target.value;
-
-            if (newMode === currentMode) {
-                return;
-            }
-
-            currentMode = newMode;
-
-            let newColumns: Column[];
-
-            switch (newMode) {
-                case 'selection-tree':
-                    // 切换到勾选树模式
-                    newColumns = columns.map((col) => {
-                        if (col.key === 'selection') {
-                            return {
-                                ...col,
-                                type: 'selection-tree',
-                                title: '选择',
-                                width: 200,
-                                align: 'left',
-                            };
-                        }
-                        if (col.key === 'emp_no') {
-                            return {
-                                ...col,
-                                type: undefined, // 移除 tree 类型
-                            };
-                        }
-                        return col;
-                    });
-                    break;
-
-                case 'tree-selection':
-                    // 切换到树勾选模式
-                    newColumns = columns.map((col) => {
-                        if (col.key === 'selection') {
-                            return {
-                                ...col,
-                                type: 'tree-selection',
-                                title: '选择',
-                                align: 'left',
-                            };
-                        }
-                        if (col.key === 'emp_no') {
-                            return {
-                                ...col,
-                                type: undefined, // 移除 tree 类型
-                            };
-                        }
-                        return col;
-                    });
-                    break;
-
-                default:
-                    // 普通模式
-                    newColumns = columns;
-                    break;
-            }
-
-            // 重新加载列配置
-            eVirtTable.loadColumns(newColumns);
-
-            // 更新配置
-            if (newMode === 'normal') {
-                eVirtTable.loadConfig({
-                    TREE_SELECT_MODE: 'auto',
-                    AUTO_FIT_TREE_WIDTH: true,
-                    ENABLE_CONTEXT_MENU: true,
-                    CONTEXT_MENU: [
-                        { label: '复制', value: 'copy' },
-                        { label: '剪切', value: 'cut' },
-                        { label: '粘贴', value: 'paste' },
-                        { label: '清空选中内容', value: 'clearSelected' },
-                        {
-                            label: '新增',
-                            value: 'add',
-                            event: () => {
-                                // 新增
-                            },
-                        },
-                    ],
-                });
-            } else {
-                eVirtTable.loadConfig({
-                    TREE_SELECT_MODE: 'auto',
-                    AUTO_FIT_TREE_WIDTH: true,
-                    ENABLE_CONTEXT_MENU: true,
-                    CONTEXT_MENU: [
-                        { label: '全选', value: 'selectAll' },
-                        { label: '取消全选', value: 'unselectAll' },
-                        { label: '展开全部', value: 'expandAll' },
-                        { label: '收起全部', value: 'collapseAll' },
-                    ],
-                });
-            }
-        });
-    });
-}
 
 const dateEl = document.getElementById('e-virt-table-date') as HTMLInputElement;
 if (dateEl) {
@@ -1242,7 +1042,7 @@ document.getElementById('setConfig')?.addEventListener('click', () => {
                 label: '新增',
                 value: 'add',
                 event: () => {
-                    // 新增
+                    console.log('新增');
                 },
             },
         ],
@@ -1344,14 +1144,6 @@ document.getElementById('setReadOnly')?.addEventListener('click', () => {
 });
 document.getElementById('getChangedValues')?.addEventListener('click', () => {
     console.log(eVirtTable.getChangedData());
-});
-document.getElementById('test')?.addEventListener('click', () => {
-    eVirtTable.setSortQueryData([
-        {
-            field: 'phone',
-            direction: 'desc',
-        },
-    ]);
 });
 
 // 销毁
