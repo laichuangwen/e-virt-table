@@ -475,6 +475,8 @@ const eVirtTable = new EVirtTable(canvas, {
         BORDER: true,
         STRIPE: false,
         TREE_LINE: true,
+        ENABLE_DRAG_COLUMN: true,
+        ENABLE_DRAG_ROW: true,
         // DISABLED: true,
         // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
@@ -769,6 +771,16 @@ eVirtTable.on('error', (error) => {
 eVirtTable.on('hoverIconClick', (cell) => {
     console.log('hoverIconClick', cell);
 });
+// 监听拖拽事件
+eVirtTable.on('columnMove', (data) => {
+    console.log('列被移动:', data);
+    // 处理列移动后的逻辑
+});
+
+eVirtTable.on('rowMove', (data) => {
+    console.log('行被移动:', data);
+    // 处理行移动后的逻辑，如更新数据库
+});
 // eVirtTable.on('change', (changeList) => {
 //     eVirtTable.validate();
 // });
@@ -1028,6 +1040,8 @@ document.getElementById('setConfig')?.addEventListener('click', () => {
         ENABLE_SELECTOR: true,
         ENABLE_KEYBOARD: true,
         ENABLE_HISTORY: true,
+        ENABLE_DRAG_COLUMN: true,
+        ENABLE_DRAG_ROW: true,
         ENABLE_OFFSET_HEIGHT: true,
         HIGHLIGHT_SELECTED_ROW: true,
         HIGHLIGHT_HOVER_ROW: true,
