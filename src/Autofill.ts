@@ -1,6 +1,7 @@
 import type Context from './Context';
 import Cell from './Cell';
 import { BeforeSetAutofillMethod, ErrorType } from './types';
+
 export default class Autofill {
     private ctx: Context;
     private maxColRowCell: Cell | undefined;
@@ -44,6 +45,10 @@ export default class Autofill {
             this.mouseenter(cell);
         });
         this.ctx.on('mousedown', () => {
+            // 如果是拖拽模式就不处理
+            if (this.ctx.dragMove) {
+                return;
+            }
             if (this.ctx.stageElement.style.cursor === 'crosshair') {
                 this.setMousedown();
             }

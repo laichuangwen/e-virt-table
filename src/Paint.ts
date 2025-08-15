@@ -31,10 +31,13 @@ export type DrawTextOptions = {
 };
 export class Paint {
     private ctx: CanvasRenderingContext2D;
-    constructor(target: HTMLCanvasElement) {
+    private context?: any; // 表格上下文
+    
+    constructor(target: HTMLCanvasElement, context?: any) {
         const ctx = target.getContext('2d');
         if (!ctx) throw new Error('canvas context not found');
         this.ctx = ctx;
+        this.context = context;
     }
     scale(dpr: number) {
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -281,6 +284,18 @@ export class Paint {
             _text,
             ellipsis,
         };
+    }
+
+    drawDragIndicator() {
+        if (this.context?.dragManager) {
+            this.context.dragManager.drawDragIndicator();
+        }
+    }
+    
+    drawDragIcons() {
+        if (this.context?.dragManager) {
+            this.context.dragManager.drawDragIcons();
+        }
     }
 }
 

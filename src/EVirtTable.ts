@@ -2,6 +2,7 @@ import {
     ChangeItem,
     Column,
     ConfigType,
+    DragEventData,
     EventCallback,
     EVirtTableOptions,
     FilterMethod,
@@ -24,6 +25,7 @@ import Overlayer from './Overlayer';
 import ContextMenu from './ContextMenu';
 import { mergeColCell, mergeRowCell, getSpanArrByRow, getSpanObjByColumn } from './util';
 import './style.css';
+import DragManager from './DragManager';
 
 export default class EVirtTable {
     private options: EVirtTableOptions;
@@ -38,6 +40,7 @@ export default class EVirtTable {
     private empty: Empty;
     private overlayer: Overlayer;
     private contextMenu: ContextMenu;
+    private dragManager: DragManager;
     ctx: Context;
     
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
@@ -62,6 +65,13 @@ export default class EVirtTable {
         this.editor = new Editor(this.ctx);
         this.overlayer = new Overlayer(this.ctx);
         this.contextMenu = new ContextMenu(this.ctx);
+        this.dragManager = new DragManager(this.ctx);
+        this.ctx.dragManager = this.dragManager;
+        
+        // 监听拖拽事件
+        this.ctx.on('columnMove', this.onColumnMove.bind(this));
+        this.ctx.on('rowMove', this.onRowMove.bind(this));
+        
         this.ctx.on('draw', () => {
             this.draw();
         });
@@ -112,6 +122,10 @@ export default class EVirtTable {
             this.footer.draw();
             this.header.draw();
             this.scroller.draw();
+            // 绘制拖拽图标
+            this.ctx.paint.drawDragIcons();
+            // 绘制拖拽指示器
+            this.ctx.paint.drawDragIndicator();
             // 忽略重绘覆盖层，解决按下事件时，重绘覆盖层导致事件无法触发，目前只在Selector中按下事件使用
             if (!ignoreOverlayer) {
                 this.overlayer.draw();
@@ -439,5 +453,22 @@ export default class EVirtTable {
         this.contextMenu.destroy();
         this.ctx.destroy();
         this.ctx.containerElement.remove();
+    }
+
+    private onColumnMove(data: DragEventData) {
+        // 列移动完成后的处理 tbd 后续可能扩展列排序等
+    }
+    
+    private onRowMove(data: DragEventData) {
+        // 行移动完成后的处理  tbd 后续可能扩展树形归属改变等
+    }
+    
+    // 公共方法：启用/禁用拖拽
+    enableDragColumn(enable: boolean = true) {
+        this.ctx.config.ENABLE_DRAG_COLUMN = enable;
+    }
+    
+    enableDragRow(enable: boolean = true) {
+        this.ctx.config.ENABLE_DRAG_ROW = enable;
     }
 }

@@ -301,3 +301,32 @@ export type BeforeAutofillDataMethod = (
 export type BeforeSetSelectorMethod = (params: BeforeSetSelectorParams) => BeforeSetSelectorParams | undefined;
 export type BeforeSetAutofillMethod = (params: BeforeSetAutofillParams) => BeforeSetAutofillParams | undefined;
 export type BeforeCopyMethod = (params: BeforeCopyParams) => BeforeCopyParams | undefined;
+
+// 拖拽类型
+export enum DragType {
+    None = 'none',
+    Column = 'column', 
+    Row = 'row'
+}
+
+// 拖拽状态
+export interface DragState {
+    type: DragType;
+    sourceIndex: number;
+    targetIndex: number;
+    isDragging: boolean;
+    startX: number;
+    startY: number;
+    currentX: number;
+    currentY: number;
+    dragElement?: CellHeader | any;
+}
+
+// 拖拽事件数据
+export interface DragEventData {
+    type: DragType;
+    fromIndex: number;
+    toIndex?: number;
+    column?: Column;
+    row?: any;
+}

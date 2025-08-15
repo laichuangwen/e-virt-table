@@ -456,6 +456,10 @@ export default class EventTable {
         if (!this.ctx.isTarget(e)) {
             return true;
         }
+        // 拖拽模式中不处理
+        if (this.ctx.dragMove) {
+            return true;
+        }
         // 行调整大小中不处理
         if (this.ctx.stageElement.style.cursor === 'row-resize') {
             return true;
