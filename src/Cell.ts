@@ -744,7 +744,7 @@ export default class Cell extends BaseCell {
             return -1;
         }
         const { BODY_FONT, CELL_PADDING, CELL_LINE_HEIGHT } = this.ctx.config;
-        const calculatedHeight = this.ctx.paint.calculateTextHeight(this.displayText, this.visibleWidth, {
+        const calculatedHeight = this.ctx.paint.calculateTextHeight(this.displayText, this.drawTextWidth, {
             font: BODY_FONT,
             padding: CELL_PADDING,
             lineHeight: CELL_LINE_HEIGHT,
