@@ -600,6 +600,8 @@ export default class Database {
             };
             this.ctx.emit('error', err);
         }
+        // 过滤旧数据新数据相同的
+        changeList = changeList.filter((item) => item.oldValue !== item.value);
         if (!changeList.length) {
             return;
         }
