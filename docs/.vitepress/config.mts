@@ -44,7 +44,8 @@ export default defineConfig({
                         text: '表格例子',
                         items: [
                             { text: '虚拟滚动', link: '/zh/table/virtualScroll' },
-                            { text: '过滤&排序', link: '/zh/table/filter' },
+                            { text: '过滤', link: '/zh/table/filter' },
+                            { text: '排序', link: '/zh/table/sort' },
                             { text: '滚动条', link: '/zh/table/scroller' },
                             { text: '主题', link: '/zh/table/theme' },
                             { text: '宽度', link: '/zh/table/width' },
@@ -116,7 +117,8 @@ export default defineConfig({
                         text: 'Table',
                         items: [
                             { text: 'Virtual Scroll', link: '/en/table/virtualScroll' },
-                            { text: 'filter&sort', link: '/en/table/filter' },
+                            { text: 'filter', link: '/en/table/filter' },
+                            { text: 'sort', link: '/en/table/sort' },
                             { text: 'Scrollbar', link: '/en/table/scroller' },
                             { text: 'Theme', link: '/en/table/theme' },
                             { text: 'Width', link: '/en/table/width' },

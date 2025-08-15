@@ -3,6 +3,7 @@ import { Align, VerticalAlign } from './types';
 export type LineOptions = {
     lineCap?: CanvasLineCap;
     lineDash?: number[];
+    lineDashOffset?: number;
     lineJoin?: CanvasLineJoin;
     borderWidth?: number;
     borderColor?: string | CanvasGradient | CanvasPattern;
@@ -40,6 +41,10 @@ export class Paint {
     scale(dpr: number) {
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.ctx.scale(dpr, dpr);
+    }
+    measureTextWidth(text: string, font: string) {
+        this.ctx.font = font;
+        return this.ctx.measureText(text).width;
     }
     save() {
         this.ctx.save();
@@ -125,7 +130,7 @@ export class Paint {
         this.ctx.strokeStyle = borderColor;
         this.ctx.lineWidth = borderWidth;
         if (options.lineDash) {
-            this.ctx.lineDashOffset = 4;
+            this.ctx.lineDashOffset = options.lineDashOffset ?? 0;
             this.ctx.setLineDash(options.lineDash);
         }
 
@@ -440,6 +445,13 @@ export class Paint {
             };
         }
         const ellipsesWidth = this.ctx.measureText('...').width;
+        // 如果宽度小于省略号宽度，则不进行省略，直接返回空字符串
+        if (width <= ellipsesWidth + padding * 2) {
+            return {
+                _text: '',
+                ellipsis: true,
+            };
+        }
         const textWidth = this.ctx.measureText(text).width;
 
         if (textWidth && textWidth + ellipsesWidth >= width - padding * 2) {

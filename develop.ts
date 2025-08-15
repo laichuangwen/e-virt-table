@@ -1,5 +1,13 @@
 import EVirtTable from './src/EVirtTable';
-import { BeforeCopyParams, BeforeSetSelectorParams, Column, PastedDataOverflow, SelectableParams } from './src/types';
+import {
+    BeforeChangeItem,
+    BeforeCopyParams,
+    BeforeSetSelectorParams,
+    BeforeValueChangeItem,
+    Column,
+    PastedDataOverflow,
+    SelectableParams,
+} from './src/types';
 // import { mergeColCell, mergeRowCell } from './src/util';
 
 const canvas = document.getElementById('e-virt-table') as HTMLDivElement;
@@ -37,6 +45,7 @@ let columns: Column[] = [
     {
         title: '工号',
         key: 'emp_no',
+        align: 'left',
         // operation: true,
         readonly: true,
         width: 120,
@@ -114,7 +123,6 @@ let columns: Column[] = [
                             required: true,
                             message: '该项必填哦！',
                             validator(rule, value, callback) {
-                                console.log(rule);
                                 if (!value) {
                                     callback('请输入岗位');
                                 } else if (value.length > 10) {
@@ -255,17 +263,32 @@ let columns: Column[] = [
         title: '物料编码',
         key: 'materialNo',
         align: 'right',
+        selectorCellValueType: 'displayText', // displayText | value
         formatter({ value }: { value: string }) {
             if (!value) {
                 return '';
             }
             const v = parseFloat(value);
-            return v.toFixed(2);
+            return `物料编码：${v}`;
         },
     },
     {
         title: '数量',
         key: 'requiredQuantity',
+        rules: [
+            {
+                required: true, // TODO:表格1.2.19有问题
+                pattern: /^(0|[1-9]\d*)$/,
+                message: '请输入0或正整数',
+                validator(rule, value, callback) {
+                    if (value > 10) {
+                        callback('数量不能大于10');
+                    } else {
+                        callback();
+                    }
+                },
+            },
+        ],
         align: 'right',
     },
     { title: '单位', key: 'unit' },
@@ -390,7 +413,6 @@ for (let i = 0; i < 1500; i += 1) {
                 emp_no: `${i}-1`,
                 emp_name: `张三${i}-1`,
                 children: [],
-                _hasChildren: true,
             },
             {
                 id: `${i}-2`,
@@ -402,7 +424,25 @@ for (let i = 0; i < 1500; i += 1) {
                         emp_no: `${i}-2-1`,
                         emp_name: `张三${i}-2-1`,
                         children: [],
-                        _hasChildren: true,
+                    },
+                    {
+                        id: `${i}-2-2`,
+                        emp_no: `${i}-2-2`,
+                        emp_name: `张三${i}-2-2`,
+                        children: [
+                            {
+                                id: `${i}-2-2-1`,
+                                emp_no: `${i}-2-2-1`,
+                                emp_name: `张三${i}-2-2-1`,
+                                children: [],
+                            },
+                        ],
+                    },
+                    {
+                        id: `${i}-2-3`,
+                        emp_no: `${i}-2-3`,
+                        emp_name: `张三${i}-2-3`,
+                        children: [],
                     },
                 ],
             },
@@ -442,6 +482,7 @@ const eVirtTable = new EVirtTable(canvas, {
         ICONS: [],
         BORDER: true,
         STRIPE: false,
+        TREE_LINE: true,
         // DISABLED: true,
         // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
@@ -456,13 +497,14 @@ const eVirtTable = new EVirtTable(canvas, {
         ENABLE_OFFSET_HEIGHT: true,
         HIGHLIGHT_SELECTED_ROW: false,
         HIGHLIGHT_HOVER_ROW: true,
-        ENABLE_MERGE_CELL_LINK: true,
+        ENABLE_MERGE_CELL_LINK: false,
         ENABLE_EDIT_SINGLE_CLICK: false,
         FOOTER_FIXED: true,
         ENABLE_COPY: true,
         ENABLE_PASTER: true,
         FOOTER_POSITION: 'bottom',
         OFFSET_HEIGHT: 16,
+        SELECTOR_CELL_VALUE_TYPE: 'displayText', // displayText | value
         // SELECTOR_AREA_MAX_X_OFFSET: 1,
         // SELECTOR_AREA_MAX_Y_OFFSET: 1,
         ENABLE_CONTEXT_MENU: true,
@@ -547,7 +589,16 @@ const eVirtTable = new EVirtTable(canvas, {
         // },
         // 改变前需要篡改数据
         BEFORE_VALUE_CHANGE_METHOD: (changeList) => {
-            return changeList;
+            let list: BeforeValueChangeItem[] = [
+                {
+                    rowKey: '1_0',
+                    key: 'emp_no',
+                    value: Math.random().toString(36).substring(2, 7),
+                },
+            ];
+            const data = [...changeList, ...list];
+            console.log('修改前数据', data);
+            return data;
             // if(changeList.some((item) => item.key !== 'requiredQuantity')) {
             //     return changeList.map(item=>{
             //       item.row.emp_name = '张三111';
@@ -1073,6 +1124,36 @@ document.getElementById('loadData')?.addEventListener('click', () => {
     }
     eVirtTable.loadData(data);
 });
+
+document.getElementById('clearEditableData')?.addEventListener('click', () => {
+    const ll = eVirtTable.clearEditableData(111);
+    console.log('clearEditableData', ll);
+});
+
+document.getElementById('setReadOnly')?.addEventListener('click', () => {
+    const list = [
+        {
+            rowKey: '1_1',
+            key: 'emp_no',
+            value: '张三111',
+        },
+        {
+            rowKey: '1_2',
+            key: 'emp_no',
+            value: '张三222',
+        },
+        {
+            rowKey: '1_4',
+            key: 'emp_no',
+            value: '张三333',
+        },
+    ];
+    eVirtTable.batchSetItemValue(list, true, false);
+});
+document.getElementById('getChangedValues')?.addEventListener('click', () => {
+    console.log(eVirtTable.getChangedData());
+});
+
 // 销毁
 function destroy() {
     eVirtTable.destroy();

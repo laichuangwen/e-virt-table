@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tree Selection - Cautious Mode</title>
+</head>
+<body>
+    <div id="e-virt-table"></div>
+</body>
+<script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+<script>
+    let data = [
+        {
+            id: '1',
+            name: 'Department A',
+            children: [
+                {
+                    id: '1-1',
+                    name: 'Sub-department A1',
+                    children: [
+                        { id: '1-1-1', name: 'Employee A1-1' },
+                        { id: '1-1-2', name: 'Employee A1-2' }
+                    ]
+                },
+                {
+                    id: '1-2',
+                    name: 'Sub-department A2',
+                    children: [
+                        { id: '1-2-1', name: 'Employee A2-1' },
+                        { id: '1-2-2', name: 'Employee A2-2' }
+                    ]
+                }
+            ]
+        },
+        {
+            id: '2',
+            name: 'Department B',
+            children: [
+                {
+                    id: '2-1',
+                    name: 'Sub-department B1',
+                    children: [
+                        { id: '2-1-1', name: 'Employee B1-1' },
+                        { id: '2-1-2', name: 'Employee B1-2' }
+                    ]
+                }
+            ]
+        }
+    ];
+
+    let columns = [
+        {
+            title: 'ID',
+            type: 'tree-selection',
+            key: 'id',
+            width: 100,
+            readonly: true
+        },
+        {
+            title: 'Name',
+            key: 'name',
+            width: 200,
+            readonly: true
+        }
+    ];
+
+    const target = document.getElementById('e-virt-table');
+    const table = new EVirtTable(target, {
+        data,
+        columns,
+        config: {
+            TREE_SELECT_MODE: 'cautious', // auto | cautious | strictly
+            ROW_KEY: 'id',
+            ENABLE_SELECTOR: true,
+            HEIGHT: 300
+        }
+    });
+
+    // Listen for selection changes
+    table.on('selectionChange', (selectedRows) => {
+        console.log('Selected rows:', selectedRows);
+    });
+</script>
+</html> 

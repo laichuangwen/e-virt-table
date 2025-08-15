@@ -1,5 +1,6 @@
 import { IconType } from './Icons';
 import {
+    Align,
     BeforeAutofillDataMethod,
     BeforeCellValueChangeMethod,
     BeforeCopyMethod,
@@ -20,7 +21,10 @@ import {
     FormatterMethod,
     MenuItem,
     SelectableMethod,
+    SelectorCellValueType,
     SpanMethod,
+    TreeSelectMode,
+    VerticalAlign,
 } from './types';
 import { getCssVar } from './util';
 
@@ -64,8 +68,11 @@ export default class Config {
     MAX_HEIGHT = 1000;
     /** 区域边框圆角 */
     BORDER_RADIUS = 8;
+    /** 启用偏移高度内部计算表格高度 */
     ENABLE_OFFSET_HEIGHT = false;
+    /** 偏移高度 */
     OFFSET_HEIGHT = 0;
+    /** 表头高度 */
     HEADER_HEIGHT = 36;
     /** 启用头部固定,需要外面实现覆盖层，或者所有表头都要是元素 */
     ENABLE_HEADER_STICKY = false;
@@ -94,6 +101,10 @@ export default class Config {
     ERROR_TIP_ICON_COLOR = 'red';
     /** 错误提示图标大小 */
     ERROR_TIP_ICON_SIZE = 6;
+    /** 所有列对齐方式 */
+    COLUMNS_ALIGN: Align = 'left';
+    /** 所有列垂直对齐方式 */
+    COLUMNS_VERTICAL_ALIGN: VerticalAlign = 'middle';
     /** 是否开启懒加载	 */
     EXPAND_LAZY = true;
     /** 默认展开全部	 */
@@ -102,8 +113,6 @@ export default class Config {
     CELL_WIDTH = 100;
     /** body 单元格默认行高 */
     CELL_HEIGHT = 36;
-    /** 格子多行文本行高,isAutoRowHeight才会生效 */
-    CELL_LINE_HEIGHT = 1.3;
     /** 表格 body 部分的 padding */
     CELL_PADDING = 8;
     /** hover编辑图标大小 */
@@ -146,6 +155,16 @@ export default class Config {
     CHECKBOX_UNCHECK_SVG = '';
     /** 选择框半选中图标 */
     CHECKBOX_INDETERMINATE_SVG = '';
+    /** 启用严格排序，即不支持多列排序 */
+    SORT_STRICTLY = true;
+    /** 排序升序图标 */
+    SORT_ASC_ICON_SVG = '';
+    /** 排序降序图标 */
+    SORT_DESC_ICON_SVG = '';
+    /** 排序默认图标 */
+    SORTABLE_ICON_SVG = '';
+    /** 排序图标颜色 */
+    SORT_ICON_COLOR = 'rgb(82,146,247)';
     /** 单元格只读背景色 */
     READONLY_COLOR = '#fff';
     /** 单元格只读文本颜色 */
@@ -162,6 +181,16 @@ export default class Config {
     CELL_FOOTER_HEIGHT = 36;
     /** 启用选择器 */
     ENABLE_SELECTOR = true;
+    /** 树形选择模式 */
+    TREE_SELECT_MODE: TreeSelectMode = 'auto';
+    /** 树形缩进宽度 */
+    TREE_INDENT = 20;
+    /** 树形图标大小 */
+    TREE_ICON_SIZE = 20;
+    /**树形划线 */
+    TREE_LINE = false;
+    /** 树形划线颜色 */
+    TREE_LINE_COLOR = '#e1e6eb';
     /** 启用单点击立马编辑 */
     ENABLE_EDIT_SINGLE_CLICK = false;
     /** 启用点击选择器编辑 */
@@ -178,6 +207,8 @@ export default class Config {
     SELECTOR_AREA_MAX_Y = 0;
     /** 选择器Y最大范围,0默认rowMax */
     SELECTOR_AREA_MAX_Y_OFFSET = 0;
+    /** 选择器值类型，value，displayText,区别displayText受format影响 */
+    SELECTOR_CELL_VALUE_TYPE: SelectorCellValueType = 'value'; // displayText | value
     /** 启用自动主题 */
     ENABLE_AUTO_THEME = true;
     /** 启用选择器-选择器单选 */
@@ -242,6 +273,8 @@ export default class Config {
         { label: '粘贴', value: 'paste' },
         { label: '清空选中内容', value: 'clearSelected' },
     ];
+    /** 格子多行文本行高,isAutoRowHeight才会生效 */
+    CELL_LINE_HEIGHT = 1.3;
     /** header 格子样式 */
     HEADER_CELL_STYLE_METHOD?: CellHeaderStyleMethod;
     /** body 格子样式 */
@@ -296,7 +329,9 @@ export default class Config {
             if (key.endsWith('_COLOR') || key.endsWith('_FONT')) {
                 const cssKey = `--evt-${key.toLocaleLowerCase().replace(/_/g, '-')}`;
                 const val = getCssVar(cssKey);
-                obj[key] = val;
+                if (val) {
+                    obj[key] = val;
+                }
             }
         });
         Object.assign(this, obj, this._config);

@@ -5,6 +5,7 @@ import BaseCell from './BaseCell';
 import { Rule, Rules } from './Validator';
 export default class CellHeader extends BaseCell {
     align: Align;
+    hideHeaderSelection = false;
     verticalAlign: VerticalAlign = 'middle';
     fixed?: Fixed;
     minWidth?: number;
@@ -34,16 +35,30 @@ export default class CellHeader extends BaseCell {
     style: Partial<CSSStyleDeclaration> = {};
     drawX = 0;
     drawY = 0;
+    sortIconName = 'sort-default';
+    sortAscIconName = 'sort-asc';
+    sortDescIconName = 'sort-desc';
     visibleWidth = 0;
     visibleHeight = 0;
+    drawTextX = 0;
+    drawTextY = 0;
+    drawTextWidth = 0;
+    drawTextHeight = 0;
     drawCellBgColor = '';
     drawTextColor = '';
-    drawImageX = 0;
-    drawImageY = 0;
-    drawImageWidth = 0;
-    drawImageHeight = 0;
-    drawImageName = '';
-    drawImageSource: HTMLImageElement | undefined;
+    drawSelectionImageX = 0;
+    drawSelectionImageY = 0;
+    drawSelectionImageWidth = 0;
+    drawSelectionImageHeight = 0;
+    drawSelectionImageName = '';
+    drawSelectionImageSource?: HTMLImageElement;
+    // 排序相关
+    drawSortImageX = 0;
+    drawSortImageY = 0;
+    drawSortImageWidth = 0;
+    drawSortImageHeight = 0;
+    drawSortImageName = '';
+    drawSortImageSource?: HTMLImageElement;
     constructor(ctx: Context, colIndex: number, x: number, y: number, width: number, height: number, column: Column) {
         super(ctx, x, y, width, height, 'header', column.fixed);
         this.ctx = ctx;
@@ -59,8 +74,10 @@ export default class CellHeader extends BaseCell {
         this.maxWidth = column.maxWidth;
         this.type = column.type || '';
         this.editorType = column.editorType || 'text';
-        this.align = column.headerAlign || column.align || 'center';
-        this.verticalAlign = column.headerVerticalAlign || column.verticalAlign || 'middle';
+        this.hideHeaderSelection = column.hideHeaderSelection || false;
+        this.align = column.headerAlign || column.align || this.ctx.config.COLUMNS_ALIGN;
+        this.verticalAlign =
+            column.headerVerticalAlign || column.verticalAlign || this.ctx.config.COLUMNS_VERTICAL_ALIGN;
         this.fixed = column.fixed;
         this.level = column.level || 0;
         this.operation = column.operation || false;
@@ -72,6 +89,9 @@ export default class CellHeader extends BaseCell {
         this.rules = column.rules;
         this.readonly = column.readonly || false;
         this.required = column.required || false;
+        this.sortIconName = column.sortIconName || 'sort-default';
+        this.sortAscIconName = column.sortAscIconName || 'sort-asc';
+        this.sortDescIconName = column.sortDescIconName || 'sort-desc';
         this.rowKey = generateShortUUID();
         this.overflowTooltipShow = column.overflowTooltipHeaderShow === false ? false : true;
         this.hasChildren = (column.children && column.children.length > 0) || false; // 是否有子
@@ -120,28 +140,90 @@ export default class CellHeader extends BaseCell {
         this.displayText = this.getText();
         this.drawX = this.getDrawX();
         this.drawY = this.getDrawY();
+        this.drawTextX = this.drawX;
+        this.drawTextY = this.drawY;
+        this.drawTextWidth = this.width;
+        this.drawTextHeight = this.height;
         this.updateStyle();
     }
     draw() {
+        this.drawEdge();
+        this.drawSelection();
+        this.recalculateTextPosition();
+        this.drawText();
+        this.drawSelector();
+        this.drawSortIcon();
+    }
+    private drawEdge() {
         const {
             paint,
-            config: { BORDER_COLOR, CELL_PADDING, HEADER_FONT, BORDER },
+            config: { BORDER_COLOR, BORDER },
         } = this.ctx;
-        const { drawX, drawY, displayText } = this;
+
         // 有边框的情况下，绘制边框
-        paint.drawRect(drawX, drawY, this.width, this.height, {
+        paint.drawRect(this.drawX, this.drawY, this.width, this.height, {
             borderColor: BORDER ? BORDER_COLOR : 'transparent',
             fillColor: this.drawCellBgColor,
         });
-        this.ellipsis = paint.drawText(displayText, drawX, drawY, this.width, this.height, {
-            font: HEADER_FONT,
-            padding: CELL_PADDING,
-            color: this.drawTextColor,
-            align: this.align,
-            verticalAlign: this.verticalAlign,
-        });
-        this.drawSelection();
-        this.drawSelector();
+    }
+    private recalculateTextPosition() {
+        // 对于 selection 类型的列，文本在复选框右侧显示
+        let textX = this.drawX;
+        let textWidth = this.width;
+        if (['selection', 'index-selection', 'selection-tree', 'tree-selection'].includes(this.type)) {
+            const { CHECKBOX_SIZE } = this.ctx.config;
+            if (this.align === 'left' || this.align === 'right') {
+                textX = this.drawX + CHECKBOX_SIZE + 4;
+                textWidth = this.width - textX + this.drawX;
+            } else {
+                // 复选框居中位置
+                const checkboxCenterX = this.drawX + (this.width - CHECKBOX_SIZE) / 2;
+                textX = checkboxCenterX + CHECKBOX_SIZE + 1; // 复选框右侧，最小间距
+                // 确保文本有足够的显示空间
+                textWidth = this.width - textX + this.drawX;
+            }
+        }
+
+        // 如果有排序图标，调整文本位置
+        if (this.column.sortBy) {
+            const iconSize = 16;
+            const iconMargin = 4;
+
+            if (this.align === 'right') {
+                // 居右时，文本需要为图标留出空间
+                textWidth = this.width - this.ctx.config.CELL_PADDING - iconSize - iconMargin;
+                textX = this.drawX + this.ctx.config.CELL_PADDING;
+            } else if (this.align === 'center') {
+                // 居中时，文本宽度需要考虑图标
+                const textWidthNeeded = this.ctx.paint.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
+                const totalWidth = textWidthNeeded + iconSize + iconMargin;
+                if (totalWidth > this.width - this.ctx.config.CELL_PADDING * 2) {
+                    textWidth = this.width - this.ctx.config.CELL_PADDING * 2 - iconSize - iconMargin;
+                }
+            }
+        }
+        this.drawTextX = textX;
+        this.drawTextWidth = textWidth;
+    }
+    private drawText() {
+        const {
+            paint,
+            config: { HEADER_FONT, CELL_PADDING },
+        } = this.ctx;
+        this.ellipsis = paint.drawText(
+            this.displayText,
+            this.drawTextX,
+            this.drawTextY,
+            this.drawTextWidth,
+            this.drawTextHeight,
+            {
+                font: HEADER_FONT,
+                padding: CELL_PADDING,
+                color: this.drawTextColor,
+                align: this.align,
+                verticalAlign: this.verticalAlign,
+            },
+        );
     }
     private drawSelector() {
         // 选择区背景颜色
@@ -159,13 +241,30 @@ export default class CellHeader extends BaseCell {
         }
     }
     private drawSelection() {
-        const { width, height, type } = this;
+        if (this.hideHeaderSelection) {
+            return;
+        }
+
         // 选中框类型
-        if (['index-selection', 'selection'].includes(type)) {
+        if (['index-selection', 'selection', 'selection-tree', 'tree-selection'].includes(this.type)) {
             const { indeterminate, check, selectable } = this.ctx.database.getCheckedState();
-            const { CHECKBOX_SIZE = 0 } = this.ctx.config;
-            const _x = this.drawX + (width - CHECKBOX_SIZE) / 2;
-            const _y = this.drawY + (height - CHECKBOX_SIZE) / 2;
+            const { CHECKBOX_SIZE = 0, CELL_PADDING } = this.ctx.config;
+            // 默认居中
+            let iconX = this.drawX + (this.width - CHECKBOX_SIZE) / 2;
+            let iconY = this.drawY + (this.height - CHECKBOX_SIZE) / 2;
+            this.drawTextX = iconX + CHECKBOX_SIZE - CELL_PADDING / 2;
+            this.drawTextWidth = this.drawX + this.visibleWidth - this.drawTextX;
+            if (this.align === 'left' || this.align === 'right') {
+                iconX = this.drawX + CELL_PADDING;
+                this.drawTextX = iconX + CHECKBOX_SIZE - CELL_PADDING / 2;
+                this.drawTextWidth = this.drawX + this.visibleWidth - this.drawTextX;
+            }
+            if (this.verticalAlign === 'top') {
+                iconY = this.drawY + CELL_PADDING / 2;
+            } else if (this.verticalAlign === 'bottom') {
+                iconY = this.drawY + this.height - CHECKBOX_SIZE - CELL_PADDING / 2;
+            }
+
             let checkboxImage: HTMLImageElement | undefined = this.ctx.icons.get('checkbox-uncheck');
             let checkboxName = 'checkbox-uncheck';
             if (indeterminate) {
@@ -174,7 +273,7 @@ export default class CellHeader extends BaseCell {
             } else if (check && selectable) {
                 checkboxImage = this.ctx.icons.get('checkbox-check');
                 checkboxName = 'checkbox-check';
-            } else if (check && selectable) {
+            } else if (check && !selectable) {
                 checkboxImage = this.ctx.icons.get('checkbox-check-disabled');
                 checkboxName = 'checkbox-check-disabled';
             } else if (!check && selectable) {
@@ -185,22 +284,82 @@ export default class CellHeader extends BaseCell {
                 checkboxName = 'checkbox-disabled';
             }
             if (checkboxImage) {
-                this.drawImageX = _x;
-                this.drawImageY = _y;
-                this.drawImageWidth = CHECKBOX_SIZE;
-                this.drawImageHeight = CHECKBOX_SIZE;
-                this.drawImageName = checkboxName;
-                this.drawImageSource = checkboxImage;
+                this.drawSelectionImageX = iconX;
+                this.drawSelectionImageY = iconY;
+                this.drawSelectionImageWidth = CHECKBOX_SIZE;
+                this.drawSelectionImageHeight = CHECKBOX_SIZE;
+                this.drawSelectionImageName = checkboxName;
+                this.drawSelectionImageSource = checkboxImage;
                 this.ctx.paint.drawImage(
-                    this.drawImageSource,
-                    this.drawImageX,
-                    this.drawImageY,
-                    this.drawImageWidth,
-                    this.drawImageHeight,
+                    this.drawSelectionImageSource,
+                    this.drawSelectionImageX,
+                    this.drawSelectionImageY,
+                    this.drawSelectionImageWidth,
+                    this.drawSelectionImageHeight,
                 );
             }
+
+            // 不再需要保存文本位置信息，直接在 draw 方法中计算
         }
     }
+    private drawSortIcon() {
+        // 如果没有sortBy配置且不是后端排序，不显示排序图标
+        if (!this.column.sortBy) {
+            return;
+        }
+
+        const { CELL_PADDING = 0 } = this.ctx.config;
+        const iconSize = 16;
+        const iconMargin = 4;
+        let iconName = this.sortIconName;
+        // 前端排序
+        const sortState = this.ctx.database.getSortState(this.key);
+        if (sortState.direction === 'asc') {
+            iconName = this.sortAscIconName;
+        } else if (sortState.direction === 'desc') {
+            iconName = this.sortDescIconName;
+        }
+        const icon = this.ctx.icons.get(iconName);
+        if (!icon) {
+            return;
+        }
+        // 计算图标位置
+        let iconX = 0;
+        let iconY = this.drawY + (this.height - iconSize) / 2;
+
+        if (this.align === 'left') {
+            // 居左：先绘制文字，图标紧跟文字
+            const textWidth = this.ctx.paint.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
+            iconX = this.drawX + CELL_PADDING + textWidth + iconMargin;
+        } else if (this.align === 'center') {
+            // 居中：先居中绘制文字，然后图标紧跟文字
+            const textWidth = this.ctx.paint.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
+            const textCenterX = this.drawX + this.width / 2;
+            const textStartX = textCenterX - textWidth / 2;
+            iconX = textStartX + textWidth + iconMargin;
+        } else if (this.align === 'right') {
+            // 居右：先绘制图标靠右，然后文字根据图标绘制后的位置紧贴在图标的左侧
+            iconX = this.drawX + this.width - CELL_PADDING - iconSize;
+        }
+
+        // 保存图标信息
+        this.drawSortImageX = iconX;
+        this.drawSortImageY = iconY;
+        this.drawSortImageWidth = iconSize;
+        this.drawSortImageHeight = iconSize;
+        this.drawSortImageName = iconName;
+        this.drawSortImageSource = icon;
+
+        // 绘制图标
+        this.ctx.paint.drawImage(
+            this.drawSortImageSource,
+            this.drawSortImageX,
+            this.drawSortImageY,
+            this.drawSortImageWidth,
+            this.drawSortImageHeight,
+        );
+    }
+    
     getText() {
         if (this.render) {
             return '';

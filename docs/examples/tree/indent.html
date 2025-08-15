@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>树形 - 自定义缩进示例</title>
+</head>
+<body>
+    <div style="margin-bottom: 20px;">
+        <label>树形缩进宽度: </label>
+        <input type="range" id="indent-slider" min="8" max="32" value="16" step="4">
+        <span id="indent-value">16px</span>
+        <button onclick="updateIndent()">更新缩进</button>
+    </div>
+    <div id="e-virt-table"></div>
+</body>
+<script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+<script>
+    let data = [
+        {
+            id: '1',
+            name: '部门A',
+            children: [
+                {
+                    id: '1-1',
+                    name: '子部门A1',
+                    children: [
+                        { id: '1-1-1', name: '员工A1-1' },
+                        { id: '1-1-2', name: '员工A1-2' }
+                    ]
+                },
+                {
+                    id: '1-2',
+                    name: '子部门A2',
+                    children: [
+                        { id: '1-2-1', name: '员工A2-1' },
+                        { id: '1-2-2', name: '员工A2-2' }
+                    ]
+                }
+            ]
+        },
+        {
+            id: '2',
+            name: '部门B',
+            children: [
+                {
+                    id: '2-1',
+                    name: '子部门B1',
+                    children: [
+                        { id: '2-1-1', name: '员工B1-1' },
+                        { id: '2-1-2', name: '员工B1-2' }
+                    ]
+                }
+            ]
+        }
+    ];
+
+    let columns = [
+        {
+            title: 'ID',
+            key: 'id',
+            width: 100,
+            readonly: true
+        },
+        {
+            title: '名称',
+            key: 'name',
+            width: 200,
+            readonly: true,
+            type: 'tree' // 使用树形类型
+        }
+    ];
+
+    const target = document.getElementById('e-virt-table');
+    let table = new EVirtTable(target, {
+        data,
+        columns,
+        config: {
+            TREE_INDENT: 20, // 默认树形缩进宽度
+            ROW_KEY: 'id',
+            HEIGHT: 300
+        }
+    });
+
+    // 更新缩进函数
+    function updateIndent() {
+        const indentValue = document.getElementById('indent-slider').value;
+        document.getElementById('indent-value').textContent = indentValue + 'px';
+        console.log(indentValue);
+
+        table.loadConfig({
+            TREE_INDENT: parseInt(indentValue),
+            ROW_KEY: 'id',
+            WIDTH: 800,
+            HEIGHT: 400
+        })
+    }
+
+    // 监听滑块变化
+    document.getElementById('indent-slider').addEventListener('input', function() {
+        document.getElementById('indent-value').textContent = this.value + 'px';
+    });
+
+    // 监听展开变化
+    table.on('expandChange', (expandedRows) => {
+        console.log('展开的行:', expandedRows);
+    });
+</script>
+</html> 

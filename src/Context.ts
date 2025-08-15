@@ -98,6 +98,8 @@ export default class Context {
     editing = false; // 编辑中
     onlyMergeCell = false; // 只有合并单元格
     selectOnlyOne = false; // 只选择一个
+    hasSelection = false; // 是否有选中
+    hasTree = false; // 是否有树形结构
     scrollY = 0;
     scrollX = 0;
     fixedLeftWidth = 0;
@@ -196,21 +198,21 @@ export default class Context {
     setConfig(config: Config) {
         this.config = new Config(config);
     }
-    setItemValueByEditor(rowKey: string, key: string, value: any, history = true, reDraw = true) {
+    setItemValueByEditor(rowKey: string, key: string, value: any, history = true, reDraw = true, checkReadonly = true) {
         // 启用合并单元格关联
         if (this.config.ENABLE_MERGE_CELL_LINK) {
             const cell = this.database.getVirtualBodyCellByKey(rowKey, key);
             if (cell && (cell.mergeRow || cell.mergeCol)) {
                 const { dataList } = cell.getSpanInfo();
                 const data = dataList.map((item: any) => ({ ...item, value }));
-                this.database.batchSetItemValue(data, history);
+                this.database.batchSetItemValue(data, history, checkReadonly);
                 return;
             }
         }
-        this.database.setItemValue(rowKey, key, value, history, reDraw, true);
+        this.database.setItemValue(rowKey, key, value, history, reDraw, true, checkReadonly);
     }
 
-    batchSetItemValueByEditor(_list: ChangeItem[], history = true) {
+    batchSetItemValueByEditor(_list: ChangeItem[], history = true, checkReadonly = true) {
         // 启用合并单元格关联
         if (this.config.ENABLE_MERGE_CELL_LINK) {
             const list: ChangeItem[] = [];
@@ -225,9 +227,9 @@ export default class Context {
                     list.push(...data);
                 }
             });
-            this.database.batchSetItemValue(list, history);
+            this.database.batchSetItemValue(list, history, checkReadonly);
         } else {
-            this.database.batchSetItemValue(_list, history);
+            this.database.batchSetItemValue(_list, history, checkReadonly);
         }
     }
     setFocusCell(cell: Cell) {
@@ -277,9 +279,15 @@ export default class Context {
             for (let ci = 0; ci <= xArr[1] - xArr[0]; ci++) {
                 const rowIndex = ri + yArr[0];
                 const colIndex = ci + xArr[0];
-                const item = this.database.getItemValueForRowIndexAndColIndex(rowIndex, colIndex);
-                if (item) {
-                    cellsData.push(item.value);
+                const cell = this.database.getVirtualBodyCell(rowIndex, colIndex);
+                if (cell) {
+                    // 选择器值类型
+                    if (cell.selectorCellValueType === 'displayText') {
+                        cellsData.push(cell.displayText);
+                    } else {
+                        // 默认value
+                        cellsData.push(cell.getValue());
+                    }
                 }
             }
             text += `${cellsData.join('\t')}\r`;

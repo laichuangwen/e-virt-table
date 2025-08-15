@@ -31,6 +31,8 @@ type EVirtTableOptions = {
 | WIDTH | 宽度为 0 表示自适应100% | number | 0 |
 | RESIZE_MIN_WIDTH | 最小可调整宽度 | number | 40 |
 | HEIGHT | 高度，高度为 0 表示自适应 | number | 0 |
+| COLUMNS_ALIGN | 全局水平对齐方式 | `"left"`, `"center"`, `"right"` | left |
+| COLUMNS_VERTICAL_ALIGN | 全局垂直对齐方式 | `"top"`, `"middle"`, `"bottom"` | middle |
 | EMPTY_BODY_HEIGHT | 数据为空时表格体的高度 | number | 120 |
 | EMPTY_CUSTOM_STYLE | 自定义空数据样式 | ^[object]`CSSProperties` | — |
 | EMPTY_TEXT | 空数据文本 | string | 暂无数据 |
@@ -49,7 +51,11 @@ type EVirtTableOptions = {
 | EXPAND_ICON_COLOR | 展开图标颜色 | string | #4E5969 |
 | ERROR_TIP_ICON_COLOR | 错误提示颜色 | string | red |
 | ERROR_TIP_ICON_SIZE | 错误提示图标大小 | number | 6 |
+| EXPAND_LAZY | tree 是否开启懒加载	 | boolean | false |
 | DEFAULT_EXPAND_ALL | tree 默认是否全部展开 | boolean | false |
+| TREE_INDENT | 树形缩进宽度	 | number | 20 |
+| TREE_LINE          | tree是否划线   | boolean  | false  |
+| TREE_LINE_COLOR    | tree的划线颜色   | string  | '#e1e6eb'  |
 | CELL_WIDTH | 表格 body 部分的宽度 | number | 100 |
 | CELL_HEIGHT | 表格 body 部分的行高 | number | 36 |
 | CELL_PADDING | 表格 body 部分的 padding | number | 8 |
@@ -102,6 +108,7 @@ type EVirtTableOptions = {
 | ENABLE_KEYBOARD | 启用键盘 | boolean | true |
 | ENABLE_HISTORY | 启用历史记录，可回退 | boolean | true |
 | HISTORY_NUM | 启用历史记录数量 | number | 50 |
+| SORT_STRICTLY | 启用严格排序，false支持多列排序 | boolean | true |
 | HIGHLIGHT_HOVER_ROW | hover 高亮当前行 | boolean | false |
 | HIGHLIGHT_HOVER_ROW_COLOR | hover 高亮当前行颜色 | string | `rgba(186,203,231,0.1)` |
 | HIGHLIGHT_SELECTED_ROW | 高亮选中当前行 | boolean | true |
@@ -174,6 +181,7 @@ type EVirtTableOptions = {
 | keydown | keydown回调 | — |
 | hoverIconClick | hoverIcon点击回调 | — |
 | onPastedDataOverflow | 粘贴溢出时回调 | `PastedDataOverflow`  |
+| sortChange | 当表格的排序条件发生变化的时候会触发该事件 | Map<string, SortStateMapItem> |
 | error | error回调 | — |
 
 ## Methods
@@ -226,6 +234,7 @@ type EVirtTableOptions = {
 | getPositionForRowIndex | 获取当前行的高度定位          | —                                                         |
 | getCellValue           | 通过 rowKey 和 key 获取格子值 | (rowKey, key)                                             |
 | getUtils               | 获取工具类方法，如内置合并行列方法                  | —                                     |
+| clearSort              | 清除排序                      | —                                                         |
 | contextMenuHide        | 隐藏右键菜单                  | —                                                         |
 | destroy                | 销毁                          | —                                                         |
 
@@ -243,10 +252,11 @@ type EVirtTableOptions = {
 | width | 列的宽度 | number | 100 |
 | minWidth | 列的最小宽度 | number | —|
 | maxWidth | 列的最大宽度 | number | —|
-| align | 水平对齐方式 | `"left"`, `"center"`, `"right"` | center |
-| headerAlign | 表头水平对齐方式 | `"left"`, `"center"`, `"right"` | center |
-| verticalAlign | 垂直对齐方式 | `"top"`, `"middle"`, `"bottom"` | middle |
+| headerAlign | 表头水平对齐方式 | `"left"`, `"center"`, `"right"` | left |
 | headerVerticalAlign | 表头垂直对齐方式 | `"top"`, `"middle"`, `"bottom"` | middle |
+| align | 水平对齐方式 | `"left"`, `"center"`, `"right"` | left |
+| verticalAlign | 垂直对齐方式 | `"top"`, `"middle"`, `"bottom"` | middle |
+| hideHeaderSelection | 表头Selection是否隐藏 | boolean | false |
 | fixed | 是否固定列 | `"left"`, `"right"` | — |
 | render | 自定义渲染方法 | string\|Function | — |
 | renderFooter | 自定义渲染底部方法 | string\|Function | — |
@@ -263,6 +273,10 @@ type EVirtTableOptions = {
 | overflowTooltipShow | 是否显示溢出提示 | boolean | true |
 | overflowTooltipMaxWidth | 溢出提示的宽度 | number | 500 |
 | overflowTooltipPlacement | 溢出提示的位置|  ^[string]`top, top-start, top-end, right, right-start, right-end, left, left-start, left-end, bottom, bottom-start, bottom-end` | — |
+| sortBy | 排序类型 | `'number'`, `'string'`, `'date'`, `(a: rowData, b: rowData) => number` | — |
+| sortIconName | 默认排序图标 | `string` | — |
+| sortAscIconName | 升序排序图标 | `string` | — |
+| sortDescIconName | 降序排序图标 | `string` | — |
 | rules | 校验规则 | Rules | — |
 
 ## Row
@@ -373,5 +387,9 @@ type PastedDataOverflow = {
     overflowColCount: number;
     textArr: string[][];
 };
+
+type SortDirection = 'asc' | 'desc' | 'none';
+type SortStateMapItem = { direction: SortDirection; timestamp: number };
+type SortStateMap = Map<string, SortStateMapItem>;
 
 ```

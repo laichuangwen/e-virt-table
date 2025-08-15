@@ -31,6 +31,8 @@ type EVirtTableOptions = {
 | WIDTH | Width (0 means auto fit to 100%) | number | — | 0 |
 | RESIZE_MIN_WIDTH | Minimum resizable width | number | — | 40 |
 | HEIGHT | Height (0 means auto fit) | number | — | 0 |
+| COLUMNS_ALIGN | Horizontal alignment | `"left"`, `"center"`, `"right"` | left |
+| COLUMNS_VERTICAL_ALIGN | Vertical alignment | `"top"`, `"middle"`, `"bottom"` | middle |
 | EMPTY_BODY_HEIGHT | Height of the body when data is empty | number | — | 120 |
 | EMPTY_CUSTOM_STYLE | Custom style for empty data | ^[object]`CSSProperties` | — | — |
 | EMPTY_TEXT | Text for empty data | string | — | No data |
@@ -50,6 +52,9 @@ type EVirtTableOptions = {
 | ERROR_TIP_ICON_COLOR | Error tip color | string | — | red |
 | ERROR_TIP_ICON_SIZE | Error tip icon size | number | — | 6 |
 | DEFAULT_EXPAND_ALL | Default tree expansion all | boolean | — | false |
+| TREE_INDENT        | Tree indent width         | number   | 20        |
+| TREE_LINE          | Show tree hierarchy lines | boolean  | false     |
+| TREE_LINE_COLOR    | Tree line color           | string   | '#e1e6eb' |
 | CELL_WIDTH | Cell width | number | — | 100 |
 | CELL_HEIGHT | Cell height | number | — | 36 |
 | CELL_PADDING | Padding of the table body | number | — | 8 |
@@ -101,6 +106,7 @@ type EVirtTableOptions = {
 | ENABLE_KEYBOARD | Enable keyboard | boolean | — | true |
 | ENABLE_HISTORY | Enable history (undo/redo) | boolean | — | true |
 | HISTORY_NUM | Number of history records | number | — | 50 |
+| SORT_STRICTLY | Enable strict sorting, false supports multi-column sorting | boolean | — | true |
 | HIGHLIGHT_HOVER_ROW | Highlight the current row on hover | boolean | — | false |
 | HIGHLIGHT_HOVER_ROW_COLOR | Highlight color of the current row on hover | string | — | `rgba(186,203,231,0.1)` |
 | HIGHLIGHT_SELECTED_ROW | Highlight the selected row | boolean | — | true |
@@ -173,6 +179,7 @@ type EVirtTableOptions = {
 | keydown | Callback for key down | — |
 | hoverIconClick | Callback for hoverIcon click | — |
 | onPastedDataOverflow | Callback when paste overflows | `PastedDataOverflow` |
+| sortChange | Triggered when table sorting conditions change | Map<string, SortStateMapItem> |
 | error | Error callback | — |
 
 ## Methods
@@ -224,6 +231,7 @@ type EVirtTableOptions = {
 | getPositionForRowIndex | Get position for row index    | —                                                         |
 | getCellValue           | Get cell value by rowKey and key | (rowKey, key)                                           |
 | getUtils               | Get utility methods, such as built-in merge row and column methods | —                     
+| clearSort              | Clear sorting                  | —                                                         |
 | contextMenuHide        | Hide context menu             | —                                                         |
 | destroy                | Destroy                       | —                                                         |
 
@@ -242,10 +250,11 @@ type EVirtTableOptions = {
 | width | Width of the column | number | — | — |
 | minWidth | Min width of the column | number | —|
 | maxWidth | Max width of the column | number | —|
-| align | Horizontal alignment | string | `"left"`, `"center"`, `"right"` | — |
-| headerAlign |Header horizontal alignment | string | `"left"`, `"center"`, `"right"` | — |
-| verticalAlign | Vertical alignment | string | `"top"`, `"middle"`, `"bottom"` | — |
-| headerVerticalAlign |Header vertical alignment | string | `"top"`, `"middle"`, `"bottom"` | — |
+| headerAlign | Header horizontal alignment | `"left"`, `"center"`, `"right"` | left |
+| headerVerticalAlign | Header vertical alignment | `"top"`, `"middle"`, `"bottom"` | middle |
+| align | Cell horizontal alignment | `"left"`, `"center"`, `"right"` | left |
+| verticalAlign | Cell vertical alignment | `"top"`, `"middle"`, `"bottom"` | middle |
+| hideHeaderSelection | Hide selection in header | boolean | false |
 | fixed | Fix the column position | string | `"left"`, `"right"` | — |
 | render | Custom render method | string\|Function | — | — |
 | renderFooter | Custom footer render method | string\|Function | — | — |
@@ -262,6 +271,10 @@ type EVirtTableOptions = {
 | overflowTooltipShow | Show overflow tooltip | boolean | — | true |
 | overflowTooltipMaxWidth | Max width of overflow tooltip | number | — | — |
 | overflowTooltipPlacement | Placement of overflow tooltip | OverflowTooltipPlacement |  ^[string]`top, top-start, top-end, right, right-start, right-end, left, left-start, left-end, bottom, bottom-start, bottom-end` | — |
+| sortBy | Sorting type | `'number'`, `'string'`, `'date'`, `(a: rowData, b: rowData) => number` | — | — |
+| sortIconName | Default sort icon | `string` | — | — |
+| sortAscIconName | Ascending sort icon | `string` | — | — |
+| sortDescIconName | Descending sort icon | `string` | — | — |
 | rules | Validation rules | Rules | — | — |
 
 ## Row
@@ -371,4 +384,8 @@ type PastedDataOverflow = {
     overflowColCount: number;
     textArr: string[][];
 };
+
+type SortDirection = 'asc' | 'desc' | 'none';
+type SortStateMapItem = { direction: SortDirection; timestamp: number };
+type SortStateMap = Map<string, SortStateMapItem>;
 ```

@@ -4,8 +4,8 @@ import type { Rule, Rules } from './Validator';
 import Config from './Config';
 export type OptionalizeExcept<T, K extends keyof T> = Partial<Omit<T, K>> & Required<Pick<T, K>>;
 export type EVirtTableOptions = {
-    data: any[];
-    footerData?: any[];
+    data: Record<string, any>[];
+    footerData?: Record<string, any>[];
     columns: Column[];
     config?: ConfigType;
     overlayerElement?: HTMLDivElement;
@@ -39,7 +39,7 @@ export type OverflowTooltipPlacement =
 export type VerticalAlign = 'top' | 'middle' | 'bottom';
 export type Align = 'left' | 'center' | 'right';
 export type Fixed = 'left' | 'right';
-export type Type = 'index' | 'selection' | 'index-selection' | 'tree' | 'number';
+export type Type = 'index' | 'selection' | 'index-selection' | 'tree' | 'selection-tree' | 'tree-selection' | 'number';
 
 export type TypeCheckbox =
     | 'checkbox-uncheck'
@@ -107,6 +107,16 @@ export type SelectionMap = {
     row: any;
 };
 
+export type SortDirection = 'asc' | 'desc' | 'none';
+export type SortStateMapItem = { direction: SortDirection; timestamp: number };
+export type SortStateMap = Map<string, SortStateMapItem>;
+export type SortByType =
+    | 'number'
+    | 'string'
+    | 'date'
+    | 'api'
+    | ((a: any, b: any) => number);
+
 export interface Column {
     key: string;
     title: string;
@@ -120,16 +130,21 @@ export interface Column {
     minWidth?: number;
     maxWidth?: number;
     widthFillDisable?: boolean;
-    align?: Align;
     headerAlign?: Align;
-    verticalAlign?: VerticalAlign;
     headerVerticalAlign?: VerticalAlign;
+    hideHeaderSelection?: boolean;
+    align?: Align;
+    verticalAlign?: VerticalAlign;
     fixed?: Fixed;
     level?: number;
     text?: string;
     colspan?: number;
     rowspan?: number;
     sort?: number;
+    sortBy?: SortByType;
+    sortIconName?: string; // 默认排序图标
+    sortAscIconName?: string; // 升序排序图标
+    sortDescIconName?: string; // 降序排序图标
     hide?: boolean | Function;
     render?: Function | string;
     renderFooter?: Function | string;
@@ -147,7 +162,12 @@ export interface Column {
     column?: Column;
     rules?: Rules | Rule;
     options?: any;
+    selectorCellValueType?: SelectorCellValueType;
 }
+export type HistoryAction = 'back' | 'forward' | 'none';
+export type SelectorCellValueType = 'displayText' | 'value';
+
+export type TreeSelectMode = 'auto' | 'cautious' | 'strictly';
 export type OverlayerTooltip = {
     style: any;
     text: string;
@@ -184,6 +204,13 @@ export type BeforeChangeItem = {
     value: any;
     oldValue: any;
     row: any;
+};
+export type BeforeValueChangeItem = {
+    rowKey: string;
+    key: string;
+    value: any;
+    oldValue?: any;
+    row?: any;
 };
 export type BeforeSetSelectorParams = {
     focusCell?: Cell;
@@ -259,8 +286,8 @@ export type SpanMethod = (params: SpanParams) => SpanType | void;
 export type SelectableMethod = (params: SelectableParams) => boolean | void;
 export type ExpandLazyMethod = (params: CellParams) => Promise<any[]>;
 export type BeforeCellValueChangeMethod = (
-    changeList: BeforeChangeItem[],
-) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
+    changeList: BeforeValueChangeItem[],
+) => BeforeValueChangeItem[] | Promise<BeforeValueChangeItem[]>;
 export type BeforePasteDataMethod = (
     changeList: BeforeChangeItem[],
     xArr: number[],

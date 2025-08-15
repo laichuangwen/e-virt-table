@@ -76,7 +76,7 @@ export default class History {
             // 设置滚动条位置
             this.ctx.setScroll(scrollX, scrollY);
             // 不需要添加历史记录
-            this.ctx.database.batchSetItemValue(data, false);
+            this.ctx.database.batchSetItemValue(data, false, false, 'back');
             this.historyIndex -= 1;
         }
     }
@@ -94,7 +94,7 @@ export default class History {
                 };
             });
             // 不需要添加历史记录
-            this.ctx.database.batchSetItemValue(data, false);
+            this.ctx.database.batchSetItemValue(data, false, false, 'forward');
         }
     }
     // 清空历史

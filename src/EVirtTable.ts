@@ -24,6 +24,7 @@ import Overlayer from './Overlayer';
 import ContextMenu from './ContextMenu';
 import { mergeColCell, mergeRowCell, getSpanArrByRow, getSpanObjByColumn } from './util';
 import './style.css';
+
 export default class EVirtTable {
     private options: EVirtTableOptions;
     private scroller: Scroller;
@@ -38,9 +39,10 @@ export default class EVirtTable {
     private overlayer: Overlayer;
     private contextMenu: ContextMenu;
     ctx: Context;
+    
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
         this.options = options;
-        const { overlayerElement, editorElement, emptyElement, contextMenuElement } = options;
+        const { overlayerElement, editorElement, emptyElement, contextMenuElement } = this.options;
         const containerElement = this.createContainer(
             target,
             overlayerElement,
@@ -145,8 +147,8 @@ export default class EVirtTable {
         this.ctx.emit('draw');
     }
 
-    setLoading(ladong: boolean) {
-        this.ctx.database.setLoading(ladong);
+    setLoading(loading: boolean) {
+        this.ctx.database.setLoading(loading);
     }
     on(event: string, callback: EventCallback) {
         this.ctx.on(event, callback);
@@ -167,7 +169,14 @@ export default class EVirtTable {
     editCell(rowIndex: number, colIndex: number) {
         this.editor.editCell(rowIndex, colIndex);
     }
-    setItemValue(rowKey: string, key: string, value: any, history = true, reDraw = true, isEditor = false) {
+    setItemValue(
+        rowKey: string,
+        key: string,
+        value: any,
+        history = true,
+        reDraw = true,
+        isEditor = false
+    ) {
         this.ctx.database.setItemValue(rowKey, key, value, history, reDraw, isEditor);
     }
     batchSetItemValue(list: ChangeItem[], history = true) {
@@ -176,6 +185,12 @@ export default class EVirtTable {
     setItemValueByEditor(rowKey: string, key: string, value: any, history = true, reDraw = true) {
         this.ctx.setItemValueByEditor(rowKey, key, value, history, reDraw);
         this.editor.doneEdit();
+    }
+
+    clearEditableData(value = null) {
+        const xArr = [0, this.ctx.maxColIndex];
+        const yArr = [0, this.ctx.maxRowIndex];
+        return this.selector.clearSelectedData(xArr, yArr, false, value);
     }
     clearEditor() {
         this.editor.clearEditor();
@@ -393,6 +408,9 @@ export default class EVirtTable {
     getCellValueByIndex(rowIndex: number, colIndex: number) {
         return this.ctx.database.getItemValueForRowIndexAndColIndex(rowIndex, colIndex);
     }
+    clearSort() {
+        this.ctx.database.clearSort();
+    }
     contextMenuHide() {
         this.contextMenu.hide();
     }
@@ -407,6 +425,7 @@ export default class EVirtTable {
     getColumnByKey(key: string) {
         return this.ctx.database.getColumnByKey(key)?.column;
     }
+
     /**
      * 销毁
      */

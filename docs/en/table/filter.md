@@ -1,4 +1,4 @@
-# Query & Sort
+# Outside Sort
 
 Use `filterMethod` to achieve query, sort, and other operations.
 

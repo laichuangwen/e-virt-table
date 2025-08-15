@@ -201,6 +201,7 @@ export default class Header {
             }
         });
     }
+
     private resizeColumn(cell: CellHeader, diff: number) {
         const setWidth = (columns: any[]) => {
             columns.forEach((column: any) => {

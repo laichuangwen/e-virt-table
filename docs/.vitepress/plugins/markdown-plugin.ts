@@ -4,7 +4,6 @@ import prism from 'prismjs';
 import path from 'path';
 import fs from 'fs';
 import mdContainer from 'markdown-it-container';
-import pkg from '../../package.json';
 
 function wrap(code: string, lang: string): string {
     if (lang === 'text') {
@@ -144,10 +143,7 @@ export const markdownConfig = (md) => {
                         'utf-8',
                     );
                     // 替换版本号
-                    source = _source.replace(
-                        '<script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>',
-                        `<script src="https://unpkg.com/e-virt-table@${pkg.version}/dist/index.umd.js"></script>`,
-                    );
+                    source = _source;
                 }
                 const sourcePath = `/examples/${sourceFile}.html`;
                 if (!source) throw new Error(`Incorrect source file: ${sourceFile}`);
