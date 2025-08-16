@@ -231,6 +231,7 @@ export default class Database {
                 }
             });
         };
+        recursiveData(this.data);
         return list;
     }
     private filterColumns(columns: Column[]) {
