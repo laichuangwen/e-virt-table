@@ -96,6 +96,7 @@ export default class Cell extends BaseCell {
     selectorCellValueType: SelectorCellValueType = 'value';
     overflowTooltipMaxWidth = 500;
     overflowTooltipPlacement: OverflowTooltipPlacement = 'top';
+    lineClamp = 1;
 
     constructor(
         ctx: Context,
@@ -116,6 +117,7 @@ export default class Cell extends BaseCell {
         this.rowIndex = rowIndex;
         this.key = column.key;
         this.type = column.type || '';
+        this.lineClamp = column.lineClamp || 1;
         this.editorType = column.editorType || 'text';
         this.selectorCellValueType =
             column.selectorCellValueType || this.ctx.config.SELECTOR_CELL_VALUE_TYPE || 'value';
@@ -464,7 +466,7 @@ export default class Cell extends BaseCell {
         // 1) 父节点行：在图标正下画一段短竖线（展开时绘制，符合视觉预期）
         if (row.hasChildren && row.expand) {
             const shortTop = this.drawTreeImageY + this.drawTreeImageHeight;
-            const shortBottom = shortTop + Math.min(this.visibleHeight / 2, Math.max(8, TREE_ICON_SIZE / 2));
+            const shortBottom = this.drawY + this.visibleHeight;
             this.ctx.paint.drawLine([iconCenterX, shortTop, iconCenterX, shortBottom], {
                 borderColor: TREE_LINE_COLOR,
                 borderWidth: 1,
@@ -995,6 +997,7 @@ export default class Cell extends BaseCell {
             this.drawTextWidth,
             CELL_PADDING,
             BODY_FONT,
+            this.lineClamp,
         );
         this.ellipsis = ellipsis;
         const { placeholder } = this.column;
@@ -1020,6 +1023,7 @@ export default class Cell extends BaseCell {
             color,
             isAutoRowHeight: this.isAutoRowHeight,
             lineHeight: CELL_LINE_HEIGHT,
+            lineClamp: this.lineClamp,
         });
     }
     private drawImage() {
