@@ -42,6 +42,7 @@ export default class Database {
     private validationErrorMap = new Map<string, ValidateResult>();
     private itemRowKeyMap = new WeakMap();
     private bufferData: any[] = [];
+    overlayerAutoHeightMap = new Map<number, number>();
     private bufferCheckState = {
         buffer: false,
         check: false,
@@ -213,6 +214,8 @@ export default class Database {
             }
         });
         this.clearBufferData(); // 清除缓存数据
+        this.getData(); // 重新获取数据
+        this.ctx.emit('draw');
     }
     /**
      * 获取所有行数据（平铺）
@@ -1760,7 +1763,6 @@ export default class Database {
         }
         return hasMergeCell;
     }
-
     /**
      * 计算树形数据的最大深度
      * @param data 树形数据
@@ -1778,5 +1780,22 @@ export default class Database {
         });
 
         return maxDepth;
+    }
+    updateOverlayerAutoHeightMap() {
+        // 当 DOM 发生变化时执行的回调
+        const elements = this.ctx.overlayerElement.querySelectorAll('[data-auto-height="true"]');
+        const map = new Map<number, number>();
+        elements.forEach((element) => {
+            const rowIndex = Number(element.getAttribute('data-row-index'));
+            if (isNaN(rowIndex)) {
+                return;
+            }
+            map.set(rowIndex, element.clientHeight);
+        });
+        this.overlayerAutoHeightMap = map;
+    }
+    getOverlayerAutoHeightByRowIndex(rowIndex: number) {
+        const height = this.overlayerAutoHeightMap.get(rowIndex) || -1;
+        return height;
     }
 }

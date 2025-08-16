@@ -49,6 +49,7 @@ export default class Cell extends BaseCell {
     render: Render;
     renderFooter: Render;
     style: any = {};
+    domDataset: any = {};
     rules: Rules | Rule = [];
     message: string = '';
     text: string = '';
@@ -315,6 +316,13 @@ export default class Cell extends BaseCell {
      * 更新样式
      */
     updateStyle() {
+        if (this.isAutoRowHeight) {
+            // 自适应行高
+            this.domDataset = {
+                autoHeight: true,
+                rowIndex: this.rowIndex,
+            };
+        }
         this.style = this.getOverlayerViewsStyle();
     }
     private updateTree() {
@@ -740,6 +748,11 @@ export default class Cell extends BaseCell {
         if (!this.isAutoRowHeight) {
             return -1;
         }
+        // 如果有渲染函数，使用渲染函数计算高度
+        if (this.render) {
+            const renderHeight = this.ctx.database.getOverlayerAutoHeightByRowIndex(this.rowIndex);
+            return renderHeight;
+        }
         if (!(this.displayText && typeof this.displayText === 'string')) {
             return -1;
         }
@@ -749,6 +762,7 @@ export default class Cell extends BaseCell {
             padding: CELL_PADDING,
             lineHeight: CELL_LINE_HEIGHT,
         });
+
         if (this.mergeRow) {
             if (this.visibleHeight < calculatedHeight) {
                 // 只会叠加在第一行
@@ -882,7 +896,8 @@ export default class Cell extends BaseCell {
             left,
             top,
             width: `${this.visibleWidth}px`,
-            height: `${this.visibleHeight}px`,
+            height: this.isAutoRowHeight ? `auto` : `${this.visibleHeight}px`,
+            // minHeight: `${this.visibleHeight}px`,
             pointerEvents: 'initial',
             userSelect: 'none',
         };

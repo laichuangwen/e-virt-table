@@ -39,7 +39,7 @@ export default class EVirtTable {
     private overlayer: Overlayer;
     private contextMenu: ContextMenu;
     ctx: Context;
-    
+
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
         this.options = options;
         const { overlayerElement, editorElement, emptyElement, contextMenuElement } = this.options;
@@ -169,14 +169,7 @@ export default class EVirtTable {
     editCell(rowIndex: number, colIndex: number) {
         this.editor.editCell(rowIndex, colIndex);
     }
-    setItemValue(
-        rowKey: string,
-        key: string,
-        value: any,
-        history = true,
-        reDraw = true,
-        isEditor = false
-    ) {
+    setItemValue(rowKey: string, key: string, value: any, history = true, reDraw = true, isEditor = false) {
         this.ctx.database.setItemValue(rowKey, key, value, history, reDraw, isEditor);
     }
     batchSetItemValue(list: ChangeItem[], history = true) {

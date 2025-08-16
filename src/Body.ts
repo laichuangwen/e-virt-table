@@ -368,6 +368,11 @@ export default class Body {
         }
         this.renderRows = rows;
         this.ctx.body.renderRows = rows;
+    }
+    updateAutoHeight() {
+        const rows = this.ctx.body.renderRows;
+        // 更新行高map
+        this.ctx.database.updateOverlayerAutoHeightMap();
         const hasCalculatedHeightCell = rows.some((row) => row.calculatedHeightCells.length > 0);
         if (hasCalculatedHeightCell) {
             // 如果有计算格子，重新计算行高
@@ -394,5 +399,6 @@ export default class Body {
             row.drawFixed();
         });
         this.drawTipLine();
+        this.updateAutoHeight();
     }
 }

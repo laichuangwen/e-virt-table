@@ -196,6 +196,23 @@ let columns: Column[] = [
             cellEl.innerHTML = cell.text;
             pEl.appendChild(cellEl);
         },
+        render: (pEl, cell) => {
+            const cellEl = document.createElement('div');
+            cellEl.style.width = '100%';
+            cellEl.style.opacity = '0.5';
+            cellEl.style.backgroundColor = 'cyan';
+            cellEl.style.display = 'block';
+            // cellEl.style.justifyContent = 'center';
+            // cellEl.style.alignItems = 'center';
+            cellEl.style.whiteSpace = 'pre-line';
+            cellEl.style.userSelect = 'text';
+            cellEl.innerHTML = cell.text;
+            cellEl.className = 'evt-body-cell-auto-height';
+            cellEl.dataset.rowIndex = cell.rowIndex;
+            cellEl.dataset.visibleWidth = cell.visibleWidth;
+            cellEl.dataset.visibleHeight = cell.visibleHeight;
+            pEl.appendChild(cellEl);
+        },
     },
     {
         title: '计薪月份',
@@ -224,36 +241,35 @@ let columns: Column[] = [
         // overflowTooltipShow: false,
         overflowTooltipMaxWidth: 200,
         overflowTooltipPlacement: 'top',
-        readonly: true,
+        readonly: false,
         // rules: {
         //     required: true,
         //     message: '该项必填哦！',
         // },
-        // render: (pEl, cell) => {
-        //     const cellEl = document.createElement('div');
-        //     cellEl.addEventListener('click', () => {
-        //         console.log('点击了家庭地址');
-        //     });
-        //     cellEl.addEventListener('selectionchange', () => {
-        //         console.log('selectionchange');
-        //         const selection = window.getSelection();
-        //         const text = selection ? selection.toString() : '';
-        //         if (text) {
-        //             console.log('用户选中了文本:', text);
-        //         }
-        //     });
-        //     cellEl.style.width = '100%';
-        //     cellEl.style.height = '100%';
-        //     cellEl.style.opacity = '0.5';
-        //     cellEl.style.backgroundColor = 'cyan';
-        //     cellEl.style.display = 'block';
-        //     // cellEl.style.justifyContent = 'center';
-        //     // cellEl.style.alignItems = 'center';
-        //     cellEl.style.whiteSpace = 'pre-line';
-        //     cellEl.style.userSelect = 'text';
-        //     cellEl.innerHTML = cell.text;
-        //     pEl.appendChild(cellEl);
-        // },
+        render: (pEl, cell) => {
+            const cellEl = document.createElement('div');
+            // 添加事件
+            cellEl.addEventListener('click', () => {
+                console.log('点击了家庭地址');
+            });
+            cellEl.style.minHeight = '36px';
+            cellEl.style.opacity = '0.5';
+            cellEl.style.backgroundColor = 'cyan';
+            cellEl.style.display = 'block';
+            cellEl.style.padding = '8px';
+            // cellEl.style.justifyContent = 'center';
+            // cellEl.style.alignItems = 'center';
+            // cellEl.style.whiteSpace = 'pre-line';
+            cellEl.style.userSelect = 'text';
+            // cellEl.style.border = '1px solid red';
+            cellEl.style.overflowWrap = 'break-word';
+            cellEl.textContent = cell.value;
+            cellEl.className = 'evt-body-cell-auto-height';
+            cellEl.dataset.rowIndex = cell.rowIndex;
+            cellEl.dataset.visibleWidth = cell.visibleWidth;
+            cellEl.dataset.visibleHeight = cell.visibleHeight;
+            pEl.appendChild(cellEl);
+        },
     },
     {
         title: '请假开始时间',
@@ -504,7 +520,7 @@ const eVirtTable = new EVirtTable(canvas, {
         ENABLE_PASTER: true,
         FOOTER_POSITION: 'bottom',
         OFFSET_HEIGHT: 16,
-        SELECTOR_CELL_VALUE_TYPE: 'displayText', // displayText | value
+        // SELECTOR_CELL_VALUE_TYPE: 'displayText', // displayText | value
         // SELECTOR_AREA_MAX_X_OFFSET: 1,
         // SELECTOR_AREA_MAX_Y_OFFSET: 1,
         ENABLE_CONTEXT_MENU: true,
@@ -816,6 +832,7 @@ eVirtTable.on('overlayerChange', (container) => {
             cellWrapView.cells.forEach((cell) => {
                 const cellEl = document.createElement('div');
                 Object.assign(cellEl.style, cell.style);
+                Object.assign(cellEl.dataset, cell.domDataset);
                 if (typeof cell.render === 'function') {
                     cell.render(cellEl, cell);
                 }
