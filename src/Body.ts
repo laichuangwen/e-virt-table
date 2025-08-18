@@ -44,9 +44,32 @@ export default class Body {
             }
         };
 
-        // 监听拖拽结束停止自动滚动
-        const handleMouseUp = () => {
-            this.stopAutoScroll();
+        // 全局监听鼠标松开事件，处理在 dropBar 外松开的情况
+        const handleMouseUp = (e: MouseEvent) => {
+            if (this.ctx.dragMove) {
+                // 检查松开位置是否在 dropBar 上
+                const target = e.target as HTMLElement;
+                let isOnDropBar = false;
+                
+                // 检查是否点击在任何 dropBar 上
+                this.dropBars.forEach((dropBar) => {
+                    if (dropBar.contains(target) || dropBar === target) {
+                        isOnDropBar = true;
+                    }
+                });
+                
+                if (!isOnDropBar) {
+                    // 在 dropBar 外松开，直接结束拖拽
+                    this.ctx.dragMove = false;
+                    this.clearAllDropBars();
+                    this.stopAutoScroll();
+                    
+                    // 重置 DragManager 状态
+                    if (this.ctx.dragManager && this.ctx.dragManager.resetDragStateFromBody) {
+                        this.ctx.dragManager.resetDragStateFromBody();
+                    }
+                }
+            }
         };
 
         document.addEventListener('mousemove', handleMouseMove);
