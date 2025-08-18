@@ -170,7 +170,7 @@ export default class DragManager {
             // 查找对应的行
             const rows = this.ctx.body.renderRows;
             const row = rows.find(r => r.rowIndex === cell.rowIndex);
-            if (row && row.cells[0] === cell) { // 只在第一个单元格悬停时显示拖拽图标
+            if (row) { // 在任何单元格悬停时都显示拖拽图标
                 if (this.hoverRow !== row) {
                     this.hoverRow = row;
                     this.ctx.emit('draw');
@@ -209,7 +209,8 @@ export default class DragManager {
         
         // 水平靠左，垂直居中
         const iconX = firstCell.drawX + 4; // 距离左侧4px
-        const iconY = row.y + (row.height - this.dragIconSize) / 2;
+        // 使用 firstCell.drawY 而不是 row.y，因为 drawY 已经考虑了滚动偏移
+        const iconY = firstCell.drawY + (firstCell.height - this.dragIconSize) / 2;
         
         return {
             x: iconX,
