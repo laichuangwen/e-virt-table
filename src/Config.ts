@@ -321,10 +321,6 @@ export default class Config {
     BEFORE_SET_AUTOFILL_METHOD?: BeforeSetAutofillMethod;
     /** 数据复制前回调 */
     BEFORE_COPY_METHOD?: BeforeCopyMethod;
-    /** 启用列拖拽 */
-    ENABLE_DRAG_COLUMN = false;
-    /** 启用行拖拽 */
-    ENABLE_DRAG_ROW = false;
     /** 拖拽触发阈值 */
     DRAG_THRESHOLD = 5;
     /** 拖拽预览透明度 */

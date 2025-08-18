@@ -19,6 +19,7 @@ export default class DragManager {
     private dragThreshold = 2; // 拖拽触发阈值（降低到2像素）
     private hoverCellHeader: CellHeader | null = null; // 悬停的表头
     private hoverRow: Row | null = null; // 悬停的行
+    private currentDragRowKey: string = ''; // 当前拖拽的行Key
     
     // 绑定的事件处理器
     private boundMouseDown: (e: MouseEvent) => void;
@@ -94,6 +95,7 @@ export default class DragManager {
             if (this.isPointInArea(offsetX, offsetY, iconArea)) {
                 // 立即设置拖拽状态，阻止其他功能
                 this.ctx.dragMove = true;
+
                 // 阻止其他拖选功能触发
                 e.preventDefault();
                 e.stopPropagation();
@@ -129,24 +131,22 @@ export default class DragManager {
     }
     
     private onMouseUp(_e: MouseEvent) {
-        const shouldComplete = this.dragState.isDragging && this.dragState.type !== DragType.None;
-        const shouldReset = this.dragState.type !== DragType.None || this.ctx.dragMove;
+        const wasDragging = this.dragState.isDragging && this.dragState.type !== DragType.None;
+        const hasDragState = this.dragState.type !== DragType.None || this.ctx.dragMove;
         
-        // 只有当确实在拖拽时才处理完成逻辑
-        if (shouldComplete) {
+        // 如果是行拖拽，不在这里处理，让 Body 的 dropHandler 处理
+        if (this.dragState.type === DragType.Row && this.dragState.isDragging) {
+            // 不阻止事件传播，让 dropBar 的事件处理器先执行
+            return;
+        }
+        
+        // 其他类型的拖拽或非拖拽状态，正常处理
+        if (wasDragging) {
             this.completeDrag();
-            
-            // 拖拽完成后延迟重置状态
-            setTimeout(() => {
-                if (this.dragState.type !== DragType.None || this.ctx.dragMove) {
-                    this.resetDragState();
-                }
-            }, 100);
-        } else if (shouldReset) {
-            // 如果有拖拽意图但没有真正开始拖拽，立即重置状态
-            setTimeout(() => {
-                this.resetDragState();
-            }, 50);
+        }
+        
+        if (hasDragState) {
+            this.resetDragState();
         }
     }
     
@@ -379,6 +379,9 @@ export default class DragManager {
             dragElement: row
         };
         
+        // 设置当前拖拽的行Key
+        this.currentDragRowKey = row.rowKey;
+        
         // 立即开始拖拽，不需要等待鼠标移动
         setTimeout(() => {
             if (this.dragState.type === DragType.Row && this.ctx.dragMove) {
@@ -537,13 +540,12 @@ export default class DragManager {
         canvas.style.top = `${previewY}px`;
     }
     
-    // 更新拖拽目标
-    private updateDragTarget(x: number, y: number) {
+    // 更新拖拽目标 - 现在主要用于列拖拽
+    private updateDragTarget(x: number, _y: number) {
         if (this.dragState.type === DragType.Column) {
             this.updateColumnTarget(x);
-        } else if (this.dragState.type === DragType.Row) {
-            this.updateRowTarget(y);
         }
+        // 行拖拽现在通过 dropBar 事件处理，不需要基于位置计算
     }
     
     // 更新列拖拽目标
@@ -562,30 +564,14 @@ export default class DragManager {
         }
     }
     
-    // 更新行拖拽目标
-    private updateRowTarget(y: number) {
-        const rows = this.ctx.body.renderRows;
-        for (let i = 0; i < rows.length; i++) {
-            const row = rows[i];
-            
-            if (y >= row.y && y <= row.y + row.height) {
-                // 根据鼠标位置决定插入位置
-                const insertBefore = y < row.y + row.height / 2;
-                this.dragState.targetIndex = insertBefore ? row.rowIndex : row.rowIndex + 1;
-                break;
-            }
-        }
-    }
+
     
     // 完成拖拽
     private completeDrag() {
-        if (this.dragState.sourceIndex !== this.dragState.targetIndex) {
-            if (this.dragState.type === DragType.Column) {
-                this.moveColumn(this.dragState.sourceIndex, this.dragState.targetIndex);
-            } else if (this.dragState.type === DragType.Row) {
-                this.moveRow(this.dragState.sourceIndex, this.dragState.targetIndex);
-            }
+        if (this.dragState.type === DragType.Column && this.dragState.sourceIndex !== this.dragState.targetIndex) {
+            this.moveColumn(this.dragState.sourceIndex, this.dragState.targetIndex);
         }
+        // 行拖拽的完成逻辑现在在 Body 的 dropHandler 中处理
         
         // 触发拖拽完成事件
         this.ctx.emit('dragEnd', {
@@ -619,29 +605,7 @@ export default class DragManager {
         });
     }
     
-    // 移动行
-    private moveRow(sourceIndex: number, targetIndex: number) {
-        const data = this.ctx.body.data;
-        const sourceRow = data[sourceIndex];
-        
-        // 从原位置移除
-        data.splice(sourceIndex, 1);
-        
-        // 插入到新位置
-        const insertIndex = targetIndex > sourceIndex ? targetIndex - 1 : targetIndex;
-        data.splice(insertIndex, 0, sourceRow);
-        
-        // 重新渲染
-        this.ctx.emit('draw');
-        
-        // 触发行移动事件
-        this.ctx.emit('rowMove', {
-            type: DragType.Row,
-            fromIndex: sourceIndex,
-            toIndex: insertIndex,
-            row: sourceRow
-        });
-    }
+
     
     // 取消拖拽
     private cancelDrag() {
@@ -651,6 +615,11 @@ export default class DragManager {
     // 重置拖拽状态
     private resetDragState() {
         this.ctx.dragMove = false; // 清除拖拽状态
+
+        this.currentDragRowKey = ''; // 清除当前拖拽行Key
+        
+        // 通过事件清理所有显示的蓝条
+        this.ctx.emit('clearDropBars');
         this.dragState = {
             type: DragType.None,
             sourceIndex: -1,
@@ -670,6 +639,33 @@ export default class DragManager {
         this.ctx.stageElement.style.cursor = '';
     }
     
+    // 获取当前拖拽的行Key
+    public getCurrentDragRowKey(): string {
+        return this.currentDragRowKey;
+    }
+
+    // 重置拖拽状态（供 Body 调用）
+    public resetDragStateFromBody() {
+        this.currentDragRowKey = '';
+        this.dragState = {
+            type: DragType.None,
+            sourceIndex: -1,
+            targetIndex: -1,
+            isDragging: false,
+            startX: 0,
+            startY: 0,
+            currentX: 0,
+            currentY: 0
+        };
+        
+        if (this.dragPreviewCanvas) {
+            this.dragPreviewCanvas.remove();
+            this.dragPreviewCanvas = undefined;
+        }
+        
+        this.ctx.stageElement.style.cursor = '';
+    }
+
     // 销毁方法
     destroy() {
         this.ctx.stageElement.removeEventListener('mousedown', this.boundMouseDown, true);
@@ -688,9 +684,8 @@ export default class DragManager {
         
         if (this.dragState.type === DragType.Column) {
             this.drawColumnDropIndicator();
-        } else if (this.dragState.type === DragType.Row) {
-            this.drawRowDropIndicator();
         }
+        // 行拖拽指示器现在通过 dropBar 显示，不需要额外绘制
     }
     
     // 绘制列拖放指示器
@@ -712,20 +707,5 @@ export default class DragManager {
         });
     }
     
-    // 绘制行拖放指示器
-    private drawRowDropIndicator() {
-        const rows = this.ctx.body.renderRows;
-        const targetRow = rows.find(row => row.rowIndex === this.dragState.targetIndex);
-        
-        if (!targetRow) return;
-        
-        const { paint } = this.ctx;
-        const y = targetRow.y;
-        
-        // 绘制插入指示线
-        paint.drawLine([0, y, this.ctx.stageWidth, y], {
-            borderColor: '#1890ff',
-            borderWidth: 2
-        });
-    }
+
 }
