@@ -76,15 +76,30 @@ export default class EventTable {
                 this.selectionClick(cell, e);
                 this.sortClick(cell, e);
             });
-
-            this.handleBodyEvent(x, y, this.ctx.body.renderRows, (cell: Cell) => {
-                this.ctx.clickCell = cell;
-                this.ctx.emit('cellClick', cell, e);
-                this.selectionClick(cell, e);
-                this.treeClick(cell, e);
-                // hoverIcon事件
-                this.hoverIconClick(cell);
-            });
+            // 可视区
+            this.handleBodyEvent(
+                x,
+                y,
+                this.ctx.body.renderRows,
+                (cell: Cell) => {
+                    this.ctx.clickCell = cell;
+                    this.ctx.emit('cellClick', cell, e);
+                    this.selectionClick(cell, e);
+                    this.treeClick(cell, e);
+                },
+                true,
+            );
+            // 正常
+            this.handleBodyEvent(
+                x,
+                y,
+                this.ctx.body.renderRows,
+                (cell: Cell) => {
+                    // hoverIcon事件
+                    this.hoverIconClick(cell);
+                },
+                false,
+            );
         });
         this.ctx.on('dblclick', (e) => {
             // 左边点击
@@ -162,6 +177,7 @@ export default class EventTable {
                 (cell: Cell) => {
                     // selection移入移除事件
                     //  this.ctx.emit("visibleCellHoverChange", cell, e);
+                    this.imageEnterAndLeave(cell, e);
                     if (this.visibleHoverCell !== cell) {
                         this.ctx.emit('visibleCellMouseleave', cell, e);
                         this.visibleHoverCell = cell;
@@ -259,6 +275,7 @@ export default class EventTable {
         const { offsetY, offsetX } = this.ctx.getOffset(e);
         const clickY = offsetY;
         const clickX = offsetX;
+
         if (
             !this.isInsideElement(
                 clickX,
