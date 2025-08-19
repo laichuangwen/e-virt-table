@@ -338,3 +338,11 @@ export interface RowMoveEventData {
     sourceRowKey: string; // 源行的 rowKey
     targetRowKey: string | null; // 目标行的 rowKey，null 表示移动到第一位
 }
+
+// 列移动事件数据
+export interface ColumnMoveEventData {
+    source: Column; // 源列数据
+    target: Column | null; // 目标列数据，null 表示移动到第一位
+    sourceColumnKey: string; // 源列的 key
+    targetColumnKey: string | null; // 目标列的 key，null 表示移动到第一位
+}

@@ -20,6 +20,7 @@ export default class DragManager {
     private hoverCellHeader: CellHeader | null = null; // 悬停的表头
     private hoverRow: Row | null = null; // 悬停的行
     private currentDragRowKey: string = ''; // 当前拖拽的行Key
+    private currentDragColumnKey: string = ''; // 当前拖拽的列Key
     
     // 绑定的事件处理器
     private boundMouseDown: (e: MouseEvent) => void;
@@ -357,6 +358,9 @@ export default class DragManager {
             dragElement: header
         };
         
+        // 设置当前拖拽的列Key
+        this.currentDragColumnKey = header.key;
+        
         // 立即开始拖拽，不需要等待鼠标移动
         setTimeout(() => {
             if (this.dragState.type === DragType.Column && this.ctx.dragMove) {
@@ -541,38 +545,16 @@ export default class DragManager {
         canvas.style.top = `${previewY}px`;
     }
     
-    // 更新拖拽目标 - 现在主要用于列拖拽
-    private updateDragTarget(x: number, _y: number) {
-        if (this.dragState.type === DragType.Column) {
-            this.updateColumnTarget(x);
-        }
-        // 行拖拽现在通过 dropBar 事件处理，不需要基于位置计算
-    }
-    
-    // 更新列拖拽目标
-    private updateColumnTarget(x: number) {
-        const headers = this.ctx.header.renderLeafCellHeaders;
-        for (let i = 0; i < headers.length; i++) {
-            const header = headers[i];
-            const headerX = header.getDrawX();
-            
-            if (x >= headerX && x <= headerX + header.width) {
-                // 根据鼠标位置决定插入位置
-                const insertBefore = x < headerX + header.width / 2;
-                this.dragState.targetIndex = insertBefore ? i : i + 1;
-                break;
-            }
-        }
+    // 更新拖拽目标 - 列拖拽现在也通过 dropPillar 事件处理，不需要基于位置计算
+    private updateDragTarget(_x: number, _y: number) {
+        // 行拖拽和列拖拽现在都通过 dropBar/dropPillar 事件处理，不需要基于位置计算
     }
     
 
     
     // 完成拖拽
     private completeDrag() {
-        if (this.dragState.type === DragType.Column && this.dragState.sourceIndex !== this.dragState.targetIndex) {
-            this.moveColumn(this.dragState.sourceIndex, this.dragState.targetIndex);
-        }
-        // 行拖拽的完成逻辑现在在 Body 的 dropHandler 中处理
+        // 行拖拽和列拖拽的完成逻辑现在都在各自的 dropHandler 中处理
         
         // 触发拖拽完成事件
         this.ctx.emit('dragEnd', {
@@ -582,29 +564,7 @@ export default class DragManager {
         });
     }
     
-    // 移动列
-    private moveColumn(sourceIndex: number, targetIndex: number) {
-        const columns = this.ctx.header.visibleLeafColumns;
-        const sourceColumn = columns[sourceIndex];
-        
-        // 从原位置移除
-        columns.splice(sourceIndex, 1);
-        
-        // 插入到新位置
-        const insertIndex = targetIndex > sourceIndex ? targetIndex - 1 : targetIndex;
-        columns.splice(insertIndex, 0, sourceColumn);
-        
-        // 重建表头
-        this.ctx.emit('resetHeader');
-        
-        // 触发列移动事件
-        this.ctx.emit('columnMove', {
-            type: DragType.Column,
-            fromIndex: sourceIndex,
-            toIndex: insertIndex,
-            column: sourceColumn
-        });
-    }
+    // 移动列方法已删除，现在通过 dropPillar 事件处理
     
 
     
@@ -618,9 +578,11 @@ export default class DragManager {
         this.ctx.dragMove = false; // 清除拖拽状态
 
         this.currentDragRowKey = ''; // 清除当前拖拽行Key
+        this.currentDragColumnKey = ''; // 清除当前拖拽列Key
         
-        // 通过事件清理所有显示的蓝条
+        // 通过事件清理所有显示的蓝条和dropPillar
         this.ctx.emit('clearDropBars');
+        this.ctx.emit('clearDropPillars');
         this.dragState = {
             type: DragType.None,
             sourceIndex: -1,
@@ -645,9 +607,15 @@ export default class DragManager {
         return this.currentDragRowKey;
     }
 
+    // 获取当前拖拽的列Key
+    public getCurrentDragColumnKey(): string {
+        return this.currentDragColumnKey;
+    }
+
     // 重置拖拽状态（供 Body 调用）
     public resetDragStateFromBody() {
         this.currentDragRowKey = '';
+        this.currentDragColumnKey = '';
         this.dragState = {
             type: DragType.None,
             sourceIndex: -1,
@@ -681,31 +649,7 @@ export default class DragManager {
     
     // 绘制拖拽指示器
     drawDragIndicator() {
-        if (!this.dragState.isDragging) return;
-        
-        if (this.dragState.type === DragType.Column) {
-            this.drawColumnDropIndicator();
-        }
-        // 行拖拽指示器现在通过 dropBar 显示，不需要额外绘制
-    }
-    
-    // 绘制列拖放指示器
-    private drawColumnDropIndicator() {
-        const headers = this.ctx.header.renderLeafCellHeaders;
-        const targetHeader = headers[this.dragState.targetIndex] || headers[headers.length - 1];
-        
-        if (!targetHeader) return;
-        
-        const { paint } = this.ctx;
-        const x = this.dragState.targetIndex >= headers.length 
-            ? targetHeader.getDrawX() + targetHeader.width 
-            : targetHeader.getDrawX();
-        
-        // 绘制插入指示线
-        paint.drawLine([x, 0, x, this.ctx.header.height], {
-            borderColor: '#1890ff',
-            borderWidth: 2
-        });
+        // 行拖拽和列拖拽指示器现在都通过 dropBar/dropPillar 显示，不需要额外绘制
     }
     
 

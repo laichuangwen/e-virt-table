@@ -2,8 +2,8 @@ import {
     ChangeItem,
     Column,
     ConfigType,
-    DragEventData,
     RowMoveEventData,
+    ColumnMoveEventData,
     EventCallback,
     EVirtTableOptions,
     FilterMethod,
@@ -456,7 +456,7 @@ export default class EVirtTable {
         this.ctx.containerElement.remove();
     }
 
-    private onColumnMove(_data: DragEventData) {
+    private onColumnMove(_data: ColumnMoveEventData) {
         // 列移动完成后的处理 tbd 后续可能扩展列排序等
     }
     

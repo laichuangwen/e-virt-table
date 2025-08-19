@@ -664,34 +664,43 @@ export default class Body {
         }
 
         const hoverHandler = () => {
-            // 只有在拖拽过程中才显示 dropBar
-            if (this.ctx.dragMove) {
-                this.hoverHandler(rowKey, true);
+            // 只有在行拖拽过程中才显示 dropBar
+            if (this.ctx.dragMove && this.ctx.dragManager) {
+                const currentDragRowKey = this.ctx.dragManager.getCurrentDragRowKey();
+                if (currentDragRowKey) { // 确保是行拖拽
+                    this.hoverHandler(rowKey, true);
+                }
             }
         };
 
         const leaveHandler = () => {
-            // 只有在拖拽过程中才隐藏 dropBar
-            if (this.ctx.dragMove) {
-                this.hoverHandler(rowKey, false);
+            // 只有在行拖拽过程中才隐藏 dropBar
+            if (this.ctx.dragMove && this.ctx.dragManager) {
+                const currentDragRowKey = this.ctx.dragManager.getCurrentDragRowKey();
+                if (currentDragRowKey) { // 确保是行拖拽
+                    this.hoverHandler(rowKey, false);
+                }
             }
         };
 
         const dropHandler = (_e: MouseEvent) => {
-            // 在拖拽时处理放置逻辑
+            // 只处理行拖拽的放置逻辑
             if (this.ctx.dragMove && this.ctx.dragManager) {
-                this.handleDrop(rowKey);
-                
-                // 直接结束拖拽状态
-                this.ctx.dragMove = false;
-                this.clearAllDropBars();
-                
-                // 延迟重置 DragManager 状态，确保在 DragManager 的 mouseup 处理之后
-                setTimeout(() => {
-                    if (this.ctx.dragManager && this.ctx.dragManager.resetDragStateFromBody) {
-                        this.ctx.dragManager.resetDragStateFromBody();
-                    }
-                }, 10);
+                const currentDragRowKey = this.ctx.dragManager.getCurrentDragRowKey();
+                if (currentDragRowKey) { // 确保是行拖拽
+                    this.handleDrop(rowKey);
+                    
+                    // 直接结束拖拽状态
+                    this.ctx.dragMove = false;
+                    this.clearAllDropBars();
+                    
+                    // 延迟重置 DragManager 状态，确保在 DragManager 的 mouseup 处理之后
+                    setTimeout(() => {
+                        if (this.ctx.dragManager && this.ctx.dragManager.resetDragStateFromBody) {
+                            this.ctx.dragManager.resetDragStateFromBody();
+                        }
+                    }, 10);
+                }
             }
         };
 
