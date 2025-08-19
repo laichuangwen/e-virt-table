@@ -1,12 +1,12 @@
 import Context from './Context';
 import CellHeader from './CellHeader';
 import Row from './Row';
-import { DragType, DragState } from './types';
+import { DragState } from './types';
 
 export default class DragManager {
     private ctx: Context;
     private dragState: DragState = {
-        type: DragType.None,
+        type: 'none',
         sourceIndex: -1,
         targetIndex: -1,
         isDragging: false,
@@ -132,11 +132,11 @@ export default class DragManager {
     }
     
     private onMouseUp(_e: MouseEvent) {
-        const wasDragging = this.dragState.isDragging && this.dragState.type !== DragType.None;
-        const hasDragState = this.dragState.type !== DragType.None || this.ctx.dragMove;
+        const wasDragging = this.dragState.isDragging && this.dragState.type !== 'none';
+        const hasDragState = this.dragState.type !== 'none' || this.ctx.dragMove;
         
         // 如果是行拖拽，不在这里处理，让 Body 的 dropHandler 处理
-        if (this.dragState.type === DragType.Row && this.dragState.isDragging) {
+        if (this.dragState.type === 'row' && this.dragState.isDragging) {
             // 不阻止事件传播，让 dropBar 的事件处理器先执行
             return;
         }
@@ -347,7 +347,7 @@ export default class DragManager {
     private initColumnDrag(header: CellHeader, x: number, y: number) {
         // dragMove 已经在点击检测时设置了
         this.dragState = {
-            type: DragType.Column,
+            type: 'column',
             sourceIndex: header.colIndex,
             targetIndex: header.colIndex,
             isDragging: false,
@@ -363,7 +363,7 @@ export default class DragManager {
         
         // 立即开始拖拽，不需要等待鼠标移动
         setTimeout(() => {
-            if (this.dragState.type === DragType.Column && this.ctx.dragMove) {
+            if (this.dragState.type === 'column' && this.ctx.dragMove) {
                 this.startDrag();
             }
         }, 5);
@@ -373,7 +373,7 @@ export default class DragManager {
     private initRowDrag(row: Row, x: number, y: number) {
         // dragMove 已经在点击检测时设置了
         this.dragState = {
-            type: DragType.Row,
+            type: 'row',
             sourceIndex: row.rowIndex,
             targetIndex: row.rowIndex,
             isDragging: false,
@@ -389,7 +389,7 @@ export default class DragManager {
         
         // 立即开始拖拽，不需要等待鼠标移动
         setTimeout(() => {
-            if (this.dragState.type === DragType.Row && this.ctx.dragMove) {
+            if (this.dragState.type === 'row' && this.ctx.dragMove) {
                 this.startDrag();
             }
         }, 5);
@@ -397,7 +397,7 @@ export default class DragManager {
     
     // 检查是否开始拖拽
     private checkStartDrag(e: MouseEvent) {
-        if (this.dragState.type === DragType.None) return;
+        if (this.dragState.type === 'none') return;
         
         const { offsetX, offsetY } = this.ctx.getOffset(e);
         const deltaX = Math.abs(offsetX - this.dragState.startX);
@@ -434,9 +434,9 @@ export default class DragManager {
             this.ctx.containerElement.appendChild(this.dragPreviewCanvas);
         }
         
-        if (this.dragState.type === DragType.Column) {
+        if (this.dragState.type === 'column') {
             this.createColumnPreview();
-        } else if (this.dragState.type === DragType.Row) {
+        } else if (this.dragState.type === 'row') {
             this.createRowPreview();
         }
     }
@@ -584,7 +584,7 @@ export default class DragManager {
         this.ctx.emit('clearDropBars');
         this.ctx.emit('clearDropPillars');
         this.dragState = {
-            type: DragType.None,
+            type: 'none',
             sourceIndex: -1,
             targetIndex: -1,
             isDragging: false,
@@ -617,7 +617,7 @@ export default class DragManager {
         this.currentDragRowKey = '';
         this.currentDragColumnKey = '';
         this.dragState = {
-            type: DragType.None,
+            type: 'none',
             sourceIndex: -1,
             targetIndex: -1,
             isDragging: false,

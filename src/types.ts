@@ -302,12 +302,8 @@ export type BeforeSetSelectorMethod = (params: BeforeSetSelectorParams) => Befor
 export type BeforeSetAutofillMethod = (params: BeforeSetAutofillParams) => BeforeSetAutofillParams | undefined;
 export type BeforeCopyMethod = (params: BeforeCopyParams) => BeforeCopyParams | undefined;
 
-// 拖拽类型
-export enum DragType {
-    None = 'none',
-    Column = 'column', 
-    Row = 'row'
-}
+// 拖拽类型（移除导出，改为内部使用的字符串字面量类型）
+type DragType = 'none' | 'column' | 'row';
 
 // 拖拽状态
 export interface DragState {
