@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table - 基础行拖拽</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+        <div id="log" style="margin-top: 20px; padding: 10px; background: #f5f5f5; border-radius: 4px;">
+            <strong>拖拽日志：</strong>
+            <div id="log-content">暂无拖拽操作</div>
+        </div>
+    </body>
+    <script>
+        let data = [
+            {
+                id: 1,
+                name: '张三',
+                age: 25,
+                department: '技术部',
+                position: '前端工程师',
+                salary: 12000,
+            },
+            {
+                id: 2,
+                name: '李四',
+                age: 28,
+                department: '产品部',
+                position: '产品经理',
+                salary: 15000,
+            },
+            {
+                id: 3,
+                name: '王五',
+                age: 30,
+                department: '设计部',
+                position: 'UI设计师',
+                salary: 11000,
+            },
+            {
+                id: 4,
+                name: '赵六',
+                age: 27,
+                department: '技术部',
+                position: '后端工程师',
+                salary: 13000,
+            },
+            {
+                id: 5,
+                name: '钱七',
+                age: 32,
+                department: '市场部',
+                position: '市场专员',
+                salary: 10000,
+            },
+            {
+                id: 6,
+                name: '孙八',
+                age: 29,
+                department: '人事部',
+                position: 'HR专员',
+                salary: 9500,
+            },
+        ];
+
+        let columns = [
+            {
+                title: 'ID',
+                key: 'id',
+                width: 80,
+                align: 'center',
+                readonly: true,
+            },
+            {
+                title: '姓名',
+                key: 'name',
+                width: 120,
+                align: 'left',
+                readonly: true,
+            },
+            {
+                title: '年龄',
+                key: 'age',
+                width: 80,
+                align: 'center',
+                readonly: true,
+            },
+            {
+                title: '部门',
+                key: 'department',
+                width: 120,
+                align: 'left',
+                readonly: true,
+            },
+            {
+                title: '职位',
+                key: 'position',
+                width: 150,
+                align: 'left',
+                readonly: true,
+            },
+            {
+                title: '薪资',
+                key: 'salary',
+                width: 120,
+                align: 'right',
+                readonly: true,
+                formatter: ({ value }) => {
+                    return `¥${value.toLocaleString()}`;
+                },
+            },
+        ];
+
+        const eVirtTable = new EVirtTable(document.getElementById('e-virt-table'), {
+            columns,
+            data,
+            config: {
+                BORDER: true,
+                STRIPE: true,
+                CELL_HEIGHT: 40,
+                HEADER_HEIGHT: 40,
+                ROW_KEY: 'id',
+                ENABLE_DRAG_ROW: true,  // 启用行拖拽
+                HIGHLIGHT_HOVER_ROW: true,
+            },
+        });
+
+        // 监听行拖拽事件
+        eVirtTable.on('rowMove', (eventData) => {
+            const { source, target, sourceRowKey, targetRowKey } = eventData;
+            const logContent = document.getElementById('log-content');
+            
+            let logMessage;
+            if (target === null) {
+                logMessage = `将 "${source.name}" 移动到第一位`;
+            } else {
+                logMessage = `将 "${source.name}" 移动到 "${target.name}" 后面`;
+            }
+            
+            logContent.innerHTML = `
+                <div>${new Date().toLocaleTimeString()} - ${logMessage}</div>
+                <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                    源行Key: ${sourceRowKey}, 目标行Key: ${targetRowKey || '第一位'}
+                </div>
+            `;
+            
+            console.log('行拖拽事件:', eventData);
+        });
+
+        // 监听拖拽开始和结束事件
+        eVirtTable.on('dragStart', (eventData) => {
+            console.log('拖拽开始:', eventData);
+        });
+
+        eVirtTable.on('dragEnd', (eventData) => {
+            console.log('拖拽结束:', eventData);
+        });
+    </script>
+</html>

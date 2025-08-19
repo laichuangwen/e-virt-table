@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table - 树形数据行拖拽</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div style="margin-bottom: 10px;">
+            <strong>说明：</strong>支持树形结构的行拖拽，可以改变节点的层级关系和排序。
+        </div>
+        <div id="e-virt-table"></div>
+        <div id="tree-display" style="margin-top: 20px; padding: 10px; background: #f5f5f5; border-radius: 4px;">
+            <strong>当前树形结构：</strong>
+            <div id="tree-content"></div>
+        </div>
+    </body>
+    <script>
+        let data = [
+            {
+                id: 1,
+                name: '前端开发',
+                type: '部门',
+                manager: '张总监',
+                members: 8,
+                budget: 500000,
+                children: [
+                    {
+                        id: 2,
+                        name: 'React团队',
+                        type: '团队',
+                        manager: '李组长',
+                        members: 4,
+                        budget: 250000,
+                        children: [
+                            {
+                                id: 3,
+                                name: '用户管理系统',
+                                type: '项目',
+                                manager: '王工程师',
+                                members: 2,
+                                budget: 120000,
+                            },
+                            {
+                                id: 4,
+                                name: '订单管理系统',
+                                type: '项目',
+                                manager: '赵工程师',
+                                members: 2,
+                                budget: 130000,
+                            },
+                        ],
+                    },
+                    {
+                        id: 5,
+                        name: 'Vue团队',
+                        type: '团队',
+                        manager: '钱组长',
+                        members: 4,
+                        budget: 250000,
+                        children: [
+                            {
+                                id: 6,
+                                name: '移动端应用',
+                                type: '项目',
+                                manager: '孙工程师',
+                                members: 2,
+                                budget: 120000,
+                            },
+                            {
+                                id: 7,
+                                name: '管理后台',
+                                type: '项目',
+                                manager: '周工程师',
+                                members: 2,
+                                budget: 130000,
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                id: 8,
+                name: '后端开发',
+                type: '部门',
+                manager: '刘总监',
+                members: 6,
+                budget: 400000,
+                children: [
+                    {
+                        id: 9,
+                        name: 'Java团队',
+                        type: '团队',
+                        manager: '吴组长',
+                        members: 3,
+                        budget: 200000,
+                        children: [
+                            {
+                                id: 10,
+                                name: '用户服务',
+                                type: '项目',
+                                manager: '郑工程师',
+                                members: 1,
+                                budget: 80000,
+                            },
+                            {
+                                id: 11,
+                                name: '订单服务',
+                                type: '项目',
+                                manager: '陈工程师',
+                                members: 2,
+                                budget: 120000,
+                            },
+                        ],
+                    },
+                    {
+                        id: 12,
+                        name: 'Python团队',
+                        type: '团队',
+                        manager: '何组长',
+                        members: 3,
+                        budget: 200000,
+                        children: [
+                            {
+                                id: 13,
+                                name: '数据分析平台',
+                                type: '项目',
+                                manager: '冯工程师',
+                                members: 2,
+                                budget: 150000,
+                            },
+                        ],
+                    },
+                ],
+            },
+        ];
+
+        let columns = [
+            {
+                title: '名称',
+                key: 'name',
+                width: 200,
+                align: 'left',
+                readonly: true,
+                type: 'tree',
+            },
+            {
+                title: '类型',
+                key: 'type',
+                width: 100,
+                align: 'center',
+                readonly: true,
+                formatter: ({ value }) => {
+                    const typeMap = {
+                        '部门': '🏢 部门',
+                        '团队': '👥 团队',
+                        '项目': '📋 项目',
+                    };
+                    return typeMap[value] || value;
+                },
+            },
+            {
+                title: '负责人',
+                key: 'manager',
+                width: 120,
+                align: 'center',
+                readonly: true,
+            },
+            {
+                title: '人员数量',
+                key: 'members',
+                width: 100,
+                align: 'center',
+                readonly: true,
+                formatter: ({ value }) => `${value}人`,
+            },
+            {
+                title: '预算',
+                key: 'budget',
+                width: 120,
+                align: 'right',
+                readonly: true,
+                formatter: ({ value }) => `¥${(value / 10000).toFixed(1)}万`,
+            },
+        ];
+
+        const eVirtTable = new EVirtTable(document.getElementById('e-virt-table'), {
+            columns,
+            data,
+            config: {
+                BORDER: true,
+                STRIPE: true,
+                CELL_HEIGHT: 40,
+                HEADER_HEIGHT: 40,
+                ROW_KEY: 'id',
+                ENABLE_DRAG_ROW: true,
+                HIGHLIGHT_HOVER_ROW: true,
+                TREE_EXPAND_ALL: true,
+                TREE_INDENT: 20,
+            },
+        });
+
+        // 显示树形结构
+        function displayTreeStructure(data, level = 0) {
+            let result = '';
+            data.forEach(item => {
+                const indent = '　'.repeat(level);
+                result += `${indent}${item.name} (${item.type})<br>`;
+                if (item.children && item.children.length > 0) {
+                    result += displayTreeStructure(item.children, level + 1);
+                }
+            });
+            return result;
+        }
+
+        function updateTreeDisplay() {
+            const treeContent = document.getElementById('tree-content');
+            const currentData = eVirtTable.getData();
+            treeContent.innerHTML = displayTreeStructure(currentData);
+        }
+
+        // 初始显示
+        updateTreeDisplay();
+
+        // 重建树形结构
+        function rebuildTreeStructure(flatData) {
+            // 这是一个简化的树形结构重建函数
+            // 在实际应用中，需要根据具体的业务逻辑来实现
+            
+            // 创建节点映射
+            const nodeMap = new Map();
+            flatData.forEach(item => {
+                nodeMap.set(item.id, { ...item, children: [] });
+            });
+
+            // 重建父子关系
+            const rootNodes = [];
+            flatData.forEach(item => {
+                const node = nodeMap.get(item.id);
+                if (item.parentId && nodeMap.has(item.parentId)) {
+                    const parent = nodeMap.get(item.parentId);
+                    parent.children.push(node);
+                } else {
+                    rootNodes.push(node);
+                }
+            });
+
+            return rootNodes;
+        }
+
+        // 展平树形数据以便重新排序
+        function flattenTreeData(data, parentId = null, level = 0) {
+            let result = [];
+            data.forEach(item => {
+                const flatItem = { 
+                    ...item, 
+                    parentId: parentId,
+                    level: level,
+                    children: undefined // 移除children以避免循环引用
+                };
+                result.push(flatItem);
+                
+                if (item.children && item.children.length > 0) {
+                    result = result.concat(flattenTreeData(item.children, item.id, level + 1));
+                }
+            });
+            return result;
+        }
+
+        // 监听行拖拽事件
+        eVirtTable.on('rowMove', (eventData) => {
+            const { source, target, sourceRowKey, targetRowKey } = eventData;
+            
+            console.log('树形行拖拽事件:', eventData);
+            
+            // 获取当前数据
+            const currentData = eVirtTable.getData();
+            
+            // 展平数据
+            const flatData = flattenTreeData(currentData);
+            
+            // 重新排序
+            const sourceIndex = flatData.findIndex(item => item.id == sourceRowKey);
+            const sourceItem = flatData[sourceIndex];
+            
+            // 从原位置移除
+            flatData.splice(sourceIndex, 1);
+            
+            if (targetRowKey === null) {
+                // 移动到第一位，成为根节点
+                sourceItem.parentId = null;
+                sourceItem.level = 0;
+                flatData.unshift(sourceItem);
+            } else {
+                // 找到目标位置
+                const targetIndex = flatData.findIndex(item => item.id == targetRowKey);
+                const targetItem = flatData[targetIndex];
+                
+                // 设置为目标项的同级，插入到目标项之后
+                sourceItem.parentId = targetItem.parentId;
+                sourceItem.level = targetItem.level;
+                flatData.splice(targetIndex + 1, 0, sourceItem);
+            }
+            
+            // 重建树形结构
+            const newTreeData = rebuildTreeStructure(flatData);
+            
+            // 更新表格数据
+            eVirtTable.loadData(newTreeData);
+            
+            // 更新显示
+            updateTreeDisplay();
+            
+            console.log('重新组织后的树形结构:', newTreeData);
+        });
+    </script>
+</html>

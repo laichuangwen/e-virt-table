@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table - 行拖拽数据更新</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div style="margin-bottom: 10px;">
+            <strong>说明：</strong>拖拽行后会重新生成数据并更新表格，同时更新排序字段。
+        </div>
+        <div id="e-virt-table"></div>
+        <div id="data-display" style="margin-top: 20px; padding: 10px; background: #f5f5f5; border-radius: 4px;">
+            <strong>当前数据顺序：</strong>
+            <div id="data-content"></div>
+        </div>
+    </body>
+    <script>
+        let data = [
+            {
+                id: 1,
+                name: '任务A',
+                priority: 1,
+                status: '进行中',
+                assignee: '张三',
+                estimatedHours: 8,
+                completedHours: 3,
+                rowKey: 'task_1'
+            },
+            {
+                id: 2,
+                name: '任务B',
+                priority: 2,
+                status: '待开始',
+                assignee: '李四',
+                estimatedHours: 16,
+                completedHours: 0,
+                rowKey: 'task_2'
+            },
+            {
+                id: 3,
+                name: '任务C',
+                priority: 3,
+                status: '已完成',
+                assignee: '王五',
+                estimatedHours: 12,
+                completedHours: 12,
+                rowKey: 'task_3'
+            },
+            {
+                id: 4,
+                name: '任务D',
+                priority: 4,
+                status: '进行中',
+                assignee: '赵六',
+                estimatedHours: 20,
+                completedHours: 8,
+                rowKey: 'task_4'
+            },
+            {
+                id: 5,
+                name: '任务E',
+                priority: 5,
+                status: '待开始',
+                assignee: '钱七',
+                estimatedHours: 6,
+                completedHours: 0,
+                rowKey: 'task_5'
+            },
+        ];
+
+        let columns = [
+            {
+                title: '优先级',
+                key: 'priority',
+                width: 80,
+                align: 'center',
+                readonly: true,
+                formatter: ({ value }) => `P${value}`,
+            },
+            {
+                title: '任务名称',
+                key: 'name',
+                width: 150,
+                align: 'left',
+                readonly: true,
+            },
+            {
+                title: '状态',
+                key: 'status',
+                width: 100,
+                align: 'center',
+                readonly: true,
+                formatter: ({ value }) => {
+                    const statusMap = {
+                        '待开始': '🔵 待开始',
+                        '进行中': '🟡 进行中',
+                        '已完成': '🟢 已完成',
+                    };
+                    return statusMap[value] || value;
+                },
+            },
+            {
+                title: '负责人',
+                key: 'assignee',
+                width: 100,
+                align: 'center',
+                readonly: true,
+            },
+            {
+                title: '预估工时',
+                key: 'estimatedHours',
+                width: 100,
+                align: 'center',
+                readonly: true,
+                formatter: ({ value }) => `${value}h`,
+            },
+            {
+                title: '完成工时',
+                key: 'completedHours',
+                width: 100,
+                align: 'center',
+                readonly: true,
+                formatter: ({ value }) => `${value}h`,
+            },
+            {
+                title: '进度',
+                key: 'progress',
+                width: 120,
+                align: 'center',
+                readonly: true,
+                formatter: ({ row }) => {
+                    const progress = Math.round((row.completedHours / row.estimatedHours) * 100);
+                    return `${progress}%`;
+                },
+            },
+        ];
+
+        const eVirtTable = new EVirtTable(document.getElementById('e-virt-table'), {
+            columns,
+            data,
+            config: {
+                BORDER: true,
+                STRIPE: true,
+                CELL_HEIGHT: 40,
+                HEADER_HEIGHT: 40,
+                ROW_KEY: 'rowKey',
+                ENABLE_DRAG_ROW: true,
+                HIGHLIGHT_HOVER_ROW: true,
+            },
+        });
+
+        // 更新数据显示
+        function updateDataDisplay() {
+            const dataContent = document.getElementById('data-content');
+            const currentData = eVirtTable.getData();
+            dataContent.innerHTML = currentData.map((item, index) => 
+                `${index + 1}. ${item.name} (P${item.priority})`
+            ).join('<br>');
+        }
+
+        // 初始显示数据
+        updateDataDisplay();
+
+        // 重新组织数据的函数
+        function reorganizeData(currentData, sourceRowKey, targetRowKey) {
+            const newData = [...currentData];
+            
+            // 找到源数据的索引
+            const sourceIndex = newData.findIndex(item => item.rowKey === sourceRowKey);
+            const sourceItem = newData[sourceIndex];
+            
+            // 从原位置移除
+            newData.splice(sourceIndex, 1);
+            
+            if (targetRowKey === null) {
+                // 移动到第一位
+                newData.unshift(sourceItem);
+            } else {
+                // 找到目标位置
+                const targetIndex = newData.findIndex(item => item.rowKey === targetRowKey);
+                // 插入到目标位置之后
+                newData.splice(targetIndex + 1, 0, sourceItem);
+            }
+            
+            // 重新分配优先级
+            newData.forEach((item, index) => {
+                item.priority = index + 1;
+            });
+            
+            return newData;
+        }
+
+        // 监听行拖拽事件
+        eVirtTable.on('rowMove', (eventData) => {
+            const { source, target, sourceRowKey, targetRowKey } = eventData;
+            
+            console.log('行拖拽事件:', eventData);
+            
+            // 获取当前数据
+            const currentData = eVirtTable.getData();
+            
+            // 重新组织数据
+            const newData = reorganizeData(currentData, sourceRowKey, targetRowKey);
+            
+            // 更新表格数据
+            eVirtTable.loadData(newData);
+            
+            // 更新显示
+            updateDataDisplay();
+            
+            // 模拟保存到服务器
+            console.log('保存新的任务优先级到服务器:', newData.map(item => ({
+                id: item.id,
+                priority: item.priority
+            })));
+        });
+    </script>
+</html>
