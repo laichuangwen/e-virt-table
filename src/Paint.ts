@@ -1,4 +1,4 @@
-import { Align, VerticalAlign } from './types';
+import { Align, LineClampType, VerticalAlign } from './types';
 
 export type LineOptions = {
     lineCap?: CanvasLineCap;
@@ -28,9 +28,9 @@ export type DrawTextOptions = {
     align?: Align;
     padding?: number;
     verticalAlign?: VerticalAlign;
-    isAutoRowHeight?: boolean;
+    autoRowHeight?: boolean;
     lineHeight?: number;
-    lineClamp?: number;
+    lineClamp?: LineClampType;
 };
 export class Paint {
     private ctx: CanvasRenderingContext2D;
@@ -44,8 +44,11 @@ export class Paint {
         this.ctx.scale(dpr, dpr);
     }
     measureTextWidth(text: string, font: string) {
+        this.ctx.save();
         this.ctx.font = font;
-        return this.ctx.measureText(text).width;
+        const width = this.ctx.measureText(text).width;
+        this.ctx.restore();
+        return width;
     }
     save() {
         this.ctx.save();
@@ -114,6 +117,7 @@ export class Paint {
                 console.error('Invalid side specified for shadow');
                 break;
         }
+        this.ctx.restore();
     }
     // 绘制线条
     drawLine(points: number[], options: LineOptions) {
@@ -222,87 +226,49 @@ export class Paint {
             padding = 0,
             verticalAlign = 'middle',
             lineClamp = 1,
+            autoRowHeight = false,
         } = options;
         this.ctx.font = font;
         this.ctx.fillStyle = color;
         this.ctx.textAlign = align;
-
-        if (options.isAutoRowHeight) {
-            // 多行文本渲染
-            this.drawMultilineText(text, x, y, width, height, options);
-            this.ctx.restore();
-            return false; // 自适应高度时不算溢出
-        } else {
-            // 单行文本渲染（原逻辑）
-            this.ctx.textBaseline = verticalAlign;
-            const { _text, ellipsis } = this.handleEllipsis(text, width, padding, font, lineClamp);
-            if (lineClamp > 1) {
-                // 多行文本渲染
-                this.drawMultilineText(_text, x, y, width, height, options);
-                return ellipsis;
-            }
-
-            let yPos = 0;
-            if (verticalAlign === 'top') {
-                yPos = y + padding;
-            } else if (verticalAlign === 'bottom') {
-                yPos = y + height - padding;
-            } else {
-                yPos = y + (height + 1) / 2;
-            }
-            let xPos = 0;
-            if (align === 'left') {
-                xPos = x + padding;
-            } else if (align === 'right') {
-                xPos = x + width - padding;
-            } else {
-                xPos = x + width / 2;
-            }
-            this.ctx.fillText(_text, xPos, yPos);
-            this.ctx.restore();
-            return ellipsis;
-        }
-    }
-
-    /**
-     * 绘制多行文本
-     * @param text
-     * @param x
-     * @param y
-     * @param width
-     * @param height
-     * @param options
-     */
-    private drawMultilineText(
-        text: string,
-        x: number,
-        y: number,
-        width: number,
-        height: number,
-        options: DrawTextOptions = {},
-    ): void {
-        const { font = '12px Arial', align = 'center', padding = 0, verticalAlign = 'middle' } = options;
-
-        this.ctx.font = font;
         const fontSize = parseInt(font.match(/\d+/)?.[0] || '12');
         const lineHeight = fontSize * (options.lineHeight || 1.2); // 默认行高为字体大小的1.2倍
         const availableWidth = width - padding * 2;
-
+        const ellipsesWidth = this.ctx.measureText('...').width;
+        let textEllipsis = false;
+        // 如果宽度小于省略号宽度,
+        if (width <= ellipsesWidth + padding * 2) {
+            this.ctx.restore();
+            textEllipsis = true;
+            return textEllipsis;
+        }
+        // 计算总行数,向上取整round
+        const maxTextLine = Math.round((height - 2 * padding) / lineHeight);
         // 将文本按可用宽度分割成行
         const lines = this.wrapText(text, availableWidth);
-
+        // 计算总行数,maxTextLine最小为1
+        let totalTextLine = Math.min(lines.length, Math.max(maxTextLine, 1));
+        // 如果lineClamp为auto，并且isAutoRowHeight为true，则总行数为lines.length
+        // 如果lineClamp为number，并且lineClamp小于maxTextLine，则总行数为lineClamp
+        // 否则总行数为lines.length
+        if (lineClamp === 'auto' && autoRowHeight) {
+            totalTextLine = lines.length;
+        } else if (typeof lineClamp === 'number' && lineClamp < maxTextLine) {
+            totalTextLine = lineClamp;
+        }
         // 计算起始Y位置
         let startY = y + padding;
         if (verticalAlign === 'middle') {
-            const totalTextHeight = lines.length * lineHeight;
+            const totalTextHeight = totalTextLine * lineHeight;
             startY = y + (height - totalTextHeight) / 2;
         } else if (verticalAlign === 'bottom') {
-            const totalTextHeight = lines.length * lineHeight;
+            const totalTextHeight = totalTextLine * lineHeight;
             startY = y + height - totalTextHeight - padding;
         }
 
-        // 绘制每一行
-        lines.forEach((line, index) => {
+        // 绘制每一行用for循环
+        for (let i = 0; i < lines.length; i++) {
+            const lineText = lines[i];
             let xPos = x + padding;
             if (align === 'center') {
                 xPos = x + width / 2;
@@ -310,10 +276,20 @@ export class Paint {
                 xPos = x + width - padding;
             }
 
-            const lineY = startY + index * lineHeight;
+            const lineY = startY + i * lineHeight;
             this.ctx.textBaseline = 'top';
-            this.ctx.fillText(line, xPos, lineY);
-        });
+            // 如果设置了lineClamp，则只绘制lineClamp行
+            if (i === totalTextLine - 1) {
+                const { _text, ellipsis } = this.handleEllipsis(lineText, width, padding, font);
+                this.ctx.fillText(_text, xPos, lineY);
+                textEllipsis = ellipsis;
+                break;
+            }
+            this.ctx.fillText(lineText, xPos, lineY);
+        }
+
+        this.ctx.restore();
+        return textEllipsis;
     }
 
     /**
@@ -371,81 +347,45 @@ export class Paint {
      * @returns 计算出的高度
      */
     calculateTextHeight(text: string = '', width: number, options: DrawTextOptions = {}): number {
-        if (!text) return 0;
-
-        const { font = '12px Arial', padding = 0 } = options;
-
+        const { font = '12px Arial', padding = 0, align = 'center', color = '#495060', lineClamp = 1 } = options;
         this.ctx.save();
         this.ctx.font = font;
-
-        // 获取字体高度
+        this.ctx.fillStyle = color;
+        this.ctx.textAlign = align;
+        // // 获取字体高度
         const fontSize = parseInt(font.match(/\d+/)?.[0] || '12');
         const lineHeight = fontSize * (options.lineHeight || 1.2); // 默认行高为字体大小的1.2倍
 
-        // 可用宽度
+        // 将文本按可用宽度分割成行
         const availableWidth = width - padding * 2;
-
-        // 按换行符分割文本
-        const lines = text.split('\n');
-        let totalLines = 0;
-
-        for (const line of lines) {
-            if (line === '') {
-                totalLines += 1;
-                continue;
-            }
-
-            const textWidth = this.ctx.measureText(line).width;
-            if (textWidth <= availableWidth) {
-                totalLines += 1;
+        const lines = this.wrapText(text, availableWidth);
+        // 计算总行数
+        let totalLines = 1;
+        if (lineClamp === 'auto') {
+            totalLines = lines.length;
+        } else {
+            if (lines.length > lineClamp) {
+                totalLines = lineClamp;
             } else {
-                // 需要换行，计算需要多少行
-                const words = line.split('');
-                let currentLine = '';
-                let lineCount = 0;
-
-                for (const word of words) {
-                    const testLine = currentLine + word;
-                    const testWidth = this.ctx.measureText(testLine).width;
-
-                    if (testWidth <= availableWidth) {
-                        currentLine = testLine;
-                    } else {
-                        if (currentLine) {
-                            lineCount += 1;
-                            currentLine = word;
-                        } else {
-                            // 单个字符也超出宽度，强制换行
-                            lineCount += 1;
-                            currentLine = '';
-                        }
-                    }
-                }
-
-                if (currentLine) {
-                    lineCount += 1;
-                }
-
-                totalLines += lineCount;
+                totalLines = lines.length;
             }
         }
-
         this.ctx.restore();
-
         // 计算总高度：行数 * 行高 + 上下padding
-        return Math.max(totalLines * lineHeight + padding * 2, fontSize + padding * 2);
+        return Math.max(Math.floor(totalLines * lineHeight + padding * 2), Math.floor(fontSize + padding * 2));
     }
     handleEllipsis(
         text: string,
         width: number,
         padding: number = 0,
         font: string = '12px Arial',
-        lineClamp: number = 1,
     ): { _text: string; ellipsis: boolean } {
+        this.ctx.save();
         let ellipsis = false;
         let _text = text;
         this.ctx.font = font;
         if (text === null || text === undefined || text === '') {
+            this.ctx.restore();
             return {
                 _text: '',
                 ellipsis,
@@ -454,6 +394,7 @@ export class Paint {
         const ellipsesWidth = this.ctx.measureText('...').width;
         // 如果宽度小于省略号宽度，则不进行省略，直接返回空字符串
         if (width <= ellipsesWidth + padding * 2) {
+            this.ctx.restore();
             return {
                 _text: '',
                 ellipsis: true,
@@ -461,26 +402,6 @@ export class Paint {
         }
         const textWidth = this.ctx.measureText(text).width;
         const lineWidth = width - padding * 2;
-        if (lineClamp > 1) {
-            // 多行文本省略
-            const lines = this.wrapText(text, lineWidth);
-            if (lines.length > lineClamp) {
-                // 大于lineClamp行数，需要省略
-                const lastText = lines[lineClamp - 1];
-                // 处理最后一行文本省略
-                const { _text: ellipsisText } = this.handleEllipsis(lastText, width, padding, font);
-                // 拼接省略后的文本
-                const newText = lines.slice(0, lineClamp - 1).join('') + ellipsisText;
-                return {
-                    _text: newText,
-                    ellipsis: true,
-                };
-            }
-            return {
-                _text: lines.join(''),
-                ellipsis: false,
-            };
-        }
         // 单行文本省略
         if (textWidth && textWidth + ellipsesWidth >= lineWidth) {
             ellipsis = true;
@@ -490,10 +411,12 @@ export class Paint {
                 textLength += this.ctx.measureText(text[i]).width;
                 if (textLength >= lineWidth - ellipsesWidth) {
                     _text = text.slice(0, i) + '...';
+                    ellipsis = true;
                     break;
                 }
             }
         }
+        this.ctx.restore();
         return {
             _text,
             ellipsis,

@@ -48,12 +48,12 @@ let columns: Column[] = [
         align: 'left',
         // operation: true,
         readonly: false,
-        isAutoRowHeight: true,
+        autoRowHeight: true,
         width: 120,
         type: 'tree',
         fixed: 'left',
         sort: 4,
-        
+
         // hide: () => 3 > 2,
     },
     {
@@ -64,9 +64,9 @@ let columns: Column[] = [
         fixed: 'left',
         align: 'left',
         hoverIconName: 'icon-edit',
-        lineClamp: 3,
-        // isAutoRowHeight: true,
+        // autoRowHeight: true,
         placeholder: '请输入',
+        // lineClamp: 3,
         // editorType: 'none',
         verticalAlign: 'middle',
         // hide: true,
@@ -120,20 +120,23 @@ let columns: Column[] = [
                     {
                         title: '姓名11',
                         key: 'emp_name11',
+                        // verticalAlign: 'middle',
                         readonly: false,
                         width: 200,
+                        autoRowHeight: true,
+                        lineClamp: 2,
                         rules: {
                             required: true,
                             message: '该项必填哦！',
-                            validator(rule, value, callback) {
-                                if (!value) {
-                                    callback('请输入岗位');
-                                } else if (value.length > 10) {
-                                    callback('岗位字段长度必须小于10个字符哦！');
-                                } else {
-                                    callback();
-                                }
-                            },
+                            // validator(rule, value, callback) {
+                            //     if (!value) {
+                            //         callback('请输入岗位');
+                            //     } else if (value.length > 10) {
+                            //         callback('岗位字段长度必须小于10个字符哦！');
+                            //     } else {
+                            //         callback();
+                            //     }
+                            // },
                         },
                     },
                     {
@@ -163,11 +166,14 @@ let columns: Column[] = [
     {
         title: '手机号',
         key: 'phone',
-        readonly: false,
-        overflowTooltipHeaderShow: true,
-        formatterFooter: ({ value }) => {
-            return `合：${value}`;
-        },
+        lineClamp: 'auto',
+        autoRowHeight: false,
+        // readonly: false,
+        // autoRowHeight: true,
+        // overflowTooltipHeaderShow: true,
+        // formatterFooter: ({ value }) => {
+        //     return `合：${value}`;
+        // },
         width: 100,
     },
     {
@@ -233,14 +239,14 @@ let columns: Column[] = [
         hoverIconName: 'icon-date',
         sort: 2,
     },
-    { title: '工作地址', key: 'work_address', isAutoRowHeight: true },
+    { title: '工作地址', key: 'work_address', autoRowHeight: true },
     {
         title: '家庭地址',
         key: 'address',
         headerAlign: 'center',
         align: 'left',
         width: 250,
-        isAutoRowHeight: true,
+        autoRowHeight: true,
         // overflowTooltipShow: false,
         overflowTooltipMaxWidth: 200,
         overflowTooltipPlacement: 'top',
@@ -379,7 +385,7 @@ let columns: Column[] = [
     },
 ];
 let data: any[] = [];
-for (let i = 0; i < 1500; i += 1) {
+for (let i = 0; i < 5000; i += 1) {
     data.push({
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
         id: `1_${i}`,
@@ -505,6 +511,7 @@ const eVirtTable = new EVirtTable(canvas, {
         // DISABLED: true,
         // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
+        AUTO_ROW_HEIGHT: true,
         ROW_KEY: 'id',
         CELL_HEIGHT: 36,
         SELECTOR_AREA_MIN_X: 0,

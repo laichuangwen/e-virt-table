@@ -62,7 +62,7 @@ export default class Row {
                 noFixedCells.push(cell);
             }
             cells.push(cell);
-            if (cell.isAutoRowHeight) {
+            if (cell.autoRowHeight) {
                 calculatedHeightCells.push(cell);
             }
         });
@@ -70,10 +70,13 @@ export default class Row {
         this.calculatedHeightCells = calculatedHeightCells;
         this.fixedCells = fixedCells;
         this.noFixedCells = noFixedCells;
-        const heights = calculatedHeightCells.map((cell) => {
+        this.calculatedHeight = this.getCalculatedHeight();
+    }
+    private getCalculatedHeight() {
+        const heights = this.calculatedHeightCells.map((cell) => {
             return cell.getAutoHeight();
         });
-        this.calculatedHeight = heights.length ? Math.max(...heights) : -1;
+        return heights.length ? Math.max(...heights) : -1;
     }
     drawCenter() {
         this.noFixedCells.forEach((cell) => {

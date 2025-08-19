@@ -373,15 +373,12 @@ export default class Body {
         const rows = this.ctx.body.renderRows;
         // 更新行高map
         this.ctx.database.updateOverlayerAutoHeightMap();
-        const hasCalculatedHeightCell = rows.some((row) => row.calculatedHeightCells.length > 0);
-        if (hasCalculatedHeightCell) {
-            // 如果有计算格子，重新计算行高
-            const heights = rows.map((row) => ({
-                height: row.calculatedHeight,
-                rowIndex: row.rowIndex,
-            }));
-            this.ctx.database.setBatchCalculatedRowHeight(heights);
-        }
+        // 如果有计算格子，重新计算行高
+        const heights = rows.map((row) => ({
+            height: row.calculatedHeight,
+            rowIndex: row.rowIndex,
+        }));
+        this.ctx.database.setBatchCalculatedRowHeight(heights);
     }
     draw() {
         // 容器背景

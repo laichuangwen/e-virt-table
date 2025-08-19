@@ -275,6 +275,8 @@ export default class Config {
     ];
     /** 格子多行文本行高,isAutoRowHeight才会生效 */
     CELL_LINE_HEIGHT = 1.3;
+    /** 全局自动行高 */
+    AUTO_ROW_HEIGHT = false;
     /** header 格子样式 */
     HEADER_CELL_STYLE_METHOD?: CellHeaderStyleMethod;
     /** body 格子样式 */

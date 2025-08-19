@@ -266,7 +266,7 @@ type EVirtTableOptions = {
 | column | Current column object | Column | — | — |
 | hoverIconName | Hover icon name, ICONS configurable | string | — |
 | placeholder | Placeholder text | string | — |
-| isAutoRowHeight | Automatic row height | boolean | false |
+| autoRowHeight | Automatic row height | boolean | false |
 | overflowTooltipHeaderShow |Header show overflow tooltip | boolean | — | true |
 | overflowTooltipShow | Show overflow tooltip | boolean | — | true |
 | overflowTooltipMaxWidth | Max width of overflow tooltip | number | — | — |

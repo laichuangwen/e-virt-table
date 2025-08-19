@@ -16,6 +16,7 @@ import type {
     OverflowTooltipPlacement,
     SpanInfo,
     SelectorCellValueType,
+    LineClampType,
 } from './types';
 import Context from './Context';
 import BaseCell from './BaseCell';
@@ -87,7 +88,7 @@ export default class Cell extends BaseCell {
     drawHoverImageHeight = 0;
     drawHoverImageName = '';
     drawHoverImageSource?: HTMLImageElement;
-    isAutoRowHeight = false; // 是否启用行高自适应
+    autoRowHeight = false; // 是否启用行高自适应
     calculatedHeight = 0; // 计算出的自适应高度
     ellipsis = false;
     rowExpand = false;
@@ -96,7 +97,7 @@ export default class Cell extends BaseCell {
     selectorCellValueType: SelectorCellValueType = 'value';
     overflowTooltipMaxWidth = 500;
     overflowTooltipPlacement: OverflowTooltipPlacement = 'top';
-    lineClamp = 1;
+    lineClamp: LineClampType = 'auto';
 
     constructor(
         ctx: Context,
@@ -117,7 +118,6 @@ export default class Cell extends BaseCell {
         this.rowIndex = rowIndex;
         this.key = column.key;
         this.type = column.type || '';
-        this.lineClamp = column.lineClamp || 1;
         this.editorType = column.editorType || 'text';
         this.selectorCellValueType =
             column.selectorCellValueType || this.ctx.config.SELECTOR_CELL_VALUE_TYPE || 'value';
@@ -138,16 +138,14 @@ export default class Cell extends BaseCell {
         this.value = this.getValue();
         this.render = column.render;
         this.overflowTooltipShow = column.overflowTooltipShow === false ? false : true;
-        this.isAutoRowHeight = column.isAutoRowHeight === true ? true : false;
-        if (this.isAutoRowHeight) {
-            this.overflowTooltipShow = false; // 自动行高不显示溢出提示
-        }
+        this.autoRowHeight = column.autoRowHeight || this.ctx.config.AUTO_ROW_HEIGHT;
         this.overflowTooltipMaxWidth = column.overflowTooltipMaxWidth || 500;
         this.overflowTooltipPlacement = column.overflowTooltipPlacement || 'top';
         this.renderFooter = column.renderFooter;
         this.hoverIconName = column.hoverIconName;
         this.formatter = column.formatter;
         this.formatterFooter = column.formatterFooter;
+        this.lineClamp = column.lineClamp || 'auto';
         this.update();
     }
     setWidthHeight(width: number, height: number) {
@@ -318,7 +316,7 @@ export default class Cell extends BaseCell {
      * 更新样式
      */
     updateStyle() {
-        if (this.isAutoRowHeight) {
+        if (this.autoRowHeight) {
             // 自适应行高
             this.domDataset = {
                 autoHeight: true,
@@ -747,7 +745,10 @@ export default class Cell extends BaseCell {
         if (this.cellType !== 'body') {
             return -1;
         }
-        if (!this.isAutoRowHeight) {
+        if (!this.autoRowHeight) {
+            return -1;
+        }
+        if (this.rowspan === 0) {
             return -1;
         }
         // 如果有渲染函数，使用渲染函数计算高度
@@ -758,19 +759,21 @@ export default class Cell extends BaseCell {
         if (!(this.displayText && typeof this.displayText === 'string')) {
             return -1;
         }
+
         const { BODY_FONT, CELL_PADDING, CELL_LINE_HEIGHT } = this.ctx.config;
         const calculatedHeight = this.ctx.paint.calculateTextHeight(this.displayText, this.drawTextWidth, {
             font: BODY_FONT,
             padding: CELL_PADDING,
+            align: this.align,
+            verticalAlign: this.verticalAlign,
+            color: this.drawTextColor,
+            autoRowHeight: this.autoRowHeight,
             lineHeight: CELL_LINE_HEIGHT,
+            lineClamp: this.lineClamp,
         });
-
-        if (this.mergeRow) {
-            if (this.visibleHeight < calculatedHeight) {
-                // 只会叠加在第一行
-                return calculatedHeight - (this.visibleHeight - this.height);
-            }
-            return this.height; // 保持原有高度
+        // 合并单元格处理
+        if (this.rowspan > 1) {
+            return Math.round(calculatedHeight - (this.visibleHeight - this.height));
         }
         // 转成整数
         return Math.round(calculatedHeight);
@@ -898,7 +901,7 @@ export default class Cell extends BaseCell {
             left,
             top,
             width: `${this.visibleWidth}px`,
-            height: this.isAutoRowHeight ? `auto` : `${this.visibleHeight}px`,
+            height: this.autoRowHeight ? `auto` : `${this.visibleHeight}px`,
             // minHeight: `${this.visibleHeight}px`,
             pointerEvents: 'initial',
             userSelect: 'none',
@@ -992,14 +995,6 @@ export default class Cell extends BaseCell {
     }
     private drawText() {
         const { CELL_PADDING, BODY_FONT, PLACEHOLDER_COLOR, CELL_LINE_HEIGHT } = this.ctx.config;
-        const { ellipsis } = this.ctx.paint.handleEllipsis(
-            this.displayText,
-            this.drawTextWidth,
-            CELL_PADDING,
-            BODY_FONT,
-            this.lineClamp,
-        );
-        this.ellipsis = ellipsis;
         const { placeholder } = this.column;
         let text = this.displayText;
         let color = this.drawTextColor;
@@ -1015,16 +1010,27 @@ export default class Cell extends BaseCell {
             text = placeholder;
             color = PLACEHOLDER_COLOR;
         }
-        return this.ctx.paint.drawText(text, this.drawTextX, this.drawTextY, this.drawTextWidth, this.drawTextHeight, {
-            font: BODY_FONT,
-            padding: CELL_PADDING,
-            align: this.align,
-            verticalAlign: this.verticalAlign,
-            color,
-            isAutoRowHeight: this.isAutoRowHeight,
-            lineHeight: CELL_LINE_HEIGHT,
-            lineClamp: this.lineClamp,
-        });
+        if (!text) {
+            return false;
+        }
+        this.ellipsis = this.ctx.paint.drawText(
+            text,
+            this.drawTextX,
+            this.drawTextY,
+            this.drawTextWidth,
+            this.drawTextHeight,
+            {
+                font: BODY_FONT,
+                padding: CELL_PADDING,
+                align: this.align,
+                verticalAlign: this.verticalAlign,
+                color,
+                autoRowHeight: this.autoRowHeight,
+                lineHeight: CELL_LINE_HEIGHT,
+                lineClamp: this.lineClamp,
+            },
+        );
+        return this.ellipsis;
     }
     private drawImage() {
         if (this.drawSelectionImageSource) {

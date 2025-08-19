@@ -151,7 +151,7 @@ export interface Column {
     renderHeader?: Function | string;
     formatter?: FormatterMethod;
     formatterFooter?: FormatterMethod;
-    isAutoRowHeight?: boolean;
+    autoRowHeight?: boolean;
     overflowTooltipShow?: boolean;
     overflowTooltipHeaderShow?: boolean;
     overflowTooltipMaxWidth?: number;
@@ -163,8 +163,9 @@ export interface Column {
     rules?: Rules | Rule;
     options?: any;
     selectorCellValueType?: SelectorCellValueType;
-    lineClamp?: number; // 行高超出多少行显示省略号
+    lineClamp?: LineClampType; // 行高超出多少行显示省略号
 }
+export type LineClampType = number | 'auto';
 export type HistoryAction = 'back' | 'forward' | 'none';
 export type SelectorCellValueType = 'displayText' | 'value';
 
