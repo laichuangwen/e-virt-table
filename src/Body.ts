@@ -458,6 +458,14 @@ export default class Body {
             return;
         }
 
+        // 如果有行，在第一行上方添加一个特殊的 dropBar（target 为 null）
+        if (this.renderRows.length > 0) {
+            const firstDropBar = this.getOrCreateDropBar('__first__');
+            this.updateFirstDropBarPosition(firstDropBar, this.renderRows[0]);
+            this.bindDropBarEvents('__first__', firstDropBar);
+        }
+
+        // 为每一行添加 dropBar
         this.renderRows.forEach((row) => {
             const dropBar = this.getOrCreateDropBar(row.rowKey);
             this.updateDropBarPosition(dropBar, row);
@@ -479,6 +487,7 @@ export default class Body {
             dropBar.style.opacity = '1'; // 外层容器保持可见
             dropBar.style.visibility = 'visible'; // 必须保持可见才能接收鼠标事件
             dropBar.style.zIndex = '1000';
+            dropBar.style.cursor = 'move';
             dropBar.style.pointerEvents = 'auto';
             dropBar.style.transition = 'opacity 0.15s ease';
             dropBar.dataset.rowKey = rowKey;
@@ -519,8 +528,21 @@ export default class Body {
         dropBar.style.left = `${left}px`;
         dropBar.style.top = `${top}px`;
         dropBar.style.width = `${this.ctx.stageWidth}px`;
-        
+    }
 
+    // 更新第一行上方 dropBar 的位置
+    private updateFirstDropBarPosition(dropBar: HTMLElement, firstRow: Row) {
+        // 获取容器的位置信息
+        const containerRect = this.ctx.containerElement.getBoundingClientRect();
+        const canvasRect = this.ctx.canvasElement.getBoundingClientRect();
+        
+        // 计算相对于容器的位置 - 放在第一行上方
+        const top = firstRow.y - 7 - this.ctx.scrollY + (canvasRect.top - containerRect.top);
+        const left = canvasRect.left - containerRect.left;
+        
+        dropBar.style.left = `${left}px`;
+        dropBar.style.top = `${top}px`;
+        dropBar.style.width = `${this.ctx.stageWidth}px`;
     }
 
     // 公共的 hoverHandler 方法
@@ -542,16 +564,28 @@ export default class Body {
     public dropHandler = (sourceRowKey: string, targetRowKey: string) => {
         // 使用正确的数据库方法获取行数据
         const sourceRow = this.ctx.database.getRowForRowKey(sourceRowKey);
-        const targetRow = this.ctx.database.getRowForRowKey(targetRowKey);
         
-        if (sourceRow && targetRow) {
-            // 触发行移动事件，与 develop.ts 中的监听器匹配
+        // 检查是否是拖动到第一位的特殊情况
+        if (targetRowKey === '__first__') {
+            // 拖动到第一位，target 为 null
             this.ctx.emit('rowMove', {
                 source: sourceRow,
-                target: targetRow,
+                target: null,
                 sourceRowKey,
-                targetRowKey
+                targetRowKey: null
             });
+        } else {
+            const targetRow = this.ctx.database.getRowForRowKey(targetRowKey);
+            
+            if (sourceRow && targetRow) {
+                // 正常的行间拖动
+                this.ctx.emit('rowMove', {
+                    source: sourceRow,
+                    target: targetRow,
+                    sourceRowKey,
+                    targetRowKey
+                });
+            }
         }
     };
 
@@ -695,9 +729,12 @@ export default class Body {
 
     // 管理行事件池
     private manageRowEventPool(currentRowKeys: string[]) {
+        // 添加第一行特殊标识符到当前 keys 中（如果有行的话）
+        const allKeys = currentRowKeys.length > 0 ? ['__first__', ...currentRowKeys] : currentRowKeys;
+        
         // 解绑不再存在的行
         this.rowEventPool.forEach((_, rowKey) => {
-            if (!currentRowKeys.includes(rowKey)) {
+            if (!allKeys.includes(rowKey)) {
                 this.unbindDropBarEvents(rowKey);
             }
         });
