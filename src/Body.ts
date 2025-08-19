@@ -459,7 +459,7 @@ export default class Body {
         }
 
         // 如果有行，在第一行上方添加一个特殊的 dropBar（target 为 null）
-        if (this.renderRows.length > 0) {
+        if (this.renderRows.length > 0 && !this.dropBars.get('__first__')) {
             const firstDropBar = this.getOrCreateDropBar('__first__');
             this.updateFirstDropBarPosition(firstDropBar, this.renderRows[0]);
             this.bindDropBarEvents('__first__', firstDropBar);
@@ -487,11 +487,10 @@ export default class Body {
             dropBar.style.opacity = '1'; // 外层容器保持可见
             dropBar.style.visibility = 'visible'; // 必须保持可见才能接收鼠标事件
             dropBar.style.zIndex = '1000';
-            dropBar.style.cursor = 'move';
             dropBar.style.pointerEvents = 'auto';
             dropBar.style.transition = 'opacity 0.15s ease';
             dropBar.dataset.rowKey = rowKey;
-            dropBar.className = 'e-virt-table-drop-bar'; // 添加类名便于调试
+            dropBar.className = rowKey==='__first__'?'e-virt-table-drop-bar-first':'e-virt-table-drop-bar'; // 添加类名便于调试
             
             // 创建内部的蓝色指示条（2px高度，居中显示）
             const innerBar = document.createElement('div');
@@ -562,26 +561,36 @@ export default class Body {
 
     // 公共的 dropHandler 方法
     public dropHandler = (sourceRowKey: string, targetRowKey: string) => {
-        // 使用正确的数据库方法获取行数据
-        const sourceRow = this.ctx.database.getRowForRowKey(sourceRowKey);
+        // 直接获取原始行数据
+        const sourceRowData = this.ctx.database.getRowDataItemForRowKey(sourceRowKey);
         
         // 检查是否是拖动到第一位的特殊情况
         if (targetRowKey === '__first__') {
-            // 拖动到第一位，target 为 null
+            // 更新 dragState 的 targetKey
+            this.ctx.dragManager.updateTargetKey(null);
+            
+            // 拖动到第一位，target 为 null（没有前一行）
             this.ctx.emit('rowMove', {
-                source: sourceRow,
+                source: sourceRowData, // 被拖拽行的原始数据
                 target: null,
                 sourceRowKey,
                 targetRowKey: null
             });
         } else {
-            const targetRow = this.ctx.database.getRowForRowKey(targetRowKey);
+            // 正常的行间拖动
+            // targetRowKey 对应的是蓝色指示条所在的行
+            // 根据dropBar的逻辑，这个蓝色条是在该行下方
+            // 所以拖拽到这里表示插入到该行之后
+            // target 应该是该行的数据（即蓝色条前面的行）
+            const targetRowData = this.ctx.database.getRowDataItemForRowKey(targetRowKey);
             
-            if (sourceRow && targetRow) {
-                // 正常的行间拖动
+            if (sourceRowData && targetRowData) {
+                // 更新 dragState 的 targetKey
+                this.ctx.dragManager.updateTargetKey(targetRowKey);
+                
                 this.ctx.emit('rowMove', {
-                    source: sourceRow,
-                    target: targetRow,
+                    source: sourceRowData, // 被拖拽行的原始数据
+                    target: targetRowData, // 蓝色指示条前面行的原始数据
                     sourceRowKey,
                     targetRowKey
                 });
@@ -596,6 +605,7 @@ export default class Body {
             if (innerBar) {
                 innerBar.style.opacity = '0';
             }
+
         });
         // 停止自动滚动
         this.stopAutoScroll();
@@ -765,7 +775,7 @@ export default class Body {
         const keysToRemove: string[] = [];
         
         this.dropBars.forEach((dropBar, rowKey) => {
-            if (!currentRowKeys.includes(rowKey)) {
+            if (!currentRowKeys.includes(rowKey) && rowKey!=='__first__') {
                 // 先解绑事件
                 this.unbindDropBarEvents(rowKey);
                 // 移除 DOM 元素

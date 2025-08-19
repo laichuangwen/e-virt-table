@@ -210,7 +210,7 @@
             currentColumns = reorganizeColumns(currentColumns, sourceColumnKey, targetColumnKey);
             
             // 更新表格列配置
-            eVirtTable.setColumns(currentColumns);
+            eVirtTable.loadColumns(currentColumns);
             
             // 更新显示
             updateColumnDisplay();
@@ -227,7 +227,7 @@
         // 重置按钮功能
         document.getElementById('reset-btn').addEventListener('click', () => {
             currentColumns = [...originalColumns];
-            eVirtTable.setColumns(currentColumns);
+            eVirtTable.loadColumns(currentColumns);
             updateColumnDisplay();
             localStorage.removeItem('userColumnPreference');
             console.log('重置列顺序');
@@ -246,7 +246,7 @@
                     });
                     
                     currentColumns = orderedColumns;
-                    eVirtTable.setColumns(currentColumns);
+                    eVirtTable.loadColumns(currentColumns);
                     updateColumnDisplay();
                     console.log('恢复用户列配置偏好');
                 } catch (e) {

@@ -152,16 +152,16 @@
         });
 
         // 更新数据显示
-        function updateDataDisplay() {
+        function updateDataDisplay(d) {
             const dataContent = document.getElementById('data-content');
-            const currentData = eVirtTable.getData();
+            const currentData = [...d];
             dataContent.innerHTML = currentData.map((item, index) => 
-                `${index + 1}. ${item.name} (P${item.priority})`
-            ).join('<br>');
+                `${index + 1}. ${item.name} `
+            ).join('>');
         }
 
         // 初始显示数据
-        updateDataDisplay();
+        updateDataDisplay(data);
 
         // 重新组织数据的函数
         function reorganizeData(currentData, sourceRowKey, targetRowKey) {
@@ -199,16 +199,16 @@
             console.log('行拖拽事件:', eventData);
             
             // 获取当前数据
-            const currentData = eVirtTable.getData();
+            const currentData = [...data];
             
             // 重新组织数据
             const newData = reorganizeData(currentData, sourceRowKey, targetRowKey);
-            
+            console.log('newData', newData);
             // 更新表格数据
             eVirtTable.loadData(newData);
             
             // 更新显示
-            updateDataDisplay();
+            updateDataDisplay(newData);
             
             // 模拟保存到服务器
             console.log('保存新的任务优先级到服务器:', newData.map(item => ({

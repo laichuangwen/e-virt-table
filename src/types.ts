@@ -310,6 +310,8 @@ export interface DragState {
     type: DragType;
     sourceIndex: number;
     targetIndex: number;
+    sourceKey?: string;
+    targetKey?: string;
     isDragging: boolean;
     startX: number;
     startY: number;
@@ -329,10 +331,10 @@ export interface DragEventData {
 
 // 行移动事件数据
 export interface RowMoveEventData {
-    source: any; // 源行数据
-    target: any | null; // 目标行数据，null 表示移动到第一位
-    sourceRowKey: string; // 源行的 rowKey
-    targetRowKey: string | null; // 目标行的 rowKey，null 表示移动到第一位
+    source: any; // 被拖拽的行数据
+    target: any | null; // 蓝色指示条前面的行数据，null 表示移动到第一位
+    sourceRowKey: string; // 被拖拽行的 rowKey
+    targetRowKey: string | null; // 蓝色指示条前面行的 rowKey，null 表示移动到第一位
 }
 
 // 列移动事件数据

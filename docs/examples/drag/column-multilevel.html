@@ -293,7 +293,7 @@
             currentColumns = findAndReorganizeColumn(currentColumns, sourceColumnKey, targetColumnKey);
             
             // 更新表格列配置
-            eVirtTable.setColumns(currentColumns);
+            eVirtTable.loadColumns(currentColumns);
             
             // 更新显示
             updateStructureDisplay();
@@ -307,7 +307,7 @@
         // 重置按钮功能
         document.getElementById('reset-btn').addEventListener('click', () => {
             currentColumns = JSON.parse(JSON.stringify(originalColumns));
-            eVirtTable.setColumns(currentColumns);
+            eVirtTable.loadColumns(currentColumns);
             updateStructureDisplay();
             localStorage.removeItem('multiLevelColumnStructure');
             console.log('重置多层列结构');
@@ -319,7 +319,7 @@
             if (saved) {
                 try {
                     currentColumns = JSON.parse(saved);
-                    eVirtTable.setColumns(currentColumns);
+                    eVirtTable.loadColumns(currentColumns);
                     updateStructureDisplay();
                     console.log('恢复多层列结构配置');
                 } catch (e) {

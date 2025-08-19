@@ -448,11 +448,10 @@ export default class CellHeader extends BaseCell {
             dropPillar.style.opacity = '1';
             dropPillar.style.visibility = 'visible';
             dropPillar.style.zIndex = '1000';
-            dropPillar.style.cursor = 'move';
             dropPillar.style.pointerEvents = 'auto';
             dropPillar.style.transition = 'opacity 0.15s ease';
             dropPillar.dataset.columnKey = dropPillarKey;
-            dropPillar.className = 'e-virt-table-drop-pillar';
+            dropPillar.className = dropPillarKey==='__first__'?'e-virt-table-drop-pillar-first':'e-virt-table-drop-pillar';
             
             // 创建内部蓝色指示条
             const innerPillar = document.createElement('div');
@@ -517,6 +516,7 @@ export default class CellHeader extends BaseCell {
                     if (innerPillar) {
                         innerPillar.style.opacity = '1';
                     }
+
                 }
             }
         };
@@ -530,6 +530,7 @@ export default class CellHeader extends BaseCell {
                     if (innerPillar) {
                         innerPillar.style.opacity = '0';
                     }
+
                 }
             }
         };
@@ -567,6 +568,9 @@ export default class CellHeader extends BaseCell {
         const sourceColumn = this.ctx.database.getColumnByKey(sourceColumnKey)?.column;
         
         if (targetColumnKey === null) {
+            // 更新 dragState 的 targetKey
+            this.ctx.dragManager.updateTargetKey(null);
+            
             // 拖动到第一位
             this.ctx.emit('columnMove', {
                 source: sourceColumn,
@@ -578,6 +582,9 @@ export default class CellHeader extends BaseCell {
             const targetColumn = this.ctx.database.getColumnByKey(targetColumnKey)?.column;
             
             if (sourceColumn && targetColumn) {
+                // 更新 dragState 的 targetKey
+                this.ctx.dragManager.updateTargetKey(targetColumnKey);
+                
                 this.ctx.emit('columnMove', {
                     source: sourceColumn,
                     target: targetColumn,
@@ -596,6 +603,7 @@ export default class CellHeader extends BaseCell {
                 if (innerPillar) {
                     innerPillar.style.opacity = '0';
                 }
+
             });
         }
     }

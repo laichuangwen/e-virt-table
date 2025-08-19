@@ -216,7 +216,7 @@
 
         function updateTreeDisplay() {
             const treeContent = document.getElementById('tree-content');
-            const currentData = eVirtTable.getData();
+            const currentData = [...data];
             treeContent.innerHTML = displayTreeStructure(currentData);
         }
 
@@ -275,7 +275,8 @@
             console.log('树形行拖拽事件:', eventData);
             
             // 获取当前数据
-            const currentData = eVirtTable.getData();
+            const currentData = [...data];
+            console.log('currentData', currentData);
             
             // 展平数据
             const flatData = flattenTreeData(currentData);

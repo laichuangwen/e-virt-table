@@ -9,6 +9,8 @@ export default class DragManager {
         type: 'none',
         sourceIndex: -1,
         targetIndex: -1,
+        sourceKey: undefined,
+        targetKey: undefined,
         isDragging: false,
         startX: 0,
         startY: 0,
@@ -350,6 +352,8 @@ export default class DragManager {
             type: 'column',
             sourceIndex: header.colIndex,
             targetIndex: header.colIndex,
+            sourceKey: header.key,
+            targetKey: undefined,
             isDragging: false,
             startX: x,
             startY: y,
@@ -376,6 +380,8 @@ export default class DragManager {
             type: 'row',
             sourceIndex: row.rowIndex,
             targetIndex: row.rowIndex,
+            sourceKey: row.rowKey,
+            targetKey: undefined,
             isDragging: false,
             startX: x,
             startY: y,
@@ -416,10 +422,18 @@ export default class DragManager {
         this.createDragPreview();
         this.ctx.stageElement.style.cursor = 'move';
         
+        // 根据拖拽类型设置相应的 cursor 变量
+        if (this.dragState.type === 'row') {
+            document.documentElement.style.setProperty('--evt-drop-bar-cursor', 'move');
+        } else if (this.dragState.type === 'column') {
+            document.documentElement.style.setProperty('--evt-drop-pillar-cursor', 'move');
+        }
+        
         // 触发拖拽开始事件
         this.ctx.emit('dragStart', {
             type: this.dragState.type,
-            fromIndex: this.dragState.sourceIndex
+            fromIndex: this.dragState.sourceIndex,
+            fromKey: this.dragState.sourceKey,
         });
     }
     
@@ -583,10 +597,17 @@ export default class DragManager {
         // 通过事件清理所有显示的蓝条和dropPillar
         this.ctx.emit('clearDropBars');
         this.ctx.emit('clearDropPillars');
+        
+        // 重置 CSS cursor 变量
+        document.documentElement.style.setProperty('--evt-drop-bar-cursor', 'default');
+        document.documentElement.style.setProperty('--evt-drop-pillar-cursor', 'default');
+        
         this.dragState = {
             type: 'none',
             sourceIndex: -1,
             targetIndex: -1,
+            sourceKey: undefined,
+            targetKey: undefined,
             isDragging: false,
             startX: 0,
             startY: 0,
@@ -612,14 +633,26 @@ export default class DragManager {
         return this.currentDragColumnKey;
     }
 
+    // 更新 dragState 的 targetKey
+    public updateTargetKey(targetKey: string | null) {
+        this.dragState.targetKey = targetKey || undefined;
+    }
+
     // 重置拖拽状态（供 Body 调用）
     public resetDragStateFromBody() {
         this.currentDragRowKey = '';
         this.currentDragColumnKey = '';
+        
+        // 重置 CSS cursor 变量
+        document.documentElement.style.setProperty('--evt-drop-bar-cursor', 'default');
+        document.documentElement.style.setProperty('--evt-drop-pillar-cursor', 'default');
+        
         this.dragState = {
             type: 'none',
             sourceIndex: -1,
             targetIndex: -1,
+            sourceKey: undefined,
+            targetKey: undefined,
             isDragging: false,
             startX: 0,
             startY: 0,

@@ -130,16 +130,11 @@ h:450px
 
 ## Advanced Usage
 
-### Drag Permission Control
-
-Use business logic to control whether certain rows or columns can be dragged:
+### Drag Started
 
 ```javascript
 eVirtTable.on('dragStart', (eventData) => {
-    // Decide whether to allow dragging based on business logic
     if (eventData.type === 'row' && someCondition) {
-        // Prevent drag start
-        return false;
     }
 });
 ```
@@ -167,7 +162,7 @@ eVirtTable.on('columnMove', (eventData) => {
     const newColumns = reorganizeColumns(currentColumns, sourceColumnKey, targetColumnKey);
     
     // Update table column configuration
-    eVirtTable.setColumns(newColumns);
+    eVirtTable.loadColumns(newColumns);
     
     // Save user column preferences
     saveColumnPreference(newColumns);

@@ -130,16 +130,11 @@ h:450px
 
 ## 高级用法
 
-### 拖拽权限控制
-
-可以通过业务逻辑来控制某些行或列是否允许拖拽：
+### 拖拽开始事件
 
 ```javascript
 eVirtTable.on('dragStart', (eventData) => {
-    // 根据业务逻辑决定是否允许拖拽
     if (eventData.type === 'row' && someCondition) {
-        // 阻止拖拽开始
-        return false;
     }
 });
 ```
@@ -167,7 +162,7 @@ eVirtTable.on('columnMove', (eventData) => {
     const newColumns = reorganizeColumns(currentColumns, sourceColumnKey, targetColumnKey);
     
     // 更新表格列配置
-    eVirtTable.setColumns(newColumns);
+    eVirtTable.loadColumns(newColumns);
     
     // 保存用户的列配置偏好
     saveColumnPreference(newColumns);
