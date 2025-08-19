@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table - 列拖拽排序更新</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div style="margin-bottom: 10px;">
+            <strong>说明：</strong>拖拽列后会重新组织列配置并更新表格显示，模拟保存用户的列配置偏好。
+            <button id="reset-btn" style="margin-left: 10px;">重置列顺序</button>
+        </div>
+        <div id="e-virt-table"></div>
+        <div id="column-display" style="margin-top: 20px; padding: 10px; background: #f5f5f5; border-radius: 4px;">
+            <strong>当前列顺序：</strong>
+            <div id="column-content"></div>
+        </div>
+    </body>
+    <script>
+        let data = [
+            {
+                id: 'EMP001',
+                name: '张三',
+                email: 'zhangsan@example.com',
+                phone: '13800138001',
+                department: '技术部',
+                position: '前端工程师',
+                salary: 15000,
+                hireDate: '2023-01-15',
+                status: '在职',
+            },
+            {
+                id: 'EMP002',
+                name: '李四',
+                email: 'lisi@example.com',
+                phone: '13800138002',
+                department: '产品部',
+                position: '产品经理',
+                salary: 18000,
+                hireDate: '2022-08-20',
+                status: '在职',
+            },
+            {
+                id: 'EMP003',
+                name: '王五',
+                email: 'wangwu@example.com',
+                phone: '13800138003',
+                department: '设计部',
+                position: 'UI设计师',
+                salary: 12000,
+                hireDate: '2023-03-10',
+                status: '在职',
+            },
+            {
+                id: 'EMP004',
+                name: '赵六',
+                email: 'zhaoliu@example.com',
+                phone: '13800138004',
+                department: '技术部',
+                position: '后端工程师',
+                salary: 16000,
+                hireDate: '2021-12-05',
+                status: '离职',
+            },
+        ];
+
+        // 原始列配置
+        const originalColumns = [
+            {
+                title: '员工ID',
+                key: 'id',
+                width: 100,
+                align: 'center',
+                readonly: true,
+                order: 1,
+            },
+            {
+                title: '姓名',
+                key: 'name',
+                width: 100,
+                align: 'left',
+                readonly: true,
+                order: 2,
+            },
+            {
+                title: '邮箱',
+                key: 'email',
+                width: 180,
+                align: 'left',
+                readonly: true,
+                order: 3,
+            },
+            {
+                title: '电话',
+                key: 'phone',
+                width: 120,
+                align: 'center',
+                readonly: true,
+                order: 4,
+            },
+            {
+                title: '部门',
+                key: 'department',
+                width: 100,
+                align: 'center',
+                readonly: true,
+                order: 5,
+            },
+            {
+                title: '职位',
+                key: 'position',
+                width: 120,
+                align: 'left',
+                readonly: true,
+                order: 6,
+            },
+            {
+                title: '薪资',
+                key: 'salary',
+                width: 100,
+                align: 'right',
+                readonly: true,
+                formatter: ({ value }) => `¥${value.toLocaleString()}`,
+                order: 7,
+            },
+            {
+                title: '入职日期',
+                key: 'hireDate',
+                width: 120,
+                align: 'center',
+                readonly: true,
+                order: 8,
+            },
+            {
+                title: '状态',
+                key: 'status',
+                width: 80,
+                align: 'center',
+                readonly: true,
+                formatter: ({ value }) => value === '在职' ? '🟢 在职' : '🔴 离职',
+                order: 9,
+            },
+        ];
+
+        // 当前列配置
+        let currentColumns = [...originalColumns];
+
+        const eVirtTable = new EVirtTable(document.getElementById('e-virt-table'), {
+            columns: currentColumns,
+            data,
+            config: {
+                BORDER: true,
+                STRIPE: true,
+                CELL_HEIGHT: 40,
+                HEADER_HEIGHT: 40,
+                ROW_KEY: 'id',
+                ENABLE_DRAG_COLUMN: true,
+                HIGHLIGHT_HOVER_ROW: true,
+            },
+        });
+
+        // 更新列顺序显示
+        function updateColumnDisplay() {
+            const columnContent = document.getElementById('column-content');
+            columnContent.innerHTML = currentColumns.map((col, index) => 
+                `${index + 1}. ${col.title} (${col.key})`
+            ).join('<br>');
+        }
+
+        // 初始显示
+        updateColumnDisplay();
+
+        // 重新组织列配置
+        function reorganizeColumns(columns, sourceColumnKey, targetColumnKey) {
+            const newColumns = [...columns];
+            
+            // 找到源列的索引
+            const sourceIndex = newColumns.findIndex(col => col.key === sourceColumnKey);
+            const sourceColumn = newColumns[sourceIndex];
+            
+            // 从原位置移除
+            newColumns.splice(sourceIndex, 1);
+            
+            if (targetColumnKey === null) {
+                // 移动到第一位
+                newColumns.unshift(sourceColumn);
+            } else {
+                // 找到目标位置
+                const targetIndex = newColumns.findIndex(col => col.key === targetColumnKey);
+                // 插入到目标位置之后
+                newColumns.splice(targetIndex + 1, 0, sourceColumn);
+            }
+            
+            // 重新分配order
+            newColumns.forEach((col, index) => {
+                col.order = index + 1;
+            });
+            
+            return newColumns;
+        }
+
+        // 监听列拖拽事件
+        eVirtTable.on('columnMove', (eventData) => {
+            const { source, target, sourceColumnKey, targetColumnKey } = eventData;
+            
+            console.log('列拖拽事件:', eventData);
+            
+            // 重新组织列配置
+            currentColumns = reorganizeColumns(currentColumns, sourceColumnKey, targetColumnKey);
+            
+            // 更新表格列配置
+            eVirtTable.loadColumns(currentColumns);
+            
+            // 更新显示
+            updateColumnDisplay();
+            
+            // 模拟保存用户的列配置偏好到localStorage
+            const columnPreference = currentColumns.map(col => ({
+                key: col.key,
+                order: col.order
+            }));
+            localStorage.setItem('userColumnPreference', JSON.stringify(columnPreference));
+            console.log('保存列配置偏好:', columnPreference);
+        });
+
+        // 重置按钮功能
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            currentColumns = [...originalColumns];
+            eVirtTable.loadColumns(currentColumns);
+            updateColumnDisplay();
+            localStorage.removeItem('userColumnPreference');
+            console.log('重置列顺序');
+        });
+
+        // 页面加载时尝试恢复用户的列配置偏好
+        function loadColumnPreference() {
+            const saved = localStorage.getItem('userColumnPreference');
+            if (saved) {
+                try {
+                    const preference = JSON.parse(saved);
+                    const orderedColumns = [...originalColumns].sort((a, b) => {
+                        const aOrder = preference.find(p => p.key === a.key)?.order || a.order;
+                        const bOrder = preference.find(p => p.key === b.key)?.order || b.order;
+                        return aOrder - bOrder;
+                    });
+                    
+                    currentColumns = orderedColumns;
+                    eVirtTable.loadColumns(currentColumns);
+                    updateColumnDisplay();
+                    console.log('恢复用户列配置偏好');
+                } catch (e) {
+                    console.warn('恢复列配置偏好失败:', e);
+                }
+            }
+        }
+
+        // 加载保存的配置
+        loadColumnPreference();
+    </script>
+</html>

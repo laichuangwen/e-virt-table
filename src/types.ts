@@ -301,3 +301,46 @@ export type BeforeAutofillDataMethod = (
 export type BeforeSetSelectorMethod = (params: BeforeSetSelectorParams) => BeforeSetSelectorParams | undefined;
 export type BeforeSetAutofillMethod = (params: BeforeSetAutofillParams) => BeforeSetAutofillParams | undefined;
 export type BeforeCopyMethod = (params: BeforeCopyParams) => BeforeCopyParams | undefined;
+
+// 拖拽类型（移除导出，改为内部使用的字符串字面量类型）
+type DragType = 'none' | 'column' | 'row';
+
+// 拖拽状态
+export interface DragState {
+    type: DragType;
+    sourceIndex: number;
+    targetIndex: number;
+    sourceKey?: string;
+    targetKey?: string;
+    isDragging: boolean;
+    startX: number;
+    startY: number;
+    currentX: number;
+    currentY: number;
+    dragElement?: CellHeader | any;
+}
+
+// 拖拽事件数据
+export interface DragEventData {
+    type: DragType;
+    fromIndex: number;
+    toIndex?: number;
+    column?: Column;
+    row?: any;
+}
+
+// 行移动事件数据
+export interface RowMoveEventData {
+    source: any; // 被拖拽的行数据
+    target: any | null; // 蓝色指示条前面的行数据，null 表示移动到第一位
+    sourceRowKey: string; // 被拖拽行的 rowKey
+    targetRowKey: string | null; // 蓝色指示条前面行的 rowKey，null 表示移动到第一位
+}
+
+// 列移动事件数据
+export interface ColumnMoveEventData {
+    source: Column; // 源列数据
+    target: Column | null; // 目标列数据，null 表示移动到第一位
+    sourceColumnKey: string; // 源列的 key
+    targetColumnKey: string | null; // 目标列的 key，null 表示移动到第一位
+}

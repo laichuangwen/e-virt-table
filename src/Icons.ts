@@ -15,7 +15,8 @@ type ConfigTypeName =
     | 'CHECKBOX_INDETERMINATE_SVG'
     | 'SORT_ASC_ICON_SVG'
     | 'SORT_DESC_ICON_SVG'
-    | 'SORTABLE_ICON_SVG';
+    | 'SORTABLE_ICON_SVG'
+    | 'DRAGGABLE_ICON_SVG';
 
 interface SvgIcon extends IconType {
     configName?: ConfigTypeName;
@@ -32,6 +33,7 @@ const svgSelect =
 const svgSortable = `<svg t="1755138507987" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5079" width="200" height="200"><path d="M512 938.688a42.688 42.688 0 0 1-35.072-18.432l-192-277.312A42.56 42.56 0 0 1 320 576h384a42.752 42.752 0 0 1 35.072 66.944l-192 277.312a42.688 42.688 0 0 1-35.072 18.432" fill="currentColor" p-id="2016"></path><path d="M704 448H320a42.752 42.752 0 0 1-35.072-66.944l192-277.312c16-23.04 54.208-23.04 70.144 0l192 277.312A42.56 42.56 0 0 1 704 448" fill="currentColor" p-id="2015"></path></svg>`;
 const svgSortAsc = svgSortable.replace(`fill="currentColor" p-id="2016"`, `fill="#bec4c7" p-id="2016"`);
 const svgSortDesc =svgSortable.replace(`fill="currentColor" p-id="2015"`, `fill="#bec4c7" p-id="2015"`);
+const svgDraggable = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15"><path fill="none" stroke="currentColor" d="M3 5.5a.5.5 0 1 1-1 0a.5.5 0 0 1 1 0Zm5 0a.5.5 0 1 1-1 0a.5.5 0 0 1 1 0Zm5 0a.5.5 0 1 1-1 0a.5.5 0 0 1 1 0Zm-10 4a.5.5 0 1 1-1 0a.5.5 0 0 1 1 0Zm5 0a.5.5 0 1 1-1 0a.5.5 0 0 1 1 0Zm5 0a.5.5 0 1 1-1 0a.5.5 0 0 1 1 0Z" stroke-width="1"/></svg>`;
 
 export default class Icons {
     private ctx: Context;
@@ -128,6 +130,12 @@ export default class Icons {
             configName: 'SORTABLE_ICON_SVG',
             svg: svgSortable,
             color: '#bec4c7',
+        },
+        {
+            name: 'draggable',
+            configName: 'DRAGGABLE_ICON_SVG',
+            svg: svgDraggable,
+            color: '#4E5969',
         },
     ];
     icons = new Map<string, HTMLImageElement>();

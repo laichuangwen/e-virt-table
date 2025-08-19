@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table - 多层表头列拖拽</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div style="margin-bottom: 10px;">
+            <strong>说明：</strong>支持多层表头结构的列拖拽，可以拖拽父级表头或子级表头来重新组织列结构。
+            <button id="reset-btn" style="margin-left: 10px;">重置列结构</button>
+        </div>
+        <div id="e-virt-table"></div>
+        <div id="structure-display" style="margin-top: 20px; padding: 10px; background: #f5f5f5; border-radius: 4px;">
+            <strong>当前列结构：</strong>
+            <div id="structure-content"></div>
+        </div>
+    </body>
+    <script>
+        let data = [
+            {
+                id: 1,
+                name: '张三',
+                basicSalary: 8000,
+                bonus: 2000,
+                allowance: 1500,
+                tax: 800,
+                insurance: 600,
+                netSalary: 10100,
+                thisMonthSales: 50000,
+                lastMonthSales: 45000,
+                quarterSales: 140000,
+                target: 150000,
+                achievement: 93.3,
+            },
+            {
+                id: 2,
+                name: '李四',
+                basicSalary: 10000,
+                bonus: 3000,
+                allowance: 2000,
+                tax: 1200,
+                insurance: 800,
+                netSalary: 13000,
+                thisMonthSales: 65000,
+                lastMonthSales: 60000,
+                quarterSales: 190000,
+                target: 180000,
+                achievement: 105.6,
+            },
+            {
+                id: 3,
+                name: '王五',
+                basicSalary: 7000,
+                bonus: 1500,
+                allowance: 1000,
+                tax: 600,
+                insurance: 500,
+                netSalary: 8400,
+                thisMonthSales: 38000,
+                lastMonthSales: 42000,
+                quarterSales: 115000,
+                target: 120000,
+                achievement: 95.8,
+            },
+        ];
+
+        // 原始多层列配置
+        const originalColumns = [
+            {
+                title: 'ID',
+                key: 'id',
+                width: 60,
+                align: 'center',
+                readonly: true,
+            },
+            {
+                title: '姓名',
+                key: 'name',
+                width: 100,
+                align: 'left',
+                readonly: true,
+            },
+            {
+                title: '薪资信息',
+                children: [
+                    {
+                        title: '收入',
+                        children: [
+                            {
+                                title: '基本工资',
+                                key: 'basicSalary',
+                                width: 100,
+                                align: 'right',
+                                readonly: true,
+                                formatter: ({ value }) => `¥${value.toLocaleString()}`,
+                            },
+                            {
+                                title: '奖金',
+                                key: 'bonus',
+                                width: 80,
+                                align: 'right',
+                                readonly: true,
+                                formatter: ({ value }) => `¥${value.toLocaleString()}`,
+                            },
+                            {
+                                title: '津贴',
+                                key: 'allowance',
+                                width: 80,
+                                align: 'right',
+                                readonly: true,
+                                formatter: ({ value }) => `¥${value.toLocaleString()}`,
+                            },
+                        ],
+                    },
+                    {
+                        title: '扣除',
+                        children: [
+                            {
+                                title: '税费',
+                                key: 'tax',
+                                width: 80,
+                                align: 'right',
+                                readonly: true,
+                                formatter: ({ value }) => `¥${value.toLocaleString()}`,
+                            },
+                            {
+                                title: '保险',
+                                key: 'insurance',
+                                width: 80,
+                                align: 'right',
+                                readonly: true,
+                                formatter: ({ value }) => `¥${value.toLocaleString()}`,
+                            },
+                        ],
+                    },
+                    {
+                        title: '实发工资',
+                        key: 'netSalary',
+                        width: 100,
+                        align: 'right',
+                        readonly: true,
+                        formatter: ({ value }) => `¥${value.toLocaleString()}`,
+                    },
+                ],
+            },
+            {
+                title: '销售业绩',
+                children: [
+                    {
+                        title: '销售额',
+                        children: [
+                            {
+                                title: '本月',
+                                key: 'thisMonthSales',
+                                width: 100,
+                                align: 'right',
+                                readonly: true,
+                                formatter: ({ value }) => `¥${(value / 10000).toFixed(1)}万`,
+                            },
+                            {
+                                title: '上月',
+                                key: 'lastMonthSales',
+                                width: 100,
+                                align: 'right',
+                                readonly: true,
+                                formatter: ({ value }) => `¥${(value / 10000).toFixed(1)}万`,
+                            },
+                            {
+                                title: '季度',
+                                key: 'quarterSales',
+                                width: 100,
+                                align: 'right',
+                                readonly: true,
+                                formatter: ({ value }) => `¥${(value / 10000).toFixed(1)}万`,
+                            },
+                        ],
+                    },
+                    {
+                        title: '目标',
+                        key: 'target',
+                        width: 100,
+                        align: 'right',
+                        readonly: true,
+                        formatter: ({ value }) => `¥${(value / 10000).toFixed(1)}万`,
+                    },
+                    {
+                        title: '完成率',
+                        key: 'achievement',
+                        width: 100,
+                        align: 'center',
+                        readonly: true,
+                        formatter: ({ value }) => {
+                            const color = value >= 100 ? '#52c41a' : value >= 90 ? '#faad14' : '#ff4d4f';
+                            return `<span style="color: ${color}; font-weight: bold;">${value}%</span>`;
+                        },
+                    },
+                ],
+            },
+        ];
+
+        // 当前列配置
+        let currentColumns = JSON.parse(JSON.stringify(originalColumns));
+
+        const eVirtTable = new EVirtTable(document.getElementById('e-virt-table'), {
+            columns: currentColumns,
+            data,
+            config: {
+                BORDER: true,
+                STRIPE: true,
+                CELL_HEIGHT: 40,
+                HEADER_HEIGHT: 40,
+                ROW_KEY: 'id',
+                ENABLE_DRAG_COLUMN: true,
+                HIGHLIGHT_HOVER_ROW: true,
+            },
+        });
+
+        // 显示列结构
+        function displayColumnStructure(columns, level = 0) {
+            let result = '';
+            columns.forEach(col => {
+                const indent = '　'.repeat(level);
+                const title = col.title || '未命名';
+                const key = col.key ? ` (${col.key})` : '';
+                result += `${indent}${title}${key}<br>`;
+                
+                if (col.children && col.children.length > 0) {
+                    result += displayColumnStructure(col.children, level + 1);
+                }
+            });
+            return result;
+        }
+
+        function updateStructureDisplay() {
+            const structureContent = document.getElementById('structure-content');
+            structureContent.innerHTML = displayColumnStructure(currentColumns);
+        }
+
+        // 初始显示
+        updateStructureDisplay();
+
+        // 查找并重新组织列配置
+        function findAndReorganizeColumn(columns, sourceColumnKey, targetColumnKey) {
+            // 深度复制以避免修改原始数据
+            let newColumns = JSON.parse(JSON.stringify(columns));
+            
+            // 递归查找源列和目标列
+            function findColumn(cols, key) {
+                for (let i = 0; i < cols.length; i++) {
+                    if (cols[i].key === key) {
+                        return { column: cols[i], parent: cols, index: i };
+                    }
+                    if (cols[i].children) {
+                        const found = findColumn(cols[i].children, key);
+                        if (found) return found;
+                    }
+                }
+                return null;
+            }
+
+            const sourceInfo = findColumn(newColumns, sourceColumnKey);
+            if (!sourceInfo) return newColumns;
+
+            // 从原位置移除源列
+            const sourceColumn = sourceInfo.parent.splice(sourceInfo.index, 1)[0];
+
+            if (targetColumnKey === null) {
+                // 移动到第一位（根级别）
+                newColumns.unshift(sourceColumn);
+            } else {
+                const targetInfo = findColumn(newColumns, targetColumnKey);
+                if (targetInfo) {
+                    // 插入到目标列之后
+                    targetInfo.parent.splice(targetInfo.index + 1, 0, sourceColumn);
+                } else {
+                    // 如果找不到目标列，添加到末尾
+                    newColumns.push(sourceColumn);
+                }
+            }
+
+            return newColumns;
+        }
+
+        // 监听列拖拽事件
+        eVirtTable.on('columnMove', (eventData) => {
+            const { source, target, sourceColumnKey, targetColumnKey } = eventData;
+            
+            console.log('多层表头列拖拽事件:', eventData);
+            
+            // 重新组织列配置
+            currentColumns = findAndReorganizeColumn(currentColumns, sourceColumnKey, targetColumnKey);
+            
+            // 更新表格列配置
+            eVirtTable.loadColumns(currentColumns);
+            
+            // 更新显示
+            updateStructureDisplay();
+            
+            // 模拟保存列结构配置
+            const structureConfig = JSON.stringify(currentColumns);
+            localStorage.setItem('multiLevelColumnStructure', structureConfig);
+            console.log('保存多层列结构配置');
+        });
+
+        // 重置按钮功能
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            currentColumns = JSON.parse(JSON.stringify(originalColumns));
+            eVirtTable.loadColumns(currentColumns);
+            updateStructureDisplay();
+            localStorage.removeItem('multiLevelColumnStructure');
+            console.log('重置多层列结构');
+        });
+
+        // 页面加载时尝试恢复列结构配置
+        function loadColumnStructure() {
+            const saved = localStorage.getItem('multiLevelColumnStructure');
+            if (saved) {
+                try {
+                    currentColumns = JSON.parse(saved);
+                    eVirtTable.loadColumns(currentColumns);
+                    updateStructureDisplay();
+                    console.log('恢复多层列结构配置');
+                } catch (e) {
+                    console.warn('恢复多层列结构配置失败:', e);
+                }
+            }
+        }
+
+        // 加载保存的配置
+        loadColumnStructure();
+    </script>
+</html>

@@ -94,6 +94,7 @@ export default class Context {
     scrollerFocus = false; // 滚动条focus中
     autofillMove = false; // 自动填充移动中
     selectorMove = false; // 选择器移动中
+    dragMove = false; // 拖拽移动中
     adjustPositioning = false; // 调整位置中
     editing = false; // 编辑中
     onlyMergeCell = false; // 只有合并单元格
@@ -167,6 +168,7 @@ export default class Context {
     database: Database;
     history: History;
     config: Config;
+    dragManager?: any;
 
     constructor(containerOptions: containerElementOptions, options: EVirtTableOptions) {
         const {
@@ -190,7 +192,7 @@ export default class Context {
         this.eventBus = new EventBus();
         this.eventBrowser = new EventBrowser(this);
         this.eventTable = new EventTable(this);
-        this.paint = new Paint(this.canvasElement);
+        this.paint = new Paint(this.canvasElement, this);
         this.database = new Database(this, options);
         this.history = new History(this);
         this.icons = new Icons(this);

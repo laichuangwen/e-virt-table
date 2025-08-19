@@ -18,6 +18,9 @@
     --evt-body-bg-color: #fff;
     --evt-header-text-color: #1d2129;
     --evt-body-text-color: #4e5969;
+    /* 拖拽相关的 cursor 变量 */
+    --evt-drop-bar-cursor: default;
+    --evt-drop-pillar-cursor: default;
     --evt-footer-text-color: #4e5969;
     --evt-loading-icon-color: #4e5969;
     --evt-expand-icon-color: #4e5969;
@@ -147,6 +150,15 @@
     cursor: pointer;
     padding: 8px 24px;
     color: var(--evt-text-color-regular);
+}
+
+/* 拖拽相关样式 */
+.e-virt-table-drop-bar,e-virt-table-drop-bar-first {
+    cursor: var(--evt-drop-bar-cursor);
+}
+
+.e-virt-table-drop-pillar,e-virt-table-drop-pillar-first {
+    cursor: var(--evt-drop-pillar-cursor);
 }
 .e-virt-table-context-menu-item:hover {
     color: var(--evt-color-primary);

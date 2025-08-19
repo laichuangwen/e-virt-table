@@ -62,6 +62,10 @@ export default class Selector {
             if (!this.ctx.isTarget(e)) {
                 return;
             }
+            // 如果是拖拽模式就不处理
+            if (this.ctx.dragMove) {
+                return;
+            }
             // 如果是选中就不处理，比如chexkbox
             if (this.ctx.stageElement.style.cursor === 'pointer') {
                 return;
@@ -102,6 +106,10 @@ export default class Selector {
             }
         });
         this.ctx.on('cellHeaderMousedown', (cell, e) => {
+            // 如果是拖拽模式就不处理
+            if (this.ctx.dragMove) {
+                return;
+            }
             // 如果是选中就不处理，比如chexkbox
             if (this.ctx.stageElement.style.cursor === 'pointer') {
                 return;

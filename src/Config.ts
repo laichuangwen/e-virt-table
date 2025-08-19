@@ -165,6 +165,16 @@ export default class Config {
     SORTABLE_ICON_SVG = '';
     /** 排序图标颜色 */
     SORT_ICON_COLOR = 'rgb(82,146,247)';
+    /** 拖拽图标 */
+    DRAGGABLE_ICON_SVG = '';
+    /** 启用列拖拽 */
+    ENABLE_DRAG_COLUMN = false;
+    /** 启用行拖拽 */  
+    ENABLE_DRAG_ROW = false;
+    /** 拖拽图标大小 */
+    DRAG_ICON_SIZE = 16;
+    /** 拖拽图标透明度 */
+    DRAG_ICON_OPACITY = 0.6;
     /** 单元格只读背景色 */
     READONLY_COLOR = '#fff';
     /** 单元格只读文本颜色 */
@@ -311,6 +321,10 @@ export default class Config {
     BEFORE_SET_AUTOFILL_METHOD?: BeforeSetAutofillMethod;
     /** 数据复制前回调 */
     BEFORE_COPY_METHOD?: BeforeCopyMethod;
+    /** 拖拽触发阈值 */
+    DRAG_THRESHOLD = 5;
+    /** 拖拽预览透明度 */
+    DRAG_PREVIEW_OPACITY = 0.8;
     constructor(config: Partial<Config>) {
         this._config = config;
         this.updateCssVar();

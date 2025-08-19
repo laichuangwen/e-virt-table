@@ -20,10 +20,64 @@ export default class Body {
     private visibleWidth = 0;
     private containerRect: DOMRect | undefined;
     private data: any[] = [];
+    private dropBars: Map<string, HTMLElement> = new Map(); // dropBar 元素池
+    private rowEventPool: Map<string, boolean> = new Map(); // 行事件绑定状态池
+    private autoScrollTimer: number | null = null; // 自动滚动计时器
+
     constructor(ctx: Context) {
         this.ctx = ctx;
         this.init();
         this.initResizeRow();
+        this.initDragEvents();
+    }
+
+    // 初始化拖拽相关事件
+    private initDragEvents() {
+        this.ctx.on('clearDropBars', () => {
+            this.clearAllDropBars();
+        });
+
+        // 监听鼠标移动事件用于自动滚动
+        const handleMouseMove = (e: MouseEvent) => {
+            if (this.ctx.dragMove) {
+                this.handleAutoScroll(e);
+            }
+        };
+
+        // 全局监听鼠标松开事件，处理在 dropBar 外松开的情况
+        const handleMouseUp = (e: MouseEvent) => {
+            if (this.ctx.dragMove) {
+                // 检查松开位置是否在 dropBar 上
+                const target = e.target as HTMLElement;
+                let isOnDropBar = false;
+                
+                // 检查是否点击在任何 dropBar 上
+                this.dropBars.forEach((dropBar) => {
+                    if (dropBar.contains(target) || dropBar === target) {
+                        isOnDropBar = true;
+                    }
+                });
+                
+                if (!isOnDropBar) {
+                    // 在 dropBar 外松开，直接结束拖拽
+                    this.ctx.dragMove = false;
+                    this.clearAllDropBars();
+                    this.stopAutoScroll();
+                    
+                    // 重置 DragManager 状态
+                    if (this.ctx.dragManager && this.ctx.dragManager.resetDragStateFromBody) {
+                        this.ctx.dragManager.resetDragStateFromBody();
+                    }
+                }
+            }
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+        
+        // 保存引用以便销毁时移除
+        (this as any)._handleMouseMove = handleMouseMove;
+        (this as any)._handleMouseUp = handleMouseUp;
     }
     private init() {
         const {
@@ -224,6 +278,8 @@ export default class Body {
                     // 恢复默认样式
                     this.ctx.stageElement.style.cursor = 'default';
                 }
+                // 拖拽状态时不显示行高调整功能
+                if (!this.ctx.dragMove) {
                 for (let i = 0; i < this.renderRows.length; i++) {
                     const row = this.renderRows[i];
                     const isYRange =
@@ -240,6 +296,7 @@ export default class Body {
                             ) {
                                 this.ctx.stageElement.style.cursor = 'row-resize';
                                 this.resizeTarget = row;
+                                }
                             }
                         }
                     }
@@ -366,6 +423,11 @@ export default class Body {
         }
         this.renderRows = rows;
         this.ctx.body.renderRows = rows;
+
+        // 维护 dropBar 池
+        const currentRowKeys = rows.map(row => row.rowKey);
+        this.cleanupDropBars(currentRowKeys);
+        this.manageRowEventPool(currentRowKeys);
     }
     draw() {
         // 容器背景
@@ -383,5 +445,363 @@ export default class Body {
             row.drawFixed();
         });
         this.drawTipLine();
+        this.drawDropBars();
+    }
+
+    // 绘制 dropBar
+    private drawDropBars() {
+        const {
+            config: { ENABLE_DRAG_ROW },
+        } = this.ctx;
+        
+        if (!ENABLE_DRAG_ROW) {
+            return;
+        }
+
+        // 如果有行，在第一行上方添加一个特殊的 dropBar（target 为 null）
+        if (this.renderRows.length > 0 && !this.dropBars.get('__first__')) {
+            const firstDropBar = this.getOrCreateDropBar('__first__');
+            this.updateFirstDropBarPosition(firstDropBar, this.renderRows[0]);
+            this.bindDropBarEvents('__first__', firstDropBar);
+        }
+
+        // 为每一行添加 dropBar
+        this.renderRows.forEach((row) => {
+            const dropBar = this.getOrCreateDropBar(row.rowKey);
+            this.updateDropBarPosition(dropBar, row);
+            this.bindDropBarEvents(row.rowKey, dropBar);
+        });
+    }
+
+    // 获取或创建 dropBar
+    private getOrCreateDropBar(rowKey: string): HTMLElement {
+        let dropBar = this.dropBars.get(rowKey);
+        
+        if (!dropBar) {
+            dropBar = document.createElement('div');
+            dropBar.style.position = 'absolute';
+            dropBar.style.width = '100%';
+            dropBar.style.height = '14px'; // 增加悬停区域
+            dropBar.style.backgroundColor = 'transparent'; // 背景透明
+            // dropBar.style.border = '1px dashed rgba(255,0,0,0.3)'; // 临时调试边框
+            dropBar.style.opacity = '1'; // 外层容器保持可见
+            dropBar.style.visibility = 'visible'; // 必须保持可见才能接收鼠标事件
+            dropBar.style.zIndex = '1000';
+            dropBar.style.pointerEvents = 'auto';
+            dropBar.style.transition = 'opacity 0.15s ease';
+            dropBar.dataset.rowKey = rowKey;
+            dropBar.className = rowKey==='__first__'?'e-virt-table-drop-bar-first':'e-virt-table-drop-bar'; // 添加类名便于调试
+            
+            // 创建内部的蓝色指示条（2px高度，居中显示）
+            const innerBar = document.createElement('div');
+            innerBar.style.position = 'absolute';
+            innerBar.style.top = '6px'; // (14-2)/2 = 6px，居中
+            innerBar.style.left = '0';
+            innerBar.style.width = '100%';
+            innerBar.style.height = '2px';
+            innerBar.style.backgroundColor = '#1890ff'; // 蓝色
+            innerBar.style.borderRadius = '1px';
+            innerBar.style.opacity = '0'; // 初始不可见
+            innerBar.style.transition = 'opacity 0.15s ease';
+            
+            dropBar.appendChild(innerBar);
+            (dropBar as any)._innerBar = innerBar; // 保存引用
+            
+            this.ctx.containerElement.appendChild(dropBar);
+            this.dropBars.set(rowKey, dropBar);
+        }
+        
+        return dropBar;
+    }
+
+    // 更新 dropBar 位置
+    private updateDropBarPosition(dropBar: HTMLElement, row: Row) {
+        // 获取容器的位置信息
+        const containerRect = this.ctx.containerElement.getBoundingClientRect();
+        const canvasRect = this.ctx.canvasElement.getBoundingClientRect();
+        
+        // 计算相对于容器的位置 - 放在行底部稍微向上一点
+        const top = row.y + row.height - 7 - this.ctx.scrollY + (canvasRect.top - containerRect.top);
+        const left = canvasRect.left - containerRect.left;
+        
+        dropBar.style.left = `${left}px`;
+        dropBar.style.top = `${top}px`;
+        dropBar.style.width = `${this.ctx.stageWidth}px`;
+    }
+
+    // 更新第一行上方 dropBar 的位置
+    private updateFirstDropBarPosition(dropBar: HTMLElement, firstRow: Row) {
+        // 获取容器的位置信息
+        const containerRect = this.ctx.containerElement.getBoundingClientRect();
+        const canvasRect = this.ctx.canvasElement.getBoundingClientRect();
+        
+        // 计算相对于容器的位置 - 放在第一行上方
+        const top = firstRow.y - 7 - this.ctx.scrollY + (canvasRect.top - containerRect.top);
+        const left = canvasRect.left - containerRect.left;
+        
+        dropBar.style.left = `${left}px`;
+        dropBar.style.top = `${top}px`;
+        dropBar.style.width = `${this.ctx.stageWidth}px`;
+    }
+
+    // 公共的 hoverHandler 方法
+    public hoverHandler = (rowKey: string, isHover: boolean) => {
+        const dropBar = this.dropBars.get(rowKey);
+        if (dropBar) {
+            const innerBar = (dropBar as any)._innerBar;
+            if (innerBar) {
+                if (isHover) {
+                    innerBar.style.opacity = '1';
+                } else {
+                    innerBar.style.opacity = '0';
+                }
+            }
+        }
+    };
+
+    // 公共的 dropHandler 方法
+    public dropHandler = (sourceRowKey: string, targetRowKey: string) => {
+        // 直接获取原始行数据
+        const sourceRowData = this.ctx.database.getRowDataItemForRowKey(sourceRowKey);
+        
+        // 检查是否是拖动到第一位的特殊情况
+        if (targetRowKey === '__first__') {
+            // 更新 dragState 的 targetKey
+            this.ctx.dragManager.updateTargetKey(null);
+            
+            // 拖动到第一位，target 为 null（没有前一行）
+            this.ctx.emit('rowMove', {
+                source: sourceRowData, // 被拖拽行的原始数据
+                target: null,
+                sourceRowKey,
+                targetRowKey: null
+            });
+        } else {
+            // 正常的行间拖动
+            // targetRowKey 对应的是蓝色指示条所在的行
+            // 根据dropBar的逻辑，这个蓝色条是在该行下方
+            // 所以拖拽到这里表示插入到该行之后
+            // target 应该是该行的数据（即蓝色条前面的行）
+            const targetRowData = this.ctx.database.getRowDataItemForRowKey(targetRowKey);
+            
+            if (sourceRowData && targetRowData) {
+                // 更新 dragState 的 targetKey
+                this.ctx.dragManager.updateTargetKey(targetRowKey);
+                
+                this.ctx.emit('rowMove', {
+                    source: sourceRowData, // 被拖拽行的原始数据
+                    target: targetRowData, // 蓝色指示条前面行的原始数据
+                    sourceRowKey,
+                    targetRowKey
+                });
+            }
+        }
+    };
+
+    // 清理所有显示的蓝条
+    public clearAllDropBars = () => {
+        this.dropBars.forEach((dropBar, _rowKey) => {
+            const innerBar = (dropBar as any)._innerBar;
+            if (innerBar) {
+                innerBar.style.opacity = '0';
+            }
+
+        });
+        // 停止自动滚动
+        this.stopAutoScroll();
+    };
+
+    // 处理自动滚动
+    private handleAutoScroll(e: MouseEvent) {
+        const containerRect = this.ctx.containerElement.getBoundingClientRect();
+        const mouseY = e.clientY;
+        const scrollThreshold = 50; // 滚动触发区域高度
+        const scrollSpeed = 10; // 滚动速度
+        
+        // 计算相对于容器的鼠标位置
+        const relativeY = mouseY - containerRect.top;
+        const containerHeight = containerRect.height;
+        
+        let shouldScroll = false;
+        let scrollDirection = 0;
+        
+        // 检查是否在顶部边界
+        if (relativeY < scrollThreshold) {
+            shouldScroll = true;
+            scrollDirection = -scrollSpeed;
+        }
+        // 检查是否在底部边界
+        else if (relativeY > containerHeight - scrollThreshold) {
+            shouldScroll = true;
+            scrollDirection = scrollSpeed;
+        }
+        
+        if (shouldScroll) {
+            this.startAutoScroll(scrollDirection);
+        } else {
+            this.stopAutoScroll();
+        }
+    }
+
+    // 开始自动滚动
+    private startAutoScroll(direction: number) {
+        if (this.autoScrollTimer) {
+            return; // 已经在滚动中
+        }
+        
+        this.autoScrollTimer = window.setInterval(() => {
+            const currentScrollY = this.ctx.scrollY;
+            const newScrollY = currentScrollY + direction;
+            
+            // 设置新的滚动位置
+            this.ctx.setScrollY(newScrollY);
+            this.ctx.emit('draw');
+        }, 16); // 约60fps
+    }
+
+    // 停止自动滚动
+    private stopAutoScroll() {
+        if (this.autoScrollTimer) {
+            clearInterval(this.autoScrollTimer);
+            this.autoScrollTimer = null;
+        }
+    }
+
+    // 绑定 dropBar 事件
+    private bindDropBarEvents(rowKey: string, dropBar: HTMLElement) {
+        if (this.rowEventPool.get(rowKey)) {
+            return; // 已经绑定过了
+        }
+
+        const hoverHandler = () => {
+            // 只有在行拖拽过程中才显示 dropBar
+            if (this.ctx.dragMove && this.ctx.dragManager) {
+                const currentDragRowKey = this.ctx.dragManager.getCurrentDragRowKey();
+                if (currentDragRowKey) { // 确保是行拖拽
+                    this.hoverHandler(rowKey, true);
+                }
+            }
+        };
+
+        const leaveHandler = () => {
+            // 只有在行拖拽过程中才隐藏 dropBar
+            if (this.ctx.dragMove && this.ctx.dragManager) {
+                const currentDragRowKey = this.ctx.dragManager.getCurrentDragRowKey();
+                if (currentDragRowKey) { // 确保是行拖拽
+                    this.hoverHandler(rowKey, false);
+                }
+            }
+        };
+
+        const dropHandler = (_e: MouseEvent) => {
+            // 只处理行拖拽的放置逻辑
+            if (this.ctx.dragMove && this.ctx.dragManager) {
+                const currentDragRowKey = this.ctx.dragManager.getCurrentDragRowKey();
+                if (currentDragRowKey) { // 确保是行拖拽
+                    this.handleDrop(rowKey);
+                    
+                    // 直接结束拖拽状态
+                    this.ctx.dragMove = false;
+                    this.clearAllDropBars();
+                    
+                    // 延迟重置 DragManager 状态，确保在 DragManager 的 mouseup 处理之后
+                    setTimeout(() => {
+                        if (this.ctx.dragManager && this.ctx.dragManager.resetDragStateFromBody) {
+                            this.ctx.dragManager.resetDragStateFromBody();
+                        }
+                    }, 10);
+                }
+            }
+        };
+
+        dropBar.addEventListener('mouseenter', hoverHandler);
+        dropBar.addEventListener('mouseleave', leaveHandler);
+        dropBar.addEventListener('mouseup', dropHandler);
+
+        // 存储事件处理器以便后续解绑
+        (dropBar as any)._hoverHandler = hoverHandler;
+        (dropBar as any)._leaveHandler = leaveHandler;
+        (dropBar as any)._dropHandler = dropHandler;
+
+        this.rowEventPool.set(rowKey, true);
+    }
+
+    // 解绑 dropBar 事件
+    private unbindDropBarEvents(rowKey: string) {
+        const dropBar = this.dropBars.get(rowKey);
+        if (dropBar) {
+            if ((dropBar as any)._hoverHandler) {
+                dropBar.removeEventListener('mouseenter', (dropBar as any)._hoverHandler);
+                delete (dropBar as any)._hoverHandler;
+            }
+            if ((dropBar as any)._leaveHandler) {
+                dropBar.removeEventListener('mouseleave', (dropBar as any)._leaveHandler);
+                delete (dropBar as any)._leaveHandler;
+            }
+            if ((dropBar as any)._dropHandler) {
+                dropBar.removeEventListener('mouseup', (dropBar as any)._dropHandler);
+                delete (dropBar as any)._dropHandler;
+            }
+        }
+        this.rowEventPool.delete(rowKey);
+    }
+
+    // 管理行事件池
+    private manageRowEventPool(currentRowKeys: string[]) {
+        // 添加第一行特殊标识符到当前 keys 中（如果有行的话）
+        const allKeys = currentRowKeys.length > 0 ? ['__first__', ...currentRowKeys] : currentRowKeys;
+        
+        // 解绑不再存在的行
+        this.rowEventPool.forEach((_, rowKey) => {
+            if (!allKeys.includes(rowKey)) {
+                this.unbindDropBarEvents(rowKey);
+            }
+        });
+    }
+
+    // 处理拖拽放置
+    private handleDrop(targetRowKey: string) {
+        if (this.ctx.dragManager) {
+            const sourceRowKey = this.ctx.dragManager.getCurrentDragRowKey();
+            if (sourceRowKey && sourceRowKey !== targetRowKey) {
+                // 触发拖拽放置事件，传递行数据
+                this.dropHandler(sourceRowKey, targetRowKey);
+            }
+        }
+    }
+
+    // 清理不再需要的 dropBar
+    private cleanupDropBars(currentRowKeys: string[]) {
+        const keysToRemove: string[] = [];
+        
+        this.dropBars.forEach((dropBar, rowKey) => {
+            if (!currentRowKeys.includes(rowKey) && rowKey!=='__first__') {
+                // 先解绑事件
+                this.unbindDropBarEvents(rowKey);
+                // 移除 DOM 元素
+                dropBar.remove();
+                keysToRemove.push(rowKey);
+            }
+        });
+        
+        // 从 Map 中移除
+        keysToRemove.forEach(key => {
+            this.dropBars.delete(key);
+        });
+    }
+
+    // 销毁方法，清理事件监听器
+    public destroy() {
+        this.stopAutoScroll();
+        
+        if ((this as any)._handleMouseMove) {
+            document.removeEventListener('mousemove', (this as any)._handleMouseMove);
+            delete (this as any)._handleMouseMove;
+        }
+        
+        if ((this as any)._handleMouseUp) {
+            document.removeEventListener('mouseup', (this as any)._handleMouseUp);
+            delete (this as any)._handleMouseUp;
+        }
     }
 }

@@ -10,6 +10,13 @@ export default defineConfig({
             fileName: (format) => `index.${format}.js`,
             formats: ['es', 'cjs', 'umd'], // 生成 ES Module 和 CommonJS 格式
         },
+        rollupOptions: {
+            output: {
+                // 对于不同格式使用不同的导出方式
+                exports: 'auto'
+            }
+        },
+
         sourcemap: true, // 生成 sourcemap 文件
     },
     server:{

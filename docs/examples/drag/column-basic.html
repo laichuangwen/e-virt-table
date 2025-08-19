@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table - 基础列拖拽</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+        <div id="log" style="margin-top: 20px; padding: 10px; background: #f5f5f5; border-radius: 4px;">
+            <strong>拖拽日志：</strong>
+            <div id="log-content">暂无拖拽操作</div>
+        </div>
+    </body>
+    <script>
+        let data = [
+            {
+                id: 1,
+                name: '商品A',
+                category: '电子产品',
+                price: 1299,
+                stock: 50,
+                sales: 120,
+                rating: 4.5,
+            },
+            {
+                id: 2,
+                name: '商品B',
+                category: '服装',
+                price: 299,
+                stock: 200,
+                sales: 350,
+                rating: 4.2,
+            },
+            {
+                id: 3,
+                name: '商品C',
+                category: '家居',
+                price: 899,
+                stock: 30,
+                sales: 80,
+                rating: 4.8,
+            },
+            {
+                id: 4,
+                name: '商品D',
+                category: '食品',
+                price: 59,
+                stock: 500,
+                sales: 800,
+                rating: 4.0,
+            },
+            {
+                id: 5,
+                name: '商品E',
+                category: '电子产品',
+                price: 2599,
+                stock: 20,
+                sales: 45,
+                rating: 4.7,
+            },
+            {
+                id: 6,
+                name: '商品F',
+                category: '运动',
+                price: 399,
+                stock: 100,
+                sales: 200,
+                rating: 4.3,
+            },
+        ];
+
+        let columns = [
+            {
+                title: 'ID',
+                key: 'id',
+                width: 80,
+                align: 'center',
+                readonly: true,
+            },
+            {
+                title: '商品名称',
+                key: 'name',
+                width: 120,
+                align: 'left',
+                readonly: true,
+            },
+            {
+                title: '分类',
+                key: 'category',
+                width: 100,
+                align: 'center',
+                readonly: true,
+            },
+            {
+                title: '价格',
+                key: 'price',
+                width: 100,
+                align: 'right',
+                readonly: true,
+                formatter: ({ value }) => `¥${value}`,
+            },
+            {
+                title: '库存',
+                key: 'stock',
+                width: 80,
+                align: 'center',
+                readonly: true,
+            },
+            {
+                title: '销量',
+                key: 'sales',
+                width: 80,
+                align: 'center',
+                readonly: true,
+            },
+            {
+                title: '评分',
+                key: 'rating',
+                width: 100,
+                align: 'center',
+                readonly: true,
+                formatter: ({ value }) => `${value} ⭐`,
+            },
+        ];
+
+        const eVirtTable = new EVirtTable(document.getElementById('e-virt-table'), {
+            columns,
+            data,
+            config: {
+                BORDER: true,
+                STRIPE: true,
+                CELL_HEIGHT: 40,
+                HEADER_HEIGHT: 40,
+                ROW_KEY: 'id',
+                ENABLE_DRAG_COLUMN: true,  // 启用列拖拽
+                HIGHLIGHT_HOVER_ROW: true,
+            },
+        });
+
+        // 监听列拖拽事件
+        eVirtTable.on('columnMove', (eventData) => {
+            const { source, target, sourceColumnKey, targetColumnKey } = eventData;
+            const logContent = document.getElementById('log-content');
+            
+            let logMessage;
+            if (target === null) {
+                logMessage = `将列 "${source.title}" 移动到第一位`;
+            } else {
+                logMessage = `将列 "${source.title}" 移动到 "${target.title}" 后面`;
+            }
+            
+            logContent.innerHTML = `
+                <div>${new Date().toLocaleTimeString()} - ${logMessage}</div>
+                <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                    源列Key: ${sourceColumnKey}, 目标列Key: ${targetColumnKey || '第一位'}
+                </div>
+            `;
+            
+            console.log('列拖拽事件:', eventData);
+        });
+
+        // 监听拖拽开始和结束事件
+        eVirtTable.on('dragStart', (eventData) => {
+            console.log('拖拽开始:', eventData);
+        });
+
+        eVirtTable.on('dragEnd', (eventData) => {
+            console.log('拖拽结束:', eventData);
+        });
+    </script>
+</html>
