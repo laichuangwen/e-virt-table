@@ -244,13 +244,9 @@ export class Paint {
         }
         // 计算总行数,向上取整round
         const maxTextLine = Math.round((height - 2 * padding) / lineHeight);
-        // 将文本按可用宽度分割成行
-        const lines = this.wrapText(text, availableWidth);
-        // 计算总行数,maxTextLine最小为1
+        // 将文本按可用宽度分割成行,如果为1直接就不计算了,直接绘制
+        const lines = lineClamp === 1 ? [text] : this.wrapText(text, availableWidth);
         let totalTextLine = Math.min(lines.length, Math.max(maxTextLine, 1));
-        // 如果lineClamp为auto，并且isAutoRowHeight为true，则总行数为lines.length
-        // 如果lineClamp为number，并且lineClamp小于maxTextLine，则总行数为lineClamp
-        // 否则总行数为lines.length
         if (lineClamp === 'auto' && autoRowHeight) {
             totalTextLine = lines.length;
         } else if (typeof lineClamp === 'number' && lineClamp < maxTextLine) {
@@ -333,6 +329,16 @@ export class Paint {
 
             if (currentLine) {
                 lines.push(currentLine);
+            }
+        }
+        // 处理溢出刚好和...溢出问题
+        if (lines.length >= 1) {
+            const lastLine = lines[lines.length - 1];
+            const { ellipsis } = this.handleEllipsis(lastLine, maxWidth, 0, this.ctx.font);
+            if (ellipsis) {
+                const newLine = lastLine.slice(0, -1);
+                lines[lines.length - 1] = newLine;
+                lines.push(lastLine.slice(-1));
             }
         }
 

@@ -166,8 +166,8 @@ let columns: Column[] = [
     {
         title: '手机号',
         key: 'phone',
-        lineClamp: 'auto',
-        autoRowHeight: false,
+        lineClamp: 2,
+        autoRowHeight: true,
         // readonly: false,
         // autoRowHeight: true,
         // overflowTooltipHeaderShow: true,

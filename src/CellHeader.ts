@@ -1,6 +1,6 @@
 import type Context from './Context';
 import { generateShortUUID } from './util';
-import type { Align, CellHeaderStyleMethod, Column, Fixed, Render, Type, VerticalAlign } from './types';
+import type { Align, CellHeaderStyleMethod, Column, Fixed, LineClampType, Render, Type, VerticalAlign } from './types';
 import BaseCell from './BaseCell';
 import { Rule, Rules } from './Validator';
 export default class CellHeader extends BaseCell {
@@ -40,6 +40,7 @@ export default class CellHeader extends BaseCell {
     sortDescIconName = 'sort-desc';
     visibleWidth = 0;
     visibleHeight = 0;
+    lineClamp: LineClampType = 'auto';
     drawTextX = 0;
     drawTextY = 0;
     drawTextWidth = 0;
@@ -222,6 +223,7 @@ export default class CellHeader extends BaseCell {
                 color: this.drawTextColor,
                 align: this.align,
                 verticalAlign: this.verticalAlign,
+                lineClamp: this.lineClamp,
             },
         );
     }
