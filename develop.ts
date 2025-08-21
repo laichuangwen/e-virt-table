@@ -277,10 +277,6 @@ let columns: Column[] = [
             // cellEl.style.border = '1px solid red';
             cellEl.style.overflowWrap = 'break-word';
             cellEl.textContent = cell.value;
-            cellEl.className = 'evt-body-cell-auto-height';
-            cellEl.dataset.rowIndex = cell.rowIndex;
-            cellEl.dataset.visibleWidth = cell.visibleWidth;
-            cellEl.dataset.visibleHeight = cell.visibleHeight;
             pEl.appendChild(cellEl);
         },
     },

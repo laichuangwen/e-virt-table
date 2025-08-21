@@ -37,6 +37,7 @@ type EVirtTableOptions = {
 | EMPTY_CUSTOM_STYLE | 自定义空数据样式 | ^[object]`CSSProperties` | — |
 | EMPTY_TEXT | 空数据文本 | string | 暂无数据 |
 | MAX_HEIGHT | 最大高度，高度为 0 表示自适应 | number | 1000 |
+| AUTO_ROW_HEIGHT | 所有行自适应高度 | boolean | false |
 | BORDER_RADIUS | 区域边框圆角 | number | 8 |
 | HEADER_HEIGHT | 表头行高 | number | 36 |
 | HEADER_BG_COLOR | 表头背景色 | string | #F8FAFF |
@@ -278,6 +279,7 @@ type EVirtTableOptions = {
 | sortAscIconName | 升序排序图标 | `string` | — |
 | sortDescIconName | 降序排序图标 | `string` | — |
 | rules | 校验规则 | Rules | — |
+| maxLineClamp | 最大溢出截断行数，默认`auto`根据内容撑开 | `auto,number` | auto |
 
 ## Row
 

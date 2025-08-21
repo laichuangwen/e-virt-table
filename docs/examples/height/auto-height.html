@@ -5,9 +5,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>e-virt-table</title>
     </head>
-     <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
     <body>
-        <div id="e-virt-table"></div>
+        <div class="content">
+            <div id="e-virt-table"></div>
+            <div id="e-virt-table-overlayer"></div>
+        </div>
     </body>
     <script>
         let data = [
@@ -48,46 +51,86 @@
             {
                 title: 'Name',
                 key: 'name',
-                readonly: true,
                 width: 200,
                 fixed: 'left',
             },
             {
                 title: 'State',
                 key: 'state',
+                maxLineClamp: 4,
                 width: 200,
-                readonly: true,
             },
             {
                 title: 'City',
                 key: 'city',
                 width: 200,
-                autoRowHeight: true,
                 align: 'left',
                 headerAlign: 'center',
-                readonly: true,
             },
             {
                 title: 'Address',
                 key: 'address',
-                readonly: true,
                 align: 'left',
                 headerAlign: 'center',
-                autoRowHeight: true,
                 width: 300,
             },
             {
                 title: 'Zip',
                 key: 'zip',
                 width: 200,
-                readonly: true,
                 fixed: 'right',
+                render: (pEl, cell) => {
+                    const cellEl = document.createElement('div');
+                    cellEl.style.minHeight = '36px';
+                    cellEl.style.opacity = '0.5';
+                    cellEl.style.backgroundColor = 'cyan';
+                    cellEl.style.display = 'block';
+                    cellEl.style.padding = '8px';
+                    cellEl.style.userSelect = 'text';
+                    cellEl.style.overflowWrap = 'break-word';
+                    cellEl.textContent = cell.value;
+                    pEl.appendChild(cellEl);
+                },
             },
         ];
         const target = document.getElementById('e-virt-table');
+        const overlayerEl = document.getElementById('e-virt-table-overlayer');
         const grid = new EVirtTable(target, {
+            overlayerElement: overlayerEl,
             data,
             columns,
+            config: {
+                AUTO_ROW_HEIGHT: true,
+            },
+        });
+        grid.on('overlayerChange', (container) => {
+            if (!overlayerEl) {
+                return;
+            }
+            // 移除所有子元素
+            overlayerEl.replaceChildren();
+            Object.assign(overlayerEl.style, container.style);
+            container.views.forEach((typeView) => {
+                const typeDiv = document.createElement('div');
+                typeDiv.className = typeView.class;
+                Object.assign(typeDiv.style, typeView.style);
+                typeView.views.forEach((cellWrapView) => {
+                    const cellWrap = document.createElement('div');
+                    Object.assign(cellWrap.style, cellWrapView.style);
+                    cellWrapView.cells.forEach((cell) => {
+                        const cellEl = document.createElement('div');
+                        Object.assign(cellEl.style, cell.style);
+                        //注意dom自适应行号需要设置domDataset
+                        Object.assign(cellEl.dataset, cell.domDataset);
+                        if (typeof cell.render === 'function') {
+                            cell.render(cellEl, cell);
+                        }
+                        cellWrap.appendChild(cellEl);
+                    });
+                    typeDiv.appendChild(cellWrap);
+                });
+                overlayerEl.appendChild(typeDiv);
+            });
         });
     </script>
 </html>

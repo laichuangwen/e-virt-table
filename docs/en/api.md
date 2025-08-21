@@ -37,6 +37,7 @@ type EVirtTableOptions = {
 | EMPTY_CUSTOM_STYLE | Custom style for empty data | ^[object]`CSSProperties` | — | — |
 | EMPTY_TEXT | Text for empty data | string | — | No data |
 | MAX_HEIGHT | Maximum height (0 means auto fit) | number | — | 1000 |
+| AUTO_ROW_HEIGHT | All rows have adaptive height | boolean | false |
 | BORDER_RADIUS | Border radius | number | — | 8 |
 | HEADER_HEIGHT | Row height of the header | number | — | 36 |
 | HEADER_BG_COLOR | Header background color | string | — | #F8FAFF |
@@ -276,6 +277,7 @@ type EVirtTableOptions = {
 | sortAscIconName | Ascending sort icon | `string` | — | — |
 | sortDescIconName | Descending sort icon | `string` | — | — |
 | rules | Validation rules | Rules | — | — |
+| maxLineClamp | Maximum overflow truncation lines, default `auto` expands based on content | `auto,number` | auto |
 
 ## Row
 
