@@ -57,6 +57,28 @@ export default class EventTable {
                 this.ctx.emit('cellMousedown', cell, e);
             });
         });
+        // 按上事件
+        this.ctx.on('mouseup', (e) => {
+            // 左边点击
+            if (e.button !== 0) {
+                return;
+            }
+            // 是否忙碌，进行其他操作
+            if (this.isBusy(e)) {
+                return;
+            }
+            const { offsetY, offsetX } = this.ctx.getOffset(e);
+            const y = offsetY;
+            const x = offsetX;
+            this.handleHeaderEvent(x, y, this.ctx.header.renderCellHeaders, (cell: CellHeader) => {
+                this.ctx.focusCellHeader = cell;
+                this.ctx.emit('cellHeaderMouseup', cell, e);
+            });
+            this.handleBodyEvent(x, y, this.ctx.body.renderRows, (cell: Cell) => {
+                this.ctx.setFocusCell(cell);
+                this.ctx.emit('cellMouseup', cell, e);
+            });
+        });
         this.ctx.on('click', (e) => {
             // 左边点击
             if (e.button !== 0) {

@@ -148,13 +148,8 @@ export default class Editor {
             // 除了上面的建其他都开始编辑
             this.startEdit(true);
         });
-        this.ctx.on('adjustBoundaryPosition', (cell) => {
-            // 调整位置会触发重绘可能会导致cellClick事件不能触发，调整位置时需要赋值cellTarget
-            this.cellTarget = cell;
-            const { xArr, yArr } = this.ctx.selector;
-            this.selectorArrStr = JSON.stringify(xArr) + JSON.stringify(yArr);
-        });
-        this.ctx.on('cellClick', (cell: Cell) => {
+        // 重绘可能会导致cellClick事件不能触发，调整用按下cellMouseup按下延时赋值cellTarget
+        this.ctx.on('cellMouseup', (cell: Cell) => {
             // 如果是调整边界位置，不进入编辑模式
             if (this.ctx.adjustPositioning) {
                 return;
@@ -342,7 +337,7 @@ export default class Editor {
             return;
         }
         // 触发绘制，刷新
-        this.ctx.emit('drawView');
+        // this.ctx.emit('drawView');
         // 可视区可见
         const isVisible = focusCell.isVerticalVisible() && focusCell.isHorizontalVisible();
         if (!isVisible) {
@@ -404,7 +399,7 @@ export default class Editor {
         this.ctx.containerElement.focus({ preventScroll: true });
         // 隐藏编辑器
         this.editorEl.style.display = 'none';
-        this.ctx.emit('drawView');
+        this.ctx.emit('draw');
     }
     clearEditor() {
         this.doneEdit();
@@ -412,7 +407,7 @@ export default class Editor {
         this.selectorArrStr = '';
         this.ctx.clearSelector();
         this.ctx.focusCell = undefined;
-        this.ctx.emit('drawView');
+        this.ctx.emit('draw');
     }
     destroy() {
         this.editorEl?.remove();

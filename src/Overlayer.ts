@@ -4,14 +4,28 @@ import type Context from './Context';
 import type { OverlayerContainer, OverlayerView, OverlayerWrapper } from './types';
 export default class Overlayer {
     ctx: Context;
+    observer: MutationObserver;
     constructor(ctx: Context) {
         this.ctx = ctx;
+        this.observer = new MutationObserver(() => {
+            // 当 DOM 发生变化时执行的回调进行刷新
+            const elements = this.ctx.overlayerElement.querySelectorAll('[data-auto-height="true"]');
+            if (elements.length > 0) {
+                this.ctx.emit('drawView');
+            }
+        });
+
+        this.observer.observe(this.ctx.overlayerElement, { childList: true, subtree: true });
     }
     draw() {
         const overlayer = this.getContainer();
         this.ctx.emit('overlayerChange', overlayer);
     }
     destroy() {
+        // 清除MutationObserver
+        if (this.observer) {
+            this.observer.disconnect();
+        }
         this.ctx.emit('overlayerChange', {
             style: {},
             views: [],

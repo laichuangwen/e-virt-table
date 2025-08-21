@@ -10,10 +10,12 @@ export default class Row {
     cells: Cell[] = [];
     fixedCells: Cell[] = [];
     noFixedCells: Cell[] = [];
+    calculatedHeightCells: Cell[] = [];
     rowIndex = 0;
     rowKey = '';
     rowType: RowType = 'body';
     data: any;
+    calculatedHeight: number = -1;
     constructor(
         ctx: Context,
         rowIndex: number,
@@ -40,6 +42,7 @@ export default class Row {
         const cells: Cell[] = [];
         const fixedCells: Cell[] = [];
         const noFixedCells: Cell[] = [];
+        const calculatedHeightCells: Cell[] = [];
         header.renderLeafCellHeaders.forEach((header) => {
             const cell = new Cell(
                 this.ctx,
@@ -59,10 +62,21 @@ export default class Row {
                 noFixedCells.push(cell);
             }
             cells.push(cell);
+            if (cell.autoRowHeight) {
+                calculatedHeightCells.push(cell);
+            }
         });
         this.cells = cells;
+        this.calculatedHeightCells = calculatedHeightCells;
         this.fixedCells = fixedCells;
         this.noFixedCells = noFixedCells;
+        this.calculatedHeight = this.getCalculatedHeight();
+    }
+    private getCalculatedHeight() {
+        const heights = this.calculatedHeightCells.map((cell) => {
+            return cell.getAutoHeight();
+        });
+        return heights.length ? Math.max(...heights) : -1;
     }
     drawCenter() {
         this.noFixedCells.forEach((cell) => {

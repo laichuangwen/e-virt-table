@@ -2,29 +2,38 @@
 
 ## RowData
 
-- The hidden field `_height` in `RowData` can also adjust the height to fit different row height settings, default is `config.CELL_HEIGHT`
-  | Parameter | Description | Type   | Default       |
-  | --------- | ----------- | ------ | ------------- |
-  | \_height  | Row height  | number | `CELL_HEIGHT` |
+- The hidden field `_height` in `RowData` can also adjust the height to adapt to different row height settings, default is `config.CELL_HEIGHT`
+  | Parameter | Description | Type | Optional Values | Default |
+  | ----- | -------- | ------ | ------ | ------ |
+  | \_height | Column width | number | — | 100 |
 
 ## Config
 
-| Parameter            | Description                            | Type    | Default |
-| -------------------- | -------------------------------------- | ------- | ------- |
-| HEIGHT               | Height (0 means auto fit)              | number  | 0       |
-| MAX_HEIGHT           | Maximum height, (0 means auto fit)     | number  | 1000    |
-| CELL_HEIGHT          | Default row height for body cells      | number  | 32      |
+| Parameter                 | Description                                                        | Type    | Optional Values | Default |
+| -------------------- | ----------------------------------------------------------- | ------- | ------ | ------ |
+| HEIGHT               | Height, 0 means adaptive                                       | number  | —      | 0      |
+| MAX_HEIGHT           | Maximum height, 0 means adaptive height based on HEIGHT                    | number  | —      | 1000   |
+| CELL_HEIGHT          | Default row height for body cells                                         | number  | —      | 32     |
 | ENABLE_RESIZE_ROW | Enable row height adjustment | boolean | — | true |
+| AUTO_ROW_HEIGHT | All rows adaptive height | boolean | false |
 
 ## Events
 
-| Name            | Description         | Callback                                              |
-| --------------- | ------------------- | ----------------------------------------------------- |
-| resizeRowChange | Adjustment callback | `({colIndex, key, oldWidth, width, column, columns})` |
+| Event Name        | Description          | Callback Parameters                                            |
+| --------------- | ------------- | --------------------------------------------------- |
+| resizeRowChange | Body adjustment callback | `({colIndex, key, oldWidth, width,column,columns})` |
 
-## Default Height
+
+## Column
+
+
+| Parameter | Description     | Type                                   | Default |
+| ---- | -------- | -------------------------------------- | ------ |
+| maxLineClamp | Maximum overflow truncation lines, default `auto` expands based on content | `auto,number` | auto |
+
+## Default Total Height
 - `MAX_HEIGHT` is 1000
-- `HEIGHT` is 0 (0 means auto fit)
+- `HEIGHT` is 0, meaning adaptive
 
 ::: demo
 
@@ -32,7 +41,7 @@ height/base
 h:320px
 :::
 
-## HEIGHT
+## Set Total Height
 
 ::: demo
 
@@ -40,7 +49,7 @@ height/set-height
 h:445px
 :::
 
-## MAX_HEIGHT
+## Maximum Total Height
 
 - Set maximum height
 
@@ -50,9 +59,9 @@ height/max-height
 h:445px
 :::
 
-## MAX_HEIGHT&HEIGHT
+## Set Total Height and Maximum Total Height
 
-- Note that setting both `HEIGHT` and `MAX_HEIGHT` to 0 means no vertical scrollbar
+- Note: setting both `HEIGHT` and `MAX_HEIGHT` to 0 means no vertical scrollbar
 
 ::: demo
 
@@ -60,9 +69,9 @@ height/set-max-height
 h:445px
 :::
 
-## CELL_HEIGHT
+## `CELL_HEIGHT` Set Row Height
 
-- Set the height by `CELL_HEIGHT`
+- Uniformly change all row heights
 
 ::: demo
 
@@ -70,21 +79,33 @@ height/setting
 h:320px
 :::
 
-## _height
+## `_height` Set Row Height
 
-- Set the height by row data
+- Can control the height of specific rows according to requirements
 
 ::: demo
 
 height/data-setting
-h:400px
+h:320px
 :::
 
 ## Disable Row Height Adjustment
-- By default, row height adjustment is enabled
+- Row height adjustment is enabled by default
 
 ::: demo
 
 height/resize
+h:350px
+:::
+
+## Adaptive Row Height
+- Disabled by default
+- Note: overlay dom adaptive row height needs to set domDataset
+- Because the table calculates row height based on the visible area, jumping is normal
+- If you don't want it to keep expanding too much, you can set maxLineClamp for truncation
+
+::: demo
+
+height/auto-height
 h:350px
 :::

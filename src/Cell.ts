@@ -16,6 +16,7 @@ import type {
     OverflowTooltipPlacement,
     SpanInfo,
     SelectorCellValueType,
+    LineClampType,
 } from './types';
 import Context from './Context';
 import BaseCell from './BaseCell';
@@ -49,6 +50,7 @@ export default class Cell extends BaseCell {
     render: Render;
     renderFooter: Render;
     style: any = {};
+    domDataset: any = {};
     rules: Rules | Rule = [];
     message: string = '';
     text: string = '';
@@ -86,6 +88,8 @@ export default class Cell extends BaseCell {
     drawHoverImageHeight = 0;
     drawHoverImageName = '';
     drawHoverImageSource?: HTMLImageElement;
+    autoRowHeight = false; // 是否启用行高自适应
+    calculatedHeight = 0; // 计算出的自适应高度
     ellipsis = false;
     rowExpand = false;
     rowHasChildren = false;
@@ -93,6 +97,7 @@ export default class Cell extends BaseCell {
     selectorCellValueType: SelectorCellValueType = 'value';
     overflowTooltipMaxWidth = 500;
     overflowTooltipPlacement: OverflowTooltipPlacement = 'top';
+    maxLineClamp: LineClampType = 'auto';
 
     constructor(
         ctx: Context,
@@ -133,12 +138,14 @@ export default class Cell extends BaseCell {
         this.value = this.getValue();
         this.render = column.render;
         this.overflowTooltipShow = column.overflowTooltipShow === false ? false : true;
+        this.autoRowHeight = column.autoRowHeight || this.ctx.config.AUTO_ROW_HEIGHT;
         this.overflowTooltipMaxWidth = column.overflowTooltipMaxWidth || 500;
         this.overflowTooltipPlacement = column.overflowTooltipPlacement || 'top';
         this.renderFooter = column.renderFooter;
         this.hoverIconName = column.hoverIconName;
         this.formatter = column.formatter;
         this.formatterFooter = column.formatterFooter;
+        this.maxLineClamp = column.maxLineClamp || 'auto';
         this.update();
     }
     setWidthHeight(width: number, height: number) {
@@ -309,6 +316,13 @@ export default class Cell extends BaseCell {
      * 更新样式
      */
     updateStyle() {
+        if (this.autoRowHeight) {
+            // 自适应行高
+            this.domDataset = {
+                autoHeight: true,
+                rowIndex: this.rowIndex,
+            };
+        }
         this.style = this.getOverlayerViewsStyle();
     }
     private updateTree() {
@@ -389,8 +403,7 @@ export default class Cell extends BaseCell {
         // 树连线仅在绘制阶段调用，避免在 update 阶段被清屏
     }
     private drawTreeLine() {
-        const { TREE_LINE, TREE_INDENT = 16, TREE_ICON_SIZE = 16, TREE_LINE_COLOR = '#e1e6eb' } =
-            this.ctx.config;
+        const { TREE_LINE, TREE_INDENT = 16, TREE_ICON_SIZE = 16, TREE_LINE_COLOR = '#e1e6eb' } = this.ctx.config;
         // 仅 body 且树类型才绘制
         if (!TREE_LINE || this.cellType !== 'body') return;
         if (!['tree', 'selection-tree', 'tree-selection'].includes(this.type)) return;
@@ -451,7 +464,7 @@ export default class Cell extends BaseCell {
         // 1) 父节点行：在图标正下画一段短竖线（展开时绘制，符合视觉预期）
         if (row.hasChildren && row.expand) {
             const shortTop = this.drawTreeImageY + this.drawTreeImageHeight;
-            const shortBottom = shortTop + Math.min(this.visibleHeight / 2, Math.max(8, TREE_ICON_SIZE / 2));
+            const shortBottom = this.drawY + this.visibleHeight;
             this.ctx.paint.drawLine([iconCenterX, shortTop, iconCenterX, shortBottom], {
                 borderColor: TREE_LINE_COLOR,
                 borderWidth: 1,
@@ -724,6 +737,47 @@ export default class Cell extends BaseCell {
             this.drawHoverImageSource = drawImageSource;
         }
     }
+    /**
+     * 获取自动高度
+     * @returns
+     */
+    getAutoHeight() {
+        if (this.cellType !== 'body') {
+            return -1;
+        }
+        if (!this.autoRowHeight) {
+            return -1;
+        }
+        if (this.rowspan === 0) {
+            return -1;
+        }
+        // 如果有渲染函数，使用渲染函数计算高度
+        if (this.render) {
+            const renderHeight = this.ctx.database.getOverlayerAutoHeightByRowIndex(this.rowIndex);
+            return renderHeight;
+        }
+        if (!(this.displayText && typeof this.displayText === 'string')) {
+            return -1;
+        }
+
+        const { BODY_FONT, CELL_PADDING, CELL_LINE_HEIGHT } = this.ctx.config;
+        const calculatedHeight = this.ctx.paint.calculateTextHeight(this.displayText, this.drawTextWidth, {
+            font: BODY_FONT,
+            padding: CELL_PADDING,
+            align: this.align,
+            verticalAlign: this.verticalAlign,
+            color: this.drawTextColor,
+            autoRowHeight: this.autoRowHeight,
+            lineHeight: CELL_LINE_HEIGHT,
+            maxLineClamp: this.maxLineClamp,
+        });
+        // 合并单元格处理
+        if (this.rowspan > 1) {
+            return Math.round(calculatedHeight - (this.visibleHeight - this.height));
+        }
+        // 转成整数
+        return Math.round(calculatedHeight);
+    }
     // 过去跨度配置
     getSpanInfo(): SpanInfo {
         return this.ctx.database.getSpanInfo(this);
@@ -847,7 +901,8 @@ export default class Cell extends BaseCell {
             left,
             top,
             width: `${this.visibleWidth}px`,
-            height: `${this.visibleHeight}px`,
+            height: this.autoRowHeight ? `auto` : `${this.visibleHeight}px`,
+            // minHeight: `${this.visibleHeight}px`,
             pointerEvents: 'initial',
             userSelect: 'none',
         };
@@ -939,14 +994,7 @@ export default class Cell extends BaseCell {
         return width;
     }
     private drawText() {
-        const { CELL_PADDING, BODY_FONT, PLACEHOLDER_COLOR } = this.ctx.config;
-        const { ellipsis } = this.ctx.paint.handleEllipsis(
-            this.displayText,
-            this.drawTextWidth,
-            CELL_PADDING,
-            BODY_FONT,
-        );
-        this.ellipsis = ellipsis;
+        const { CELL_PADDING, BODY_FONT, PLACEHOLDER_COLOR, CELL_LINE_HEIGHT } = this.ctx.config;
         const { placeholder } = this.column;
         let text = this.displayText;
         let color = this.drawTextColor;
@@ -962,13 +1010,27 @@ export default class Cell extends BaseCell {
             text = placeholder;
             color = PLACEHOLDER_COLOR;
         }
-        return this.ctx.paint.drawText(text, this.drawTextX, this.drawTextY, this.drawTextWidth, this.drawTextHeight, {
-            font: BODY_FONT,
-            padding: CELL_PADDING,
-            align: this.align,
-            verticalAlign: this.verticalAlign,
-            color,
-        });
+        if (!text) {
+            return false;
+        }
+        this.ellipsis = this.ctx.paint.drawText(
+            text,
+            this.drawTextX,
+            this.drawTextY,
+            this.drawTextWidth,
+            this.drawTextHeight,
+            {
+                font: BODY_FONT,
+                padding: CELL_PADDING,
+                align: this.align,
+                verticalAlign: this.verticalAlign,
+                color,
+                autoRowHeight: this.autoRowHeight,
+                lineHeight: CELL_LINE_HEIGHT,
+                maxLineClamp: this.maxLineClamp,
+            },
+        );
+        return this.ellipsis;
     }
     private drawImage() {
         if (this.drawSelectionImageSource) {

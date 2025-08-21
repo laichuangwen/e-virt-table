@@ -192,8 +192,10 @@ export default class Body {
             if (this.isResizing && this.resizeTarget) {
                 const resizeTargetHeight = this.resizeTarget.height;
                 let diff = clientY - this.clientY;
-                if (diff + resizeTargetHeight < RESIZE_ROW_MIN_HEIGHT) {
-                    diff = -(resizeTargetHeight - RESIZE_ROW_MIN_HEIGHT);
+                const { calculatedHeight } = this.resizeTarget;
+                const minHeight = calculatedHeight === -1 ? RESIZE_ROW_MIN_HEIGHT : calculatedHeight;
+                if (diff + resizeTargetHeight < minHeight) {
+                    diff = -(resizeTargetHeight - minHeight);
                 }
                 this.resizeDiff = diff;
                 this.ctx.emit('draw');
@@ -367,6 +369,17 @@ export default class Body {
         this.renderRows = rows;
         this.ctx.body.renderRows = rows;
     }
+    updateAutoHeight() {
+        const rows = this.ctx.body.renderRows;
+        // 更新行高map
+        this.ctx.database.updateOverlayerAutoHeightMap();
+        // 如果有计算格子，重新计算行高
+        const heights = rows.map((row) => ({
+            height: row.calculatedHeight,
+            rowIndex: row.rowIndex,
+        }));
+        this.ctx.database.setBatchCalculatedRowHeight(heights);
+    }
     draw() {
         // 容器背景
         this.renderRows.forEach((row) => {
@@ -383,5 +396,6 @@ export default class Body {
             row.drawFixed();
         });
         this.drawTipLine();
+        this.updateAutoHeight();
     }
 }
