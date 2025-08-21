@@ -280,6 +280,7 @@ type EVirtTableOptions = {
 | sortDescIconName | 降序排序图标 | `string` | — |
 | rules | 校验规则 | Rules | — |
 | maxLineClamp | 最大溢出截断行数，默认`auto`根据内容撑开 | `auto,number` | auto |
+| autoRowHeight | 当前列行自适应高度 | boolean | false |
 
 ## Row
 

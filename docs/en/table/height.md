@@ -30,6 +30,7 @@
 | Parameter | Description     | Type                                   | Default |
 | ---- | -------- | -------------------------------------- | ------ |
 | maxLineClamp | Maximum overflow truncation lines, default `auto` expands based on content | `auto,number` | auto |
+| autoRowHeight | Adaptive row height | boolean | false |
 
 ## Default Total Height
 - `MAX_HEIGHT` is 1000

@@ -278,6 +278,7 @@ type EVirtTableOptions = {
 | sortDescIconName | Descending sort icon | `string` | — | — |
 | rules | Validation rules | Rules | — | — |
 | maxLineClamp | Maximum overflow truncation lines, default `auto` expands based on content | `auto,number` | auto |
+| autoRowHeight | Adaptive row height | boolean | false |
 
 ## Row
 
