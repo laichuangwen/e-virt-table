@@ -30,7 +30,20 @@ export type DrawTextOptions = {
     verticalAlign?: VerticalAlign;
     autoRowHeight?: boolean;
     lineHeight?: number;
-    lineClamp?: LineClampType;
+    maxLineClamp?: LineClampType;
+    offsetLeft?: number;
+    offsetRight?: number;
+    textCallback?: (textInfo: TextInfo) => void;
+};
+export type TextInfo = {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    left: number;
+    right: number;
+    top: number;
+    bottom: number;
 };
 export class Paint {
     private ctx: CanvasRenderingContext2D;
@@ -42,13 +55,6 @@ export class Paint {
     scale(dpr: number) {
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.ctx.scale(dpr, dpr);
-    }
-    measureTextWidth(text: string, font: string) {
-        this.ctx.save();
-        this.ctx.font = font;
-        const width = this.ctx.measureText(text).width;
-        this.ctx.restore();
-        return width;
     }
     save() {
         this.ctx.save();
@@ -225,19 +231,21 @@ export class Paint {
             color = '#495060',
             padding = 0,
             verticalAlign = 'middle',
-            lineClamp = 1,
+            maxLineClamp = 1,
             autoRowHeight = false,
+            offsetLeft = 0,
+            offsetRight = 0,
         } = options;
         this.ctx.font = font;
         this.ctx.fillStyle = color;
         this.ctx.textAlign = align;
         const fontSize = parseInt(font.match(/\d+/)?.[0] || '12');
         const lineHeight = fontSize * (options.lineHeight || 1.2); // 默认行高为字体大小的1.2倍
-        const availableWidth = width - padding * 2;
+        const availableWidth = width - padding * 2 - offsetLeft - offsetRight;
         const ellipsesWidth = this.ctx.measureText('...').width;
         let textEllipsis = false;
         // 如果宽度小于省略号宽度,
-        if (width <= ellipsesWidth + padding * 2) {
+        if (width <= ellipsesWidth + padding * 2 + offsetLeft + offsetRight) {
             this.ctx.restore();
             textEllipsis = true;
             return textEllipsis;
@@ -245,45 +253,77 @@ export class Paint {
         // 计算总行数,向上取整round
         const maxTextLine = Math.round((height - 2 * padding) / lineHeight);
         // 将文本按可用宽度分割成行,如果为1直接就不计算了,直接绘制
-        const lines = lineClamp === 1 ? [text] : this.wrapText(text, availableWidth);
+        let lines = this.wrapText(text, availableWidth);
         let totalTextLine = Math.min(lines.length, Math.max(maxTextLine, 1));
-        if (lineClamp === 'auto' && autoRowHeight) {
+        if (maxLineClamp === 'auto' && autoRowHeight) {
             totalTextLine = lines.length;
-        } else if (typeof lineClamp === 'number' && lineClamp < maxTextLine) {
-            totalTextLine = lineClamp;
+        } else if (typeof maxLineClamp === 'number' && maxLineClamp < maxTextLine) {
+            totalTextLine = maxLineClamp;
+        } else {
+            // 处理边界问题
+            if (maxLineClamp === 1 && !autoRowHeight) {
+                lines = [text];
+                totalTextLine = 1;
+            }
+            if (maxLineClamp === 'auto' && maxTextLine === 1) {
+                lines = [text];
+                totalTextLine = 1;
+            }
         }
         // 计算起始Y位置
         let startY = y + padding;
+        const totalTextHeight = Math.round(totalTextLine * lineHeight);
         if (verticalAlign === 'middle') {
-            const totalTextHeight = totalTextLine * lineHeight;
             startY = y + (height - totalTextHeight) / 2;
         } else if (verticalAlign === 'bottom') {
-            const totalTextHeight = totalTextLine * lineHeight;
             startY = y + height - totalTextHeight - padding;
+        }
+        // 计算起始X位置
+        let startX = x + padding + offsetLeft;
+        if (align === 'center') {
+            startX = x + (width - offsetLeft - offsetRight) / 2;
+        } else if (align === 'right') {
+            startX = x + width - padding - offsetRight;
         }
 
         // 绘制每一行用for循环
         for (let i = 0; i < lines.length; i++) {
             const lineText = lines[i];
-            let xPos = x + padding;
-            if (align === 'center') {
-                xPos = x + width / 2;
-            } else if (align === 'right') {
-                xPos = x + width - padding;
-            }
-
             const lineY = startY + i * lineHeight;
             this.ctx.textBaseline = 'top';
             // 如果设置了lineClamp，则只绘制lineClamp行
             if (i === totalTextLine - 1) {
                 const { _text, ellipsis } = this.handleEllipsis(lineText, width, padding, font);
-                this.ctx.fillText(_text, xPos, lineY);
+                this.ctx.fillText(_text, startX, lineY);
                 textEllipsis = ellipsis;
                 break;
             }
-            this.ctx.fillText(lineText, xPos, lineY);
+            this.ctx.fillText(lineText, startX, lineY);
         }
-
+        // 文字信息回调，用于画跟随图标的
+        if (options.textCallback && lines.length) {
+            const textMaxWidth = Math.round(this.ctx.measureText(lines[0]).width);
+            let left = startX;
+            let right = startX + textMaxWidth;
+            if (align === 'center') {
+                left = startX - textMaxWidth / 2;
+                right = startX + textMaxWidth / 2;
+            } else if (align === 'right') {
+                left = startX - textMaxWidth;
+                right = startX;
+            }
+            const textInfo = {
+                x: startX,
+                y: startY,
+                width: textMaxWidth,
+                height: totalTextHeight,
+                left,
+                right,
+                top: startY,
+                bottom: startY + totalTextHeight,
+            };
+            options.textCallback(textInfo);
+        }
         this.ctx.restore();
         return textEllipsis;
     }
@@ -353,7 +393,7 @@ export class Paint {
      * @returns 计算出的高度
      */
     calculateTextHeight(text: string = '', width: number, options: DrawTextOptions = {}): number {
-        const { font = '12px Arial', padding = 0, align = 'center', color = '#495060', lineClamp = 1 } = options;
+        const { font = '12px Arial', padding = 0, align = 'center', color = '#495060', maxLineClamp = 1 } = options;
         this.ctx.save();
         this.ctx.font = font;
         this.ctx.fillStyle = color;
@@ -367,11 +407,11 @@ export class Paint {
         const lines = this.wrapText(text, availableWidth);
         // 计算总行数
         let totalLines = 1;
-        if (lineClamp === 'auto') {
+        if (maxLineClamp === 'auto') {
             totalLines = lines.length;
         } else {
-            if (lines.length > lineClamp) {
-                totalLines = lineClamp;
+            if (lines.length > maxLineClamp) {
+                totalLines = maxLineClamp;
             } else {
                 totalLines = lines.length;
             }

@@ -3,6 +3,7 @@ import { generateShortUUID } from './util';
 import type { Align, CellHeaderStyleMethod, Column, Fixed, LineClampType, Render, Type, VerticalAlign } from './types';
 import BaseCell from './BaseCell';
 import { Rule, Rules } from './Validator';
+import { TextInfo } from './Paint';
 export default class CellHeader extends BaseCell {
     align: Align;
     hideHeaderSelection = false;
@@ -40,7 +41,7 @@ export default class CellHeader extends BaseCell {
     sortDescIconName = 'sort-desc';
     visibleWidth = 0;
     visibleHeight = 0;
-    lineClamp: LineClampType = 'auto';
+    maxLineClamp: LineClampType = 'auto';
     drawTextX = 0;
     drawTextY = 0;
     drawTextWidth = 0;
@@ -150,7 +151,6 @@ export default class CellHeader extends BaseCell {
     draw() {
         this.drawEdge();
         this.drawSelection();
-        this.recalculateTextPosition();
         this.drawText();
         this.drawSelector();
         this.drawSortIcon();
@@ -166,45 +166,6 @@ export default class CellHeader extends BaseCell {
             borderColor: BORDER ? BORDER_COLOR : 'transparent',
             fillColor: this.drawCellBgColor,
         });
-    }
-    private recalculateTextPosition() {
-        // 对于 selection 类型的列，文本在复选框右侧显示
-        let textX = this.drawX;
-        let textWidth = this.width;
-        if (['selection', 'index-selection', 'selection-tree', 'tree-selection'].includes(this.type)) {
-            const { CHECKBOX_SIZE } = this.ctx.config;
-            if (this.align === 'left' || this.align === 'right') {
-                textX = this.drawX + CHECKBOX_SIZE + 4;
-                textWidth = this.width - textX + this.drawX;
-            } else {
-                // 复选框居中位置
-                const checkboxCenterX = this.drawX + (this.width - CHECKBOX_SIZE) / 2;
-                textX = checkboxCenterX + CHECKBOX_SIZE + 1; // 复选框右侧，最小间距
-                // 确保文本有足够的显示空间
-                textWidth = this.width - textX + this.drawX;
-            }
-        }
-
-        // 如果有排序图标，调整文本位置
-        if (this.column.sortBy) {
-            const iconSize = 16;
-            const iconMargin = 4;
-
-            if (this.align === 'right') {
-                // 居右时，文本需要为图标留出空间
-                textWidth = this.width - this.ctx.config.CELL_PADDING - iconSize - iconMargin;
-                textX = this.drawX + this.ctx.config.CELL_PADDING;
-            } else if (this.align === 'center') {
-                // 居中时，文本宽度需要考虑图标
-                const textWidthNeeded = this.ctx.paint.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
-                const totalWidth = textWidthNeeded + iconSize + iconMargin;
-                if (totalWidth > this.width - this.ctx.config.CELL_PADDING * 2) {
-                    textWidth = this.width - this.ctx.config.CELL_PADDING * 2 - iconSize - iconMargin;
-                }
-            }
-        }
-        this.drawTextX = textX;
-        this.drawTextWidth = textWidth;
     }
     private drawText() {
         const {
@@ -223,7 +184,15 @@ export default class CellHeader extends BaseCell {
                 color: this.drawTextColor,
                 align: this.align,
                 verticalAlign: this.verticalAlign,
-                lineClamp: this.lineClamp,
+                maxLineClamp: this.maxLineClamp,
+                offsetRight: this.column.sortBy ? 16 : 0, // 排序图标占位
+                textCallback: (textInfo: TextInfo) => {
+                    // 排序图标位置,需要跟随文字变化
+                    if (this.column.sortBy) {
+                        this.drawSortImageX = textInfo.right + 4;
+                        this.drawSortImageY = textInfo.top + (textInfo.height - 16) / 2;
+                    }
+                },
             },
         );
     }
@@ -309,10 +278,7 @@ export default class CellHeader extends BaseCell {
         if (!this.column.sortBy) {
             return;
         }
-
-        const { CELL_PADDING = 0 } = this.ctx.config;
         const iconSize = 16;
-        const iconMargin = 4;
         let iconName = this.sortIconName;
         // 前端排序
         const sortState = this.ctx.database.getSortState(this.key);
@@ -325,28 +291,6 @@ export default class CellHeader extends BaseCell {
         if (!icon) {
             return;
         }
-        // 计算图标位置
-        let iconX = 0;
-        let iconY = this.drawY + (this.height - iconSize) / 2;
-
-        if (this.align === 'left') {
-            // 居左：先绘制文字，图标紧跟文字
-            const textWidth = this.ctx.paint.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
-            iconX = this.drawX + CELL_PADDING + textWidth + iconMargin;
-        } else if (this.align === 'center') {
-            // 居中：先居中绘制文字，然后图标紧跟文字
-            const textWidth = this.ctx.paint.measureTextWidth(this.displayText, this.ctx.config.HEADER_FONT);
-            const textCenterX = this.drawX + this.width / 2;
-            const textStartX = textCenterX - textWidth / 2;
-            iconX = textStartX + textWidth + iconMargin;
-        } else if (this.align === 'right') {
-            // 居右：先绘制图标靠右，然后文字根据图标绘制后的位置紧贴在图标的左侧
-            iconX = this.drawX + this.width - CELL_PADDING - iconSize;
-        }
-
-        // 保存图标信息
-        this.drawSortImageX = iconX;
-        this.drawSortImageY = iconY;
         this.drawSortImageWidth = iconSize;
         this.drawSortImageHeight = iconSize;
         this.drawSortImageName = iconName;
@@ -361,7 +305,7 @@ export default class CellHeader extends BaseCell {
             this.drawSortImageHeight,
         );
     }
-    
+
     getText() {
         if (this.render) {
             return '';

@@ -97,7 +97,7 @@ export default class Cell extends BaseCell {
     selectorCellValueType: SelectorCellValueType = 'value';
     overflowTooltipMaxWidth = 500;
     overflowTooltipPlacement: OverflowTooltipPlacement = 'top';
-    lineClamp: LineClampType = 'auto';
+    maxLineClamp: LineClampType = 'auto';
 
     constructor(
         ctx: Context,
@@ -145,7 +145,7 @@ export default class Cell extends BaseCell {
         this.hoverIconName = column.hoverIconName;
         this.formatter = column.formatter;
         this.formatterFooter = column.formatterFooter;
-        this.lineClamp = column.lineClamp || 'auto';
+        this.maxLineClamp = column.maxLineClamp || 'auto';
         this.update();
     }
     setWidthHeight(width: number, height: number) {
@@ -769,7 +769,7 @@ export default class Cell extends BaseCell {
             color: this.drawTextColor,
             autoRowHeight: this.autoRowHeight,
             lineHeight: CELL_LINE_HEIGHT,
-            lineClamp: this.lineClamp,
+            maxLineClamp: this.maxLineClamp,
         });
         // 合并单元格处理
         if (this.rowspan > 1) {
@@ -1027,7 +1027,7 @@ export default class Cell extends BaseCell {
                 color,
                 autoRowHeight: this.autoRowHeight,
                 lineHeight: CELL_LINE_HEIGHT,
-                lineClamp: this.lineClamp,
+                maxLineClamp: this.maxLineClamp,
             },
         );
         return this.ellipsis;

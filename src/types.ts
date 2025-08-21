@@ -163,7 +163,7 @@ export interface Column {
     rules?: Rules | Rule;
     options?: any;
     selectorCellValueType?: SelectorCellValueType;
-    lineClamp?: LineClampType; // 行高超出多少行显示省略号
+    maxLineClamp?: LineClampType; // 行高超出多少行显示省略号
 }
 export type LineClampType = number | 'auto';
 export type HistoryAction = 'back' | 'forward' | 'none';
