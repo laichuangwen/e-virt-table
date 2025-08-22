@@ -1791,7 +1791,14 @@ export default class Database {
             if (isNaN(rowIndex)) {
                 return;
             }
-            map.set(rowIndex, element.clientHeight);
+            if (!(element instanceof HTMLElement)) {
+                return;
+            }
+            if (element.offsetWidth === 0) {
+                return;
+            }
+            // 取最大值
+            map.set(rowIndex, Math.max(map.get(rowIndex) || 0, Math.round(element.offsetHeight)));
         });
         this.overlayerAutoHeightMap = map;
     }

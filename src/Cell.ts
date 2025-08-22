@@ -319,8 +319,8 @@ export default class Cell extends BaseCell {
         if (this.autoRowHeight) {
             // 自适应行高
             this.domDataset = {
-                autoHeight: true,
-                rowIndex: this.rowIndex,
+                'data-auto-height': true,
+                'data-row-index': this.rowIndex,
             };
         }
         this.style = this.getOverlayerViewsStyle();
@@ -894,6 +894,10 @@ export default class Cell extends BaseCell {
             if (this.ctx.config.FOOTER_FIXED) {
                 top = `${this.drawY - this.ctx.footer.y}px`;
             }
+        }
+        if (this.ctx.database.getOverlayerAutoHeightByRowIndex(this.rowIndex) === -1) {
+            left = '-99999px';
+            top = '-99999px';
         }
         return {
             position: 'absolute',

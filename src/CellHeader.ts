@@ -42,6 +42,7 @@ export default class CellHeader extends BaseCell {
     visibleWidth = 0;
     visibleHeight = 0;
     maxLineClamp: LineClampType = 'auto';
+    domDataset: any = {};
     drawTextX = 0;
     drawTextY = 0;
     drawTextWidth = 0;
