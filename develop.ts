@@ -165,8 +165,8 @@ let columns: Column[] = [
         maxLineClamp: 'auto',
         // autoRowHeight: true,
         sortBy: 'string',
-        align: 'right',
-        // verticalAlign: 'middle',
+        align: 'left',
+        verticalAlign: 'bottom',
         // readonly: false,
         // autoRowHeight: true,
         // overflowTooltipHeaderShow: true,
@@ -343,6 +343,8 @@ let columns: Column[] = [
         title: '采购价(元)',
         key: 'purchasePrice',
         fixed: 'right',
+        required: true,
+        align: 'right',
         // type: 'number',
         rules: [
             {

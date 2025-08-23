@@ -173,6 +173,7 @@ export default class CellHeader extends BaseCell {
             paint,
             config: { HEADER_FONT, CELL_PADDING },
         } = this.ctx;
+        
         this.ellipsis = paint.drawText(
             this.displayText,
             this.drawTextX,
@@ -187,11 +188,28 @@ export default class CellHeader extends BaseCell {
                 verticalAlign: this.verticalAlign,
                 maxLineClamp: this.maxLineClamp,
                 offsetRight: this.column.sortBy ? 16 : 0, // 排序图标占位
+                offsetLeft: this.required ? 12 : 0, // 必填星号占位
                 textCallback: (textInfo: TextInfo) => {
                     // 排序图标位置,需要跟随文字变化
                     if (this.column.sortBy) {
                         this.drawSortImageX = textInfo.right + 4;
                         this.drawSortImageY = textInfo.top + (textInfo.height - 16) / 2;
+                    }
+                    if (this.required) {
+                        paint.drawText(
+                            '*',
+                            textInfo.left - 18,
+                            textInfo.top + (textInfo.height - 12) / 2,
+                            24,
+                            24,
+                            {
+                                color: 'red',
+                                font: '18px Arial',
+                                align: 'center',
+                                verticalAlign: 'middle',
+                                padding: 0,
+                            },
+                        );
                     }
                 },
             },
