@@ -70,13 +70,12 @@ export default class Row {
         this.calculatedHeightCells = calculatedHeightCells;
         this.fixedCells = fixedCells;
         this.noFixedCells = noFixedCells;
-        this.calculatedHeight = this.getCalculatedHeight();
     }
-    private getCalculatedHeight() {
+    updateCalculatedHeight() {
         const heights = this.calculatedHeightCells.map((cell) => {
             return cell.getAutoHeight();
         });
-        return heights.length ? Math.max(...heights) : -1;
+        this.calculatedHeight = heights.length ? Math.max(...heights) : -1;
     }
     drawCenter() {
         this.noFixedCells.forEach((cell) => {

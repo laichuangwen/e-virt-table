@@ -116,6 +116,7 @@ export default class EVirtTable {
             if (!ignoreOverlayer) {
                 this.overlayer.draw();
             }
+            this.body.updateAutoHeight();
         });
     }
     loadConfig(_config: ConfigType) {

@@ -2,20 +2,57 @@ import type Cell from './Cell';
 import type CellHeader from './CellHeader';
 import type Context from './Context';
 import type { OverlayerContainer, OverlayerView, OverlayerWrapper } from './types';
+import { throttle } from './util';
 export default class Overlayer {
     ctx: Context;
     observer: MutationObserver;
     constructor(ctx: Context) {
         this.ctx = ctx;
-        this.observer = new MutationObserver(() => {
-            // 当 DOM 发生变化时执行的回调进行刷新
-            const elements = this.ctx.overlayerElement.querySelectorAll('[data-auto-height="true"]');
-            if (elements.length > 0) {
-                this.ctx.emit('drawView');
-            }
-        });
+        this.observer = new MutationObserver(
+            throttle(() => {
+                // 当 DOM 发生变化时执行的回调
+                const elements = this.ctx.overlayerElement.querySelectorAll('[data-auto-height="true"]');
+                const map = new Map<string, number>();
+                elements.forEach((element) => {
+                    const rowIndex = Number(element.getAttribute('data-row-index'));
+                    const colIndex = Number(element.getAttribute('data-col-index'));
+                    if (isNaN(rowIndex)) {
+                        return;
+                    }
+                    if (isNaN(colIndex)) {
+                        return;
+                    }
+                    if (!(element instanceof HTMLElement)) {
+                        return;
+                    }
+                    if (element.offsetWidth === 0) {
+                        return;
+                    }
+                    const key = `${rowIndex}\u200b_${colIndex}`;
+                    map.set(key, Math.round(element.offsetHeight));
+                });
+                const overlayerAutoHeightMap = this.ctx.database.getOverlayerAutoHeightMap();
+                const isNeedUpdate = !this.arerMapsEqual(overlayerAutoHeightMap, map);
+                if (isNeedUpdate) {
+                    this.ctx.database.setOverlayerAutoHeightMap(map);
+                    if (overlayerAutoHeightMap.size === 0 && map.size === 0) {
+                        return;
+                    }
+                    this.ctx.emit('draw');
+                }
+            }, 16.67),
+        );
+        this.observer.observe(this.ctx.overlayerElement, { childList: true, subtree: true, attributes: true });
+    }
+    private arerMapsEqual(m1: Map<string, number>, m2: Map<string, number>): boolean {
+        if (m1.size !== m2.size) return false;
 
-        this.observer.observe(this.ctx.overlayerElement, { childList: true, subtree: true });
+        for (let [key, value] of m1) {
+            if (!m2.has(key)) return false;
+            if (m2.get(key) !== value) return false;
+        }
+
+        return true;
     }
     draw() {
         const overlayer = this.getContainer();

@@ -281,7 +281,7 @@ export class Paint {
         // 计算起始X位置
         let startX = x + padding + offsetLeft;
         if (align === 'center') {
-            startX = x + (width - offsetLeft - offsetRight) / 2;
+            startX = x + width / 2;
         } else if (align === 'right') {
             startX = x + width - padding - offsetRight;
         }
