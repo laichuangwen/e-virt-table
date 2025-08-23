@@ -42,7 +42,7 @@ export default class Database {
     private validationErrorMap = new Map<string, ValidateResult>();
     private itemRowKeyMap = new WeakMap();
     private bufferData: any[] = [];
-    overlayerAutoHeightMap = new Map<number, number>();
+    overlayerAutoHeightMap = new Map<string, number>();
     private bufferCheckState = {
         buffer: false,
         check: false,
@@ -1782,28 +1782,15 @@ export default class Database {
 
         return maxDepth;
     }
-    updateOverlayerAutoHeightMap() {
-        // 当 DOM 发生变化时执行的回调
-        const elements = this.ctx.overlayerElement.querySelectorAll('[data-auto-height="true"]');
-        const map = new Map<number, number>();
-        elements.forEach((element) => {
-            const rowIndex = Number(element.getAttribute('data-row-index'));
-            if (isNaN(rowIndex)) {
-                return;
-            }
-            if (!(element instanceof HTMLElement)) {
-                return;
-            }
-            if (element.offsetWidth === 0) {
-                return;
-            }
-            // 取最大值
-            map.set(rowIndex, Math.max(map.get(rowIndex) || 0, Math.round(element.offsetHeight)));
-        });
+    setOverlayerAutoHeightMap(map: Map<string, number>) {
         this.overlayerAutoHeightMap = map;
     }
-    getOverlayerAutoHeightByRowIndex(rowIndex: number) {
-        const height = this.overlayerAutoHeightMap.get(rowIndex) || -1;
+    getOverlayerAutoHeightMap() {
+        return this.overlayerAutoHeightMap;
+    }
+    getOverlayerAutoHeight(rowIndex: number, colIndex: number) {
+        const key = `${rowIndex}\u200b_${colIndex}`;
+        const height = this.overlayerAutoHeightMap.get(key) || 0;
         return height;
     }
 }

@@ -371,8 +371,15 @@ export default class Body {
     }
     updateAutoHeight() {
         const rows = this.ctx.body.renderRows;
-        // 更新行高map
-        this.ctx.database.updateOverlayerAutoHeightMap();
+        const hasAutoHeight = rows.some((row) => row.calculatedHeightCells.length > 0);
+        // 如果没有计算格子，不更新
+        if (!hasAutoHeight) {
+            return;
+        }
+        // 更新计算高度
+        rows.forEach((row) => {
+            row.updateCalculatedHeight();
+        });
         // 如果有计算格子，重新计算行高
         const heights = rows.map((row) => ({
             height: row.calculatedHeight,
@@ -396,6 +403,5 @@ export default class Body {
             row.drawFixed();
         });
         this.drawTipLine();
-        this.updateAutoHeight();
     }
 }

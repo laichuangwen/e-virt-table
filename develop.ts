@@ -71,22 +71,17 @@ let columns: Column[] = [
         // editorType: 'none',
         verticalAlign: 'middle',
         // hide: true,
-        // render: (pEl, cell) => {
-        //     const cellEl = document.createElement('div');
-        //     cellEl.addEventListener('click', () => {
-        //         console.log('点击了姓名');
-        //     });
-        //     cellEl.style.width = '100%';
-        //     cellEl.style.height = '100%';
-        //     cellEl.style.opacity = '0.5';
-        //     cellEl.style.backgroundColor = 'cyan';
-        //     cellEl.style.display = 'flex';
-        //     cellEl.style.justifyContent = 'center';
-        //     cellEl.style.alignItems = 'center';
+        render: (pEl, cell) => {
+            const cellEl = document.createElement('div');
+            cellEl.addEventListener('click', () => {
+                console.log('点击了姓名');
+            });
+            cellEl.style.opacity = '0.5';
+            cellEl.style.backgroundColor = 'cyan';
 
-        //     cellEl.innerHTML = cell.text;
-        //     pEl.appendChild(cellEl);
-        // },
+            cellEl.innerHTML = cell.text;
+            pEl.appendChild(cellEl);
+        },
         // render: "emp_name",
     },
     // {
@@ -268,6 +263,7 @@ let columns: Column[] = [
             cellEl.style.minHeight = '36px';
             cellEl.style.opacity = '0.5';
             cellEl.style.backgroundColor = 'cyan';
+            cellEl.style.flex = 'none';
             cellEl.style.display = 'block';
             cellEl.style.padding = '8px';
             // cellEl.style.justifyContent = 'center';
@@ -511,7 +507,7 @@ const eVirtTable = new EVirtTable(canvas, {
         // DISABLED: true,
         // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
-        AUTO_ROW_HEIGHT: false,
+        AUTO_ROW_HEIGHT: true,
         ROW_KEY: 'id',
         CELL_HEIGHT: 36,
         SELECTOR_AREA_MIN_X: 0,
@@ -842,7 +838,10 @@ eVirtTable.on('overlayerChange', (container) => {
             cellWrapView.cells.forEach((cell) => {
                 const cellEl = document.createElement('div');
                 Object.assign(cellEl.style, cell.style);
-                Object.assign(cellEl.dataset, cell.domDataset);
+                Object.keys(cell.domDataset).forEach((key) => {
+                    cellEl.setAttribute(key, cell.domDataset[key]);
+                });
+
                 if (typeof cell.render === 'function') {
                     cell.render(cellEl, cell);
                 }

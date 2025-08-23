@@ -321,6 +321,7 @@ export default class Cell extends BaseCell {
             this.domDataset = {
                 'data-auto-height': true,
                 'data-row-index': this.rowIndex,
+                'data-col-index': this.colIndex,
             };
         }
         this.style = this.getOverlayerViewsStyle();
@@ -743,21 +744,28 @@ export default class Cell extends BaseCell {
      */
     getAutoHeight() {
         if (this.cellType !== 'body') {
-            return -1;
+            return 0;
         }
         if (!this.autoRowHeight) {
-            return -1;
+            return 0;
         }
         if (this.rowspan === 0) {
-            return -1;
+            return 0;
         }
         // 如果有渲染函数，使用渲染函数计算高度
         if (this.render) {
-            const renderHeight = this.ctx.database.getOverlayerAutoHeightByRowIndex(this.rowIndex);
-            return renderHeight;
+            const renderHeight = this.ctx.database.getOverlayerAutoHeight(this.rowIndex, this.colIndex);
+            if (this.rowspan > 1) {
+                // 如果计算高度小于可见高度，返回0，表示不显示
+                if (renderHeight < this.visibleHeight) {
+                    return 0;
+                }
+                return Math.round(renderHeight - (this.visibleHeight - this.height));
+            }
+            return Math.round(renderHeight);
         }
         if (!(this.displayText && typeof this.displayText === 'string')) {
-            return -1;
+            return 0;
         }
 
         const { BODY_FONT, CELL_PADDING, CELL_LINE_HEIGHT } = this.ctx.config;
@@ -773,6 +781,10 @@ export default class Cell extends BaseCell {
         });
         // 合并单元格处理
         if (this.rowspan > 1) {
+            // 如果计算高度小于可见高度，返回0，表示不显示
+            if (calculatedHeight < this.visibleHeight) {
+                return 0;
+            }
             return Math.round(calculatedHeight - (this.visibleHeight - this.height));
         }
         // 转成整数
@@ -895,7 +907,8 @@ export default class Cell extends BaseCell {
                 top = `${this.drawY - this.ctx.footer.y}px`;
             }
         }
-        if (this.ctx.database.getOverlayerAutoHeightByRowIndex(this.rowIndex) === -1) {
+        // 防止闪烁
+        if (this.autoRowHeight && this.ctx.database.getOverlayerAutoHeight(this.rowIndex, this.colIndex) === 0) {
             left = '-99999px';
             top = '-99999px';
         }
@@ -906,6 +919,7 @@ export default class Cell extends BaseCell {
             top,
             width: `${this.visibleWidth}px`,
             height: this.autoRowHeight ? `auto` : `${this.visibleHeight}px`,
+            // height: `${this.visibleHeight}px`,
             // minHeight: `${this.visibleHeight}px`,
             pointerEvents: 'initial',
             userSelect: 'none',
