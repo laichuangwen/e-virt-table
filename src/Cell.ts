@@ -138,7 +138,8 @@ export default class Cell extends BaseCell {
         this.value = this.getValue();
         this.render = column.render;
         this.overflowTooltipShow = column.overflowTooltipShow === false ? false : true;
-        this.autoRowHeight = column.autoRowHeight || this.ctx.config.AUTO_ROW_HEIGHT;
+        this.autoRowHeight =
+            column.autoRowHeight !== undefined ? column.autoRowHeight : this.ctx.config.AUTO_ROW_HEIGHT;
         this.overflowTooltipMaxWidth = column.overflowTooltipMaxWidth || 500;
         this.overflowTooltipPlacement = column.overflowTooltipPlacement || 'top';
         this.renderFooter = column.renderFooter;
@@ -769,6 +770,7 @@ export default class Cell extends BaseCell {
         }
 
         const { BODY_FONT, CELL_PADDING, CELL_LINE_HEIGHT } = this.ctx.config;
+        const cacheTextKey = `${this.displayText}_${this.drawTextWidth}`;
         const calculatedHeight = this.ctx.paint.calculateTextHeight(this.displayText, this.drawTextWidth, {
             font: BODY_FONT,
             padding: CELL_PADDING,
@@ -778,6 +780,7 @@ export default class Cell extends BaseCell {
             autoRowHeight: this.autoRowHeight,
             lineHeight: CELL_LINE_HEIGHT,
             maxLineClamp: this.maxLineClamp,
+            cacheTextKey,
         });
         // 合并单元格处理
         if (this.rowspan > 1) {
@@ -1031,6 +1034,7 @@ export default class Cell extends BaseCell {
         if (!text) {
             return false;
         }
+        const cacheTextKey = `${text}_${this.drawTextWidth}`;
         this.ellipsis = this.ctx.paint.drawText(
             text,
             this.drawTextX,
@@ -1046,6 +1050,7 @@ export default class Cell extends BaseCell {
                 autoRowHeight: this.autoRowHeight,
                 lineHeight: CELL_LINE_HEIGHT,
                 maxLineClamp: this.maxLineClamp,
+                cacheTextKey,
             },
         );
         return this.ellipsis;

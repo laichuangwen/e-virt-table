@@ -34,6 +34,7 @@ export type DrawTextOptions = {
     offsetLeft?: number;
     offsetRight?: number;
     textCallback?: (textInfo: TextInfo) => void;
+    cacheTextKey?: string;
 };
 export type TextInfo = {
     x: number;
@@ -47,10 +48,14 @@ export type TextInfo = {
 };
 export class Paint {
     private ctx: CanvasRenderingContext2D;
+    private textCacheMap = new Map<string, string[]>();
     constructor(target: HTMLCanvasElement) {
         const ctx = target.getContext('2d');
         if (!ctx) throw new Error('canvas context not found');
         this.ctx = ctx;
+    }
+    clearTextCache() {
+        this.textCacheMap.clear();
     }
     scale(dpr: number) {
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -253,7 +258,7 @@ export class Paint {
         // 计算总行数,向上取整round
         const maxTextLine = Math.round((height - 2 * padding) / lineHeight);
         // 将文本按可用宽度分割成行,如果为1直接就不计算了,直接绘制
-        let lines = this.wrapText(text, availableWidth);
+        let lines = this.wrapText(text, availableWidth, options.cacheTextKey);
         let totalTextLine = Math.min(lines.length, Math.max(maxTextLine, 1));
         if (maxLineClamp === 'auto' && autoRowHeight) {
             totalTextLine = lines.length;
@@ -334,9 +339,12 @@ export class Paint {
      * @param maxWidth
      * @returns
      */
-    private wrapText(text: string, maxWidth: number): string[] {
+    private wrapText(text: string, maxWidth: number, cacheTextKey = ''): string[] {
         if (!text) return [''];
-
+        // 缓存文本
+        if (cacheTextKey && this.textCacheMap.has(cacheTextKey)) {
+            return this.textCacheMap.get(cacheTextKey) || [''];
+        }
         const lines: string[] = [];
         const paragraphs = text.split('\n');
 
@@ -381,8 +389,11 @@ export class Paint {
                 lines.push(lastLine.slice(-1));
             }
         }
-
-        return lines.length > 0 ? lines : [''];
+        const result = lines.length > 0 ? lines : [''];
+        if (cacheTextKey) {
+            this.textCacheMap.set(cacheTextKey, result);
+        }
+        return result;
     }
 
     /**
@@ -393,7 +404,14 @@ export class Paint {
      * @returns 计算出的高度
      */
     calculateTextHeight(text: string = '', width: number, options: DrawTextOptions = {}): number {
-        const { font = '12px Arial', padding = 0, align = 'center', color = '#495060', maxLineClamp = 1 } = options;
+        const {
+            font = '12px Arial',
+            padding = 0,
+            align = 'center',
+            color = '#495060',
+            maxLineClamp = 1,
+            cacheTextKey = '',
+        } = options;
         this.ctx.save();
         this.ctx.font = font;
         this.ctx.fillStyle = color;
@@ -404,7 +422,7 @@ export class Paint {
 
         // 将文本按可用宽度分割成行
         const availableWidth = width - padding * 2;
-        const lines = this.wrapText(text, availableWidth);
+        const lines = this.wrapText(text, availableWidth, cacheTextKey);
         // 计算总行数
         let totalLines = 1;
         if (maxLineClamp === 'auto') {

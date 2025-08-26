@@ -64,6 +64,7 @@ export default class Database {
     }
     // 初始化默认不忽略清空改变值和校验map
     init(isClear = true) {
+        this.ctx.paint.clearTextCache();    
         this.clearBufferData();
         this.rowKeyMap.clear();
         this.checkboxKeyMap.clear();

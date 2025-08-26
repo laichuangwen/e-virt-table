@@ -7,15 +7,15 @@ function generateShortUUID(): string {
         return v.toString(16);
     });
 }
-function throttle<T extends (...args: any) => any>(func: T, delay: number): T {
+function throttle<T extends (...args: any) => any>(func: T, delay: number | (() => number)): T {
     let lastCalledTime = 0;
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
     return function (this: ThisParameterType<T>, ...args: Parameters<T>): ReturnType<T> | undefined {
         const now = new Date().getTime();
         const elapsedTime = now - lastCalledTime;
-
-        if (!lastCalledTime || elapsedTime >= delay) {
+        const wait = typeof delay === 'function' ? delay() : delay
+        if (!lastCalledTime || elapsedTime >= wait) {
             func.apply(this, args);
             lastCalledTime = now;
         } else if (!timeoutId) {
@@ -23,7 +23,7 @@ function throttle<T extends (...args: any) => any>(func: T, delay: number): T {
                 func.apply(this, args);
                 lastCalledTime = new Date().getTime();
                 timeoutId = undefined;
-            }, delay - elapsedTime);
+            }, wait - elapsedTime);
         }
 
         return undefined;

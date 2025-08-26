@@ -22,7 +22,7 @@ import Editor from './Editor';
 import Empty from './Empty';
 import Overlayer from './Overlayer';
 import ContextMenu from './ContextMenu';
-import { mergeColCell, mergeRowCell, getSpanArrByRow, getSpanObjByColumn } from './util';
+import { mergeColCell, mergeRowCell, getSpanArrByRow, getSpanObjByColumn, throttle } from './util';
 import './style.css';
 
 export default class EVirtTable {
@@ -62,12 +62,26 @@ export default class EVirtTable {
         this.editor = new Editor(this.ctx);
         this.overlayer = new Overlayer(this.ctx);
         this.contextMenu = new ContextMenu(this.ctx);
-        this.ctx.on('draw', () => {
-            this.draw();
-        });
-        this.ctx.on('drawView', () => {
-            this.draw(true);
-        });
+        // 节流绘制表格
+        this.ctx.on(
+            'draw',
+            throttle(
+                () => {
+                    this.draw();
+                },
+                () => this.ctx.drawTime,
+            ),
+        );
+        // 节流绘制视图
+        this.ctx.on(
+            'drawView',
+            throttle(
+                () => {
+                    this.draw(true);
+                },
+                () => this.ctx.drawTime,
+            ),
+        );
         this.draw();
     }
     private createContainer(
@@ -104,6 +118,7 @@ export default class EVirtTable {
     }
     draw(ignoreOverlayer = false) {
         requestAnimationFrame(() => {
+            const startTime = performance.now();
             this.header.update();
             this.footer.update();
             this.body.update();
@@ -116,7 +131,13 @@ export default class EVirtTable {
             if (!ignoreOverlayer) {
                 this.overlayer.draw();
             }
-            this.body.updateAutoHeight();
+            // 更新自动高度放在第二帧，避免影响绘制性能
+            requestAnimationFrame(() => {
+                this.body.updateAutoHeight();
+            });
+            const endTime = performance.now();
+            const drawTime = Math.round(endTime - startTime);
+            this.ctx.drawTime = drawTime * this.ctx.config.DRAW_TIME_MULTIPLIER;
         });
     }
     loadConfig(_config: ConfigType) {

@@ -167,6 +167,7 @@ export default class Context {
     database: Database;
     history: History;
     config: Config;
+    drawTime = 0;
 
     constructor(containerOptions: containerElementOptions, options: EVirtTableOptions) {
         const {

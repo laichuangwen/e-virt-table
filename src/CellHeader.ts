@@ -173,7 +173,7 @@ export default class CellHeader extends BaseCell {
             paint,
             config: { HEADER_FONT, CELL_PADDING },
         } = this.ctx;
-        
+        const cacheTextKey = `${this.displayText}_${this.drawTextWidth}`;
         this.ellipsis = paint.drawText(
             this.displayText,
             this.drawTextX,
@@ -189,6 +189,7 @@ export default class CellHeader extends BaseCell {
                 maxLineClamp: this.maxLineClamp,
                 offsetRight: this.column.sortBy ? 16 : 0, // 排序图标占位
                 offsetLeft: this.required ? 12 : 0, // 必填星号占位
+                cacheTextKey,
                 textCallback: (textInfo: TextInfo) => {
                     // 排序图标位置,需要跟随文字变化
                     if (this.column.sortBy) {
