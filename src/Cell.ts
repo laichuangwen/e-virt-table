@@ -1034,6 +1034,10 @@ export default class Cell extends BaseCell {
         if (!text) {
             return false;
         }
+        // 如果text 不是字符串,则转换为字符串
+        if (typeof text !== 'string') {
+            text = `${text}`;
+        }
         const cacheTextKey = `${text}_${this.drawTextWidth}`;
         this.ellipsis = this.ctx.paint.drawText(
             text,

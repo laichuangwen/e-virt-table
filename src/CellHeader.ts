@@ -330,7 +330,7 @@ export default class CellHeader extends BaseCell {
         if (this.render) {
             return '';
         }
-        return this.text;
+        return `${this.text}`;
     }
     /**
      * 获取样式
