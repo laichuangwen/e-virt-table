@@ -330,6 +330,9 @@ export default class CellHeader extends BaseCell {
         if (this.render) {
             return '';
         }
+        if (['', null, undefined].includes(this.text)) {
+            return '';
+        }
         return `${this.text}`;
     }
     /**
