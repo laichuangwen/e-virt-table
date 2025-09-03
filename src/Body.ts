@@ -134,20 +134,23 @@ export default class Body {
     }
     // 调整行的高度
     private initResizeRow() {
-        const {
-            config: { ENABLE_RESIZE_ROW },
-        } = this.ctx;
-        if (!ENABLE_RESIZE_ROW) {
-            return;
-        }
         this.ctx.on('resize', () => {
+            if (!this.ctx.config.ENABLE_RESIZE_ROW) {
+                return;
+            }
             this.containerRect = this.ctx.containerElement.getBoundingClientRect();
         });
         this.ctx.on('resizeObserver', () => {
+            if (!this.ctx.config.ENABLE_RESIZE_ROW) {
+                return;
+            }
             this.containerRect = this.ctx.containerElement.getBoundingClientRect();
         });
         // 鼠标移动
         this.ctx.on('mouseup', () => {
+            if (!this.ctx.config.ENABLE_RESIZE_ROW) {
+                return;
+            }
             this.isMouseDown = false;
             if (this.resizeDiff !== 0 && this.resizeTarget) {
                 // 调整宽度
@@ -163,6 +166,9 @@ export default class Body {
             this.clientY = 0;
         });
         this.ctx.on('mousedown', (e) => {
+            if (!this.ctx.config.ENABLE_RESIZE_ROW) {
+                return;
+            }
             if (!this.ctx.isTarget(e)) {
                 return;
             }
@@ -178,6 +184,9 @@ export default class Body {
             this.isMouseDown = true;
         });
         this.ctx.on('mousemove', (e) => {
+            if (!this.ctx.config.ENABLE_RESIZE_ROW) {
+                return;
+            }
             // 编辑中不触发mousemove
             if (this.ctx.editing) return;
             const { offsetY, offsetX } = this.ctx.getOffset(e);
