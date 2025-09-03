@@ -66,6 +66,8 @@ export default class Config {
     EMPTY_CUSTOM_STYLE: Partial<CSSStyleDeclaration> = {};
     /** 空数据文本 */
     EMPTY_TEXT = '暂无数据';
+    /** 加载文本 */
+    LOADING_TEXT = '加载中...';
     /** 最大高度，为 0 表示自适应高度根据 HEIGHT	 */
     MAX_HEIGHT = 1000;
     /** 区域边框圆角 */
@@ -84,6 +86,8 @@ export default class Config {
     BODY_BG_COLOR = '#FFF';
     /** 表头文本颜色 */
     HEADER_TEXT_COLOR = '#1D2129';
+    /** 必填*颜色 */
+    REQUIRED_COLOR = '#F56C6C';
     /** body文本颜色 */
     BODY_TEXT_COLOR = '#4E5969';
     /** footer文本颜色 */
@@ -98,6 +102,7 @@ export default class Config {
     SHRINK_ICON_SVG = '';
     /** 展开图标颜色 */
     EXPAND_ICON_COLOR = '#4E5969';
+    /** 收缩图标颜色 */
     SHRINK_ICON_COLOR = '#4E5969';
     /** 错误提示颜色 */
     ERROR_TIP_ICON_COLOR = 'red';
@@ -151,12 +156,28 @@ export default class Config {
     CHECKBOX_SIZE = 20;
     /** 选择框禁用图标 */
     CHECKBOX_DISABLED_SVG = '';
+    /** 选择框禁用图标颜色 */
+    CHECKBOX_DISABLED_COLOR = '#F1F2F4';
     /** 选择框选中图标 */
     CHECKBOX_CHECK_SVG = '';
     /** 选择框未中图标 */
     CHECKBOX_UNCHECK_SVG = '';
+    /** 选择框未中图标颜色 */
+    CHECKBOX_UNCHECK_COLOR = '#DDE0EA';
     /** 选择框半选中图标 */
     CHECKBOX_INDETERMINATE_SVG = '';
+    /** 选择框选中禁用图标 */
+    CHECKBOX_CHECK_DISABLED_SVG = '';
+    /** 选择框选中禁用图标颜色 */
+    CHECKBOX_CHECK_DISABLED_COLOR = '#DDE0EA';
+    /** 编辑图标 */
+    ICON_EDIT_SVG = '';
+    /** 编辑图标颜色 */
+    ICON_EDIT_COLOR = '#4E5969';
+    /** 选择图标 */
+    ICON_SELECT_SVG = '';
+    /** 选择图标颜色 */
+    ICON_SELECT_COLOR = '#4E5969';
     /** 启用严格排序，即不支持多列排序 */
     SORT_STRICTLY = true;
     /** 排序升序图标 */

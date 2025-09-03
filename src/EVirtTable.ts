@@ -24,6 +24,7 @@ import Overlayer from './Overlayer';
 import ContextMenu from './ContextMenu';
 import { mergeColCell, mergeRowCell, getSpanArrByRow, getSpanObjByColumn, throttle } from './util';
 import './style.css';
+import Loading from './Loading';
 
 export default class EVirtTable {
     private options: EVirtTableOptions;
@@ -38,6 +39,7 @@ export default class EVirtTable {
     private empty: Empty;
     private overlayer: Overlayer;
     private contextMenu: ContextMenu;
+    private loading: Loading;
     ctx: Context;
 
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
@@ -62,6 +64,7 @@ export default class EVirtTable {
         this.editor = new Editor(this.ctx);
         this.overlayer = new Overlayer(this.ctx);
         this.contextMenu = new ContextMenu(this.ctx);
+        this.loading = new Loading(this.ctx);
         // 节流绘制表格
         this.ctx.on(
             'draw',
@@ -170,7 +173,12 @@ export default class EVirtTable {
     }
 
     setLoading(loading: boolean) {
-        this.ctx.database.setLoading(loading);
+        this.ctx.loading = loading;
+        if (loading) {
+            this.loading.show();
+        } else {
+            this.loading.hide();
+        }
     }
     on(event: string, callback: EventCallback) {
         this.ctx.on(event, callback);
@@ -452,6 +460,7 @@ export default class EVirtTable {
         this.selector.destroy();
         this.autofill.destroy();
         this.contextMenu.destroy();
+        this.loading.destroy();
         this.ctx.destroy();
         this.ctx.containerElement.remove();
     }

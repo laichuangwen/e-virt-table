@@ -63,7 +63,7 @@ let columns: Column[] = [
         sort: 7,
         fixed: 'left',
         align: 'left',
-        
+
         hoverIconName: 'icon-edit',
         placeholder: '请输入',
         // maxLineClamp: 3,
@@ -234,7 +234,7 @@ let columns: Column[] = [
         hoverIconName: 'icon-date',
         sort: 2,
     },
-    { title: '工作地址', key: 'work_address'},
+    { title: '工作地址', key: 'work_address' },
     {
         title: '家庭地址',
         key: 'address',
@@ -1080,6 +1080,7 @@ document.getElementById('setConfig')?.addEventListener('click', () => {
     });
 });
 document.getElementById('loadData')?.addEventListener('click', () => {
+    eVirtTable.setLoading(true);
     let data: any[] = [];
     for (let i = 0; i < 500; i += 1) {
         data.push({
@@ -1145,7 +1146,12 @@ document.getElementById('loadData')?.addEventListener('click', () => {
             ],
         });
     }
-    eVirtTable.loadData(data);
+    setTimeout(() => {
+        eVirtTable.loadData(data);
+        eVirtTable.setLoading(false);
+    }, 3000);
+ 
+  
 });
 
 document.getElementById('clearEditableData')?.addEventListener('click', () => {

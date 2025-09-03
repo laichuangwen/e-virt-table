@@ -362,3 +362,16 @@ V1.2.31
 fix:修复title传数字会出现异常
 
 ---
+
+V1.2.32
+### Bug Fixes
+
+feat:添加必填*配置颜色
+fix:setLoading不生效
+fix:#92动态修改调整行列无效
+fix:修复设置maxLineClamp导致verticalAlign=bottom 计算错误
+feat:可以调整checkbox的边框颜色,及拓展部分图标也可也控制颜色
+fix:column.title没设置会出现undefined
+fix:type='selection' title=‘’ 的列过窄会出现tooltip
+
+---
