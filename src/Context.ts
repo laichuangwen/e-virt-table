@@ -19,6 +19,7 @@ export type containerElementOptions = {
     editorElement: HTMLDivElement;
     emptyElement?: HTMLDivElement;
     contextMenuElement?: HTMLDivElement;
+    loadingElement?: HTMLDivElement;
 };
 export type HeaderOptions = {
     x: number;
@@ -80,6 +81,7 @@ export default class Context {
     editorElement: HTMLDivElement;
     emptyElement?: HTMLDivElement;
     contextMenuElement?: HTMLDivElement;
+    loadingElement?: HTMLDivElement;
     stageWidth = 0;
     stageHeight = 0;
     paint: Paint;
@@ -96,6 +98,7 @@ export default class Context {
     selectorMove = false; // 选择器移动中
     adjustPositioning = false; // 调整位置中
     editing = false; // 编辑中
+    loading = false; // 加载中
     onlyMergeCell = false; // 只有合并单元格
     selectOnlyOne = false; // 只选择一个
     hasSelection = false; // 是否有选中
@@ -177,6 +180,7 @@ export default class Context {
             overlayerElement,
             editorElement,
             emptyElement,
+            loadingElement,
             contextMenuElement,
         } = containerOptions;
         this.containerElement = containerElement;
@@ -186,6 +190,7 @@ export default class Context {
         this.overlayerElement = overlayerElement;
         this.editorElement = editorElement;
         this.emptyElement = emptyElement;
+        this.loadingElement = loadingElement;
         this.contextMenuElement = contextMenuElement;
         this.config = new Config(options.config || {});
         this.eventBus = new EventBus();

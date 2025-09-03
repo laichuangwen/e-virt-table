@@ -492,6 +492,9 @@ export default class EventTable {
         const y = offsetY;
         const x = offsetX;
 
+        if (this.ctx.loading) {
+            return true;
+        }
         if (!this.ctx.isTarget(e)) {
             return true;
         }

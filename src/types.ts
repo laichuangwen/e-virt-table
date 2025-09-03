@@ -12,6 +12,7 @@ export type EVirtTableOptions = {
     editorElement?: HTMLDivElement;
     emptyElement?: HTMLDivElement;
     contextMenuElement?: HTMLDivElement;
+    loadingElement?: HTMLDivElement;
 };
 
 export type EventCallback = (...args: any[]) => void;
@@ -46,7 +47,6 @@ export type TypeCheckbox =
     | 'checkbox-check'
     | 'checkbox-check-disabled'
     | 'checkbox-disabled'
-    | 'checkbox-hover'
     | 'checkbox-indeterminate';
 export type CellType = 'header' | 'body' | 'footer';
 export type FooterPosition = 'top' | 'bottom';

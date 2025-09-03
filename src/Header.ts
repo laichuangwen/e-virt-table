@@ -105,13 +105,10 @@ export default class Header {
     }
     // 调整表头的宽度
     private initResizeColumn() {
-        const {
-            config: { ENABLE_RESIZE_COLUMN },
-        } = this.ctx;
-        if (!ENABLE_RESIZE_COLUMN) {
-            return;
-        }
         this.ctx.on('mousedown', (e) => {
+            if (!this.ctx.config.ENABLE_RESIZE_COLUMN) {
+                return;
+            }
             if (!this.ctx.isTarget(e)) {
                 return;
             }
@@ -125,6 +122,9 @@ export default class Header {
             this.isMouseDown = true;
         });
         this.ctx.on('mouseup', () => {
+            if (!this.ctx.config.ENABLE_RESIZE_COLUMN) {
+                return;
+            }
             this.isMouseDown = false;
             // 清空
             if (this.resizeDiff !== 0 && this.resizeTarget) {
@@ -139,6 +139,9 @@ export default class Header {
             this.resizeDiff = 0;
         });
         this.ctx.on('mousemove', (e) => {
+            if (!this.ctx.config.ENABLE_RESIZE_COLUMN) {
+                return;
+            }
             // 编辑中不触发mousemove
             if (this.ctx.editing) return;
             const {

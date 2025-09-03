@@ -244,6 +244,10 @@ export class Paint {
         this.ctx.font = font;
         this.ctx.fillStyle = color;
         this.ctx.textAlign = align;
+        if (['', null, undefined].includes(text)) {
+            this.ctx.restore();
+            return false;
+        }
         const fontSize = parseInt(font.match(/\d+/)?.[0] || '12');
         const lineHeight = fontSize * (options.lineHeight || 1.2); // 默认行高为字体大小的1.2倍
         const availableWidth = width - padding * 2 - offsetLeft - offsetRight;
@@ -262,7 +266,7 @@ export class Paint {
         let totalTextLine = Math.min(lines.length, Math.max(maxTextLine, 1));
         if (maxLineClamp === 'auto' && autoRowHeight) {
             totalTextLine = lines.length;
-        } else if (typeof maxLineClamp === 'number' && maxLineClamp < maxTextLine) {
+        } else if (typeof maxLineClamp === 'number' && maxLineClamp < totalTextLine) {
             totalTextLine = maxLineClamp;
         } else {
             // 处理边界问题

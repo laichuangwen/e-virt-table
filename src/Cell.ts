@@ -1031,7 +1031,7 @@ export default class Cell extends BaseCell {
             text = placeholder;
             color = PLACEHOLDER_COLOR;
         }
-        if (!text) {
+        if (['', null, undefined].includes(text)) {
             return false;
         }
         // 如果text 不是字符串,则转换为字符串

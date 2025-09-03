@@ -24,7 +24,6 @@ import { generateShortUUID, toLeaf, compareDates } from './util';
 import { HistoryItemData } from './History';
 import Cell from './Cell';
 export default class Database {
-    private loading = false;
     private ctx: Context;
     private data: any[];
     private columns: Column[];
@@ -59,7 +58,6 @@ export default class Database {
         this.data = data;
         this.footerData = footerData;
         this.columns = columns;
-        this.setLoading(true);
         this.init();
     }
     // 初始化默认不忽略清空改变值和校验map
@@ -260,7 +258,6 @@ export default class Database {
     }
     setData(data: any[]) {
         this.data = data;
-        this.setLoading(true);
         this.init();
     }
     /**
@@ -1687,13 +1684,6 @@ export default class Database {
             offsetLeft,
             dataList,
         };
-    }
-    setLoading(loading: boolean) {
-        this.loading = loading;
-        this.ctx.emit('loadingChange', loading);
-    }
-    getLoading() {
-        return this.loading;
     }
     setValidationErrorByRowIndex(rowIndex: number, key: string, message: string) {
         const rowKey = this.rowIndexRowKeyMap.get(rowIndex);
