@@ -266,7 +266,7 @@ export class Paint {
         let totalTextLine = Math.min(lines.length, Math.max(maxTextLine, 1));
         if (maxLineClamp === 'auto' && autoRowHeight) {
             totalTextLine = lines.length;
-        } else if (typeof maxLineClamp === 'number' && maxLineClamp < maxTextLine) {
+        } else if (typeof maxLineClamp === 'number' && maxLineClamp < totalTextLine) {
             totalTextLine = maxLineClamp;
         } else {
             // 处理边界问题
