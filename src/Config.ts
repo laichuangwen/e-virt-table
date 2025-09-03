@@ -66,6 +66,8 @@ export default class Config {
     EMPTY_CUSTOM_STYLE: Partial<CSSStyleDeclaration> = {};
     /** 空数据文本 */
     EMPTY_TEXT = '暂无数据';
+    /** 加载文本 */
+    LOADING_TEXT = '加载中...';
     /** 最大高度，为 0 表示自适应高度根据 HEIGHT	 */
     MAX_HEIGHT = 1000;
     /** 区域边框圆角 */

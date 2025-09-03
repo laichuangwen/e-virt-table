@@ -12,6 +12,7 @@ export type EVirtTableOptions = {
     editorElement?: HTMLDivElement;
     emptyElement?: HTMLDivElement;
     contextMenuElement?: HTMLDivElement;
+    loadingElement?: HTMLDivElement;
 };
 
 export type EventCallback = (...args: any[]) => void;

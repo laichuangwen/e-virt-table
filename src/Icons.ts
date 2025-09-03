@@ -215,4 +215,7 @@ export default class Icons {
     get(name: string) {
         return this.icons.get(name);
     }
+    getSvg(name: string) {
+        return this.list.find((item) => item.name === name);
+    }
 }
