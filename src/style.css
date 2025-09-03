@@ -34,6 +34,11 @@
     --evt-autofill-point-border-color: #fff;
     --evt-edit-bg-color: #fcf6ed;
     --evt-checkbox-color: var(--evt-color-primary);
+    --evt-checkbox-uncheck-color: #dde0ea;
+    --evt-checkbox-disabled-color: #F1F2F4;
+    --evt-checkbox-check-disabled-color: #DDE0EA;
+    --evt-icon-edit-color: #4E5969;
+    --evt-icon-select-color: #4E5969;
     --evt-readonly-color: #fff;
     --evt-readonly-text-color: var(--evt-body-text-color);
     --evt-error-tip-color: #ed3f14;
