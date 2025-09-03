@@ -86,6 +86,8 @@ export default class Config {
     BODY_BG_COLOR = '#FFF';
     /** 表头文本颜色 */
     HEADER_TEXT_COLOR = '#1D2129';
+    /** 必填*颜色 */
+    REQUIRED_COLOR = '#F56C6C';
     /** body文本颜色 */
     BODY_TEXT_COLOR = '#4E5969';
     /** footer文本颜色 */

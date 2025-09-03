@@ -171,7 +171,7 @@ export default class CellHeader extends BaseCell {
     private drawText() {
         const {
             paint,
-            config: { HEADER_FONT, CELL_PADDING },
+            config: { HEADER_FONT, CELL_PADDING, REQUIRED_COLOR },
         } = this.ctx;
         const cacheTextKey = `${this.displayText}_${this.drawTextWidth}`;
         this.ellipsis = paint.drawText(
@@ -197,20 +197,13 @@ export default class CellHeader extends BaseCell {
                         this.drawSortImageY = textInfo.top + (textInfo.height - 16) / 2;
                     }
                     if (this.required) {
-                        paint.drawText(
-                            '*',
-                            textInfo.left - 18,
-                            textInfo.top + (textInfo.height - 12) / 2,
-                            24,
-                            24,
-                            {
-                                color: 'red',
-                                font: '18px Arial',
-                                align: 'center',
-                                verticalAlign: 'middle',
-                                padding: 0,
-                            },
-                        );
+                        paint.drawText('*', textInfo.left - 18, textInfo.top + (textInfo.height - 12) / 2, 24, 24, {
+                            color: REQUIRED_COLOR,
+                            font: '18px Arial',
+                            align: 'center',
+                            verticalAlign: 'middle',
+                            padding: 0,
+                        });
                     }
                 },
             },
