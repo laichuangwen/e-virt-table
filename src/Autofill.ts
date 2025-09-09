@@ -32,6 +32,10 @@ export default class Autofill {
                 // 引进到点
                 this.ctx.stageElement.style.cursor = 'crosshair';
             }
+            // 自动填充移动时，调整滚动条位置
+            if (this.ctx.autofillMove) {
+                this.ctx.startAdjustPosition(e);
+            }
         });
         this.ctx.on('cellMouseenter', (cell) => {
             const { xArr, yArr } = this.ctx.selector;
@@ -50,6 +54,8 @@ export default class Autofill {
         });
         this.ctx.on('mouseup', () => {
             this.setMouseUp();
+            // 停止调整位置
+            this.ctx.stopAdjustPosition();
         });
     }
     /**

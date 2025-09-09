@@ -6,12 +6,7 @@ import { throttle, decodeSpreadsheetStr, encodeToSpreadsheetStr } from './util';
 export default class Selector {
     private isCut = false;
     private isMultipleRow = false;
-    private mousedownHeader = false;
     private ctx: Context;
-    private adjustPositionX = '';
-    private adjustPositionY = '';
-    private timerX = 0; // 水平滚动定时器
-    private timerY = 0; // 垂直滚动定时器
 
     constructor(ctx: Context) {
         this.ctx = ctx;
@@ -25,20 +20,8 @@ export default class Selector {
         this.ctx.on(
             'mousemove',
             throttle((e) => {
-                const { offsetY, offsetX } = this.ctx.getOffset(e);
-                const isInsideBody =
-                    this.ctx.isTarget(e) &&
-                    offsetX > 0 &&
-                    offsetX < this.ctx.body.visibleWidth &&
-                    offsetY > this.ctx.header.visibleHeight &&
-                    offsetY < this.ctx.header.visibleHeight + this.ctx.body.visibleHeight;
-                if (this.ctx.selectorMove || this.ctx.autofillMove) {
-                    // 如果是body外部就调整位置
-                    if (!isInsideBody && !this.mousedownHeader) {
-                        this.startAdjustPosition(e);
-                    } else {
-                        this.stopAdjustPosition();
-                    }
+                if (this.ctx.selectorMove) {
+                    this.ctx.startAdjustPosition(e);
                 }
             }, 100),
         );
@@ -88,7 +71,8 @@ export default class Selector {
             this.ctx.emit('selectorClick', cell);
         });
         this.ctx.on('mouseup', () => {
-            this.mousedownHeader = false;
+            this.ctx.selectorMove = false;
+            this.ctx.stopAdjustPosition();
             // mousedown销毁dom会导致click事件清除
             // 加个setTimeout小延迟一下，使得editor cellClick 判断adjustPositioning正常
             const timer = setTimeout(() => {
@@ -114,7 +98,6 @@ export default class Selector {
             if (style.userSelect !== 'text') {
                 e.preventDefault();
             }
-            this.mousedownHeader = true;
             this.selectCols(cell);
         });
         this.ctx.on('keydown', (e) => {
@@ -187,10 +170,6 @@ export default class Selector {
         this.ctx.on('setSelectorCell', (cell: Cell) => {
             this.ctx.setFocusCell(cell);
             this.click();
-        });
-        this.ctx.on('mouseup', () => {
-            this.ctx.selectorMove = false;
-            this.stopAdjustPosition();
         });
     }
     private setSelector(xArr: number[], yArr: number[]) {
@@ -277,6 +256,18 @@ export default class Selector {
             }
             this.ctx.selector.xArr = _xArr;
             this.ctx.selector.yArr = _yArr;
+            // 判断是否选择列中
+            if (maxY === this.ctx.maxRowIndex && minY === 0) {
+                this.ctx.selectColsIng = true;
+            } else {
+                this.ctx.selectColsIng = false;
+            }
+            // 判断是否选择行中
+            if (maxX === this.ctx.maxColIndex && minX === 0) {
+                this.ctx.selectRowsIng = true;
+            } else {
+                this.ctx.selectRowsIng = false;
+            }
             this.ctx.emit('setSelector', this.ctx.selector);
             this.ctx.emit('drawView');
         }
@@ -284,6 +275,14 @@ export default class Selector {
     private adjustMergeCells(xArr: number[], yArr: number[]) {
         const [minY, maxY] = yArr;
         const [minX, maxX] = xArr;
+        // 如果是选择行或列中就不处理，因为会导致性能问题
+        if ((maxY === this.ctx.maxRowIndex && minY === 0) || (maxX === this.ctx.maxColIndex && minX === 0)) {
+            return {
+                xArr,
+                yArr,
+                onlyMergeCell: false,
+            };
+        }
         let topBottomCells: Cell[] = [];
         let leftRightCells: Cell[] = [];
         // 遍历选择中的单元格
@@ -375,7 +374,6 @@ export default class Selector {
         const maxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex - SELECTOR_AREA_MAX_Y_OFFSET;
         if (this.ctx.mousedown && this.ctx.focusCellHeader) {
             const { colIndex } = this.ctx.focusCellHeader;
-            //
             this.ctx.clearSelector();
             if (cell.colIndex >= colIndex) {
                 const xArr = [colIndex, cell.colIndex + cell.colspan - 1];
@@ -826,18 +824,6 @@ export default class Selector {
         this.ctx.emit('moveFocus', cell);
         this.ctx.emit('draw');
     }
-    private stopAdjustPosition() {
-        this.adjustPositionX = '';
-        this.adjustPositionY = '';
-        if (this.timerX) {
-            clearInterval(this.timerX);
-            this.timerX = 0;
-        }
-        if (this.timerY) {
-            clearInterval(this.timerY);
-            this.timerY = 0;
-        }
-    }
     // 判断是否在设置范围内
     private isInSettingRange(rowIndex: number, colIndex: number) {
         const {
@@ -865,65 +851,6 @@ export default class Selector {
             return false;
         }
         return true;
-    }
-    /**
-     * 调整滚动条位置，让到达边界时自动滚动
-     */
-    private startAdjustPosition(e: MouseEvent) {
-        const { offsetX, offsetY } = this.ctx.getOffset(e);
-        let positionX = '';
-        let positionY = '';
-        if (offsetX < 0) {
-            positionX = 'left';
-        } else if (offsetX > this.ctx.body.visibleWidth) {
-            positionX = 'right';
-        }
-        if (offsetY < this.ctx.header.visibleHeight) {
-            positionY = 'top';
-        } else if (offsetY > this.ctx.header.visibleHeight + this.ctx.body.visibleHeight) {
-            positionY = 'bottom';
-        }
-        if (positionX && this.adjustPositionX !== positionX) {
-            this.adjustPositionX = positionX;
-            const position = positionX === 'left' ? -1 : 1;
-            let scrollSpeedX = 10 * position; // 滚动速度
-            if (this.timerX) {
-                clearInterval(this.timerX);
-                this.timerX = 0;
-            }
-            this.timerX = setInterval(() => {
-                // 增加滚动速度
-                scrollSpeedX *= 1.5; // 加速因子
-                const { scrollX } = this.ctx;
-                const num = scrollX + scrollSpeedX;
-                if (num < 0 || num > this.ctx.body.width) {
-                    clearInterval(this.timerX);
-                    this.timerX = 0;
-                }
-                this.ctx.setScrollX(num);
-            }, 100); // 每100毫秒执行一次
-        }
-
-        if (positionY && this.adjustPositionY !== positionY) {
-            this.adjustPositionY = positionY;
-            const position = positionY === 'top' ? -1 : 1;
-            let scrollSpeedY = 10 * position; // 滚动速度
-            if (this.timerY) {
-                clearInterval(this.timerY);
-                this.timerY = 0;
-            }
-            this.timerY = setInterval(() => {
-                // 增加滚动速度
-                scrollSpeedY *= 1.5; // 加速因子
-                const { scrollY } = this.ctx;
-                const num = scrollY + scrollSpeedY;
-                if (num < 0 || num > this.ctx.body.height) {
-                    clearInterval(this.timerY);
-                    this.timerY = 0;
-                }
-                this.ctx.setScrollY(num);
-            }, 100); // 每100毫秒执行一次
-        }
     }
     /**
      * 调整滚动条位置，让焦点单元格始终出现在可视区域内
@@ -989,14 +916,5 @@ export default class Selector {
             this.ctx.emit('adjustBoundaryPosition', focusCell);
         }
     }
-    destroy() {
-        if (this.timerX) {
-            clearTimeout(this.timerX);
-            this.timerX = 0;
-        }
-        if (this.timerY) {
-            clearTimeout(this.timerY);
-            this.timerY = 0;
-        }
-    }
+    destroy() {}
 }

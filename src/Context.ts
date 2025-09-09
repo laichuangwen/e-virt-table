@@ -96,6 +96,8 @@ export default class Context {
     scrollerFocus = false; // 滚动条focus中
     autofillMove = false; // 自动填充移动中
     selectorMove = false; // 选择器移动中
+    selectColsIng = false; // 选择列中
+    selectRowsIng = false; // 选择行中
     adjustPositioning = false; // 调整位置中
     editing = false; // 编辑中
     loading = false; // 加载中
@@ -354,6 +356,12 @@ export default class Context {
             scrollY = scrollMaxY;
         }
         this.emit('setScrollY', scrollY);
+    }
+    startAdjustPosition(e: MouseEvent) {
+        this.emit('startAdjustPosition', e);
+    }
+    stopAdjustPosition() {
+        this.emit('stopAdjustPosition');
     }
     isTarget(e: Event): boolean {
         if (!this.containerElement.contains(e.target as Node)) {

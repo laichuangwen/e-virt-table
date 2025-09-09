@@ -296,6 +296,11 @@ export default class Scroller {
     private ctx: Context;
     private verticalScrollbar: Scrollbar;
     private horizontalScrollbar: Scrollbar;
+    private mousedownHeader = false; // 是否点击了表头,点击头部处理滚动条调整位置
+    private adjustPositionX = '';
+    private adjustPositionY = '';
+    private timerX = 0; // 水平滚动定时器
+    private timerY = 0; // 垂直滚动定时器
 
     constructor(ctx: Context) {
         this.ctx = ctx;
@@ -317,6 +322,15 @@ export default class Scroller {
         });
         this.ctx.on('setScrollY', (scrollY: number) => {
             this.setScrollY(scrollY);
+        });
+        this.ctx.on('cellHeaderMousedown', () => {
+            this.mousedownHeader = true;
+        });
+        this.ctx.on('startAdjustPosition', (e: MouseEvent) => {
+            this.startAdjustPosition(e);
+        });
+        this.ctx.on('stopAdjustPosition', () => {
+            this.stopAdjustPosition();
         });
     }
 
@@ -350,6 +364,7 @@ export default class Scroller {
     }
 
     onMouseUp() {
+        this.mousedownHeader = false;
         this.verticalScrollbar.onMouseUp();
         this.horizontalScrollbar.onMouseUp();
         this.ctx.scrollerMove = false;
@@ -417,9 +432,94 @@ export default class Scroller {
         const { body, database } = this.ctx;
         const rowIndex = database.getRowIndexForRowKey(rowKey);
         if (rowIndex === undefined) {
-            return; 
+            return;
         }
         const { top } = database.getPositionForRowIndex(rowIndex);
         this.setScrollY(top - body.visibleHeight / 2);
+    }
+    /**
+     * 调整滚动条位置，让到达边界时自动滚动
+     */
+    private startAdjustPosition(e: MouseEvent) {
+        const { offsetX, offsetY } = this.ctx.getOffset(e);
+        let positionX = '';
+        let positionY = '';
+        if (this.ctx.focusCell?.fixed !== 'left' && offsetX < this.ctx.fixedLeftWidth) {
+            positionX = 'left';
+        } else if (
+            this.ctx.focusCell?.fixed !== 'right' &&
+            offsetX > this.ctx.body.visibleWidth - this.ctx.fixedRightWidth
+        ) {
+            positionX = 'right';
+        } else {
+            positionX = '';
+            this.stopAdjustPosition(true, false);
+        }
+
+        if (!this.mousedownHeader && offsetY < this.ctx.header.visibleHeight) {
+            positionY = 'top';
+        } else if (offsetY > this.ctx.header.visibleHeight + this.ctx.body.visibleHeight) {
+            positionY = 'bottom';
+        } else {
+            positionY = '';
+            this.stopAdjustPosition(false, true);
+        }
+        if (positionX && this.adjustPositionX !== positionX) {
+            this.adjustPositionX = positionX;
+            const position = positionX === 'left' ? -1 : 1;
+            let scrollSpeedX = 10 * position; // 滚动速度
+            if (this.timerX) {
+                clearInterval(this.timerX);
+                this.timerX = 0;
+            }
+            this.timerX = setInterval(() => {
+                // 增加滚动速度
+                scrollSpeedX *= 1.5; // 加速因子
+                const { scrollX } = this.ctx;
+                const num = scrollX + scrollSpeedX;
+                if (num < 0 || num > this.ctx.body.width) {
+                    clearInterval(this.timerX);
+                    this.timerX = 0;
+                }
+                this.ctx.setScrollX(num);
+            }, 100); // 每100毫秒执行一次
+        }
+
+        if (positionY && this.adjustPositionY !== positionY) {
+            this.adjustPositionY = positionY;
+            const position = positionY === 'top' ? -1 : 1;
+            let scrollSpeedY = 10 * position; // 滚动速度
+            if (this.timerY) {
+                clearInterval(this.timerY);
+                this.timerY = 0;
+            }
+            this.timerY = setInterval(() => {
+                // 增加滚动速度
+                scrollSpeedY *= 1.5; // 加速因子
+                const { scrollY } = this.ctx;
+                const num = scrollY + scrollSpeedY;
+                if (num < 0 || num > this.ctx.body.height) {
+                    clearInterval(this.timerY);
+                    this.timerY = 0;
+                }
+                this.ctx.setScrollY(num);
+            }, 100); // 每100毫秒执行一次
+        }
+    }
+    private stopAdjustPosition(x = true, y = true) {
+        if (x) {
+            this.adjustPositionX = '';
+            if (this.timerX) {
+                clearInterval(this.timerX);
+                this.timerX = 0;
+            }
+        }
+        if (y) {
+            this.adjustPositionY = '';
+            if (this.timerY) {
+                clearInterval(this.timerY);
+                this.timerY = 0;
+            }
+        }
     }
 }
