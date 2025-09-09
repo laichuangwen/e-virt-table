@@ -251,14 +251,7 @@ export class Paint {
         const fontSize = parseInt(font.match(/\d+/)?.[0] || '12');
         const lineHeight = fontSize * (options.lineHeight || 1.2); // 默认行高为字体大小的1.2倍
         const availableWidth = width - padding * 2 - offsetLeft - offsetRight;
-        const ellipsesWidth = this.ctx.measureText('...').width;
         let textEllipsis = false;
-        // 如果宽度小于省略号宽度,
-        if (width <= ellipsesWidth + padding * 2 + offsetLeft + offsetRight) {
-            this.ctx.restore();
-            textEllipsis = true;
-            return textEllipsis;
-        }
         // 计算总行数,向上取整round
         const maxTextLine = Math.round((height - 2 * padding) / lineHeight);
         // 将文本按可用宽度分割成行,如果为1直接就不计算了,直接绘制
@@ -301,7 +294,7 @@ export class Paint {
             this.ctx.textBaseline = 'top';
             // 如果设置了lineClamp，则只绘制lineClamp行
             if (i === totalTextLine - 1) {
-                //截取剩余lines
+                //截取剩余lines，组合成字符串处理省略号
                 const remainingLines = lines.slice(i);
                 const remainingText = remainingLines.join('');
                 const { _text, ellipsis } = this.handleEllipsis(remainingText, width, padding, font);
@@ -313,7 +306,11 @@ export class Paint {
         }
         // 文字信息回调，用于画跟随图标的
         if (options.textCallback && lines.length) {
-            const textMaxWidth = Math.round(this.ctx.measureText(lines[0]).width);
+            // 取最长行
+            const maxLineWidth = lines.reduce((max, line) => {
+                return Math.max(max, this.ctx.measureText(line).width);
+            }, 0);
+            const textMaxWidth = Math.round(maxLineWidth);
             let left = startX;
             let right = startX + textMaxWidth;
             if (align === 'center') {
@@ -366,7 +363,6 @@ export class Paint {
             for (const word of words) {
                 const testLine = currentLine + word;
                 const testWidth = this.ctx.measureText(testLine).width;
-
                 if (testWidth <= maxWidth) {
                     currentLine = testLine;
                 } else {
@@ -383,16 +379,6 @@ export class Paint {
 
             if (currentLine) {
                 lines.push(currentLine);
-            }
-        }
-        // 处理溢出刚好和...溢出问题
-        if (lines.length >= 1) {
-            const lastLine = lines[lines.length - 1];
-            const { ellipsis } = this.handleEllipsis(lastLine, maxWidth, 0, this.ctx.font);
-            if (ellipsis) {
-                const newLine = lastLine.slice(0, -1);
-                lines[lines.length - 1] = newLine;
-                lines.push(lastLine.slice(-1));
             }
         }
         const result = lines.length > 0 ? lines : [''];
@@ -473,7 +459,7 @@ export class Paint {
         const textWidth = this.ctx.measureText(text).width;
         const lineWidth = width - padding * 2;
         // 单行文本省略
-        if (textWidth && textWidth  >= lineWidth) {
+        if (textWidth && textWidth >= lineWidth) {
             ellipsis = true;
             // text字符截取并添加省略号
             let textLength = 0;
