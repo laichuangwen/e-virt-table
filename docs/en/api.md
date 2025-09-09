@@ -68,6 +68,7 @@ type EVirtTableOptions = {
 | SELECT_ROW_COL_BG_COLOR | Background color of the current focus cell row and column | string | — | `rgba(82,146,247,0.1)` |
 | EDIT_BG_COLOR | Editable background color | string | — | `rgba(221,170,83,0.1)` |
 | AUTOFILL_POINT_BORDER_COLOR | Autofill point border color | string | — | #fff |
+| CHECKBOX_KEY | Select key, after setting, the data will be checked according to the key association | string | - |
 | CHECKBOX_COLOR | Checkbox color | string | — | `rgb(82,146,247)` |
 | CHECKBOX_SIZE | Checkbox size | number | — | 20 |
 | CHECKBOX_CHECK_SVG | Checkbox checked icon | string | — | — |
@@ -278,6 +279,7 @@ type EVirtTableOptions = {
 | sortDescIconName | Descending sort icon | `string` | — | — |
 | rules | Validation rules | Rules | — | — |
 | maxLineClamp | Maximum overflow truncation lines, default `auto` expands based on content | `auto,number` | auto |
+| maxLineClampHeader | Maximum overflow truncation lines, default `auto` expands based on content | `auto,number` | auto |
 | autoRowHeight | Adaptive row height | boolean | false |
 
 ## Row
