@@ -266,11 +266,11 @@ export class Paint {
         let totalTextLine = Math.min(lines.length, Math.max(maxTextLine, 1));
         if (maxLineClamp === 'auto' && autoRowHeight) {
             totalTextLine = lines.length;
-        } else if (typeof maxLineClamp === 'number' && maxLineClamp < totalTextLine) {
+        } else if (typeof maxLineClamp === 'number' && maxLineClamp < totalTextLine && maxLineClamp !== 1) {
             totalTextLine = maxLineClamp;
         } else {
             // 处理边界问题
-            if (maxLineClamp === 1 && !autoRowHeight) {
+            if (maxLineClamp === 1) {
                 lines = [text];
                 totalTextLine = 1;
             }
@@ -294,7 +294,6 @@ export class Paint {
         } else if (align === 'right') {
             startX = x + width - padding - offsetRight;
         }
-
         // 绘制每一行用for循环
         for (let i = 0; i < lines.length; i++) {
             const lineText = lines[i];
@@ -302,7 +301,10 @@ export class Paint {
             this.ctx.textBaseline = 'top';
             // 如果设置了lineClamp，则只绘制lineClamp行
             if (i === totalTextLine - 1) {
-                const { _text, ellipsis } = this.handleEllipsis(lineText, width, padding, font);
+                //截取剩余lines
+                const remainingLines = lines.slice(i);
+                const remainingText = remainingLines.join('');
+                const { _text, ellipsis } = this.handleEllipsis(remainingText, width, padding, font);
                 this.ctx.fillText(_text, startX, lineY);
                 textEllipsis = ellipsis;
                 break;
@@ -471,7 +473,7 @@ export class Paint {
         const textWidth = this.ctx.measureText(text).width;
         const lineWidth = width - padding * 2;
         // 单行文本省略
-        if (textWidth && textWidth + ellipsesWidth >= lineWidth) {
+        if (textWidth && textWidth  >= lineWidth) {
             ellipsis = true;
             // text字符截取并添加省略号
             let textLength = 0;
