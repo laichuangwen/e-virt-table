@@ -164,6 +164,7 @@ export interface Column {
     options?: any;
     selectorCellValueType?: SelectorCellValueType;
     maxLineClamp?: LineClampType; // 行高超出多少行显示省略号
+    maxLineClampHeader?: LineClampType; // 表头行高超出多少行显示省略号
 }
 export type LineClampType = number | 'auto';
 export type HistoryAction = 'back' | 'forward' | 'none';

@@ -69,6 +69,7 @@ type EVirtTableOptions = {
 | SELECT_ROW_COL_BG_COLOR | 当前焦点单元格所在行、列的背景色 | string | `rgba(82,146,247,0.1)` |
 | EDIT_BG_COLOR | 可编辑背景色 | string | `rgba(221,170,83,0.1)` |
 | AUTOFILL_POINT_BORDER_COLOR | 填充点的边框颜色 | string | #fff |
+| CHECKBOX_KEY | 选择key,设置后会根据key关联勾选数据 | string | - |
 | CHECKBOX_COLOR | 选择框颜色 | string | `rgb(82,146,247)` |
 | CHECKBOX_SIZE | 选择框大小 | number | 20 |
 | CHECKBOX_CHECK_SVG | 选择框选中图标 | string | — |
@@ -280,6 +281,7 @@ type EVirtTableOptions = {
 | sortDescIconName | 降序排序图标 | `string` | — |
 | rules | 校验规则 | Rules | — |
 | maxLineClamp | 最大溢出截断行数，默认`auto`根据内容撑开 | `auto,number` | auto |
+| maxLineClampHeader | 表头最大溢出截断行数，默认`auto`根据内容撑开 | `auto,number` | auto |
 | autoRowHeight | 当前列行自适应高度 | boolean | false |
 
 ## Row
