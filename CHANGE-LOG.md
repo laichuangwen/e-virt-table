@@ -173,42 +173,42 @@ V1.2.2
 
 V1.2.3
 ### Bug Fixes
-feat: 支持使用 Shift + Tab 键向左移动焦点
-feat: 支持使用 Tab 键在编辑状态下移动焦点
+- feat: 支持使用 Shift + Tab 键向左移动焦点
+- feat: 支持使用 Tab 键在编辑状态下移动焦点
 ---
 
 V1.2.4(废弃)
 ### Bug Fixes
-feat: 添加css全局变量及暗黑主题切换
-docs: 更新主题文档
+- feat: 添加css全局变量及暗黑主题切换
+- docs: 更新主题文档
 ---
 
 V1.2.5
 ### Bug Fixes
-fix: 修复css全局变量比config优先级
+- fix: 修复css全局变量比config优先级
 ---
 
 V1.2.6
 ### Bug Fixes
-fix: 去除复制粘贴剪切阻止默认行为
+- fix: 去除复制粘贴剪切阻止默认行为
 ---
 
 V1.2.7
 ### Bug Fixes
-fix:修复过滤数据后，编辑数据会错乱
+- fix:修复过滤数据后，编辑数据会错乱
 ---
 
 V1.2.8
 ### Bug Fixes
-fix: 修复tree溢出文本显示的错误
-docs: 更新ENABLE_HISTORY默认值为false
-docs: 更新tree文档
+- fix: 修复tree溢出文本显示的错误
+- docs: 更新ENABLE_HISTORY默认值为false
+- docs: 更新tree文档
 ---
 
 V1.2.9
 ### Bug Fixes
-fix: 主题css字体样式失效
-feat: body,footer文本颜色配置
+- fix: 主题css字体样式失效
+- feat: body,footer文本颜色配置
 ---
 
 V1.2.10
@@ -218,160 +218,170 @@ fix: 浏览器修复部分缩放canvas字体会糊
 
 V1.2.11
 ### Bug Fixes
-fix: 废除ENABLE_RESERVE_SELECTION属性，默认支持跨页选
-fix: 在handleContextMenu中添加preventDefault以防止默认右键菜单
-feat: 添加列宽度的最小和最大限制
-fix: 修复tree重新加载数据会恢复初始状态
-fix: 修复列宽调整后双击错乱
-feat: 添加获取高亮行功能并更新相关逻辑
+- fix: 废除ENABLE_RESERVE_SELECTION属性，默认支持跨页选
+- fix: 在handleContextMenu中添加preventDefault以防止默认右键菜单
+- feat: 添加列宽度的最小和最大限制
+- fix: 修复tree重新加载数据会恢复初始状态
+- fix: 修复列宽调整后双击错乱
+- feat: 添加获取高亮行功能并更新相关逻辑
 ---
 
 
 V1.2.12
 ### Bug Fixes
-fix: 优化多选清除
+- fix: 优化多选清除
 ---
 
 V1.2.13
 ### Bug Fixes
-fix: 加载数据不清除提示
+- fix: 加载数据不清除提示
 docs: 添加hover编辑图标文档例子
 ---
 
 V1.2.14
 ### Bug Fixes
-fix: 修复dom选中时不能复制
+- fix: 修复dom选中时不能复制
 ---
 
 V1.2.15
 ### Bug Fixes
-fix: 修复初始化列宽为null时滚动条计算错误
-fix: 优化tooltip功能，添加表头tooltip
+- fix: 修复初始化列宽为null时滚动条计算错误
+- fix: 优化tooltip功能，添加表头tooltip
 ---
 
 V1.2.16
 ### Bug Fixes
-fix: 修复loadConfig，filterMethod会清除校验错误信息及已经改变值
-fix: 修复tree校验错误时不回展开
+- fix: 修复loadConfig，filterMethod会清除校验错误信息及已经改变值
+- fix: 修复tree校验错误时不回展开
 ---
 
 V1.2.17
 ### Bug Fixes
-refactor:重构校验器，剔除async-validator
-fix: 添加config类型提示
+- refactor:重构校验器，剔除async-validator
+- fix: 添加config类型提示
 ---
 
 V1.2.18
 ### Bug Fixes
-fix: 解决选择和tree导致的内存泄漏 #73
-feat: 添加选择器值类型支持，更新相关逻辑以处理displayText和value
+- fix: 解决选择和tree导致的内存泄漏 #73
+- feat: 添加选择器值类型支持，更新相关逻辑以处理displayText和value
 ---
 
 V1.2.19
 ### Bug Fixes
-feat: 优化批量设置值的方法，支持只读设置方法
-feat: 添加清除可以编辑cell数据方法
+- feat: 优化批量设置值的方法，支持只读设置方法
+- feat: 添加清除可以编辑cell数据方法
 ---
 
 V1.2.20
 ### Bug Fixes
-fix: 废除批量设置值支持只读，变更为通过BEFORE_VALUE_CHANGE_METHOD进行更改，支持只读值更改
-fix: 优化验证逻辑修复非必填时返回错误
+- fix: 废除批量设置值支持只读，变更为通过BEFORE_VALUE_CHANGE_METHOD进行更改，支持只读值更改
+- fix: 优化验证逻辑修复非必填时返回错误
 ---
 
 V1.2.21
 ### Bug Fixes
-fix: 修复校验器，非必填时自定义校验方法失效
+- fix: 修复校验器，非必填时自定义校验方法失效
 ---
 
 V1.2.22
 ### Bug Fixes
-feat: 添加tree-selection和selection-tree类型支持树形选择
-feat: 添加COLUMNS_ALIGN，COLUMNS_VERTICAL_ALIGN 全局可控制
+- feat: 添加tree-selection和selection-tree类型支持树形选择
+- feat: 添加COLUMNS_ALIGN，COLUMNS_VERTICAL_ALIGN 全局可控制
 ---
 
 
 V1.2.23
 ### Bug Fixes
-feat: 添加tree层级线
-fix: 修复默认没有设置css变量时导致传递config空
-docs: 更新文档
+- feat: 添加tree层级线
+- fix: 修复默认没有设置css变量时导致传递config空
+- docs: 更新文档
 ---
 
 V1.2.24
 ### Bug Fixes
-feat: 添加表头排序功能
-docs: 更新文档
+- feat: 添加表头排序功能
+- docs: 更新文档
 ---
 
 V1.2.25
 ### Bug Fixes
 
-fix:修复合并单元格编辑时编辑不更改数据也会触发change事件
+- fix:修复合并单元格编辑时编辑不更改数据也会触发change事件
 
 ---
 
 V1.2.26
 ### Bug Fixes
 
-fix:修复添加排序功能导致validate失效问题
+- fix:修复添加排序功能导致validate失效问题
 
 ---
 
 V1.2.27
 ### Bug Fixes
 
-fix:修复合并单元格不能选中
+- fix:修复合并单元格不能选中
 
 ---
 
 V1.2.28
 ### Bug Fixes
-feat: 支持多行显示
-feat: 支持多行溢出截取
-feat: 支持自适应行高
-fix:优化排序图标位置算法
+- feat: 支持多行显示
+- feat: 支持多行溢出截取
+- feat: 支持自适应行高
+- fix:优化排序图标位置算法
 
 ---
 
 V1.2.29
 ### Bug Fixes
-fix:修复多个dom自动行高没有生效
-fix:优化自动行高dom会闪
-feat:添加必填标识
+- fix:修复多个dom自动行高没有生效
+- fix:优化自动行高dom会闪
+- feat:添加必填标识
 
 ---
 
 
 V1.2.29
 ### Bug Fixes
-fix:修复多个dom自动行高没有生效
-fix:优化自动行高dom会闪
-feat:添加必填标识
+- fix:修复多个dom自动行高没有生效
+- fix:优化自动行高dom会闪
+- feat:添加必填标识
 
 ---
 
 V1.2.30
 ### Bug Fixes
-fix:添加多行文本缓存优化多行文本的性能
+- fix:添加多行文本缓存优化多行文本的性能
 
 ---
 
 V1.2.31
 ### Bug Fixes
-fix:修复title传数字会出现异常
+- fix:修复title传数字会出现异常
 
 ---
 
 V1.2.32
 ### Bug Fixes
 
-feat:添加必填*配置颜色
-fix:setLoading不生效
-fix:#92动态修改调整行列无效
-fix:修复设置maxLineClamp导致verticalAlign=bottom 计算错误
-feat:可以调整checkbox的边框颜色,及拓展部分图标也可也控制颜色
-fix:column.title没设置会出现undefined
-fix:type='selection' title=‘’ 的列过窄会出现tooltip
+- feat:添加必填*配置颜色
+- fix:setLoading不生效
+- fix:#92动态修改调整行列无效
+- fix:修复设置maxLineClamp导致verticalAlign=bottom 计算错误
+- feat:可以调整checkbox的边框颜色,及拓展部分图标也可也控制颜色
+- fix:column.title没设置会出现undefined
+- fix:type='selection' title=‘’ 的列过窄会出现tooltip
 
+---
+
+V1.2.33
+### Bug Fixes
+
+- feat:添加maxLineClampHeader支持表头多行文本溢出
+- fix:优化多行文本溢出逻辑
+- fix:优化换行的阈值问题
+- fix:抽离选择器移动及合并数据关联全选行列性能问题
+- docs:更新文档
 ---
