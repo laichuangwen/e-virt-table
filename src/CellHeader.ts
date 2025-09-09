@@ -41,7 +41,7 @@ export default class CellHeader extends BaseCell {
     sortDescIconName = 'sort-desc';
     visibleWidth = 0;
     visibleHeight = 0;
-    maxLineClamp: LineClampType = 'auto';
+    maxLineClampHeader: LineClampType = 'auto';
     domDataset: any = {};
     drawTextX = 0;
     drawTextY = 0;
@@ -99,6 +99,7 @@ export default class CellHeader extends BaseCell {
         this.overflowTooltipShow = column.overflowTooltipHeaderShow === false ? false : true;
         this.hasChildren = (column.children && column.children.length > 0) || false; // 是否有子
         this.render = column.renderHeader;
+        this.maxLineClampHeader = column.maxLineClampHeader || 'auto';
     }
     /**
      * 是否可见，覆盖基类方法，表头是跟y滚动条没有关系的所以不需要加滚动参数
@@ -186,7 +187,7 @@ export default class CellHeader extends BaseCell {
                 color: this.drawTextColor,
                 align: this.align,
                 verticalAlign: this.verticalAlign,
-                maxLineClamp: this.maxLineClamp,
+                maxLineClamp: this.maxLineClampHeader,
                 offsetRight: this.column.sortBy ? 16 : 0, // 排序图标占位
                 offsetLeft: this.required ? 12 : 0, // 必填星号占位
                 cacheTextKey,
