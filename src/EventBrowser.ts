@@ -1,9 +1,14 @@
 import Context from './Context';
 
-type EventTask = Map<string, EventListenerOrEventListenerObject>;
+type ListenerEntry = {
+    target: EventTarget;
+    name: string;
+    fn: EventListenerOrEventListenerObject;
+    options?: AddEventListenerOptions | boolean;
+};
 
 export default class EventBrowser {
-    private eventTasks: EventTask = new Map();
+    private eventTasks: Set<ListenerEntry> = new Set();
     private ctx: Context;
     constructor(ctx: Context) {
         this.ctx = ctx;
@@ -27,7 +32,7 @@ export default class EventBrowser {
         this.bind(this.ctx.stageElement, 'dblclick', this.handleDblclick.bind(this));
         this.bind(this.ctx.stageElement, 'mouseover', this.handleMouseover.bind(this));
         this.bind(this.ctx.stageElement, 'mouseout', this.handleMouseout.bind(this));
-        document.addEventListener('selectionchange', this.selectionchange.bind(this));
+        this.bind(document, 'selectionchange', this.selectionchange.bind(this));
     }
     private selectionchange() {
         this.ctx.domSelectionStr = '';
@@ -35,6 +40,7 @@ export default class EventBrowser {
         if (selection && selection.toString()) {
             this.ctx.domSelectionStr = selection.toString();
         }
+
     }
     private clearDomSelection() {
         const selection = window.getSelection();
@@ -43,10 +49,10 @@ export default class EventBrowser {
         }
     }
     destroy() {
-        this.eventTasks.forEach((fn, event) => {
-            this.unbind(window, event, fn);
+        const entries = Array.from(this.eventTasks);
+        entries.forEach(({ target, name, fn, options }) => {
+            this.unbind(target, name, fn, options);
         });
-        document.removeEventListener('selectionchange', this.selectionchange.bind(this));
         this.eventTasks.clear();
     }
     private handleResize(e: Event) {
@@ -125,11 +131,16 @@ export default class EventBrowser {
         options?: AddEventListenerOptions | boolean,
     ): void {
         target.addEventListener(name, fn, options);
-        this.eventTasks.set(name, fn);
+        this.eventTasks.add({ target, name, fn, options });
     }
 
-    private unbind(target: EventTarget, name: string, fn: EventListenerOrEventListenerObject): void {
-        target.removeEventListener(name, fn);
-        this.eventTasks.delete(name);
+    private unbind(target: EventTarget, name: string, fn: EventListenerOrEventListenerObject, options?: AddEventListenerOptions | boolean): void {
+        target.removeEventListener(name, fn as EventListener, options as any);
+        for (const entry of this.eventTasks) {
+            if (entry.target === target && entry.name === name && entry.fn === fn) {
+                this.eventTasks.delete(entry);
+                break;
+            }
+        }
     }
 }
