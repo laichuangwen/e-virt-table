@@ -755,7 +755,7 @@ const eVirtTable = new EVirtTable(canvas, {
                 return mergeRowCell(params, 'emp_name', ['emp_name', 'phone']);
             }
             if (['emp_name221', 'emp_name222', 'emp_name2'].includes(column.key)) {
-                return mergeColCell(params, ['emp_name221', 'emp_name222', 'emp_name2']);
+                return mergeColCell(params, ['emp_name221', 'emp_name222']);
             }
             // if (column.key === 'selection') {
             //     // 合并行单元格

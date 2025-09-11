@@ -219,24 +219,26 @@ export default class Header {
         };
         setWidth(this.columns);
         this.ctx.database.setColumns(this.columns);
-        this.init();
-        this.ctx.emit('draw');
         let overDiff = 0;
         // 如果表头宽度小于可视宽度，平均分配
         if (this.width < this.visibleWidth) {
             const overWidth = this.visibleWidth - this.width;
             overDiff = Math.floor((overWidth / this.resizeNum) * 100) / 100;
             this.resizeAllColumn(overDiff);
-            this.ctx.emit('draw');
         }
+        const width = cell.width + diff + overDiff;
         this.ctx.emit('resizeColumnChange', {
             colIndex: cell.colIndex,
             key: cell.key,
             oldWidth: cell.width,
-            width: cell.width + diff + overDiff,
+            width: width,
             column: cell.column,
             columns: this.columns,
         });
+        this.ctx.database.setCustomHeaderResizableData(cell.key, width);
+        this.ctx.database.init(false);
+        this.init();
+        this.ctx.emit('draw');
     }
     resizeAllColumn(fellWidth: number) {
         if (fellWidth === 0) return;
@@ -324,7 +326,7 @@ export default class Header {
         if (this.isResizing && this.resizeTarget) {
             const {
                 stageHeight,
-                config: { RESIZE_COLUMN_LINE_COLOR },
+                config: { RESIZE_COLUMN_LINE_COLOR, RESIZE_COLUMN_TEXT_COLOR, RESIZE_COLUMN_TEXT_BG_COLOR },
             } = this.ctx;
             const resizeTargetDrawX = this.resizeTarget.getDrawX();
             const resizeTargetWidth = this.resizeTarget.width;
@@ -332,7 +334,17 @@ export default class Header {
             const poins = [x - 0.5, 0, x - 0.5, stageHeight];
             this.ctx.paint.drawLine(poins, {
                 borderColor: RESIZE_COLUMN_LINE_COLOR,
-                borderWidth: 1,
+            });
+            const text = `${resizeTargetWidth + this.resizeDiff}px`;
+            this.ctx.paint.drawRect(x, 0, 45, 24, {
+                fillColor: RESIZE_COLUMN_TEXT_BG_COLOR,
+                borderWidth: 0,
+            });
+            this.ctx.paint.drawText(text, x, 0, 45, 26, {
+                padding: 0,
+                color: RESIZE_COLUMN_TEXT_COLOR,
+                align: 'center',
+                verticalAlign: 'middle',
             });
         }
     }

@@ -260,6 +260,10 @@ export default class Config {
     RESIZE_ROW_LINE_COLOR = '#e1e6eb';
     /** 列调整线颜色 */
     RESIZE_COLUMN_LINE_COLOR = '#e1e6eb';
+    /** 列调整线颜色 */
+    RESIZE_COLUMN_TEXT_COLOR = '#fff';
+    /** 列调整线文本背景色 */
+    RESIZE_COLUMN_TEXT_BG_COLOR = 'rgb(82,146,247)';
     /** 最小调整行高 */
     RESIZE_ROW_MIN_HEIGHT = 36;
     /** 列宽最小值 */

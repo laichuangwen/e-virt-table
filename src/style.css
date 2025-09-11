@@ -31,7 +31,7 @@
     --evt-scroller-focus-color: #bbbec4;
     --evt-select-border-color: var(--evt-color-primary);
     --evt-select-area-color: rgba(82, 146, 247, 0.1);
-    --evt-select-row-col-bg-color: transparent;
+    --evt-select-row-col-bg-color: rgba(82, 146, 247, 0.1);
     --evt-autofill-point-border-color: #fff;
     --evt-edit-bg-color: #fcf6ed;
     --evt-checkbox-color: var(--evt-color-primary);
@@ -49,9 +49,11 @@
     --evt-tooltip-bg-color: #303133;
     --evt-tooltip-text-color: #fff;
     --evt-resize-row-line-color: #e1e6eb;
+    --evt-resize-column-text-color: #fff;
+    --evt-resize-column-text-bg-color: var(--evt-color-primary);
     --evt-resize-column-line-color: #e1e6eb;
     --evt-tree-line-color: #e1e6eb;
-    --evt-sort-icon-color: rgb(82, 146, 247);
+    --evt-sort-icon-color: var(--evt-color-primary);
 }
 .dark {
     --evt-border-color: #363637;

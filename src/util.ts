@@ -14,7 +14,7 @@ function throttle<T extends (...args: any) => any>(func: T, delay: number | (() 
     return function (this: ThisParameterType<T>, ...args: Parameters<T>): ReturnType<T> | undefined {
         const now = new Date().getTime();
         const elapsedTime = now - lastCalledTime;
-        const wait = typeof delay === 'function' ? delay() : delay
+        const wait = typeof delay === 'function' ? delay() : delay;
         if (!lastCalledTime || elapsedTime >= wait) {
             func.apply(this, args);
             lastCalledTime = now;
@@ -79,7 +79,7 @@ function calCrossSpan(arr: Column[] = [], maxRow: number = 1, level: number = 0)
                 level,
                 rowspan: 1,
                 colspan,
-                children,
+                children: children.sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0)),
             };
         }
         return {
@@ -100,6 +100,21 @@ function toLeaf(arr: Column[] = []): Column[] {
         }
     });
     return tmp;
+}
+
+function filterHiddenColumns(columns: Column[]): Column[] {
+    return columns
+        .filter((col) => !col.hide) // 先过滤掉自己 hide 的列
+        .map((col: Column) => {
+            // 如果有子列
+            if (Array.isArray(col.children) && col.children.length > 0) {
+                return {
+                    ...col,
+                    children: filterHiddenColumns(col.children), // 递归处理
+                };
+            }
+            return { ...col };
+        });
 }
 
 type DebouncedFunction<F extends (...args: any[]) => any> = (...args: Parameters<F>) => void;
@@ -350,20 +365,20 @@ function getCssVar(name: string, el: HTMLElement = document.documentElement): st
  */
 function parseDate(dateStr: any): Date {
     if (!dateStr) return new Date(0);
-    
+
     // 如果是数字（时间戳），直接创建Date对象
     if (typeof dateStr === 'number') {
         return new Date(dateStr);
     }
-    
+
     const str = String(dateStr).trim();
-    
+
     // 尝试直接解析
     const directDate = new Date(str);
     if (!isNaN(directDate.getTime())) {
         return directDate;
     }
-    
+
     // 支持多种常见格式
     const patterns = [
         // YYYY-MM-DD
@@ -391,21 +406,33 @@ function parseDate(dateStr: any): Date {
         // 带时间的格式 YYYY/MM/DD HH:mm:ss
         /^(\d{4})\/(\d{1,2})\/(\d{1,2})\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/,
     ];
-    
+
     for (const pattern of patterns) {
         const match = str.match(pattern);
         if (match) {
             const groups = match.slice(1).map(Number);
-            
-            if (pattern.source.includes('YYYY-MM-DD') || pattern.source.includes('YYYY/MM/DD') || pattern.source.includes('YYYY.MM.DD')) {
+
+            if (
+                pattern.source.includes('YYYY-MM-DD') ||
+                pattern.source.includes('YYYY/MM/DD') ||
+                pattern.source.includes('YYYY.MM.DD')
+            ) {
                 // YYYY-MM-DD 格式
                 const [year, month, day, hour = 0, minute = 0, second = 0] = groups;
                 return new Date(year, month - 1, day, hour, minute, second);
-            } else if (pattern.source.includes('DD-MM-YYYY') || pattern.source.includes('DD/MM/YYYY') || pattern.source.includes('DD.MM.YYYY')) {
+            } else if (
+                pattern.source.includes('DD-MM-YYYY') ||
+                pattern.source.includes('DD/MM/YYYY') ||
+                pattern.source.includes('DD.MM.YYYY')
+            ) {
                 // DD-MM-YYYY 格式
                 const [day, month, year, hour = 0, minute = 0, second = 0] = groups;
                 return new Date(year, month - 1, day, hour, minute, second);
-            } else if (pattern.source.includes('MM-DD-YYYY') || pattern.source.includes('MM/DD/YYYY') || pattern.source.includes('MM.DD.YYYY')) {
+            } else if (
+                pattern.source.includes('MM-DD-YYYY') ||
+                pattern.source.includes('MM/DD/YYYY') ||
+                pattern.source.includes('MM.DD.YYYY')
+            ) {
                 // MM-DD-YYYY 格式
                 const [month, day, year, hour = 0, minute = 0, second = 0] = groups;
                 return new Date(year, month - 1, day, hour, minute, second);
@@ -416,7 +443,7 @@ function parseDate(dateStr: any): Date {
             }
         }
     }
-    
+
     // 如果都不匹配，返回无效日期
     return new Date(NaN);
 }
@@ -430,7 +457,7 @@ function parseDate(dateStr: any): Date {
 function compareDates(a: any, b: any): number {
     const aDate = parseDate(a);
     const bDate = parseDate(b);
-    
+
     if (isNaN(aDate.getTime()) && isNaN(bDate.getTime())) {
         return 0; // 都是无效日期
     }
@@ -440,10 +467,9 @@ function compareDates(a: any, b: any): number {
     if (isNaN(bDate.getTime())) {
         return 1; // b 是无效日期，排在前面
     }
-    
+
     return aDate.getTime() - bDate.getTime();
 }
-
 
 export {
     debounce,
@@ -461,5 +487,6 @@ export {
     getSpanObjByColumn,
     getCssVar,
     parseDate,
-    compareDates
+    compareDates,
+    filterHiddenColumns,
 };

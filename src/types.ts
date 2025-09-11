@@ -110,12 +110,7 @@ export type SelectionMap = {
 export type SortDirection = 'asc' | 'desc' | 'none';
 export type SortStateMapItem = { direction: SortDirection; timestamp: number };
 export type SortStateMap = Map<string, SortStateMapItem>;
-export type SortByType =
-    | 'number'
-    | 'string'
-    | 'date'
-    | 'api'
-    | ((a: any, b: any) => number);
+export type SortByType = 'number' | 'string' | 'date' | 'api' | ((a: any, b: any) => number);
 
 export interface Column {
     key: string;
@@ -176,6 +171,12 @@ export type OverlayerTooltip = {
     text: string;
     show: boolean;
 };
+export type CustomHeader = {
+    fixedData?: Record<string, Fixed>;
+    sortData?: Record<string, number>;
+    hideData?: Record<string, boolean>;
+    resizableData?: Record<string, number>;
+  };
 export type OverlayerContextmenu = {
     style: any;
     list: any[];

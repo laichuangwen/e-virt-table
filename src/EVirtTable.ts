@@ -2,6 +2,7 @@ import {
     ChangeItem,
     Column,
     ConfigType,
+    CustomHeader,
     EventCallback,
     EVirtTableOptions,
     FilterMethod,
@@ -155,6 +156,7 @@ export default class EVirtTable {
     loadColumns(columns: Column[]) {
         // 先关闭编辑
         this.editor.doneEdit();
+        this.ctx.database.setOriginalColumns(columns);
         this.ctx.database.setColumns(columns);
         this.header.init();
         this.ctx.emit('draw');
@@ -171,6 +173,13 @@ export default class EVirtTable {
         this.ctx.database.setFooterData(data);
         this.ctx.emit('draw');
     }
+    loadCustomHeader(customHeader: CustomHeader) {
+        this.ctx.database.setCustomHeader(customHeader);
+        this.ctx.database.init(false);
+        this.header.init();
+        this.ctx.emit('draw');
+    }
+
 
     setLoading(loading: boolean) {
         this.ctx.loading = loading;
