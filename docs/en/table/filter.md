@@ -1,10 +1,8 @@
-# Outside Sort
+# Filter
 
-Use `filterMethod` to achieve query, sort, and other operations.
+Use the `filterMethod` method on the table instance to implement filtering, custom sorting for table data.
 
 ## Example
-
-- Custom header can achieve custom filtering and sorting in the table header.
 
 ::: demo
 
