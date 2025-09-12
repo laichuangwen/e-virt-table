@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, nextTick } from "vue";
+import { computed, onMounted, onUnmounted, ref, nextTick } from "vue";
 import { EditorView } from "@codemirror/view";
 import { basicSetup } from "codemirror";
 import { html } from "@codemirror/lang-html";
@@ -32,6 +32,14 @@ onMounted(async () => {
       }),
       parent: editorRef.value,
     });
+  }
+});
+
+onUnmounted(() => {
+  if (editorView) {
+    editorView.destroy();
+    editorView = null;
+    console.log('editorView destroyed');
   }
 });
 </script>
