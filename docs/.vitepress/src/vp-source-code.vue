@@ -39,7 +39,6 @@ onUnmounted(() => {
   if (editorView) {
     editorView.destroy();
     editorView = null;
-    console.log('editorView destroyed');
   }
 });
 </script>
