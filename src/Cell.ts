@@ -63,6 +63,7 @@ export default class Cell extends BaseCell {
     drawCellBgColor = '';
     drawCellSkyBgColor = '';
     drawTextColor = '';
+    drawTextFont = '';
     drawTextX = 0;
     drawTextY = 0;
     drawTextWidth = 0;
@@ -555,6 +556,7 @@ export default class Cell extends BaseCell {
         // 恢复默认背景色
         let bgColor = BODY_BG_COLOR;
         let textColor = BODY_TEXT_COLOR;
+
         // 只读
         if (!this.ctx.database.getReadonly(this.rowKey, this.key)) {
             bgColor = EDIT_BG_COLOR;
@@ -571,7 +573,7 @@ export default class Cell extends BaseCell {
 
         if (typeof BODY_CELL_STYLE_METHOD === 'function') {
             const cellStyleMethod: CellStyleMethod = BODY_CELL_STYLE_METHOD;
-            const { backgroundColor, color } =
+            const { backgroundColor, color, font } =
                 cellStyleMethod({
                     row: this.row,
                     rowIndex: this.rowIndex,
@@ -586,6 +588,9 @@ export default class Cell extends BaseCell {
             // 文字颜色
             if (color) {
                 textColor = color;
+            }
+            if(font){
+                this.drawTextFont = font;
             }
         }
         this.drawCellBgColor = bgColor;
@@ -772,7 +777,7 @@ export default class Cell extends BaseCell {
         const { BODY_FONT, CELL_PADDING, CELL_LINE_HEIGHT } = this.ctx.config;
         const cacheTextKey = `${this.displayText}_${this.drawTextWidth}`;
         const calculatedHeight = this.ctx.paint.calculateTextHeight(this.displayText, this.drawTextWidth, {
-            font: BODY_FONT,
+            font: this.drawTextFont || BODY_FONT,
             padding: CELL_PADDING,
             align: this.align,
             verticalAlign: this.verticalAlign,
@@ -1046,7 +1051,7 @@ export default class Cell extends BaseCell {
             this.drawTextWidth,
             this.drawTextHeight,
             {
-                font: BODY_FONT,
+                font: this.drawTextFont || BODY_FONT,
                 padding: CELL_PADDING,
                 align: this.align,
                 verticalAlign: this.verticalAlign,
