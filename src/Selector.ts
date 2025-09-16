@@ -20,7 +20,11 @@ export default class Selector {
         this.ctx.on(
             'mousemove',
             throttle((e) => {
-                if (this.ctx.selectorMove) {
+                // focus为fixed的不处理
+                if (this.ctx.focusCell?.fixed || this.ctx.focusCellHeader?.fixed) {
+                    return;
+                }
+                if (!this.ctx.dragHeaderIng && this.ctx.selectorMove) {
                     this.ctx.startAdjustPosition(e);
                 }
             }, 100),
@@ -85,6 +89,11 @@ export default class Selector {
                 this.selectCols(cell);
             }
         });
+        this.ctx.on('cellHoverChange', (cell) => {
+            if (this.ctx.mousedown) {
+                this.selectCols(cell);
+            }
+        });
         this.ctx.on('cellHeaderMousedown', (cell, e) => {
             // 如果是选中就不处理，比如chexkbox
             if (this.ctx.stageElement.style.cursor === 'pointer') {
@@ -98,7 +107,12 @@ export default class Selector {
             if (style.userSelect !== 'text') {
                 e.preventDefault();
             }
-            this.selectCols(cell);
+            this.ctx.clearSelector();
+            if (cell.operation) {
+                this.selectAll();
+            } else {
+                this.selectCols(cell);
+            }
         });
         this.ctx.on('keydown', (e) => {
             if (this.ctx.editing) {
@@ -173,6 +187,9 @@ export default class Selector {
         });
     }
     private setSelector(xArr: number[], yArr: number[]) {
+        if (this.ctx.dragHeaderIng) {
+            return;
+        }
         const { ENABLE_SELECTOR_SPAN_COL, ENABLE_SELECTOR_SPAN_ROW } = this.ctx.config;
         let _xArr = xArr;
         let _yArr = yArr;
@@ -345,7 +362,7 @@ export default class Selector {
             onlyMergeCell,
         };
     }
-    private selectCols(cell: CellHeader) {
+    private selectCols(cell: CellHeader | Cell) {
         // 启用单选就不能批量选中
         if (this.ctx.config.ENABLE_SELECTOR_SINGLE) {
             return;
@@ -364,11 +381,6 @@ export default class Selector {
         if (this.ctx.editing) {
             return;
         }
-        // 是可操作列就全选
-        if (cell.operation) {
-            this.selectAll();
-            return;
-        }
         const { SELECTOR_AREA_MIN_Y, SELECTOR_AREA_MAX_Y, SELECTOR_AREA_MAX_Y_OFFSET } = this.ctx.config;
         const minY = SELECTOR_AREA_MIN_Y;
         const maxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex - SELECTOR_AREA_MAX_Y_OFFSET;
@@ -384,11 +396,6 @@ export default class Selector {
                 const yArr = [minY, maxY];
                 this.setSelector(xArr, yArr);
             }
-        } else {
-            // this.setFocusCellHeader(cell);
-            const xArr = [cell.colIndex, cell.colIndex + cell.colspan - 1];
-            const yArr = [minY, maxY];
-            this.setSelector(xArr, yArr);
         }
     }
     private selectAll() {

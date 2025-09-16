@@ -50,11 +50,15 @@ export default class EventTable {
             const x = offsetX;
             this.handleHeaderEvent(x, y, this.ctx.header.renderCellHeaders, (cell: CellHeader) => {
                 this.ctx.focusCellHeader = cell;
+                this.ctx.focusCell = undefined;
                 this.ctx.emit('cellHeaderMousedown', cell, e);
+                this.ctx.emit('draw');
             });
             this.handleBodyEvent(x, y, this.ctx.body.renderRows, (cell: Cell) => {
                 this.ctx.setFocusCell(cell);
+                this.ctx.focusCellHeader = undefined;
                 this.ctx.emit('cellMousedown', cell, e);
+                this.ctx.emit('draw');
             });
         });
         // 按上事件

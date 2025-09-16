@@ -51,16 +51,13 @@ let columns: Column[] = [
         readonly: false,
         width: 120,
         type: 'tree',
-        fixed: 'left',
-        sort: 4,
-
+        fixed: 'right',
         // hide: () => 3 > 2,
     },
     {
         title: '姓名',
         key: 'emp_name',
         width: 100,
-        sort: 7,
         fixed: 'left',
         align: 'left',
 
@@ -146,6 +143,11 @@ let columns: Column[] = [
                             {
                                 title: '姓名222',
                                 key: 'emp_name222',
+                                // hide: true,
+                            },
+                            {
+                                title: '姓名223',
+                                key: 'emp_name223',
                             },
                         ],
                     },
@@ -164,6 +166,7 @@ let columns: Column[] = [
         sortBy: 'string',
         align: 'left',
         verticalAlign: 'bottom',
+        fixed: 'right',
         // readonly: false,
         // overflowTooltipHeaderShow: true,
         // formatterFooter: ({ value }) => {
@@ -192,7 +195,7 @@ let columns: Column[] = [
             cellEl.style.width = '100%';
             cellEl.style.height = '100%';
             cellEl.style.opacity = '0.5';
-            cellEl.style.backgroundColor = 'cyan';
+            // cellEl.style.backgroundColor = 'cyan';
             cellEl.style.display = 'flex';
             cellEl.style.justifyContent = 'center';
             cellEl.style.alignItems = 'center';
@@ -507,7 +510,7 @@ const eVirtTable = new EVirtTable(canvas, {
         AUTO_ROW_HEIGHT: false,
         ROW_KEY: 'id',
         CELL_HEIGHT: 36,
-        SELECTOR_AREA_MIN_X: 0,
+        SELECTOR_AREA_MIN_X: 1,
         DEFAULT_EXPAND_ALL: false,
         ENABLE_AUTOFILL: true,
         ENABLE_SELECTOR: true,
@@ -522,6 +525,7 @@ const eVirtTable = new EVirtTable(canvas, {
         ENABLE_COPY: true,
         ENABLE_PASTER: true,
         FOOTER_POSITION: 'bottom',
+        // ENABLE_SELECTOR_SINGLE: true,
         OFFSET_HEIGHT: 16,
         // SELECTOR_CELL_VALUE_TYPE: 'displayText', // displayText | value
         // SELECTOR_AREA_MAX_X_OFFSET: 1,
@@ -713,6 +717,7 @@ const eVirtTable = new EVirtTable(canvas, {
         //         }, 1000);
         //     });
         // },
+
         BODY_CELL_STYLE_METHOD: (cell: any) => {
             const { rowIndex, column } = cell;
             if (rowIndex == 5 && column.key === 'phone')
@@ -754,9 +759,9 @@ const eVirtTable = new EVirtTable(canvas, {
                 // 合并行单元格
                 return mergeRowCell(params, 'emp_name', ['emp_name', 'phone']);
             }
-            if (['emp_name221', 'emp_name222', 'emp_name2'].includes(column.key)) {
-                return mergeColCell(params, ['emp_name221', 'emp_name222']);
-            }
+            // if (['emp_name221', 'emp_name222', 'emp_name2'].includes(column.key)) {
+            //     return mergeColCell(params, ['emp_name221', 'emp_name222']);
+            // }
             // if (column.key === 'selection') {
             //     // 合并行单元格
             //     return mergeRowCell(params, 'emp_name');
@@ -909,7 +914,7 @@ eVirtTable.on('validateChangedData', (list) => {
     console.log('validateChangedData', list);
 });
 document.getElementById('instantiation')?.addEventListener('click', () => {
-    console.log(eVirtTable.getExpandRowKeys());
+    console.log(eVirtTable);
 });
 document.getElementById('validator')?.addEventListener('click', () => {
     eVirtTable.validate(true).then(() => {
@@ -1150,8 +1155,6 @@ document.getElementById('loadData')?.addEventListener('click', () => {
         eVirtTable.loadData(data);
         eVirtTable.setLoading(false);
     }, 3000);
- 
-  
 });
 
 document.getElementById('clearEditableData')?.addEventListener('click', () => {

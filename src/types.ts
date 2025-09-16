@@ -140,6 +140,7 @@ export interface Column {
     sortIconName?: string; // 默认排序图标
     sortAscIconName?: string; // 升序排序图标
     sortDescIconName?: string; // 降序排序图标
+    parentKey?: string;
     hide?: boolean | Function;
     render?: Function | string;
     renderFooter?: Function | string;

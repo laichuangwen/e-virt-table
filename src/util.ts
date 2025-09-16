@@ -59,7 +59,7 @@ function sortFixed(arr: Column[] = []) {
         ...right.sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0)),
     ];
 }
-function calCrossSpan(arr: Column[] = [], maxRow: number = 1, level: number = 0): Column[] {
+function calCrossSpan(arr: Column[] = [], maxRow: number = 1, level: number = 0, parentKey=''): Column[] {
     return arr.map((config) => {
         if (config.children) {
             let colspan = 0;
@@ -67,7 +67,7 @@ function calCrossSpan(arr: Column[] = [], maxRow: number = 1, level: number = 0)
             config.children.forEach((item) => {
                 item.fixed = fixed;
             });
-            const children = calCrossSpan(config.children, maxRow - 1, level + 1);
+            const children = calCrossSpan(config.children, maxRow - 1, level + 1,parentKey);
             if (children) {
                 children.forEach((item) => {
                     colspan += item.colspan ?? 0;
@@ -79,6 +79,7 @@ function calCrossSpan(arr: Column[] = [], maxRow: number = 1, level: number = 0)
                 level,
                 rowspan: 1,
                 colspan,
+                parentKey,
                 children: children.sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0)),
             };
         }
@@ -87,6 +88,7 @@ function calCrossSpan(arr: Column[] = [], maxRow: number = 1, level: number = 0)
             level,
             rowspan: maxRow,
             colspan: 1,
+            parentKey,
         };
     });
 }

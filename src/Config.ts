@@ -268,6 +268,11 @@ export default class Config {
     RESIZE_ROW_MIN_HEIGHT = 36;
     /** 列宽最小值 */
     RESIZE_COLUMN_MIN_WIDTH = 40;
+    /** 拖拽提示背景色 */
+    DRAG_TIP_BG_COLOR = 'rgba(82,146,247,0.1)';
+    /** 拖拽提示线颜色 */
+    DRAG_TIP_LINE_COLOR = 'rgb(82,146,247)';
+    /** 拖拽提示文本颜色 */
     /** 启用键盘 */
     ENABLE_KEYBOARD = true;
     /** 启用历史 */

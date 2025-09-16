@@ -1,5 +1,5 @@
 import Context from './Context';
-import { getMaxRow, calCrossSpan, toLeaf, sortFixed, throttle } from './util';
+import { getMaxRow, calCrossSpan, toLeaf, sortFixed, throttle, filterHiddenColumns } from './util';
 import CellHeader from './CellHeader';
 import type { Column } from './types';
 export default class Header {
@@ -9,6 +9,9 @@ export default class Header {
     private width = 0; // 宽度
     private height = 0; // 高度
     private resizeTarget: CellHeader | null = null; //调整表头
+    private dragTarget: CellHeader | null = null; //拖拽表头
+    private dragingCell: CellHeader | undefined = undefined; //拖拽表头进入的格子
+    private dragCellDiff = 0; //拖拽表头
     private resizeNum = 0; // 调整列的数量
     private isResizing = false; // 是否移动中
     private clientX = 0; // 鼠标按下时的x轴位置
@@ -16,6 +19,7 @@ export default class Header {
     private columnIndex = 0;
     private isMouseDown = false; // 是否按下
     private columns: any;
+    private visibleColumns: any;
     private visibleLeafColumns: any[] = [];
     private visibleHeight = 0;
     private visibleWidth = 0;
@@ -40,6 +44,7 @@ export default class Header {
         this.init();
         // 初始化调整列大小ENABLE_RESIZE_COLUMN
         this.initResizeColumn();
+        this.initDragColumn();
     }
     init() {
         const {
@@ -52,8 +57,11 @@ export default class Header {
         this.fixedLeftCellHeaders = [];
         this.fixedRightCellHeaders = [];
         this.centerCellHeaders = [];
-        const maxHeaderRow = getMaxRow(columns);
-        const leafColumns = toLeaf(columns);
+
+        this.visibleHeight = this.height;
+        this.visibleColumns = filterHiddenColumns(columns);
+        const maxHeaderRow = getMaxRow(this.visibleColumns);
+        const leafColumns = toLeaf(this.visibleColumns);
         this.height = HEADER_HEIGHT * maxHeaderRow;
         this.width = leafColumns.reduce((sum, _item) => {
             const width = _item.width || 100;
@@ -66,19 +74,16 @@ export default class Header {
             }
             return sum + width;
         }, 0);
-        this.visibleHeight = this.height;
-        const spanColumns = sortFixed(calCrossSpan(columns, maxHeaderRow));
         this.columnIndex = 0;
         this.resizeNum = 0; // 可调整调整列数量
+        const spanColumns = sortFixed(calCrossSpan(this.visibleColumns, maxHeaderRow));
         this.render(spanColumns, 0);
         this.ctx.database.updateColIndexKeyMap(this.leafCellHeaders);
         const containerElement = this.ctx.containerElement.getBoundingClientRect();
         // 如果有可调整列，宽度等于容器宽度
         if (this.resizeNum > 0) {
-            // this.ctx.canvasElement.width = containerElement.width;
             this.ctx.stageWidth = Math.floor(containerElement.width);
         } else {
-            // this.ctx.canvasElement.width = this.width + SCROLLER_TRACK_SIZE - 1;
             this.ctx.stageWidth = Math.floor(this.width + SCROLLER_TRACK_SIZE);
         }
         this.ctx.stageElement.style.width = this.ctx.stageWidth + 'px';
@@ -204,7 +209,103 @@ export default class Header {
             }
         });
     }
+    private initDragColumn() {
+        this.ctx.on('cellHeaderMousedown', (cellHeader) => {
+            if (this.dragTarget === cellHeader) {
+                this.ctx.dragHeaderIng = true;
+                this.dragCellDiff = this.ctx.mouseX - cellHeader.drawX;
+                this.ctx.stageElement.style.cursor = 'grabbing';
+            } else {
+                this.dragTarget = cellHeader;
+                this.ctx.dragHeaderIng = false;
+            }
+        });
+        this.ctx.on('cellMousedown', () => {
+            this.dragTarget = null;
+            this.ctx.dragHeaderIng = false;
+        });
+        this.ctx.on('mouseup', () => {
+            if (this.dragingCell && this.dragTarget) {
+                // 需要移动
+                const genSortObj = (columns: Column[], obj: any = {}) => {
+                    columns.forEach((item: Column, index): any => {
+                        if (item.children) {
+                            genSortObj(item.children, obj);
+                        }
+                        obj[item.key] = index;
+                    });
+                    return obj;
+                };
+                const columns = this.ctx.database.getColumns();
+                const sortColumns = calCrossSpan(columns, getMaxRow(columns));
+                const sortData = genSortObj(sortColumns);
+                const dragStartKey = this.dragTarget.key;
+                const dragEndKey = this.dragingCell.key;
+                //  把dragStartKey挪倒dragEndKey后面
+                // 交换两个key的顺序
+                const dragStartSort = sortData[dragStartKey];
+                const dragEndSort = sortData[dragEndKey];
+                sortData[dragStartKey] = dragEndSort;
+                sortData[dragEndKey] = dragStartSort;
+                this.ctx.database.setCustomHeader({ sortData });
+                this.ctx.database.init(false);
+                this.init();
+            }
+            if (this.ctx.dragHeaderIng && this.dragTarget) {
+                this.ctx.dragHeaderIng = false;
+                this.dragTarget = null;
+                this.dragingCell = undefined;
+                this.dragCellDiff = 0;
+                this.ctx.clearSelector();
+                this.ctx.focusCellHeader = undefined;
+                this.ctx.stageElement.style.cursor = 'default';
+                this.ctx.emit('draw');
+            }
+        });
+        this.ctx.on('mousemove', (e) => {
+            if (!this.ctx.dragHeaderIng || !this.dragTarget) {
+                return;
+            }
+            if (!this.dragTarget.fixed) {
+                this.ctx.startAdjustPosition(e);
+            }
+            this.ctx.emit('draw');
+        });
+        this.ctx.on('cellHoverChange', (cell) => {
+            this.dragingCell = this.getDragCellHeader(cell.colIndex);
+        });
+        this.ctx.on('cellHeaderHoverChange', (cellHeader) => {
+            this.dragingCell = this.getDragCellHeader(cellHeader.colIndex);
+        });
+    }
 
+    private getDragCellHeader(colIndex: number) {
+        if (!this.dragTarget || !this.ctx.dragHeaderIng) {
+            return;
+        }
+        // 同级别
+        const {
+            column: { parentKey },
+            key,
+            level,
+            fixed,
+        } = this.dragTarget;
+        const dragCellHeader = this.allCellHeaders.find(
+            (item) =>
+                item.key !== key &&
+                item.fixed === fixed &&
+                item.column.level === level &&
+                item.column.parentKey === parentKey &&
+                item.colIndex <= colIndex &&
+                item.colIndex + item.colspan - 1 >= colIndex,
+        );
+        if (this.ctx.dragHeaderIng) {
+            const cursor = dragCellHeader ? 'grabbing' : 'not-allowed';
+            // 禁用拖拽
+            this.ctx.stageElement.style.cursor = cursor;
+        }
+        return dragCellHeader;
+    }
     private resizeColumn(cell: CellHeader, diff: number) {
         const setWidth = (columns: any[]) => {
             columns.forEach((column: any) => {
@@ -336,16 +437,59 @@ export default class Header {
                 borderColor: RESIZE_COLUMN_LINE_COLOR,
             });
             const text = `${resizeTargetWidth + this.resizeDiff}px`;
-            this.ctx.paint.drawRect(x, 0, 45, 24, {
+            const rw = 45;
+            const rh = 24;
+            this.ctx.paint.drawRect(x + rw / 2, this.ctx.mouseY - rh / 2, rw, rh, {
                 fillColor: RESIZE_COLUMN_TEXT_BG_COLOR,
                 borderWidth: 0,
+                borderColor: 'transparent',
             });
-            this.ctx.paint.drawText(text, x, 0, 45, 26, {
+            this.ctx.paint.drawText(text, x + rw / 2, this.ctx.mouseY - rh / 2, rw, rh + 2, {
                 padding: 0,
                 color: RESIZE_COLUMN_TEXT_COLOR,
                 align: 'center',
                 verticalAlign: 'middle',
             });
+        }
+    }
+    private drawDragTip() {
+        if (this.dragTarget && this.ctx.dragHeaderIng) {
+            const { DRAG_TIP_BG_COLOR, DRAG_TIP_LINE_COLOR } = this.ctx.config;
+            const rw = this.dragTarget.width;
+            // 提示背景
+            this.ctx.paint.drawRect(
+                this.ctx.mouseX - this.dragCellDiff,
+                this.visibleHeight,
+                rw,
+                this.ctx.body.visibleHeight,
+                {
+                    fillColor: DRAG_TIP_BG_COLOR,
+                    borderWidth: 0,
+                    borderColor: 'transparent',
+                },
+            );
+            if (this.dragingCell) {
+                const { drawX, drawY, visibleWidth, colIndex } = this.dragingCell;
+                // 向坐移动
+                let x = drawX;
+                let y = drawY;
+                if (colIndex > this.dragTarget.colIndex) {
+                    // 向右移动
+                    x = drawX + visibleWidth;
+                }
+                const poins = [x, y, x, this.ctx.stageHeight];
+                // 倒三角形
+                const trianglePoins = [x - 4, y, x + 4, y, x, y + 6, x - 4, y];
+                this.ctx.paint.drawLine(trianglePoins, {
+                    borderColor: DRAG_TIP_LINE_COLOR,
+                    borderWidth: 1.2,
+                    fillColor: DRAG_TIP_LINE_COLOR,
+                });
+                this.ctx.paint.drawLine(poins, {
+                    borderColor: DRAG_TIP_LINE_COLOR,
+                    borderWidth: 1.2,
+                });
+            }
         }
     }
     private drawFixedShadow() {
@@ -439,7 +583,8 @@ export default class Header {
             item.update();
             item.draw();
         });
-        this.drawTipLine();
         this.drawBottomLine();
+        this.drawTipLine();
+        this.drawDragTip();
     }
 }

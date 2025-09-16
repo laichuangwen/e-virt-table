@@ -21,7 +21,7 @@ import type {
     SortStateMap,
     CustomHeader,
 } from './types';
-import { generateShortUUID, toLeaf, compareDates, filterHiddenColumns } from './util';
+import { generateShortUUID, toLeaf, compareDates } from './util';
 import { HistoryItemData } from './History';
 import Cell from './Cell';
 export default class Database {
@@ -268,7 +268,7 @@ export default class Database {
         return _generateColumns(columns);
     }
     getColumns() {
-        return filterHiddenColumns(this.generateColumns(this.columns));
+        return this.generateColumns(this.columns);
     }
     setColumns(columns: Column[]) {
         this.columns = columns;
