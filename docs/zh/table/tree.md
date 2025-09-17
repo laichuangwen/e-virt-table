@@ -138,7 +138,7 @@ h:320px
 :::
 
 ## Auto 模式
-Cautious 模式，半选中状态会当做选中。具体打开控制台查看`selectionChange`事件
+默认模式，半选中状态会当做选中。具体打开控制台查看`selectionChange`事件
 ::: demo
 
 tree/auto
