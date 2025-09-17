@@ -888,6 +888,7 @@ export default class Database {
                 // 递归选中所有子项
                 this.selectTreeSelectionRecursive(rowKey);
             }
+            this.updateParentTreeSelection(rowKey);
         } else if (mode === 'cautious') {
             // cautious模式：交互上相同，但是半选是不算在数据里面的
             if (treeState.checked && !treeState.indeterminate) {
@@ -901,6 +902,7 @@ export default class Database {
                 // 递归选中所有子项
                 this.selectTreeSelectionRecursive(rowKey);
             }
+            this.updateParentTreeSelection(rowKey);
         } else if (mode === 'strictly') {
             // strictly模式：父子各选各的互相不干扰，没有半选模式
             const selection = this.selectionMap.get(rowKey);
