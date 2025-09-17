@@ -940,7 +940,7 @@ export default class Database {
     private selectTreeSelectionRecursive(rowKey: string) {
         const children = this.getTreeChildren(rowKey);
         children.forEach((childKey) => {
-            this.setRowSelection(childKey, true, false);
+            this.setRowSelectionByParent(childKey, true);
             this.selectTreeSelectionRecursive(childKey);
         });
     }
@@ -949,7 +949,7 @@ export default class Database {
     private clearTreeSelectionRecursive(rowKey: string) {
         const children = this.getTreeChildren(rowKey);
         children.forEach((childKey) => {
-            this.setRowSelection(childKey, false, false);
+            this.setRowSelectionByParent(childKey, false);
             this.clearTreeSelectionRecursive(childKey);
         });
     }
@@ -1021,6 +1021,14 @@ export default class Database {
             this.bufferCheckState.buffer = false;
             this.ctx.emit('draw');
         }
+    }
+    setRowSelectionByParent(rowKey: string, check: boolean, ) {
+        const selection = this.selectionMap.get(rowKey);
+        if (!selection) {
+            return;
+        }
+        selection.check = check;
+        this.setRowSelectionByCheckboxKey(rowKey, selection.check);
     }
     getSelectionRows() {
         let rows: any[] = [];
