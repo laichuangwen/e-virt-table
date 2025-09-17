@@ -177,7 +177,7 @@ onUnmounted(() => {
             </div>
 
             <ElCollapseTransition>
-                <SourceCode v-show="sourceVisible" :source="source" />
+                <SourceCode v-show="sourceVisible" :source="rawSource" />
             </ElCollapseTransition>
 
             <Transition name="el-fade-in-linear">

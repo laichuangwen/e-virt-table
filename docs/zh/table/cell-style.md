@@ -22,7 +22,7 @@ h:320px
 
 ## body样式自定义
 
--   只支持 color 和 backgroundColor
+-   支持 color 、 backgroundColor、font
 
 ::: demo
 
