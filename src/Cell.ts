@@ -498,7 +498,7 @@ export default class Cell extends BaseCell {
             let textColor = FOOTER_TEXT_COLOR;
             if (typeof FOOTER_CELL_STYLE_METHOD === 'function') {
                 const footerCellStyleMethod: CellStyleMethod = FOOTER_CELL_STYLE_METHOD;
-                const { backgroundColor, color } =
+                const { backgroundColor, color,font } =
                     footerCellStyleMethod({
                         row: this.row,
                         rowIndex: this.rowIndex,
@@ -512,6 +512,9 @@ export default class Cell extends BaseCell {
                 // 文字颜色
                 if (color) {
                     textColor = color;
+                }
+                if(font){
+                    this.drawTextFont = font;
                 }
             }
             // 合计底部背景色
@@ -775,7 +778,7 @@ export default class Cell extends BaseCell {
         }
 
         const { BODY_FONT, CELL_PADDING, CELL_LINE_HEIGHT } = this.ctx.config;
-        const cacheTextKey = `${this.displayText}_${this.drawTextWidth}`;
+        const cacheTextKey = `${this.displayText}_${this.drawTextWidth}_${this.drawTextFont}`;
         const calculatedHeight = this.ctx.paint.calculateTextHeight(this.displayText, this.drawTextWidth, {
             font: this.drawTextFont || BODY_FONT,
             padding: CELL_PADDING,
@@ -1043,7 +1046,7 @@ export default class Cell extends BaseCell {
         if (typeof text !== 'string') {
             text = `${text}`;
         }
-        const cacheTextKey = `${text}_${this.drawTextWidth}`;
+        const cacheTextKey = `${text}_${this.drawTextWidth}_${this.drawTextFont}`;
         this.ellipsis = this.ctx.paint.drawText(
             text,
             this.drawTextX,
