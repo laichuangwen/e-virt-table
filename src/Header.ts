@@ -2,6 +2,7 @@ import Context from './Context';
 import { getMaxRow, calCrossSpan, toLeaf, sortFixed, throttle, filterHiddenColumns } from './util';
 import CellHeader from './CellHeader';
 import type { Column } from './types';
+import { TreeUtil } from './TreeUtil';
 export default class Header {
     private ctx: Context; // 上下文
     private x = 0; // x坐标
@@ -238,15 +239,15 @@ export default class Header {
                 };
                 const columns = this.ctx.database.getColumns();
                 const sortColumns = calCrossSpan(columns, getMaxRow(columns));
-                const sortData = genSortObj(sortColumns);
-                const dragStartKey = this.dragTarget.key;
-                const dragEndKey = this.dragingCell.key;
-                //  把dragStartKey挪倒dragEndKey后面
-                // 交换两个key的顺序
-                const dragStartSort = sortData[dragStartKey];
-                const dragEndSort = sortData[dragEndKey];
-                sortData[dragStartKey] = dragEndSort;
-                sortData[dragEndKey] = dragStartSort;
+                const tree = new TreeUtil(sortColumns, {
+                    key: 'key', // 节点唯一标识字段（对应我们之前的field）
+                    childrenKey: 'children', // 子节点数组字段
+                });
+                const position = this.dragTarget.colIndex > this.dragingCell.colIndex ? 'before' : 'after';
+                tree.treeMove(this.dragTarget.column, this.dragingCell.column, position);
+                const sortData = genSortObj(tree.getTree());
+                console.log(sortData);
+                
                 this.ctx.database.setCustomHeader({ sortData });
                 this.ctx.database.init(false);
                 this.init();
