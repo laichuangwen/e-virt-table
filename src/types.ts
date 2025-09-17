@@ -184,6 +184,7 @@ export type OverlayerContextmenu = {
 export type CellStyleOptions = {
     color?: string;
     backgroundColor?: string;
+    font?: string;
 };
 export type CellParams = {
     row: any;

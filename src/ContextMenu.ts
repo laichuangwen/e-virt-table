@@ -88,6 +88,9 @@ export default class ContextMenu {
     //创建右键菜单子项元素
     private createContextMenuItems(items: MenuItem[], callback: (e: MenuItem) => void) {
         this.contextMenuEl.replaceChildren();
+        
+        // 使用 DocumentFragment 批量添加子元素，避免多次 DOM 操作
+        const fragment = document.createDocumentFragment();
         items.forEach((item: MenuItem) => {
             const menuItemEl: HTMLDivElement = document.createElement('div');
             menuItemEl.className = 'e-virt-table-context-menu-item';
@@ -100,8 +103,11 @@ export default class ContextMenu {
             } else {
                 menuItemEl.onclick = () => callback(item);
             }
-            this.contextMenuEl.appendChild(menuItemEl);
+            fragment.appendChild(menuItemEl);
         });
+        
+        // 一次性添加所有子元素
+        this.contextMenuEl.appendChild(fragment);
     }
     private show(x: Number, y: Number) {
         Object.assign(this.contextMenuEl.style, {

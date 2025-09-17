@@ -49,6 +49,7 @@ export default class CellHeader extends BaseCell {
     drawTextHeight = 0;
     drawCellBgColor = '';
     drawTextColor = '';
+    drawTextFont = '';
     drawSelectionImageX = 0;
     drawSelectionImageY = 0;
     drawSelectionImageWidth = 0;
@@ -123,7 +124,7 @@ export default class CellHeader extends BaseCell {
         let textColor = HEADER_TEXT_COLOR;
         if (typeof HEADER_CELL_STYLE_METHOD === 'function') {
             const headerCellStyleMethod: CellHeaderStyleMethod = HEADER_CELL_STYLE_METHOD;
-            const { backgroundColor, color } =
+            const { backgroundColor, color, font } =
                 headerCellStyleMethod({
                     colIndex: this.colIndex,
                     column: this.column,
@@ -134,6 +135,9 @@ export default class CellHeader extends BaseCell {
             // 文字颜色
             if (color) {
                 textColor = color;
+            }
+            if (font) {
+                this.drawTextFont = font;
             }
         }
         this.drawCellBgColor = bgColor;
@@ -174,7 +178,7 @@ export default class CellHeader extends BaseCell {
             paint,
             config: { HEADER_FONT, CELL_PADDING, REQUIRED_COLOR },
         } = this.ctx;
-        const cacheTextKey = `${this.displayText}_${this.drawTextWidth}`;
+        const cacheTextKey = `${this.displayText}_${this.drawTextWidth}_${this.drawTextFont}`;
         this.ellipsis = paint.drawText(
             this.displayText,
             this.drawTextX,
@@ -182,7 +186,7 @@ export default class CellHeader extends BaseCell {
             this.drawTextWidth,
             this.drawTextHeight,
             {
-                font: HEADER_FONT,
+                font: this.drawTextFont || HEADER_FONT,
                 padding: CELL_PADDING,
                 color: this.drawTextColor,
                 align: this.align,
