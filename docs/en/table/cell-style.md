@@ -10,7 +10,7 @@
 
 ## Header Style
 
--   Only supports color and backgroundColor
+-   Supports color, backgroundColor, and font
 
 ::: demo
 
@@ -30,7 +30,7 @@ h:320px
 
 ## Footer Style
 
--   Only supports color and backgroundColor
+-   Supports color, backgroundColor, and font
 
 ::: demo
 
