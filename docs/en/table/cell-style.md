@@ -20,7 +20,7 @@ h:320px
 
 ## Body Style
 
--   Only supports color and backgroundColor
+-   Supports color, backgroundColor, and font
 
 ::: demo
 
