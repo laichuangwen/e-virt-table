@@ -4,6 +4,7 @@ import { EditorView } from "@codemirror/view";
 import { basicSetup } from "codemirror";
 import { html } from "@codemirror/lang-html";
 import { EditorState } from "@codemirror/state";
+import { EditorView as EditorViewExt } from "@codemirror/view";
 
 const props = defineProps({
   source: {
@@ -28,6 +29,7 @@ onMounted(async () => {
         extensions: [
           basicSetup,
           html(),
+          EditorViewExt.editable.of(false),
         ],
       }),
       parent: editorRef.value,
