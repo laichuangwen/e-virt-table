@@ -166,7 +166,7 @@ let columns: Column[] = [
         sortBy: 'string',
         align: 'left',
         verticalAlign: 'bottom',
-        fixed: 'right',
+        // fixed: 'right',
         // readonly: false,
         // overflowTooltipHeaderShow: true,
         // formatterFooter: ({ value }) => {
@@ -1184,6 +1184,13 @@ document.getElementById('setReadOnly')?.addEventListener('click', () => {
 });
 document.getElementById('getChangedValues')?.addEventListener('click', () => {
     console.log(eVirtTable.getChangedData());
+});
+
+document.getElementById('visible')?.addEventListener('click', () => {
+    eVirtTable.setCustomHeader({ hideData: {} });
+});
+document.getElementById('hide')?.addEventListener('click', () => {
+    eVirtTable.setCustomHeader({ hideData: { phone: true } });
 });
 
 // 销毁

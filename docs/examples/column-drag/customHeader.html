@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div>
+            <button id="fixed-btn">fixed</button>
+            <button id="no-fixed-btn">no-fixed</button>
+            <button id="hide-btn">hide</button>
+            <button id="visible-btn">visible</button>
+        </div>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        let data = [
+            {
+                date: '2016-05-03',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-02',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-04',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-01',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-08',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+            {
+                date: '2016-05-06',
+                name: 'Tom',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+            },
+        ];
+        let columns = [
+            {
+                title: 'index',
+                key: 'index',
+                readonly: true,
+                type: 'index',
+                width: 50,
+                widthFillDisable: true,
+            },
+            {
+                title: 'Date',
+                key: 'date',
+                readonly: true,
+            },
+            {
+                key: 'info',
+                title: 'Delivery Info',
+                children: [
+                    {
+                        title: 'Name',
+                        key: 'name',
+                        readonly: true,
+                    },
+                    {
+                        title: 'Address',
+                        key: 'Address Info',
+                        readonly: true,
+                        children: [
+                            {
+                                title: 'State',
+                                key: 'state',
+                                readonly: true,
+                            },
+                            {
+                                title: 'City',
+                                key: 'city',
+                                readonly: true,
+                            },
+                            {
+                                title: 'Address',
+                                key: 'address',
+                                readonly: true,
+                                width: 200,
+                            },
+                            {
+                                title: 'Zip',
+                                key: 'zip',
+                                readonly: true,
+                            },
+                        ],
+                    },
+                ],
+            },
+        ];
+        const target = document.getElementById('e-virt-table');
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                ENABLE_DRAG_COLUMN: true,
+            },
+        });
+
+        // 如果是自定义表头不建用
+        grid.on('customHeaderChange', (data) => {
+            console.log('customHeaderChange', data);
+            localStorage.setItem('customHeader', JSON.stringify(data));
+        });
+        const customHeader = localStorage.getItem('customHeader');
+        if (customHeader) {
+            grid.setCustomHeader(JSON.parse(customHeader));
+            console.log('setCustomHeader', JSON.parse(customHeader));
+        }
+        const fixedBtn = document.getElementById('fixed-btn');
+        const noFixedBtn = document.getElementById('no-fixed-btn');
+        fixedBtn.addEventListener('click', () => {
+            grid.setCustomHeader({ fixedData: { index: 'left' } });
+        });
+        noFixedBtn.addEventListener('click', () => {
+            grid.setCustomHeader({ fixedData: {} });
+        });
+        const hideBtn = document.getElementById('hide-btn');
+        const visibleBtn = document.getElementById('visible-btn');
+        hideBtn.addEventListener('click', () => {
+            grid.setCustomHeader({ hideData: { date: true } });
+        });
+        visibleBtn.addEventListener('click', () => {
+            grid.setCustomHeader({
+                hideData: {
+                    // date: false,
+                },
+            });
+        });
+    </script>
+</html>
