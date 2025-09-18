@@ -1,7 +1,7 @@
 import Context from './Context';
 import { getMaxRow, calCrossSpan, toLeaf, sortFixed, throttle, filterHiddenColumns } from './util';
 import CellHeader from './CellHeader';
-import type { Column } from './types';
+import type { Column, ColumnDragChangeEvent } from './types';
 import { TreeUtil } from './TreeUtil';
 export default class Header {
     private ctx: Context; // 上下文
@@ -262,6 +262,12 @@ export default class Header {
                 this.ctx.database.setCustomHeader({ sortData });
                 this.ctx.database.init(false);
                 this.init();
+                const data: ColumnDragChangeEvent = {
+                    source: this.dragTarget,
+                    target: this.dragingCell,
+                    columns: sortColumns,
+                };
+                this.ctx.emit('columnDragChange', data);
             }
             if (this.ctx.dragHeaderIng && this.dragTarget) {
                 this.ctx.dragHeaderIng = false;

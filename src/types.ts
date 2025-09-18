@@ -178,7 +178,12 @@ export type CustomHeader = {
     sortData?: Record<string, number>;
     hideData?: Record<string, boolean>;
     resizableData?: Record<string, number>;
-  };
+};export interface ColumnDragChangeEvent {
+    source: CellHeader;
+    target: CellHeader;
+    columns: Column[];
+}
+
 export type OverlayerContextmenu = {
     style: any;
     list: any[];
