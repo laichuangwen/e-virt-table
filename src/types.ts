@@ -158,6 +158,7 @@ export interface Column {
     column?: Column;
     rules?: Rules | Rule;
     options?: any;
+    columnDragDisabled?: boolean;
     selectorCellValueType?: SelectorCellValueType;
     maxLineClamp?: LineClampType; // 行高超出多少行显示省略号
     maxLineClampHeader?: LineClampType; // 表头行高超出多少行显示省略号

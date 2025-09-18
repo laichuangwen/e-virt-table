@@ -1022,7 +1022,7 @@ export default class Database {
             this.ctx.emit('draw');
         }
     }
-    setRowSelectionByParent(rowKey: string, check: boolean, ) {
+    setRowSelectionByParent(rowKey: string, check: boolean) {
         const selection = this.selectionMap.get(rowKey);
         if (!selection) {
             return;
@@ -1823,6 +1823,9 @@ export default class Database {
         const obj = this.clearCustomHeaderInvalidValues(this.originalColumns);
         this.ctx.emit('customHeaderChange', obj);
     }
+    getCustomHeader() {
+        return this.customHeader;
+    }
     setCustomHeaderResizableData(key: string, width: number) {
         // 统一设置方法
         let { resizableData = {} } = this.customHeader;
@@ -1854,9 +1857,7 @@ export default class Database {
                 assignIfDifferent('resizableData', column.width);
             });
         };
-        let obj: CustomHeader = {
-            fixedData: {},
-        };
+        let obj: CustomHeader = {};
         clearCustomHeaderInvalidValues(columns, obj);
         return obj;
     }

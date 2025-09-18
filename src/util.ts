@@ -60,7 +60,7 @@ function sortFixed(arr: Column[] = []) {
     ];
 }
 function calCrossSpan(arr: Column[] = [], maxRow: number = 1, level: number = 0, parentKey=''): Column[] {
-    return arr.map((config) => {
+    return arr.sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0)).map((config) => {
         if (config.children) {
             let colspan = 0;
             let fixed = config.fixed;

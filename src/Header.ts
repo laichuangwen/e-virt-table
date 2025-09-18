@@ -212,6 +212,12 @@ export default class Header {
     }
     private initDragColumn() {
         this.ctx.on('cellHeaderMousedown', (cellHeader) => {
+            if (!this.ctx.config.ENABLE_DRAG_COLUMN) {
+                return;
+            }
+            if (cellHeader.column.columnDragDisabled) {
+                return;
+            }
             if (this.dragTarget === cellHeader) {
                 this.ctx.dragHeaderIng = true;
                 this.dragCellDiff = this.ctx.mouseX - cellHeader.drawX;
@@ -222,10 +228,16 @@ export default class Header {
             }
         });
         this.ctx.on('cellMousedown', () => {
+            if (!this.ctx.config.ENABLE_DRAG_COLUMN) {
+                return;
+            }
             this.dragTarget = null;
             this.ctx.dragHeaderIng = false;
         });
         this.ctx.on('mouseup', () => {
+            if (!this.ctx.config.ENABLE_DRAG_COLUMN) {
+                return;
+            }
             if (this.dragingCell && this.dragTarget) {
                 // 需要移动
                 const genSortObj = (columns: Column[], obj: any = {}) => {
@@ -245,9 +257,8 @@ export default class Header {
                 });
                 const position = this.dragTarget.colIndex > this.dragingCell.colIndex ? 'before' : 'after';
                 tree.treeMove(this.dragTarget.column, this.dragingCell.column, position);
-                const sortData = genSortObj(tree.getTree());
-                console.log(sortData);
-                
+                const columnsTree = tree.getTree();
+                const sortData = genSortObj(columnsTree);
                 this.ctx.database.setCustomHeader({ sortData });
                 this.ctx.database.init(false);
                 this.init();
@@ -264,6 +275,9 @@ export default class Header {
             }
         });
         this.ctx.on('mousemove', (e) => {
+            if (!this.ctx.config.ENABLE_DRAG_COLUMN) {
+                return;
+            }
             if (!this.ctx.dragHeaderIng || !this.dragTarget) {
                 return;
             }
@@ -273,9 +287,21 @@ export default class Header {
             this.ctx.emit('draw');
         });
         this.ctx.on('cellHoverChange', (cell) => {
+            if (!this.ctx.config.ENABLE_DRAG_COLUMN) {
+                return;
+            }
+            if (cell.column.columnDragDisabled) {
+                return;
+            }
             this.dragingCell = this.getDragCellHeader(cell.colIndex);
         });
         this.ctx.on('cellHeaderHoverChange', (cellHeader) => {
+            if (!this.ctx.config.ENABLE_DRAG_COLUMN) {
+                return;
+            }
+            if (cellHeader.column.columnDragDisabled) {
+                return;
+            }
             this.dragingCell = this.getDragCellHeader(cellHeader.colIndex);
         });
     }
@@ -379,7 +405,22 @@ export default class Header {
         this.init();
         // this.ctx.emit("draw");
     }
-
+    getCustomHeader() {
+        const columns = this.ctx.database.getColumns();
+        const customHeader = this.ctx.database.getCustomHeader();
+        const { sortData = {} } = customHeader;
+        if (Object.keys(sortData).length === 0) {
+            return {
+                columns,
+                customHeader,
+            };
+        }
+        const _sortColumns = calCrossSpan(columns, getMaxRow(columns));
+        return {
+            columns: _sortColumns,
+            customHeader,
+        };
+    }
     private render(arr: Column[], originX: number) {
         const len = arr.length;
         let everyOffsetX = originX;
@@ -477,6 +518,14 @@ export default class Header {
                 if (colIndex > this.dragTarget.colIndex) {
                     // 向右移动
                     x = drawX + visibleWidth;
+                }
+                // 边界处理
+                if (colIndex === 0) {
+                    x = x + 1;
+                }
+                // 边界处理
+                if (colIndex === this.ctx.maxColIndex) {
+                    x = x - 1;
                 }
                 const poins = [x, y, x, this.ctx.stageHeight];
                 // 倒三角形

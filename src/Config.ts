@@ -307,6 +307,8 @@ export default class Config {
     CELL_LINE_HEIGHT = 1.3;
     /** 全局自动行高 */
     AUTO_ROW_HEIGHT = false;
+    /** 启用拖拽表头 */
+    ENABLE_DRAG_COLUMN = false;
     /** header 格子样式 */
     HEADER_CELL_STYLE_METHOD?: CellHeaderStyleMethod;
     /** body 格子样式 */

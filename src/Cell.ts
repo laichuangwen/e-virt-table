@@ -215,6 +215,7 @@ export default class Cell extends BaseCell {
             } else {
                 this.relationRowKeys = [this.key];
             }
+            
             if (Array.isArray(relationColKeys) && relationColKeys.length > 0) {
                 this.relationColKeys = relationColKeys;
             } else {
