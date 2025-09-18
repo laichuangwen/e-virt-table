@@ -878,28 +878,28 @@ export default class Database {
             // auto模式：子项全不选->父项不勾选，子项全选->父项勾选，子项都有->父项半选
             // 父项选中的情况点击清空父项选择和所有子项选择，其他情况点击父项，勾选父项和所有子项选择（递归）
             if (treeState.checked && !treeState.indeterminate) {
-                // 如果已全选，则取消选中
-                this.setRowSelection(rowKey, false, false);
                 // 递归取消所有子项
                 this.clearTreeSelectionRecursive(rowKey);
+                // 如果已全选，则取消选中
+                this.setRowSelection(rowKey, false, false);
             } else {
-                // 如果未选中或半选，则选中
-                this.setRowSelection(rowKey, true, false);
                 // 递归选中所有子项
                 this.selectTreeSelectionRecursive(rowKey);
+                 // 如果未选中或半选，则选中
+                this.setRowSelection(rowKey, true, false);
             }
         } else if (mode === 'cautious') {
             // cautious模式：交互上相同，但是半选是不算在数据里面的
             if (treeState.checked && !treeState.indeterminate) {
-                // 如果已全选，则取消选中
-                this.setRowSelection(rowKey, false, false);
                 // 递归取消所有子项
                 this.clearTreeSelectionRecursive(rowKey);
+                // 如果已全选，则取消选中
+                this.setRowSelection(rowKey, false, false);
             } else {
-                // 如果未选中或半选，则选中
-                this.setRowSelection(rowKey, true, false);
                 // 递归选中所有子项
                 this.selectTreeSelectionRecursive(rowKey);
+                // 如果未选中或半选，则选中
+                this.setRowSelection(rowKey, true, false);
             }
         } else if (mode === 'strictly') {
             // strictly模式：父子各选各的互相不干扰，没有半选模式
