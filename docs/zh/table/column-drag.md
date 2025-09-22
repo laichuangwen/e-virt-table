@@ -17,14 +17,14 @@
 | 事件名称    | 说明       | 回调参数                                      |
 | ----------- | ---------- | --------------------------------------------- |
 | columnDragChange | 列拖拽事件 | `ColumnDragChangeEvent` |
-| customHeaderChange | 自定义表头事件 | `CustomHeader` |
+| customHeaderChange | 自定义表头事件 | `CustomHeaderType` |
 
 ## Methods
 
 | 方法名称             | 说明                             | 参数                                                  |
 | -------------------- | -------------------------------- | ----------------------------------------------------- |
-| setCustomHeader | 设置自定义表头 | `CustomHeader` |
-| getCustomHeader | 更新数据方法可实现拓展任意编辑器 | `{CustomHeader，Column[]}` |
+| setCustomHeader | 设置自定义表头 | `CustomHeaderType` |
+| getCustomHeader | 更新数据方法可实现拓展任意编辑器 | `{CustomHeaderType，Column[]}` |
 
 ## 列拖拽
 
@@ -50,7 +50,7 @@ h:400px
 ## 类型
 
 ``` ts
-export type CustomHeader = {
+export type CustomHeaderType = {
     fixedData?: Record<string, Fixed>;
     sortData?: Record<string, number>;
     hideData?: Record<string, boolean>;

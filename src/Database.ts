@@ -19,7 +19,8 @@ import type {
     BeforeValueChangeItem,
     SortByType,
     SortStateMap,
-    CustomHeader,
+    CustomHeaderType,
+    Fixed,
 } from './types';
 import { generateShortUUID, toLeaf, compareDates } from './util';
 import { HistoryItemData } from './History';
@@ -41,8 +42,9 @@ export default class Database {
     private changedDataMap = new Map<string, any>();
     private validationErrorMap = new Map<string, ValidateResult>();
     private itemRowKeyMap = new WeakMap();
+    private columnKeyMap = new Map<string, Column>();
     private bufferData: any[] = [];
-    private customHeader: CustomHeader = {
+    private customHeader: CustomHeaderType = {
         fixedData: {},
         sortData: {},
         hideData: {},
@@ -259,16 +261,21 @@ export default class Database {
                 for (const [key, value] of Object.entries(dataMap)) {
                     if (value !== undefined) obj[key] = value;
                 }
-                return {
+                const data = {
                     ...column,
                     ...obj,
                 };
+                this.columnKeyMap.set(column.key, data);
+                return data;
             });
         };
         return _generateColumns(columns);
     }
     getColumns() {
         return this.generateColumns(this.columns);
+    }
+    getColumnByKey(key: string) {
+        return this.columnKeyMap.get(key);
     }
     setColumns(columns: Column[]) {
         this.columns = columns;
@@ -415,7 +422,7 @@ export default class Database {
         for (const [key, { direction }] of sortedEntries) {
             if (direction === 'none') continue;
 
-            const cellHeader = this.getColumnByKey(key);
+            const cellHeader = this.getCellHeaderByKey(key);
             if (!cellHeader || !cellHeader.column.sortBy) continue;
 
             // 对当前层级进行单列排序
@@ -1359,7 +1366,7 @@ export default class Database {
             return this.headerMap.get(key)?.column;
         }
     }
-    getColumnByKey(key: string) {
+    getCellHeaderByKey(key: string) {
         const column = this.headerMap.get(key);
         if (column) {
             return column;
@@ -1718,7 +1725,7 @@ export default class Database {
         const rowKey = this.rowIndexRowKeyMap.get(rowIndex);
         const _key = `${rowKey}\u200b_${key}`;
         const row = this.getRowForRowIndex(rowIndex);
-        const cellHeader = this.getColumnByKey(key);
+        const cellHeader = this.getCellHeaderByKey(key);
         if (!rowKey || !cellHeader || !row) {
             return;
         }
@@ -1813,8 +1820,8 @@ export default class Database {
         const height = this.overlayerAutoHeightMap.get(key) || 0;
         return height;
     }
-    setCustomHeader(customHeader: CustomHeader) {
-        (['fixedData', 'sortData', 'hideData', 'resizableData'] as (keyof CustomHeader)[]).forEach((key) => {
+    setCustomHeader(customHeader: CustomHeaderType) {
+        (['fixedData', 'sortData', 'hideData', 'resizableData'] as (keyof CustomHeaderType)[]).forEach((key) => {
             const value = customHeader[key];
             if (value !== undefined) {
                 this.customHeader[key] = value as any;
@@ -1834,15 +1841,29 @@ export default class Database {
             resizableData,
         });
     }
+    setCustomHeaderHideData(key: string, hide: boolean) {
+        let { hideData = {} } = this.customHeader;
+        hideData[key] = hide;
+        this.setCustomHeader({
+            hideData,
+        });
+    }
+    setCustomHeaderFixedData(key: string, fixed: Fixed | '') {
+        let { fixedData = {} } = this.customHeader;
+        fixedData[key] = fixed;
+        this.setCustomHeader({
+            fixedData,
+        });
+    }
     // 递归处理
     clearCustomHeaderInvalidValues(columns: Column[]) {
-        const clearCustomHeaderInvalidValues = (columns: Column[], customHeader: CustomHeader = {}) => {
+        const clearCustomHeaderInvalidValues = (columns: Column[], customHeader: CustomHeaderType = {}) => {
             columns.forEach((column) => {
                 if (column.children && column.children.length > 0) {
                     clearCustomHeaderInvalidValues(column.children, customHeader);
                 }
                 // 用一个小的 helper 函数，减少重复代码
-                const assignIfDifferent = (field: keyof CustomHeader, columnValue: any) => {
+                const assignIfDifferent = (field: keyof CustomHeaderType, columnValue: any) => {
                     const value = this.customHeader[field]?.[column.key];
                     if (value !== undefined && value !== columnValue) {
                         if (!customHeader[field]) {
@@ -1857,7 +1878,7 @@ export default class Database {
                 assignIfDifferent('resizableData', column.width);
             });
         };
-        let obj: CustomHeader = {};
+        let obj: CustomHeaderType = {};
         clearCustomHeaderInvalidValues(columns, obj);
         return obj;
     }

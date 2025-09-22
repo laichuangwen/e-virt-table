@@ -59,38 +59,40 @@ function sortFixed(arr: Column[] = []) {
         ...right.sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0)),
     ];
 }
-function calCrossSpan(arr: Column[] = [], maxRow: number = 1, level: number = 0, parentKey=''): Column[] {
-    return arr.sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0)).map((config) => {
-        if (config.children) {
-            let colspan = 0;
-            let fixed = config.fixed;
-            config.children.forEach((item) => {
-                item.fixed = fixed;
-            });
-            const children = calCrossSpan(config.children, maxRow - 1, level + 1,parentKey);
-            if (children) {
-                children.forEach((item) => {
-                    colspan += item.colspan ?? 0;
+function calCrossSpan(arr: Column[] = [], maxRow: number = 1, level: number = 0, parentKey = ''): Column[] {
+    return arr
+        .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
+        .map((config) => {
+            if (config.children) {
+                let colspan = 0;
+                let fixed = config.fixed;
+                config.children.forEach((item) => {
+                    item.fixed = fixed;
                 });
+                const children = calCrossSpan(config.children, maxRow - 1, level + 1, config.key);
+                if (children) {
+                    children.forEach((item) => {
+                        colspan += item.colspan ?? 0;
+                    });
+                }
+                return {
+                    ...config,
+                    width: config.width,
+                    level,
+                    rowspan: 1,
+                    colspan,
+                    parentKey,
+                    children: children.sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0)),
+                };
             }
             return {
                 ...config,
-                width: config.width,
                 level,
-                rowspan: 1,
-                colspan,
+                rowspan: maxRow,
+                colspan: 1,
                 parentKey,
-                children: children.sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0)),
             };
-        }
-        return {
-            ...config,
-            level,
-            rowspan: maxRow,
-            colspan: 1,
-            parentKey,
-        };
-    });
+        });
 }
 function toLeaf(arr: Column[] = []): Column[] {
     let tmp: Column[] = [];

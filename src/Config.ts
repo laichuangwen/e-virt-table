@@ -309,6 +309,16 @@ export default class Config {
     AUTO_ROW_HEIGHT = false;
     /** 启用拖拽表头 */
     ENABLE_DRAG_COLUMN = false;
+    /** 隐藏表头图标 */
+    HEADER_HIDEN_ICON_SVG = '';
+    /** 表头可见图标 */
+    HEADER_VISIBLE_ICON_SVG = '';
+    /** 表头固定左图标 */
+    HEADER_FIXED_LEFT_ICON_SVG = '';
+    /** 表头固定右图标 */
+    HEADER_FIXED_RIGHT_ICON_SVG = '';
+    /** 表头不固定图标 */
+    HEADER_NO_FIXED_ICON_SVG = '';
     /** header 格子样式 */
     HEADER_CELL_STYLE_METHOD?: CellHeaderStyleMethod;
     /** body 格子样式 */

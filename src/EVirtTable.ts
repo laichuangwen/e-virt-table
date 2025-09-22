@@ -2,7 +2,7 @@ import {
     ChangeItem,
     Column,
     ConfigType,
-    CustomHeader,
+    CustomHeaderType,
     EventCallback,
     EVirtTableOptions,
     FilterMethod,
@@ -26,6 +26,7 @@ import ContextMenu from './ContextMenu';
 import { mergeColCell, mergeRowCell, getSpanArrByRow, getSpanObjByColumn, throttle } from './util';
 import './style.css';
 import Loading from './Loading';
+import CustomHeader from './CustomHeader';
 
 export default class EVirtTable {
     private options: EVirtTableOptions;
@@ -41,6 +42,7 @@ export default class EVirtTable {
     private overlayer: Overlayer;
     private contextMenu: ContextMenu;
     private loading: Loading;
+    private customHeader: CustomHeader;
     ctx: Context;
 
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
@@ -66,6 +68,7 @@ export default class EVirtTable {
         this.overlayer = new Overlayer(this.ctx);
         this.contextMenu = new ContextMenu(this.ctx);
         this.loading = new Loading(this.ctx);
+        this.customHeader = new CustomHeader(this.ctx, this.header);
         // 节流绘制表格
         this.ctx.on(
             'draw',
@@ -173,7 +176,7 @@ export default class EVirtTable {
         this.ctx.database.setFooterData(data);
         this.ctx.emit('draw');
     }
-    setCustomHeader(customHeader: CustomHeader) {
+    setCustomHeader(customHeader: CustomHeaderType) {
         this.ctx.database.setCustomHeader(customHeader);
         this.ctx.database.init(false);
         this.header.init();
@@ -182,7 +185,6 @@ export default class EVirtTable {
     getCustomHeader() {
         return this.header.getCustomHeader();
     }
-
 
     setLoading(loading: boolean) {
         this.ctx.loading = loading;
@@ -458,7 +460,7 @@ export default class EVirtTable {
         };
     }
     getColumnByKey(key: string) {
-        return this.ctx.database.getColumnByKey(key)?.column;
+        return this.ctx.database.getCellHeaderByKey(key)?.column;
     }
 
     /**
@@ -473,6 +475,7 @@ export default class EVirtTable {
         this.autofill.destroy();
         this.contextMenu.destroy();
         this.loading.destroy();
+        this.customHeader.destroy();
         this.ctx.destroy();
         this.ctx.containerElement.remove();
     }

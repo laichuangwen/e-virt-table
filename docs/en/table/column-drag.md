@@ -17,14 +17,14 @@
 | Event Name    | Description       | Callback Parameters                                      |
 | ----------- | ---------- | --------------------------------------------- |
 | columnDragChange | Column drag event | `ColumnDragChangeEvent` |
-| customHeaderChange | Custom header event | `CustomHeader` |
+| customHeaderChange | Custom header event | `CustomHeaderType` |
 
 ## Methods
 
 | Method Name             | Description                             | Parameters                                                  |
 | -------------------- | -------------------------------- | ----------------------------------------------------- |
-| setCustomHeader | Set custom header | `CustomHeader` |
-| getCustomHeader | Get custom header data | `{CustomHeader，Column[]}` |
+| setCustomHeader | Set custom header | `CustomHeaderType` |
+| getCustomHeader | Get custom header data | `{CustomHeaderType，Column[]}` |
 
 ## Column Drag
 
@@ -50,7 +50,7 @@ h:400px
 ## Types
 
 ``` ts
-export type CustomHeader = {
+export type CustomHeaderType = {
     fixedData?: Record<string, Fixed>;
     sortData?: Record<string, number>;
     hideData?: Record<string, boolean>;

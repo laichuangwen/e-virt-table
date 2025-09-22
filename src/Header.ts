@@ -20,8 +20,7 @@ export default class Header {
     private columnIndex = 0;
     private isMouseDown = false; // 是否按下
     private columns: any;
-    private visibleColumns: any;
-    private visibleLeafColumns: any[] = [];
+    private visibleLeafColumns: Column[] = [];
     private visibleHeight = 0;
     private visibleWidth = 0;
     private allCellHeaders: CellHeader[] = [];
@@ -32,6 +31,7 @@ export default class Header {
     private fixedRightCellHeaders: CellHeader[] = [];
     private renderCenterCellHeaders: CellHeader[] = [];
     private renderFixedCellHeaders: CellHeader[] = [];
+    visibleColumns: Column[] = [];
     constructor(ctx: Context) {
         this.ctx = ctx;
         // 监听表头重置,窗口变化

@@ -568,6 +568,7 @@ export default class EventTable {
                 return; // 找到后直接返回
             }
         }
+        this.ctx.emit('headerMouseleave');
     }
     private isInsideBody(y: number) {
         return y > this.ctx.body.y && y < this.ctx.body.y + this.ctx.body.visibleHeight;

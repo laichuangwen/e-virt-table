@@ -173,8 +173,8 @@ export type OverlayerTooltip = {
     text: string;
     show: boolean;
 };
-export type CustomHeader = {
-    fixedData?: Record<string, Fixed>;
+export type CustomHeaderType = {
+    fixedData?: Record<string, Fixed | ''>;
     sortData?: Record<string, number>;
     hideData?: Record<string, boolean>;
     resizableData?: Record<string, number>;

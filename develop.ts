@@ -525,6 +525,7 @@ const eVirtTable = new EVirtTable(canvas, {
         ENABLE_COPY: true,
         ENABLE_PASTER: true,
         FOOTER_POSITION: 'bottom',
+        ENABLE_DRAG_COLUMN: true,
         // ENABLE_SELECTOR_SINGLE: true,
         OFFSET_HEIGHT: 16,
         // SELECTOR_CELL_VALUE_TYPE: 'displayText', // displayText | value
@@ -1199,3 +1200,7 @@ function destroy() {
     window.removeEventListener('beforeunload', destroy);
 }
 window.addEventListener('beforeunload', destroy);
+
+eVirtTable.on('customHeaderChange', (data) => {
+    console.log('customHeaderChange', data);
+});
