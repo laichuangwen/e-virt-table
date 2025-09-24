@@ -51,10 +51,24 @@ export type TypeCheckbox =
 export type CellType = 'header' | 'body' | 'footer';
 export type FooterPosition = 'top' | 'bottom';
 export type RowType = CellType;
+export type MenuItemEvent =
+    | 'copy'
+    | 'paste'
+    | 'cut'
+    | 'clearSelected'
+    | 'fixedLeft'
+    | 'fixedRight'
+    | 'noFixed'
+    | 'hide'
+    | 'resetHeader'
+    | 'cancelHide';
 export type MenuItem = {
     label: string;
-    value: string | 'copy' | 'paste' | 'cut' | 'clearSelected';
+    value: string | MenuItemEvent;
     event?: Function;
+    icon?: string;
+    divider?: boolean;
+    disabled?: boolean;
     children?: MenuItem[];
 };
 export type OverlayerView = {
@@ -142,7 +156,7 @@ export interface Column {
     sortAscIconName?: string; // 升序排序图标
     sortDescIconName?: string; // 降序排序图标
     parentKey?: string;
-    hide?: boolean | Function;
+    hide?: boolean ;
     render?: Function | string;
     renderFooter?: Function | string;
     renderHeader?: Function | string;

@@ -43,6 +43,7 @@ export default class Database {
     private validationErrorMap = new Map<string, ValidateResult>();
     private itemRowKeyMap = new WeakMap();
     private bufferData: any[] = [];
+    private originalColumns: Column[] = [];
     private customHeader: CustomHeader = {
         fixedData: {},
         sortData: {},
@@ -67,6 +68,7 @@ export default class Database {
         this.data = data;
         this.footerData = footerData;
         this.columns = columns;
+        this.originalColumns = deepClone(columns);
         this.init();
     }
     // 初始化默认不忽略清空改变值和校验map
@@ -267,8 +269,8 @@ export default class Database {
         return _generateColumns(columns);
     }
     getColumns() {
-        const _columns = deepClone(this.columns)
-        return  this.generateColumns(_columns);
+        const _columns = deepClone(this.columns);
+        return this.generateColumns(_columns);
     }
     setColumns(columns: Column[]) {
         this.columns = columns;
@@ -1817,12 +1819,14 @@ export default class Database {
                 this.customHeader[key] = value as any;
             }
         });
-        const obj = this.clearCustomHeaderInvalidValues(this.columns);
+        const obj = this.clearCustomHeaderInvalidValues(this.originalColumns);
         this.ctx.emit('customHeaderChange', obj);
     }
     resetCustomHeader() {
         this.customHeader = {};
+        this.columns = this.originalColumns;
         this.init(false);
+        this.ctx.emit('resetHeader');
         this.ctx.emit('customHeaderChange', this.customHeader);
     }
     getCustomHeader() {
@@ -1845,6 +1849,7 @@ export default class Database {
             hideData,
         });
         this.init(false);
+        this.ctx.emit('resetHeader');
     }
     setCustomHeaderFixedData(keys: string[], fixed: Fixed | '') {
         let { fixedData = {} } = this.customHeader;
@@ -1855,6 +1860,10 @@ export default class Database {
             fixedData,
         });
         this.init(false);
+        this.ctx.emit('resetHeader');
+    }
+    setOriginalColumns(columns: Column[]) {
+        this.originalColumns = columns;
     }
     // 递归处理
     clearCustomHeaderInvalidValues(columns: Column[]) {
@@ -1871,6 +1880,11 @@ export default class Database {
                             customHeader[field] = {} as any;
                         }
                         (customHeader[field] as any)[column.key] = value;
+                        if (field === 'fixedData' && columnValue === undefined && value === '') {
+                            console.log('shanhcu');
+                            
+                            delete customHeader[field];
+                        }
                     }
                 };
                 assignIfDifferent('fixedData', column.fixed);

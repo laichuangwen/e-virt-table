@@ -540,7 +540,8 @@ const eVirtTable = new EVirtTable(canvas, {
             {
                 label: '新增',
                 value: 'add',
-                event: () => {
+                event: (_e,callback) => {
+                    callback();
                     console.log('新增');
                 },
             },
@@ -1194,8 +1195,13 @@ document.getElementById('hide')?.addEventListener('click', () => {
     eVirtTable.setCustomHeader({ hideData: { phone: true } });
 });
 
+const customHeader = localStorage.getItem('customHeader');
+if (customHeader) {
+    eVirtTable.setCustomHeader(JSON.parse(customHeader));
+}
 eVirtTable.on('customHeaderChange', (customHeader) => {
     console.log('customHeaderChange', customHeader);
+    localStorage.setItem('customHeader', JSON.stringify(customHeader));
 });
 // 销毁
 function destroy() {

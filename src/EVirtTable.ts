@@ -155,6 +155,7 @@ export default class EVirtTable {
         // 先关闭编辑
         this.editor.doneEdit();
         this.ctx.database.setColumns(columns);
+        this.ctx.database.setOriginalColumns(columns);
         this.header.init();
         this.ctx.emit('draw');
     }
