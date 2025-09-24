@@ -55,6 +55,7 @@ export type MenuItem = {
     label: string;
     value: string | 'copy' | 'paste' | 'cut' | 'clearSelected';
     event?: Function;
+    children?: MenuItem[];
 };
 export type OverlayerView = {
     key: 'left' | 'center' | 'right';
@@ -174,11 +175,12 @@ export type OverlayerTooltip = {
     show: boolean;
 };
 export type CustomHeader = {
-    fixedData?: Record<string, Fixed>;
+    fixedData?: Record<string, Fixed | ''>;
     sortData?: Record<string, number>;
     hideData?: Record<string, boolean>;
     resizableData?: Record<string, number>;
-};export interface ColumnDragChangeEvent {
+};
+export interface ColumnDragChangeEvent {
     source: CellHeader;
     target: CellHeader;
     columns: Column[];

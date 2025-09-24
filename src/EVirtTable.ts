@@ -149,14 +149,11 @@ export default class EVirtTable {
         //重新加载config，初始化表格，但是默认不清除用户操作
         this.ctx.database.init(false);
         this.header.init();
-        // 更新右键菜单，有可能配置项变化
-        this.contextMenu.updated();
         this.ctx.emit('draw');
     }
     loadColumns(columns: Column[]) {
         // 先关闭编辑
         this.editor.doneEdit();
-        this.ctx.database.setOriginalColumns(columns);
         this.ctx.database.setColumns(columns);
         this.header.init();
         this.ctx.emit('draw');

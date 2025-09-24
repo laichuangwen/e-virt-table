@@ -20,8 +20,9 @@ import type {
     SortByType,
     SortStateMap,
     CustomHeader,
+    Fixed,
 } from './types';
-import { generateShortUUID, toLeaf, compareDates } from './util';
+import { generateShortUUID, toLeaf, compareDates, deepClone } from './util';
 import { HistoryItemData } from './History';
 import Cell from './Cell';
 export default class Database {
@@ -48,7 +49,6 @@ export default class Database {
         hideData: {},
         resizableData: {},
     };
-    private originalColumns: Column[] = [];
 
     overlayerAutoHeightMap = new Map<string, number>();
     private bufferCheckState = {
@@ -67,7 +67,6 @@ export default class Database {
         this.data = data;
         this.footerData = footerData;
         this.columns = columns;
-        this.setOriginalColumns(columns);
         this.init();
     }
     // 初始化默认不忽略清空改变值和校验map
@@ -268,14 +267,12 @@ export default class Database {
         return _generateColumns(columns);
     }
     getColumns() {
-        return this.generateColumns(this.columns);
+        const _columns = deepClone(this.columns)
+        return  this.generateColumns(_columns);
     }
     setColumns(columns: Column[]) {
         this.columns = columns;
         this.clearBufferData();
-    }
-    setOriginalColumns(columns: Column[]) {
-        this.originalColumns = JSON.parse(JSON.stringify(columns));
     }
     setData(data: any[]) {
         this.data = data;
@@ -1820,8 +1817,13 @@ export default class Database {
                 this.customHeader[key] = value as any;
             }
         });
-        const obj = this.clearCustomHeaderInvalidValues(this.originalColumns);
+        const obj = this.clearCustomHeaderInvalidValues(this.columns);
         this.ctx.emit('customHeaderChange', obj);
+    }
+    resetCustomHeader() {
+        this.customHeader = {};
+        this.init(false);
+        this.ctx.emit('customHeaderChange', this.customHeader);
     }
     getCustomHeader() {
         return this.customHeader;
@@ -1833,6 +1835,26 @@ export default class Database {
         this.setCustomHeader({
             resizableData,
         });
+    }
+    setCustomHeaderHideData(keys: string[], hide: boolean) {
+        let { hideData = {} } = this.customHeader;
+        keys.forEach((key) => {
+            hideData[key] = hide;
+        });
+        this.setCustomHeader({
+            hideData,
+        });
+        this.init(false);
+    }
+    setCustomHeaderFixedData(keys: string[], fixed: Fixed | '') {
+        let { fixedData = {} } = this.customHeader;
+        keys.forEach((key) => {
+            fixedData[key] = fixed;
+        });
+        this.setCustomHeader({
+            fixedData,
+        });
+        this.init(false);
     }
     // 递归处理
     clearCustomHeaderInvalidValues(columns: Column[]) {

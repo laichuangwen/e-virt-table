@@ -97,6 +97,9 @@ export default class Tooltip {
     }
     private show(cell: Cell) {
         // 如果没有设置overflowTooltipShow=true，则不显示
+        if(this.ctx.contextMenuIng){
+            return;
+        }
         if (!cell.overflowTooltipShow) {
             return;
         }

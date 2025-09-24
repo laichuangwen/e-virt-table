@@ -39,6 +39,7 @@ export default class Header {
             'resetHeader',
             throttle(() => {
                 this.init();
+                this.ctx.clearSelector();
                 this.ctx.emit('draw');
             }, 100),
         );
@@ -106,6 +107,7 @@ export default class Header {
         this.ctx.header.y = this.y;
         this.ctx.header.width = this.width;
         this.ctx.header.height = this.height;
+        this.ctx.header.allCellHeaders = this.allCellHeaders;
         this.ctx.header.visibleWidth = this.visibleWidth;
         this.ctx.header.visibleHeight = this.visibleHeight;
     }
@@ -251,7 +253,7 @@ export default class Header {
                 };
                 const columns = this.ctx.database.getColumns();
                 const sortColumns = calCrossSpan(columns, getMaxRow(columns));
-                const tree = new TreeUtil(sortColumns, {
+                const tree = new TreeUtil(JSON.parse(JSON.stringify(sortColumns)), {
                     key: 'key', // 节点唯一标识字段（对应我们之前的field）
                     childrenKey: 'children', // 子节点数组字段
                 });

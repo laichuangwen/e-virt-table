@@ -507,6 +507,7 @@ const eVirtTable = new EVirtTable(canvas, {
         // DISABLED: true,
         // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
+        ENABLE_DRAG_COLUMN: true,
         AUTO_ROW_HEIGHT: false,
         ROW_KEY: 'id',
         CELL_HEIGHT: 36,
@@ -1193,6 +1194,9 @@ document.getElementById('hide')?.addEventListener('click', () => {
     eVirtTable.setCustomHeader({ hideData: { phone: true } });
 });
 
+eVirtTable.on('customHeaderChange', (customHeader) => {
+    console.log('customHeaderChange', customHeader);
+});
 // 销毁
 function destroy() {
     eVirtTable.destroy();

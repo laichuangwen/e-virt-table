@@ -155,13 +155,14 @@
 }
 .e-virt-table-context-menu-item {
     cursor: pointer;
-    padding: 8px 24px;
+    padding: 6px 24px;
     color: var(--evt-text-color-regular);
 }
 .e-virt-table-context-menu-item:hover {
     color: var(--evt-color-primary);
     background-color: #f5f7fa;
 }
+
 .e-virt-table-loading {
     display: none;
     position: absolute;

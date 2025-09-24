@@ -185,6 +185,10 @@ export default class Selector {
             this.ctx.setFocusCell(cell);
             this.click();
         });
+        //解耦：外部调用选择单元格
+        this.ctx.on('selectCols', (cell: CellHeader) => {
+            this.selectCols(cell);
+        });
     }
     private setSelector(xArr: number[], yArr: number[]) {
         if (this.ctx.dragHeaderIng) {
@@ -384,15 +388,15 @@ export default class Selector {
         const { SELECTOR_AREA_MIN_Y, SELECTOR_AREA_MAX_Y, SELECTOR_AREA_MAX_Y_OFFSET } = this.ctx.config;
         const minY = SELECTOR_AREA_MIN_Y;
         const maxY = SELECTOR_AREA_MAX_Y || this.ctx.maxRowIndex - SELECTOR_AREA_MAX_Y_OFFSET;
-        if (this.ctx.mousedown && this.ctx.focusCellHeader) {
+        if (this.ctx.focusCellHeader) {
             const { colIndex } = this.ctx.focusCellHeader;
             this.ctx.clearSelector();
-            if (cell.colIndex >= colIndex) {
+            if (this.ctx.mousedown && cell.colIndex >= colIndex) {
                 const xArr = [colIndex, cell.colIndex + cell.colspan - 1];
                 const yArr = [minY, maxY];
                 this.setSelector(xArr, yArr);
             } else {
-                const xArr = [cell.colIndex, colIndex];
+                const xArr = [cell.colIndex, colIndex + cell.colspan - 1];
                 const yArr = [minY, maxY];
                 this.setSelector(xArr, yArr);
             }
