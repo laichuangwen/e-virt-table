@@ -173,6 +173,7 @@ export default class Context {
     history: History;
     config: Config;
     drawTime = 0;
+    rowExtendMap = new Map<string, string>(); // 行扩展状态管理，key为rowKey，value为展开的colKey
 
     constructor(containerOptions: containerElementOptions, options: EVirtTableOptions) {
         const {
@@ -395,5 +396,57 @@ export default class Context {
         this.eventTable.destroy();
         this.eventBrowser.destroy();
         this.eventBus.destroy();
+    }
+
+    /**
+     * 设置行扩展状态
+     */
+    setRowExtend(rowKey: string, colKey: string) {
+        const currentColKey = this.rowExtendMap.get(rowKey);
+        const wasExtended = !!currentColKey;
+        
+        if (currentColKey === colKey) {
+            // 如果点击的是同一个扩展，则收起
+            this.rowExtendMap.delete(rowKey);
+        } else {
+            // 否则设置新的扩展
+            this.rowExtendMap.set(rowKey, colKey);
+        }
+        
+        const isExtended = this.rowExtendMap.has(rowKey);
+        const rowIndex = this.database.getRowIndexForRowKey(rowKey);
+        
+        // 发出扩展变化事件，包含位置信息
+        this.emit('rowExtendChange', { 
+            rowKey, 
+            colKey: this.rowExtendMap.get(rowKey),
+            rowIndex,
+            wasExtended,
+            isExtended,
+            action: isExtended ? 'expand' : 'collapse'
+        });
+    }
+
+    /**
+     * 获取行的扩展状态
+     */
+    getRowExtend(rowKey: string): string | undefined {
+        return this.rowExtendMap.get(rowKey);
+    }
+
+    /**
+     * 检查行是否已扩展指定列
+     */
+    isRowExtended(rowKey: string, colKey: string): boolean {
+        return this.rowExtendMap.get(rowKey) === colKey;
+    }
+
+    /**
+     * 清除所有扩展状态
+     */
+    clearAllRowExtend() {
+        this.rowExtendMap.clear();
+        this.emit('rowExtendChange', { rowKey: null, colKey: null });
+        this.emit('clearAllExtendRowHeights'); // 通知清除所有高度记录
     }
 }

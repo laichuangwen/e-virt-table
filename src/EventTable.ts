@@ -106,8 +106,18 @@ export default class EventTable {
                 (cell: Cell) => {
                     this.ctx.clickCell = cell;
                     this.ctx.emit('cellClick', cell, e);
-                    this.selectionClick(cell, e);
-                    this.treeClick(cell, e);
+                    
+                    // 优先处理图标点击，如果点击了图标就不执行选择逻辑
+                    let iconClicked = false;
+                    if (this.extendClick(cell, e)) {
+                        iconClicked = true;
+                    }
+                    if (!iconClicked && this.treeClick(cell, e)) {
+                        iconClicked = true;
+                    }
+                    if (!iconClicked) {
+                        this.selectionClick(cell, e);
+                    }
                 },
                 true,
             );
@@ -287,11 +297,11 @@ export default class EventTable {
      * 树点击
      * @param cell
      */
-    private treeClick(cell: Cell, e: MouseEvent) {
+    private treeClick(cell: Cell, e: MouseEvent): boolean {
         // 鼠标移动到图标上会变成pointer，所以这里判断是否是pointer就能判断出是图标点击的
         const isTree = ['tree', 'selection-tree', 'tree-selection'].includes(cell.type) && this.ctx.isPointer;
         if (!isTree) {
-            return;
+            return false;
         }
         // 判断是否点击tree图标
         const { offsetY, offsetX } = this.ctx.getOffset(e);
@@ -308,7 +318,7 @@ export default class EventTable {
                 cell.drawTreeImageHeight,
             )
         ) {
-            return;
+            return false;
         }
 
         const row = this.ctx.database.getRowForRowKey(cell.rowKey);
@@ -342,6 +352,46 @@ export default class EventTable {
             this.ctx.database.expandItem(cell.rowKey, !isExpand);
             this.ctx.emit('expandChange', this.ctx.database.getExpandRowKeys());
         }
+        
+        return true;
+    }
+
+    /**
+     * 扩展点击
+     * @param cell
+     */
+    private extendClick(cell: Cell, e: MouseEvent): boolean {
+        // 检查是否有扩展图标且鼠标是pointer状态
+        if (!cell.hasExtendIcon || !this.ctx.isPointer) {
+            return false;
+        }
+        
+        // 判断是否点击扩展图标
+        const { offsetY, offsetX } = this.ctx.getOffset(e);
+        const clickY = offsetY;
+        const clickX = offsetX;
+
+        if (
+            !this.isInsideElement(
+                clickX,
+                clickY,
+                cell.drawTreeImageX,
+                cell.drawTreeImageY,
+                cell.drawTreeImageWidth,
+                cell.drawTreeImageHeight,
+            )
+        ) {
+            return false;
+        }
+
+        
+        // 切换扩展状态
+        this.ctx.setRowExtend(cell.rowKey, cell.key);
+        
+        // 触发重绘
+        this.ctx.emit('draw');
+        
+        return true;
     }
 
     private sortClick(cellHeader: CellHeader, e: MouseEvent) {

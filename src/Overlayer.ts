@@ -1,4 +1,4 @@
-import type Cell from './Cell';
+import Cell from './Cell';
 import type CellHeader from './CellHeader';
 import type Context from './Context';
 import type { OverlayerContainer, OverlayerView, OverlayerWrapper } from './types';
@@ -169,13 +169,16 @@ export default class Overlayer {
         if (!this.ctx.config.FOOTER_FIXED) {
             renderRows = renderRows.concat(this.ctx.footer.renderRows);
         }
-        renderRows.forEach((row: { cells: Cell[] }) => {
+        renderRows.forEach((row: any) => {
             row.cells.forEach((cell: Cell) => {
                 if (cell.cellType === 'footer') {
                     cell.render = cell.renderFooter;
                 }
                 if (cell.render) {
-                    if (cell.fixed === 'left') {
+                    // ExtendRow 的单元格总是添加到 centerCells，因为它们不应该受固定列影响
+                    if (row.rowType === 'extend' || (cell as any).isExtendContent) {
+                        centerCells.push(cell);
+                    } else if (cell.fixed === 'left') {
                         leftCells.push(cell);
                     } else if (cell.fixed === 'right') {
                         rightCells.push(cell);
@@ -242,6 +245,7 @@ export default class Overlayer {
         };
         return body;
     }
+    
     private getFooter() {
         const centerCells: Cell[] = [];
         const leftCells: Cell[] = [];
