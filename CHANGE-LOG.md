@@ -396,3 +396,13 @@ V1.2.34
 - fix: 修复unbind时对象固定为window,实际上没有完成unbind的问题
 - 
 ---
+
+V1.3.0
+### Bug Fixes
+
+- feat: 内置自定义表头
+- feat: 添加拖拽表头
+- fix: 右键菜单支持多级
+- feat: footer溢出提示
+
+---
