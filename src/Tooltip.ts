@@ -94,10 +94,26 @@ export default class Tooltip {
                 this.show(cell);
             }
         });
+        this.ctx.on('cellFooterMouseleave', (_, e) => {
+            const contains = this.floatingEl.contains(e.target);
+            if (contains) {
+                return;
+            }
+            this.hide();
+        });
+        this.ctx.on('cellFooterHoverChange', (cell, e) => {
+            const contains = this.floatingEl.contains(e.target);
+            if (contains) {
+                return;
+            }
+            if (cell.ellipsis) {
+                this.show(cell);
+            }
+        });
     }
     private show(cell: Cell) {
         // 如果没有设置overflowTooltipShow=true，则不显示
-        if(this.ctx.contextMenuIng){
+        if (this.ctx.contextMenuIng) {
             return;
         }
         if (!cell.overflowTooltipShow) {
