@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>行内渲染 - 基础用法</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <style>
+        .content {
+            position: relative;
+        }
+        .employee-card {
+            padding: 20px;
+            margin: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            box-sizing: border-box;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .avatar {
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-right: 16px;
+        }
+        .employee-info {
+            flex: 1;
+        }
+        .employee-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0 0 4px 0;
+        }
+        .employee-title {
+            font-size: 14px;
+            opacity: 0.9;
+            margin: 0;
+        }
+        .employee-id {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        .card-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .detail-item {
+            background: rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 8px;
+        }
+        .detail-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+        .detail-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+    </style>
+    <body>
+        <div class="content">
+            <div id="e-virt-table"></div>
+            <div id="e-virt-table-overlayer"></div>
+        </div>
+    </body>
+    <script>
+        // 生成员工数据
+        function generateEmployeeData() {
+            const departments = ['技术部', '市场部', '人事部', '财务部', '运营部'];
+            const positions = ['工程师', '经理', '专员', '主管', '总监'];
+            
+            const data = [];
+            for (let i = 0; i < 50; i++) {
+                data.push({
+                    id: `EMP${String(i + 1).padStart(3, '0')}`,
+                    name: `员工${i + 1}`,
+                    department: departments[i % departments.length],
+                    position: positions[i % positions.length],
+                    email: `emp${i + 1}@company.com`,
+                    phone: `138${String(i).padStart(8, '0')}`,
+                    salary: 8000 + Math.floor(Math.random() * 12000),
+                    joinDate: `2023-${String((i % 12) + 1).padStart(2, '0')}-${String((i % 28) + 1).padStart(2, '0')}`,
+                    status: ['在职', '离职', '试用'][i % 3],
+                    address: `北京市朝阳区某某街道${i + 1}号`,
+                    experience: Math.floor(Math.random() * 10) + 1
+                });
+            }
+            return data;
+        }
+
+        const columns = [
+            {
+                key: 'id',
+                title: 'ID',
+                width: 100,
+                fixed: 'left',
+                extendRender: (pEl, cell) => {
+                    const employee = cell.row;
+                    const cardEl = document.createElement('div');
+                    cardEl.className = 'employee-card';
+                    
+                    cardEl.innerHTML = `
+                        <div class="card-header">
+                            <div class="avatar">${employee.name.charAt(employee.name.length - 1)}</div>
+                            <div class="employee-info">
+                                <h3 class="employee-name">${employee.name}</h3>
+                                <p class="employee-title">${employee.department} - ${employee.position}</p>
+                                <p class="employee-id">工号: ${employee.id}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card-details">
+                            <div class="detail-item">
+                                <div class="detail-label">联系邮箱</div>
+                                <div class="detail-value">${employee.email}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">手机号码</div>
+                                <div class="detail-value">${employee.phone}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">月薪</div>
+                                <div class="detail-value">¥${employee.salary.toLocaleString()}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">入职日期</div>
+                                <div class="detail-value">${employee.joinDate}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">工作经验</div>
+                                <div class="detail-value">${employee.experience} 年</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">在职状态</div>
+                                <div class="detail-value">${employee.status}</div>
+                            </div>
+                        </div>
+                    `;
+                    pEl.appendChild(cardEl);
+                }
+            },
+            {
+                key: 'name',
+                title: '姓名',
+                width: 120
+            },
+            {
+                key: 'department',
+                title: '部门',
+                width: 100
+            },
+            {
+                key: 'position',
+                title: '职位',
+                width: 120
+            },
+            {
+                key: 'email',
+                title: '邮箱',
+                width: 200
+            },
+            {
+                key: 'salary',
+                title: '薪资',
+                width: 100,
+                align: 'right',
+                render: (pEl, cell) => {
+                    pEl.textContent = `¥${cell.getValue().toLocaleString()}`;
+                }
+            },
+            {
+                key: 'status',
+                title: '状态',
+                width: 80,
+                align: 'center',
+                render: (pEl, cell) => {
+                    const status = cell.getValue();
+                    const color = status === '在职' ? '#52c41a' : 
+                                 status === '试用' ? '#faad14' : '#ff4d4f';
+                    pEl.style.color = color;
+                    pEl.style.fontWeight = 'bold';
+                    pEl.textContent = status;
+                }
+            }
+        ];
+
+        const data = generateEmployeeData();
+        const target = document.getElementById('e-virt-table');
+        const overlayerEl = document.getElementById('e-virt-table-overlayer');
+
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                AUTO_ROW_HEIGHT: true,
+                ENABLE_SELECTOR: true,
+                ENABLE_OFFSET_HEIGHT: true,
+                OFFSET_HEIGHT: 24,
+            },
+            overlayerElement: overlayerEl,
+        });
+
+        // 处理覆盖层渲染
+        grid.on('overlayerChange', (container) => {
+            if (!overlayerEl) return;
+            
+            overlayerEl.replaceChildren();
+            Object.assign(overlayerEl.style, container.style);
+            
+            container.views.forEach((typeView) => {
+                const typeDiv = document.createElement('div');
+                typeDiv.className = typeView.class;
+                Object.assign(typeDiv.style, typeView.style);
+                
+                typeView.views.forEach((cellWrapView) => {
+                    const cellWrap = document.createElement('div');
+                    Object.assign(cellWrap.style, cellWrapView.style);
+                    
+                    cellWrapView.cells.forEach((cell) => {
+                        const cellEl = document.createElement('div');
+                        Object.assign(cellEl.style, cell.style);
+                        Object.assign(cellEl.dataset, cell.domDataset || {});
+                        
+                        if (typeof cell.render === 'function') {
+                            cell.render(cellEl, cell);
+                        }
+                        cellWrap.appendChild(cellEl);
+                    });
+                    typeDiv.appendChild(cellWrap);
+                });
+                overlayerEl.appendChild(typeDiv);
+            });
+        });
+    </script>
+</html>

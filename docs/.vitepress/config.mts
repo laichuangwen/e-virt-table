@@ -93,6 +93,7 @@ export default defineConfig({
                             { text: '右键菜单', link: '/zh/table/context-menu' },
                             { text: '历史回退', link: '/zh/table/history' },
                             { text: '插槽（覆盖层）', link: '/zh/table/overlayer' },
+                            { text: '行内渲染', link: '/zh/table/extend-render' },
                         ],
                     },
                     {
@@ -168,6 +169,7 @@ export default defineConfig({
                             { text: 'Context Menu', link: '/en/table/context-menu' },
                             { text: 'History', link: '/en/table/history' },
                             { text: 'Slot (Overlay)', link: '/en/table/overlayer' },
+                            { text: 'Inline Rendering', link: '/en/table/extend-render' },
                         ],
                     },
                     {

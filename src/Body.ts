@@ -100,7 +100,7 @@ export default class Body {
             const extendRowIndex = this.ctx.database.getRowIndexForRowKey(rowKey);
             
             // 如果扩展行在当前行之前，累加其高度
-            if (extendRowIndex !== null && extendRowIndex < rowIndex) {
+            if (extendRowIndex !== null && extendRowIndex!==undefined && extendRowIndex < rowIndex) {
                 // 使用实际记录的高度，如果没有记录则使用默认值
                 const actualHeight = this.extendRowHeights.get(rowKey) || 150;
                 yOffset += actualHeight;

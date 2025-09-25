@@ -48,7 +48,7 @@ export type TypeCheckbox =
     | 'checkbox-check-disabled'
     | 'checkbox-disabled'
     | 'checkbox-indeterminate';
-export type CellType = 'header' | 'body' | 'footer';
+export type CellType = 'header' | 'body' | 'footer' | 'extend';
 export type FooterPosition = 'top' | 'bottom';
 export type RowType = CellType;
 export type MenuItem = {
@@ -57,7 +57,7 @@ export type MenuItem = {
     event?: Function;
 };
 export type OverlayerView = {
-    key: 'left' | 'center' | 'right';
+    key: 'left' | 'center' | 'right' | 'extend';
     style: any;
     cells: Cell[] | CellHeader[];
 };
