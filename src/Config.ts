@@ -246,8 +246,10 @@ export default class Config {
     ENABLE_MERGE_CELL_LINK = false;
     /** 启用填充器 */
     ENABLE_AUTOFILL = false;
-    /** 启用右键菜单 */
-    ENABLE_CONTEXT_MENU = true;
+    /** 启用body右键菜单 */
+    ENABLE_CONTEXT_MENU = false;
+    /** 启用表头右键菜单 */
+    ENABLE_HEADER_CONTEXT_MENU = false;
     /** 启用复制 */
     ENABLE_COPY = true;
     /** 启用粘贴 */
@@ -303,8 +305,9 @@ export default class Config {
         { label: '粘贴', value: 'paste' },
         { label: '清空选中内容', value: 'clearSelected' },
     ];
-    CONTEXT_HEADER_MENU: MenuItem[] = [
-        { label: '左固定', value: 'fixedLeft', disabled: true },
+    CUSTOM_BODY_CONTEXT_MENU: MenuItem[] = [];
+    HEADER_CONTEXT_MENU: MenuItem[] = [
+        { label: '左固定', value: 'fixedLeft' },
         { label: '右固定', value: 'fixedRight' },
         { label: '取消固定', value: 'noFixed' },
         { label: '隐藏', value: 'hide' },
@@ -314,6 +317,7 @@ export default class Config {
         },
         { label: '恢复默认', value: 'resetHeader' },
     ];
+    CUSTOM_HEADER_CONTEXT_MENU: MenuItem[] = [];
     /** 格子多行文本行高,isAutoRowHeight才会生效 */
     CELL_LINE_HEIGHT = 1.3;
     /** 全局自动行高 */

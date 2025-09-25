@@ -531,7 +531,6 @@ const eVirtTable = new EVirtTable(canvas, {
         // SELECTOR_CELL_VALUE_TYPE: 'displayText', // displayText | value
         // SELECTOR_AREA_MAX_X_OFFSET: 1,
         // SELECTOR_AREA_MAX_Y_OFFSET: 1,
-        ENABLE_CONTEXT_MENU: true,
         CONTEXT_MENU: [
             { label: '复制', value: 'copy' },
             { label: '剪切', value: 'cut' },
@@ -735,6 +734,8 @@ const eVirtTable = new EVirtTable(canvas, {
                 return true;
             }
         },
+        ENABLE_HEADER_CONTEXT_MENU: true,
+        ENABLE_CONTEXT_MENU: true,
         SPAN_METHOD: (params) => {
             const { mergeColCell, mergeRowCell } = eVirtTable.getUtils();
             const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;

@@ -23,7 +23,9 @@ export default class ContextMenu {
             this.hide();
         });
         this.ctx.on('cellContextMenuClick', (cell: Cell, e: MouseEvent) => {
-            if (!this.ctx.config.ENABLE_CONTEXT_MENU) return;
+            const { ENABLE_CONTEXT_MENU, CUSTOM_BODY_CONTEXT_MENU, CONTEXT_MENU } = this.ctx.config;
+            const list = [...CUSTOM_BODY_CONTEXT_MENU, ...CONTEXT_MENU];
+            if (!ENABLE_CONTEXT_MENU || list.length === 0) return;
             e.preventDefault();
             const { xArr, yArr } = this.ctx.selector;
             const [minX, maxX] = xArr;
@@ -39,7 +41,7 @@ export default class ContextMenu {
                 this.currentDOMTreeMenu.destroy();
             }
             this.ctx.contextMenuIng = true;
-            this.currentDOMTreeMenu = new DOMTreeMenu(this.contextMenuEl, this.ctx.config.CONTEXT_MENU, {
+            this.currentDOMTreeMenu = new DOMTreeMenu(this.contextMenuEl, list, {
                 onClick: (_itemData: MenuItem, value: string) => {
                     if (value === 'copy') {
                         this.ctx.emit('contextMenuCopy');
@@ -59,7 +61,9 @@ export default class ContextMenu {
             this.currentDOMTreeMenu.positionMenu(e);
         });
         this.ctx.on('cellHeaderContextMenuClick', (cell: CellHeader, e: MouseEvent) => {
-            if (!this.ctx.config.ENABLE_CONTEXT_MENU) return;
+            const { HEADER_CONTEXT_MENU, CUSTOM_HEADER_CONTEXT_MENU, ENABLE_HEADER_CONTEXT_MENU } = this.ctx.config;
+            const list = [...HEADER_CONTEXT_MENU, ...CUSTOM_HEADER_CONTEXT_MENU];
+            if (!ENABLE_HEADER_CONTEXT_MENU || list.length === 0) return;
             e.preventDefault();
             const { xArr } = this.ctx.selector;
             const [minX, maxX] = xArr;
@@ -76,7 +80,7 @@ export default class ContextMenu {
             const columns = this.ctx.database.getColumns();
             const leafColumns = toLeaf(columns);
             const hideColumns = leafColumns.filter((item) => item.hide);
-            const menuData = this.ctx.config.CONTEXT_HEADER_MENU.map((item) => {
+            const menuData = list.map((item) => {
                 if (item.value === 'cancelHide') {
                     return {
                         ...item,
