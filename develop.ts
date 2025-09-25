@@ -11,6 +11,56 @@ import {
 // import { mergeColCell, mergeRowCell } from './src/util';
 
 const canvas = document.getElementById('e-virt-table') as HTMLDivElement;
+const testRenderExtend = (pEl: HTMLElement, cell: any) => {
+    const cardEl = document.createElement('div');
+    cardEl.style.cssText = `
+        padding: 15px;
+        margin: 5px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        box-sizing: border-box;
+        max-width: 100%;
+        overflow: hidden;
+    `;
+    cardEl.innerHTML = `
+        <div class="test" style="display: flex;width: 100%; align-items: center; margin-bottom: 16px;">
+            <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; margin-right: 16px;">
+                ${cell.row.emp_name?.charAt(0) || 'N'}
+            </div>
+            <div>
+                <h3 style="margin: 0; font-size: 18px; font-weight: 600;">${cell.row.emp_name || '未知姓名'}</h3>
+                <p style="margin: 4px 0 0 0; font-size: 14px; opacity: 0.9;">ID: ${cell.row.id}</p>
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+            <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px;">
+                <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">工号</div>
+                <div style="font-size: 16px; font-weight: 500;">${cell.row.emp_no || '未知'}</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px;">
+                <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">年龄</div>
+                <div style="font-size: 16px; font-weight: 500;">${cell.row.age || '未知'}</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px;">
+                <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">手机号</div>
+                <div style="font-size: 16px; font-weight: 500;">${cell.row.phone || '未知'}</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px;">
+                <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">地址</div>
+                <div style="font-size: 16px; font-weight: 500;">${cell.row.address || '未知'}</div>
+            </div>
+        </div>
+        <div style="margin-top: 16px; padding: 12px; background: rgba(255,255,255,0.1); border-radius: 8px; text-align: center;">
+            <div style="font-size: 14px; opacity: 0.9;">
+                📋 这是一个扩展行渲染示例，展示员工的详细信息卡片
+            </div>
+        </div>
+    `;
+    pEl.appendChild(cardEl);
+}
 let columns: Column[] = [
     // {
     //   title: "序号",
@@ -36,56 +86,7 @@ let columns: Column[] = [
         fixed: 'left',
         minWidth: 80,
         maxWidth: 200,
-        extendRender: (pEl: HTMLElement, cell: any) => {
-            const cardEl = document.createElement('div');
-            cardEl.style.cssText = `
-                padding: 15px;
-                margin: 5px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                box-sizing: border-box;
-                max-width: 100%;
-                overflow: hidden;
-            `;
-            cardEl.innerHTML = `
-                <div class="test" style="display: flex;width: 100%; align-items: center; margin-bottom: 16px;">
-                    <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; margin-right: 16px;">
-                        ${cell.row.emp_name?.charAt(0) || 'N'}
-                    </div>
-                    <div>
-                        <h3 style="margin: 0; font-size: 18px; font-weight: 600;">${cell.row.emp_name || '未知姓名'}</h3>
-                        <p style="margin: 4px 0 0 0; font-size: 14px; opacity: 0.9;">ID: ${cell.row.id}</p>
-                    </div>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-                    <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">工号</div>
-                        <div style="font-size: 16px; font-weight: 500;">${cell.row.emp_no || '未知'}</div>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">年龄</div>
-                        <div style="font-size: 16px; font-weight: 500;">${cell.row.age || '未知'}</div>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">手机号</div>
-                        <div style="font-size: 16px; font-weight: 500;">${cell.row.phone || '未知'}</div>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px;">
-                        <div style="font-size: 12px; opacity: 0.8; margin-bottom: 4px;">地址</div>
-                        <div style="font-size: 16px; font-weight: 500;">${cell.row.address || '未知'}</div>
-                    </div>
-                </div>
-                <div style="margin-top: 16px; padding: 12px; background: rgba(255,255,255,0.1); border-radius: 8px; text-align: center;">
-                    <div style="font-size: 14px; opacity: 0.9;">
-                        📋 这是一个扩展行渲染示例，展示员工的详细信息卡片
-                    </div>
-                </div>
-            `;
-            pEl.appendChild(cardEl);
-        },
+        extendRender: testRenderExtend ,
     },
     // {
     //   key: "selection",

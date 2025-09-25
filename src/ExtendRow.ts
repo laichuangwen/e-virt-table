@@ -98,23 +98,27 @@ export default class ExtendRow extends Row {
         // 如果计算高度发生变化，需要通知 Body 更新
         if (this.calculatedHeight !== this.height && this.calculatedHeight > 0) {
             const oldHeight = this.height;
-            this.height = this.calculatedHeight;
+            const newHeight = this.calculatedHeight;
             
-            console.log('ExtendRow 高度变化：', {
-                rowKey: this.sourceRowKey,
-                oldHeight,
-                newHeight: this.height,
-                calculatedHeight: this.calculatedHeight
-            });
+            // 检查高度变化是否显著（避免微小变化导致的循环）
+            const heightDiff = Math.abs(newHeight - oldHeight);
+            if (heightDiff < 1) {
+                return; // 忽略小于1px的变化
+            }
             
-            // 通知高度变化
-            this.ctx.emit('extendRowHeightChange', {
-                sourceRowKey: this.sourceRowKey,
-                extendRowKey: this.rowKey,
-                oldHeight,
-                newHeight: this.height,
-                rowIndex: Math.floor(this.rowIndex) // 获取源行的 rowIndex
-            });
+            this.height = newHeight;
+            
+            
+            // 使用 setTimeout 避免同步循环
+            setTimeout(() => {
+                this.ctx.emit('extendRowHeightChange', {
+                    sourceRowKey: this.sourceRowKey,
+                    extendRowKey: this.rowKey,
+                    oldHeight,
+                    newHeight: this.height,
+                    rowIndex: Math.floor(this.rowIndex)
+                });
+            }, 0);
         }
     }
 
@@ -145,11 +149,15 @@ export default class ExtendRow extends Row {
     drawContainer() {
         const { paint, config: { BORDER_COLOR, BORDER } } = this.ctx;
         
-        // 绘制扩展行的背景，添加边框以明确边界
-        paint.drawRect(this.x, this.y, this.width, this.height, {
+        // ExtendRow 使用整个可视宽度，不受固定列限制
+        const fullWidth = this.ctx.body.visibleWidth;
+        
+        // 绘制扩展行的背景和边框，占据整个可视宽度
+        paint.drawRect(0, this.y, fullWidth, this.height, {
             borderColor: BORDER ? BORDER_COLOR : '#e0e0e0', // 确保有边框
             fillColor: '#f8f9fa', // 扩展行使用稍微不同的背景色
             borderWidth: 1,
         });
+        
     }
 }

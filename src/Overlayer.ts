@@ -57,6 +57,40 @@ export default class Overlayer {
     draw() {
         const overlayer = this.getContainer();
         this.ctx.emit('overlayerChange', overlayer);
+        
+        // 为扩展容器添加事件处理
+        this.setupExtendContainerEvents();
+    }
+    
+    /**
+     * 为扩展容器设置事件处理，防止点击穿透引发滚动
+     */
+    private setupExtendContainerEvents() {
+        // 延迟执行，确保 DOM 已经渲染
+        setTimeout(() => {
+            // 查找所有扩展单元格的容器
+            const extendCells = this.ctx.overlayerElement.querySelectorAll('[data-extend-content="true"]');
+            extendCells.forEach((cellElement) => {
+                // 移除之前的事件监听器（如果存在）
+                cellElement.removeEventListener('mousedown', this.preventScrollEvent);
+                cellElement.removeEventListener('click', this.preventScrollEvent);
+                
+                // 只添加必要的事件监听器，不阻止滚轮
+                cellElement.addEventListener('mousedown', this.preventScrollEvent);
+                cellElement.addEventListener('click', this.preventScrollEvent);
+            });
+        }, 0);
+    }
+    
+    /**
+     * 阻止滚动事件的处理函数
+     */
+    private preventScrollEvent = (e: Event) => {
+        // 只阻止 mousedown 和 click 事件的冒泡，保留滚轮功能
+        if (e.type === 'mousedown' || e.type === 'click') {
+            e.stopPropagation();
+        }
+        // 不阻止滚轮事件，让它正常传播以保持滚动功能
     }
     destroy() {
         // 清除MutationObserver
@@ -164,6 +198,7 @@ export default class Overlayer {
         const centerCells: Cell[] = [];
         const leftCells: Cell[] = [];
         const rightCells: Cell[] = [];
+        const extendCells: Cell[] = []; // 专门为 ExtendRow 创建的全宽单元格数组
         let renderRows = this.ctx.body.renderRows;
         // 合计如果不是固定在底部，就加入到渲染行中
         if (!this.ctx.config.FOOTER_FIXED) {
@@ -175,9 +210,9 @@ export default class Overlayer {
                     cell.render = cell.renderFooter;
                 }
                 if (cell.render) {
-                    // ExtendRow 的单元格总是添加到 centerCells，因为它们不应该受固定列影响
+                    // ExtendRow 的单元格单独处理，不受固定列影响
                     if (row.rowType === 'extend' || (cell as any).isExtendContent) {
-                        centerCells.push(cell);
+                        extendCells.push(cell);
                     } else if (cell.fixed === 'left') {
                         leftCells.push(cell);
                     } else if (cell.fixed === 'right') {
@@ -232,6 +267,28 @@ export default class Overlayer {
             },
             cells: rightCells,
         };
+        // 为 ExtendRow 创建独立的全宽容器，不受固定列限制
+        const extend: OverlayerView = {
+            key: 'extend',
+            style: {
+                position: 'absolute',
+                top: `${0.5}px`,
+                left: `${0.5}px`, // 从最左边开始
+                overflow: 'hidden',
+                width: `${visibleWidth}px`, // 占据整个可视宽度
+                height: `${visibleHeight}px`,
+                zIndex: '10', // 确保在固定列之上
+                pointerEvents: 'auto', // 允许扩展容器响应点击事件，防止穿透
+            },
+            cells: extendCells,
+        };
+        
+        const views = [left, center, right];
+        // 只有当存在扩展单元格时才添加扩展容器
+        if (extendCells.length > 0) {
+            views.push(extend);
+        }
+        
         const body: OverlayerWrapper = {
             type: 'body',
             class: `${CSS_PREFIX}-overlayer-body`,
@@ -241,7 +298,7 @@ export default class Overlayer {
                 width: `${visibleWidth}px`,
                 height: `${visibleHeight}px`,
             },
-            views: [left, center, right],
+            views: views,
         };
         return body;
     }

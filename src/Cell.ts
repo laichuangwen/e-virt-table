@@ -340,6 +340,15 @@ export default class Cell extends BaseCell {
                 'data-col-index': this.colIndex,
             };
         }
+        
+        // 为扩展内容添加特殊标识
+        if (this.isExtendContent) {
+            this.domDataset = {
+                ...this.domDataset,
+                'data-extend-content': true,
+            };
+        }
+        
         this.style = this.getOverlayerViewsStyle();
     }
     private updateTree() {
@@ -1002,6 +1011,29 @@ export default class Cell extends BaseCell {
     getOverlayerViewsStyle() {
         let left = `${this.drawX - this.ctx.fixedLeftWidth}px`;
         let top = `${this.drawY - this.ctx.body.y}px`;
+        
+        // ExtendRow 的单元格特殊处理：占据整个可视宽度，不受固定列影响
+        if (this.isExtendContent) {
+            left = `0px`; // 从容器最左边开始
+            top = `${this.drawY - this.ctx.body.y}px`;
+            
+            // ExtendRow 永远不应该被隐藏，即使部分超出可见区域
+            return {
+                position: 'absolute',
+                overflow: 'hidden',
+                left,
+                top,
+                width: `${this.ctx.body.visibleWidth}px`, // 使用整个可视宽度
+                height: this.autoRowHeight ? `auto` : `${this.visibleHeight}px`,
+                pointerEvents: 'initial', // 扩展内容需要响应点击
+                userSelect: 'none',
+                zIndex: '10', // 确保在固定列之上
+                backgroundColor: '#f8f9fa', // 添加背景色以区分
+                border: '1px solid #e0e0e0',
+                boxSizing: 'border-box',
+            };
+        }
+        
         // 固定列
         if (this.fixed === 'left') {
             left = `${this.drawX}px`;
@@ -1019,6 +1051,8 @@ export default class Cell extends BaseCell {
             left = '-99999px';
             top = '-99999px';
         }
+        
+        
         return {
             position: 'absolute',
             overflow: 'hidden',
