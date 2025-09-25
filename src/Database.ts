@@ -19,8 +19,10 @@ import type {
     BeforeValueChangeItem,
     SortByType,
     SortStateMap,
+    CustomHeader,
+    Fixed,
 } from './types';
-import { generateShortUUID, toLeaf, compareDates } from './util';
+import { generateShortUUID, toLeaf, compareDates, deepClone } from './util';
 import { HistoryItemData } from './History';
 import Cell from './Cell';
 export default class Database {
@@ -41,6 +43,14 @@ export default class Database {
     private validationErrorMap = new Map<string, ValidateResult>();
     private itemRowKeyMap = new WeakMap();
     private bufferData: any[] = [];
+    private originalColumns: Column[] = [];
+    private customHeader: CustomHeader = {
+        fixedData: {},
+        sortData: {},
+        hideData: {},
+        resizableData: {},
+    };
+
     overlayerAutoHeightMap = new Map<string, number>();
     private bufferCheckState = {
         buffer: false,
@@ -58,11 +68,12 @@ export default class Database {
         this.data = data;
         this.footerData = footerData;
         this.columns = columns;
+        this.originalColumns = deepClone(columns);
         this.init();
     }
     // 初始化默认不忽略清空改变值和校验map
     init(isClear = true) {
-        this.ctx.paint.clearTextCache();    
+        this.ctx.paint.clearTextCache();
         this.clearBufferData();
         this.rowKeyMap.clear();
         this.checkboxKeyMap.clear();
@@ -233,24 +244,33 @@ export default class Database {
         recursiveData(this.data);
         return list;
     }
-    private filterColumns(columns: Column[]) {
-        return columns.reduce((acc: Column[], column) => {
-            // 检查当前列的 hide 属性
-            const shouldHide = typeof column.hide === 'function' ? column.hide() : column.hide;
-            // 如果当前列不应该隐藏，则添加到结果中
-            if (!shouldHide) {
-                const newColumn = { ...column }; // 复制当前列
-                // 递归处理子列
-                if (newColumn.children && Array.isArray(newColumn.children)) {
-                    newColumn.children = this.filterColumns(newColumn.children);
+    private generateColumns(columns: Column[]) {
+        const _generateColumns = (columns: Column[]) => {
+            return columns.map((column: Column) => {
+                if (column.children && Array.isArray(column.children)) {
+                    column.children = _generateColumns(column.children);
                 }
-                acc.push(newColumn);
-            }
-            return acc;
-        }, []);
+                const dataMap = {
+                    hide: this.customHeader?.hideData?.[column.key],
+                    fixed: this.customHeader?.fixedData?.[column.key],
+                    sort: this.customHeader?.sortData?.[column.key],
+                    width: this.customHeader?.resizableData?.[column.key],
+                };
+                const obj: any = {};
+                for (const [key, value] of Object.entries(dataMap)) {
+                    if (value !== undefined) obj[key] = value;
+                }
+                return {
+                    ...column,
+                    ...obj,
+                };
+            });
+        };
+        return _generateColumns(columns);
     }
     getColumns() {
-        return this.filterColumns(this.columns);
+        const _columns = deepClone(this.columns);
+        return this.generateColumns(_columns);
     }
     setColumns(columns: Column[]) {
         this.columns = columns;
@@ -1001,7 +1021,7 @@ export default class Database {
             this.ctx.emit('draw');
         }
     }
-    setRowSelectionByParent(rowKey: string, check: boolean, ) {
+    setRowSelectionByParent(rowKey: string, check: boolean) {
         const selection = this.selectionMap.get(rowKey);
         if (!selection) {
             return;
@@ -1791,5 +1811,91 @@ export default class Database {
         const key = `${rowIndex}\u200b_${colIndex}`;
         const height = this.overlayerAutoHeightMap.get(key) || 0;
         return height;
+    }
+    setCustomHeader(customHeader: CustomHeader, ignoreEmit = false) {
+        (['fixedData', 'sortData', 'hideData', 'resizableData'] as (keyof CustomHeader)[]).forEach((key) => {
+            const value = customHeader[key];
+            if (value !== undefined) {
+                this.customHeader[key] = value as any;
+            }
+        });
+        if (!ignoreEmit) {
+            const obj = this.clearCustomHeaderInvalidValues(this.originalColumns);
+            this.ctx.emit('customHeaderChange', obj);
+        }
+    }
+    resetCustomHeader() {
+        this.customHeader = {};
+        this.columns = this.originalColumns;
+        this.init(false);
+        this.ctx.emit('resetHeader');
+        this.ctx.emit('customHeaderChange', this.customHeader);
+    }
+    getCustomHeader() {
+        return this.customHeader;
+    }
+    setCustomHeaderResizableData(key: string, width: number) {
+        // 统一设置方法
+        let { resizableData = {} } = this.customHeader;
+        resizableData[key] = width;
+        this.setCustomHeader({
+            resizableData,
+        });
+    }
+    setCustomHeaderHideData(keys: string[], hide: boolean) {
+        let { hideData = {} } = this.customHeader;
+        keys.forEach((key) => {
+            hideData[key] = hide;
+        });
+        this.setCustomHeader({
+            hideData,
+        });
+        this.init(false);
+        this.ctx.emit('resetHeader');
+    }
+    setCustomHeaderFixedData(keys: string[], fixed: Fixed | '') {
+        let { fixedData = {} } = this.customHeader;
+        keys.forEach((key) => {
+            fixedData[key] = fixed;
+        });
+        this.setCustomHeader({
+            fixedData,
+        });
+        this.init(false);
+        this.ctx.emit('resetHeader');
+    }
+    setOriginalColumns(columns: Column[]) {
+        this.originalColumns = columns;
+    }
+    // 递归处理
+    clearCustomHeaderInvalidValues(columns: Column[]) {
+        const clearCustomHeaderInvalidValues = (columns: Column[], customHeader: CustomHeader = {}) => {
+            columns.forEach((column) => {
+                if (column.children && column.children.length > 0) {
+                    clearCustomHeaderInvalidValues(column.children, customHeader);
+                }
+                // 用一个小的 helper 函数，减少重复代码
+                const assignIfDifferent = (field: keyof CustomHeader, columnValue: any) => {
+                    const value = this.customHeader[field]?.[column.key];
+                    if (value !== undefined && value !== columnValue) {
+                        if (!customHeader[field]) {
+                            customHeader[field] = {} as any;
+                        }
+                        (customHeader[field] as any)[column.key] = value;
+                        // 如果固定源数据为空，则删除
+                        if (field === 'fixedData' && !value && !columnValue) {
+                            delete customHeader[field]?.[column.key];
+                        }
+                    }
+                };
+                assignIfDifferent('fixedData', column.fixed);
+                assignIfDifferent('sortData', column.sort);
+                assignIfDifferent('hideData', column.hide);
+                assignIfDifferent('resizableData', column.width);
+            });
+        };
+        let obj: CustomHeader = {};
+        clearCustomHeaderInvalidValues(columns, obj);
+        return obj;
     }
 }

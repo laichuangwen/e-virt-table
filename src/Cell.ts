@@ -126,7 +126,7 @@ export default class Cell extends BaseCell {
         this.cellType = cellType;
         this.align = column.align || this.ctx.config.COLUMNS_ALIGN;
         this.verticalAlign = column.verticalAlign || this.ctx.config.COLUMNS_VERTICAL_ALIGN;
-        this.fixed = column.fixed;
+        this.fixed = column.fixed || '';
         this.level = column.level || 0;
         this.operation = column.operation || false;
         this.column = column;
@@ -215,6 +215,7 @@ export default class Cell extends BaseCell {
             } else {
                 this.relationRowKeys = [this.key];
             }
+
             if (Array.isArray(relationColKeys) && relationColKeys.length > 0) {
                 this.relationColKeys = relationColKeys;
             } else {
@@ -498,7 +499,7 @@ export default class Cell extends BaseCell {
             let textColor = FOOTER_TEXT_COLOR;
             if (typeof FOOTER_CELL_STYLE_METHOD === 'function') {
                 const footerCellStyleMethod: CellStyleMethod = FOOTER_CELL_STYLE_METHOD;
-                const { backgroundColor, color,font } =
+                const { backgroundColor, color, font } =
                     footerCellStyleMethod({
                         row: this.row,
                         rowIndex: this.rowIndex,
@@ -513,7 +514,7 @@ export default class Cell extends BaseCell {
                 if (color) {
                     textColor = color;
                 }
-                if(font){
+                if (font) {
                     this.drawTextFont = font;
                 }
             }
@@ -592,7 +593,7 @@ export default class Cell extends BaseCell {
             if (color) {
                 textColor = color;
             }
-            if(font){
+            if (font) {
                 this.drawTextFont = font;
             }
         }

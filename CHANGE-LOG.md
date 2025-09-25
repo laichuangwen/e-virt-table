@@ -394,9 +394,21 @@ V1.2.34
 - feat: cell支持设置font样式
 - fix: 优化右键菜单元素插入dom操作
 - fix: 修复unbind时对象固定为window,实际上没有完成unbind的问题
+- 
 ---
+
 
 V1.2.35
 ### Bug Fixes
 - fix: 修复树形选择取消子节点勾选,父节点勾选状态未更新问题 
+---
+
+V1.3.0
+### Bug Fixes
+
+- feat: 内置自定义表头
+- feat: 添加拖拽表头
+- fix: 右键菜单支持多级
+- feat: footer溢出提示
+
 ---

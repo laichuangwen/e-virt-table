@@ -17,6 +17,7 @@ export default class CellHeader extends BaseCell {
     editorType: string;
     level: number;
     text: string;
+    hide: boolean = false;
     displayText: string = '';
     colspan: number;
     rowspan: number;
@@ -76,13 +77,14 @@ export default class CellHeader extends BaseCell {
         this.key = column.key;
         this.minWidth = column.minWidth;
         this.maxWidth = column.maxWidth;
+        this.hide = column.hide || false;
         this.type = column.type || '';
         this.editorType = column.editorType || 'text';
         this.hideHeaderSelection = column.hideHeaderSelection || false;
         this.align = column.headerAlign || column.align || this.ctx.config.COLUMNS_ALIGN;
         this.verticalAlign =
             column.headerVerticalAlign || column.verticalAlign || this.ctx.config.COLUMNS_VERTICAL_ALIGN;
-        this.fixed = column.fixed;
+        this.fixed = column.fixed || '';
         this.level = column.level || 0;
         this.operation = column.operation || false;
         this.text = column.title;
@@ -158,7 +160,7 @@ export default class CellHeader extends BaseCell {
         this.drawEdge();
         this.drawSelection();
         this.drawText();
-        this.drawSelector();
+        this.drawBg();
         this.drawSortIcon();
     }
     private drawEdge() {
@@ -214,15 +216,26 @@ export default class CellHeader extends BaseCell {
             },
         );
     }
-    private drawSelector() {
-        // 选择区背景颜色
-        const { ENABLE_SELECTOR } = this.ctx.config;
-        if (!ENABLE_SELECTOR) {
+    private drawBg() {
+        if (this.ctx.dragHeaderIng) {
             return;
         }
-        const { xArr } = this.ctx.selector;
-        const [minX, maxX] = xArr;
-        if (this.colIndex >= minX && this.colIndex <= maxX) {
+        // 选择区背景颜色
+        const { ENABLE_SELECTOR, ENABLE_SELECTOR_SINGLE } = this.ctx.config;
+        let minX = -1;
+        let maxX = -1;
+        if (this.ctx.focusCellHeader) {
+            minX = this.ctx.focusCellHeader.colIndex;
+            maxX = this.ctx.focusCellHeader.colIndex + this.ctx.focusCellHeader.colspan - 1;
+        }
+        // 启用选择器且不是单选
+        if (ENABLE_SELECTOR && !ENABLE_SELECTOR_SINGLE) {
+            const { xArr } = this.ctx.selector;
+            minX = xArr[0];
+            maxX = xArr[1];
+        }
+        const colSpanMaxIndex = this.colspan + this.colIndex - 1;
+        if (this.colIndex >= minX && this.colIndex <= maxX && colSpanMaxIndex <= maxX) {
             this.ctx.paint.drawRect(this.drawX, this.drawY, this.width, this.height, {
                 borderColor: 'transparent',
                 fillColor: this.ctx.config.SELECT_ROW_COL_BG_COLOR || 'transparent',

@@ -2,6 +2,7 @@ import {
     ChangeItem,
     Column,
     ConfigType,
+    CustomHeader,
     EventCallback,
     EVirtTableOptions,
     FilterMethod,
@@ -148,14 +149,13 @@ export default class EVirtTable {
         //重新加载config，初始化表格，但是默认不清除用户操作
         this.ctx.database.init(false);
         this.header.init();
-        // 更新右键菜单，有可能配置项变化
-        this.contextMenu.updated();
         this.ctx.emit('draw');
     }
     loadColumns(columns: Column[]) {
         // 先关闭编辑
         this.editor.doneEdit();
         this.ctx.database.setColumns(columns);
+        this.ctx.database.setOriginalColumns(columns);
         this.header.init();
         this.ctx.emit('draw');
     }
@@ -170,6 +170,15 @@ export default class EVirtTable {
     loadFooterData(data: any[]) {
         this.ctx.database.setFooterData(data);
         this.ctx.emit('draw');
+    }
+    setCustomHeader(customHeader: CustomHeader, ignoreEmit = true) {
+        this.ctx.database.setCustomHeader(customHeader, ignoreEmit);
+        this.ctx.database.init(false);
+        this.header.init();
+        this.ctx.emit('draw');
+    }
+    getCustomHeader() {
+        return this.header.getCustomHeader();
     }
 
     setLoading(loading: boolean) {

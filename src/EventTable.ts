@@ -50,11 +50,15 @@ export default class EventTable {
             const x = offsetX;
             this.handleHeaderEvent(x, y, this.ctx.header.renderCellHeaders, (cell: CellHeader) => {
                 this.ctx.focusCellHeader = cell;
+                this.ctx.focusCell = undefined;
                 this.ctx.emit('cellHeaderMousedown', cell, e);
+                this.ctx.emit('draw');
             });
             this.handleBodyEvent(x, y, this.ctx.body.renderRows, (cell: Cell) => {
                 this.ctx.setFocusCell(cell);
+                this.ctx.focusCellHeader = undefined;
                 this.ctx.emit('cellMousedown', cell, e);
+                this.ctx.emit('draw');
             });
         });
         // 按上事件
@@ -226,6 +230,14 @@ export default class EventTable {
                 }
                 this.ctx.hoverCell = cell;
                 this.ctx.emit('cellHoverChange', cell, e);
+            });
+            this.handleFooterEvent(x, y, this.ctx.footer.renderRows, (cell: Cell) => {
+                this.ctx.emit('cellFooterMouseenter', cell, e);
+                // 移出事件
+                if (this.ctx.hoverCell && this.ctx.hoverCell !== cell) {
+                    this.ctx.emit('cellFooterMouseleave', cell, e);
+                }
+                this.ctx.emit('cellFooterHoverChange', cell, e);
             });
         });
     }
@@ -562,6 +574,25 @@ export default class EventTable {
             if (x > drawX && x < drawX + cell.width && y > drawY && y < drawY + cell.height) {
                 callback(cell);
                 return; // 找到后直接返回
+            }
+        }
+    }
+    private handleFooterEvent(x: number, y: number, renderRows: Row[], callback: Function, visible = false) {
+        for (const row of renderRows) {
+            // 优先处理固定列
+            const cells = row.fixedCells.concat(row.noFixedCells);
+            for (const cell of cells) {
+                const drawX = cell.getDrawX();
+                const drawY = cell.getDrawY();
+                if (visible) {
+                    if (x > drawX && x < drawX + cell.visibleWidth && y > drawY && y < drawY + cell.visibleHeight) {
+                        callback(cell);
+                        return; // 找到后直接返回
+                    }
+                } else if (x > drawX && x < drawX + cell.width && y > drawY && y < drawY + cell.height) {
+                    callback(cell);
+                    return; // 找到后直接返回
+                }
             }
         }
     }

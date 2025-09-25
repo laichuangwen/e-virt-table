@@ -35,6 +35,7 @@ export type HeaderOptions = {
     fixedLeftCellHeaders: [];
     fixedRightCellHeaders: [];
     renderCenterCellHeaders: [];
+    allCellHeaders: CellHeader[];
 };
 export type BodyOptions = {
     x: number;
@@ -98,7 +99,9 @@ export default class Context {
     selectorMove = false; // 选择器移动中
     selectColsIng = false; // 选择列中
     selectRowsIng = false; // 选择行中
+    dragHeaderIng = false; // 拖拽表头中
     adjustPositioning = false; // 调整位置中
+    contextMenuIng = false; // 右键菜单中
     editing = false; // 编辑中
     loading = false; // 加载中
     onlyMergeCell = false; // 只有合并单元格
@@ -120,6 +123,8 @@ export default class Context {
     clickCellHeader?: CellHeader;
     focusCellHeader?: CellHeader;
     hoverCellHeader?: CellHeader;
+    mouseX = 0;
+    mouseY = 0;
     body: BodyOptions = {
         x: 0,
         y: 0,
@@ -151,6 +156,7 @@ export default class Context {
         visibleWidth: 0,
         visibleLeafColumns: [],
         leafCellHeaders: [],
+        allCellHeaders: [],
         renderLeafCellHeaders: [],
         renderCellHeaders: [],
         fixedLeftCellHeaders: [],
