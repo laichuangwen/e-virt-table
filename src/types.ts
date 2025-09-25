@@ -48,7 +48,7 @@ export type TypeCheckbox =
     | 'checkbox-check-disabled'
     | 'checkbox-disabled'
     | 'checkbox-indeterminate';
-export type CellType = 'header' | 'body' | 'footer';
+export type CellType = 'header' | 'body' | 'footer' | 'extend';
 export type FooterPosition = 'top' | 'bottom';
 export type RowType = CellType;
 export type MenuItem = {
@@ -57,7 +57,7 @@ export type MenuItem = {
     event?: Function;
 };
 export type OverlayerView = {
-    key: 'left' | 'center' | 'right';
+    key: 'left' | 'center' | 'right' | 'extend';
     style: any;
     cells: Cell[] | CellHeader[];
 };
@@ -165,6 +165,7 @@ export interface Column {
     selectorCellValueType?: SelectorCellValueType;
     maxLineClamp?: LineClampType; // 行高超出多少行显示省略号
     maxLineClampHeader?: LineClampType; // 表头行高超出多少行显示省略号
+    extendRender?: Function | string; // 行扩展渲染函数，仅在AUTO_ROW_HEIGHT开启且列类型不带tree时生效
 }
 export type LineClampType = number | 'auto';
 export type HistoryAction = 'back' | 'forward' | 'none';

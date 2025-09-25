@@ -102,6 +102,14 @@ export default class Config {
     EXPAND_ICON_COLOR = '#4E5969';
     /** 收缩图标颜色 */
     SHRINK_ICON_COLOR = '#4E5969';
+    /** 行扩展svg 图标 */
+    EXPAND_ROW_ICON_SVG = '';
+    /** 行收缩svg 图标 */
+    COLLAPSE_ROW_ICON_SVG = '';
+    /** 行扩展图标颜色 */
+    EXPAND_ROW_ICON_COLOR = '#4E5969';
+    /** 行收缩图标颜色 */
+    COLLAPSE_ROW_ICON_COLOR = '#4E5969';
     /** 错误提示颜色 */
     ERROR_TIP_ICON_COLOR = 'red';
     /** 错误提示图标大小 */

@@ -99,6 +99,14 @@ export default class Cell extends BaseCell {
     overflowTooltipMaxWidth = 500;
     overflowTooltipPlacement: OverflowTooltipPlacement = 'top';
     maxLineClamp: LineClampType = 'auto';
+    
+    // 扩展渲染相关属性
+    extendRender?: Function | string;
+    hasExtendIcon = false;
+    isExtendContent = false;
+    sourceCell?: Cell;
+    _originalRender?: Render;
+    _originalGetAutoHeight?: () => number;
 
     constructor(
         ctx: Context,
@@ -148,6 +156,11 @@ export default class Cell extends BaseCell {
         this.formatter = column.formatter;
         this.formatterFooter = column.formatterFooter;
         this.maxLineClamp = column.maxLineClamp || 'auto';
+        
+        // 初始化扩展渲染相关属性
+        this.extendRender = column.extendRender;
+        this.hasExtendIcon = this.shouldShowExtendIcon();
+        
         this.update();
     }
     setWidthHeight(width: number, height: number) {
@@ -176,6 +189,7 @@ export default class Cell extends BaseCell {
         this.updateHoverIcon();
         this.updateSelection();
         this.updateTree();
+        this.updateExtend();
         this.updateEditor();
         this.updateRender();
         this.getValidationMessage();
@@ -326,6 +340,15 @@ export default class Cell extends BaseCell {
                 'data-col-index': this.colIndex,
             };
         }
+        
+        // 为扩展内容添加特殊标识
+        if (this.isExtendContent) {
+            this.domDataset = {
+                ...this.domDataset,
+                'data-extend-content': 'true',
+            };
+        }
+        
         this.style = this.getOverlayerViewsStyle();
     }
     private updateTree() {
@@ -405,6 +428,100 @@ export default class Cell extends BaseCell {
         }
         // 树连线仅在绘制阶段调用，避免在 update 阶段被清屏
     }
+    
+    /**
+     * 更新扩展图标
+     */
+    private updateExtend() {
+        if (!this.hasExtendIcon) {
+            return;
+        }
+
+        const { CELL_PADDING = 0, TREE_ICON_SIZE } = this.ctx.config;
+        const { rowKey } = this;
+        
+        // 判断当前是否展开
+        const isExtended = this.ctx.isRowExtended(rowKey, this.key);
+        
+        // 优先使用专用的扩展行图标
+        let expandIcon = this.ctx.icons.get('expand-row');
+        let shrinkIcon = this.ctx.icons.get('collapse-row');
+        let expandIconName = 'expand-row';
+        let shrinkIconName = 'collapse-row';
+        
+        // 如果扩展行图标不存在，则回退到树形图标
+        if (!expandIcon || !shrinkIcon) {
+            expandIcon = this.ctx.icons.get('expand');
+            shrinkIcon = this.ctx.icons.get('shrink');
+            expandIconName = 'expand';
+            shrinkIconName = 'shrink';
+        }
+        
+        const icon = !isExtended ? expandIcon : shrinkIcon;
+        const iconName = !isExtended ? expandIconName : shrinkIconName;
+
+        // 扩展行图标使用比树形图标稍小的尺寸
+        let iconWidth = Math.max(12, TREE_ICON_SIZE * 0.8);
+        let iconHeight = Math.max(12, TREE_ICON_SIZE * 0.8);
+        let drawX = this.drawX;
+        
+        // 参考树形图标的对齐逻辑
+        if (this.align === 'center' || this.align === 'right') {
+            drawX = this.drawX + (this.visibleWidth - iconWidth - 2 * CELL_PADDING) / 2;
+            // 居中对齐，改成左对齐
+            this.align = 'left';
+        }
+        
+        let iconX = drawX + CELL_PADDING;
+        let iconY = this.drawY + (this.visibleHeight - iconHeight) / 2;
+        let drawTextX = iconX + iconWidth - CELL_PADDING / 2;
+
+        // 判断是否溢出格子（参考树形图标的逻辑）
+        if (iconX + iconWidth + CELL_PADDING > this.drawX + this.visibleWidth) {
+            return;
+        }
+        if (iconY + iconHeight + CELL_PADDING > this.drawY + this.visibleHeight) {
+            return;
+        }
+
+        // 更改文本距离
+        this.drawTextX = drawTextX;
+        this.drawTextWidth = this.drawX + this.visibleWidth - drawTextX; // 减去扩展图标的宽度
+        
+        // 不论是否需要绘制图标，都更新图标的"基准位置"，供扩展功能使用
+        this.drawTreeImageX = iconX;
+        this.drawTreeImageY = iconY;
+        this.drawTreeImageWidth = iconWidth;
+        this.drawTreeImageHeight = iconHeight;
+        if (icon) {
+            this.drawTreeImageName = iconName;
+            this.drawTreeImageSource = icon;
+        } else {
+            this.drawTreeImageName = '';
+            this.drawTreeImageSource = undefined;
+        }
+        
+    }
+    
+    /**
+     * 判断是否应该显示扩展图标
+     */
+    shouldShowExtendIcon(): boolean {
+        if (this.isExtendContent) {
+            return false;
+        }
+        if (this.cellType !== 'body' || !this.extendRender) {
+            return false;
+        }
+        if (!this.ctx.config.AUTO_ROW_HEIGHT) {
+            return false;
+        }
+        if (['tree', 'selection-tree', 'tree-selection'].includes(this.type)) {
+            return false;
+        }
+        return true;
+    }
+    
     private drawTreeLine() {
         const { TREE_LINE, TREE_INDENT = 16, TREE_ICON_SIZE = 16, TREE_LINE_COLOR = '#e1e6eb' } = this.ctx.config;
         // 仅 body 且树类型才绘制
@@ -906,6 +1023,29 @@ export default class Cell extends BaseCell {
     getOverlayerViewsStyle() {
         let left = `${this.drawX - this.ctx.fixedLeftWidth}px`;
         let top = `${this.drawY - this.ctx.body.y}px`;
+        
+        // ExtendRow 的单元格特殊处理：占据整个可视宽度，不受固定列影响
+        if (this.isExtendContent) {
+            left = `0px`; // 从容器最左边开始
+            top = `${this.drawY - this.ctx.body.y}px`;
+            
+            // ExtendRow 永远不应该被隐藏，即使部分超出可见区域
+            return {
+                position: 'absolute',
+                overflow: 'hidden',
+                left,
+                top,
+                width: `${this.ctx.body.visibleWidth}px`, // 使用整个可视宽度
+                height: this.autoRowHeight ? `auto` : `${this.visibleHeight}px`,
+                pointerEvents: 'initial', // 扩展内容需要响应点击
+                userSelect: 'none',
+                zIndex: '10', // 确保在固定列之上
+                backgroundColor: '#f8f9fa', // 添加背景色以区分
+                border: '1px solid #e0e0e0',
+                boxSizing: 'border-box',
+            };
+        }
+        
         // 固定列
         if (this.fixed === 'left') {
             left = `${this.drawX}px`;
@@ -918,11 +1058,13 @@ export default class Cell extends BaseCell {
                 top = `${this.drawY - this.ctx.footer.y}px`;
             }
         }
-        // 防止闪烁
-        if (this.autoRowHeight && this.ctx.database.getOverlayerAutoHeight(this.rowIndex, this.colIndex) === 0) {
+        // 防止闪烁（但扩展内容不应该被隐藏）
+        if (this.autoRowHeight && !this.isExtendContent && this.ctx.database.getOverlayerAutoHeight(this.rowIndex, this.colIndex) === 0) {
             left = '-99999px';
             top = '-99999px';
         }
+        
+        
         return {
             position: 'absolute',
             overflow: 'hidden',
@@ -1015,11 +1157,28 @@ export default class Cell extends BaseCell {
         if (colSpan === 0) {
             return 0;
         }
+        
+        // 扩展内容单元格特殊处理
+        if (this.isExtendContent || colSpan >= 999) {
+            return this.ctx.body.visibleWidth;
+        }
+        
         let width = 0;
-        for (let i = colIndex; i < colIndex + colSpan; i++) {
+        const maxIndex = Math.min(colIndex + colSpan, this.ctx.header.leafCellHeaders.length);
+        for (let i = colIndex; i < maxIndex; i++) {
             const cellHeader = this.ctx.header.leafCellHeaders[i];
+            if (!cellHeader) {
+                console.warn(`Cell header not found at index ${i}`);
+                continue;
+            }
             width += cellHeader.width;
         }
+        
+        // 如果是大 colspan，返回整个可视宽度
+        if (colSpan > this.ctx.header.leafCellHeaders.length) {
+            return this.ctx.body.visibleWidth;
+        }
+        
         return width;
     }
     private drawText() {

@@ -2,7 +2,7 @@ import Cell from './Cell';
 import Context from './Context';
 import type { RowType } from './types';
 export default class Row {
-    private ctx: Context;
+    protected ctx: Context;
     x = 0;
     y: number = 0;
     width = 0;

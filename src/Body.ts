@@ -1,5 +1,6 @@
 import type Context from './Context';
 import Row from './Row';
+import ExtendRow from './ExtendRow';
 import { Position } from './types';
 export default class Body {
     private resizeTarget: Row | null = null; //调整行大小的目标
@@ -14,16 +15,107 @@ export default class Body {
     private headIndex = 0;
     private tailIndex = 0;
     private isResizing = false; //是否正在调整大小
-    private renderRows: Row[] = [];
+    private renderRows: (Row | ExtendRow)[] = [];
     private visibleRows: any[] = [];
     private visibleHeight = 0;
     private visibleWidth = 0;
     private containerRect: DOMRect | undefined;
     private data: any[] = [];
+    private extendRowHeights = new Map<string, number>(); // 记录每个扩展行的实际高度
+    private isUpdatingExtendHeight = false; // 防止高度更新循环
     constructor(ctx: Context) {
         this.ctx = ctx;
         this.init();
         this.initResizeRow();
+        this.initExtendRowObserver();
+    }
+    
+    /**
+     * 初始化扩展行观察者
+     */
+    private initExtendRowObserver() {
+        // 监听扩展行展开/收起
+        this.ctx.on('rowExtendChange', (event: any) => {
+            // 重新计算总高度
+            this.updateTotalHeight();
+            
+            // 更新后续行的位置（在下次渲染时生效）
+            this.updateRowPositionsAfterExtend(event.rowIndex, event.action);
+            
+            // 触发重绘
+            this.ctx.emit('draw');
+        });
+        
+        // 监听扩展行高度变化
+        this.ctx.on('extendRowHeightChange', (event: any) => {
+            // 防止循环更新
+            if (this.isUpdatingExtendHeight) {
+                return;
+            }
+            
+            this.isUpdatingExtendHeight = true;
+            
+            // 检查高度是否真的发生了变化
+            const currentHeight = this.extendRowHeights.get(event.sourceRowKey);
+            if (currentHeight === event.newHeight) {
+                this.isUpdatingExtendHeight = false;
+                return;
+            }
+            
+            // 更新实际高度记录
+            this.updateExtendRowHeight(event.sourceRowKey, event.newHeight);
+            
+            // 重新计算总高度
+            this.updateTotalHeight();
+            
+            // 延迟触发重绘，避免同步循环
+            setTimeout(() => {
+                this.isUpdatingExtendHeight = false;
+                this.ctx.emit('draw');
+            }, 16); // 约一帧的时间
+        });
+        
+        // 监听清除所有扩展行高度
+        this.ctx.on('clearAllExtendRowHeights', () => {
+            this.extendRowHeights.clear();
+        });
+    }
+    
+    /**
+     * 更新扩展行后续行的位置
+     */
+    private updateRowPositionsAfterExtend(_extendRowIndex: number, _action: 'expand' | 'collapse') {
+        // 这里主要是为了在下次 update() 时正确计算 yOffset
+        // 实际的位置更新会在 update() 方法中的 yOffset 计算中体现
+    }
+    
+    /**
+     * 计算指定行之前所有扩展行的累积高度偏移
+     */
+    private calculateYOffsetForRow(rowIndex: number): number {
+        let yOffset = 0;
+        
+        // 遍历所有展开的行，计算在当前行之前的扩展行高度
+        this.ctx.rowExtendMap.forEach((_colKey, rowKey) => {
+            const extendRowIndex = this.ctx.database.getRowIndexForRowKey(rowKey);
+            
+            // 如果扩展行在当前行之前，累加其高度
+            if (extendRowIndex !== null && extendRowIndex!==undefined && extendRowIndex < rowIndex) {
+                // 使用实际记录的高度，如果没有记录则使用默认值
+                const actualHeight = this.extendRowHeights.get(rowKey) || 150;
+                yOffset += actualHeight;
+            }
+        });
+        
+        return yOffset;
+    }
+    
+    /**
+     * 更新扩展行的实际高度
+     */
+    private updateExtendRowHeight(sourceRowKey: string, newHeight: number) {
+        this.extendRowHeights.set(sourceRowKey, newHeight);
+        
     }
     private init() {
         const {
@@ -52,7 +144,7 @@ export default class Body {
             this.y = header.height;
         }
         const { data, sumHeight } = database.getData();
-        // 更新高度
+        // 更新高度（基础高度，不包含ExtendRow）
         this.height = sumHeight;
         // 更新数据
         this.data = data;
@@ -338,62 +430,227 @@ export default class Body {
         }
         return tempIndex;
     }
+    
+    /**
+     * 计算考虑扩展行影响的可见区域
+     */
+    private calculateVisibleRangeWithExtendRows(positions: any[], offset: number) {
+        const { CELL_HEIGHT } = this.ctx.config;
+        
+        // 如果没有扩展行，使用原始逻辑
+        if (this.ctx.rowExtendMap.size === 0) {
+            let _headIndex = this.binarySearch(positions, offset);
+            let _tailIndex = this.binarySearch(positions, offset + this.visibleHeight);
+            if (_tailIndex === -1) {
+                _tailIndex = this.ctx.maxRowIndex;
+            }
+            if (_headIndex === -1 && _tailIndex === this.ctx.maxRowIndex) {
+                const buffer = Math.floor(this.visibleHeight / CELL_HEIGHT);
+                _headIndex = this.ctx.maxRowIndex - buffer;
+            }
+            return {
+                headIndex: Math.max(0, _headIndex),
+                tailIndex: Math.min(this.ctx.maxRowIndex, _tailIndex + 1)
+            };
+        }
+        
+        // 有扩展行时，需要考虑扩展行对位置的影响
+        let headIndex = -1;
+        let tailIndex = -1;
+        
+        for (let i = 0; i < positions.length; i++) {
+            const position = positions[i];
+            const rowKey = this.ctx.database.getRowKeyForRowIndex(i);
+            
+            // 计算当前行的实际位置（考虑之前扩展行的影响）
+            const yOffsetBefore = this.calculateYOffsetForRow(i);
+            const actualTop = position.top + yOffsetBefore;
+            const actualBottom = actualTop + position.height;
+            
+            // 检查是否有扩展行
+            const extendHeight = this.extendRowHeights.get(rowKey) || 0;
+            const totalBottom = actualBottom + extendHeight;
+            
+            // 判断可见性
+            if (headIndex === -1 && totalBottom > offset) {
+                headIndex = i;
+            }
+            
+            if (actualTop <= offset + this.visibleHeight) {
+                tailIndex = i;
+            } else {
+                break;
+            }
+        }
+        
+        // 边界处理
+        if (headIndex === -1) headIndex = 0;
+        if (tailIndex === -1) tailIndex = this.ctx.maxRowIndex;
+        
+        // 扩展范围以确保不遗漏
+        headIndex = Math.max(0, headIndex - 1);
+        tailIndex = Math.min(this.ctx.maxRowIndex, tailIndex + 1);
+        
+        
+        return { headIndex, tailIndex };
+    }
     update() {
         this.init();
         const {
             header,
             database,
             scrollY,
-            config: { CELL_HEIGHT },
+            config: { CELL_HEIGHT: _CELL_HEIGHT },
         } = this.ctx;
         const offset = scrollY;
         const { data, positions } = database.getData();
         // 更新最大行数
         this.ctx.maxRowIndex = data.length - 1;
-        let _headIndex = this.binarySearch(positions, offset);
-        let _tailIndex = this.binarySearch(positions, offset + this.visibleHeight);
-        if (_tailIndex === -1) {
-            _tailIndex = this.ctx.maxRowIndex;
-        }
-        // 解决性能问题,设置数据时又设置滚动条可能导致虚拟滚动计算错误
-        if (_headIndex === -1 && _tailIndex === this.ctx.maxRowIndex) {
-            const buffer = Math.floor(this.visibleHeight / CELL_HEIGHT);
-            _headIndex = this.ctx.maxRowIndex - buffer;
-        }
-        this.headIndex = Math.max(0, _headIndex);
-        this.tailIndex = Math.min(this.ctx.maxRowIndex, _tailIndex + 1);
+        
+        // 计算考虑扩展行影响的可见区域
+        const { headIndex, tailIndex } = this.calculateVisibleRangeWithExtendRows(positions, offset);
+        this.headIndex = headIndex;
+        this.tailIndex = tailIndex;
         this.visibleRows = data.slice(this.headIndex, this.tailIndex + 1);
         this.ctx.body.headIndex = this.headIndex;
         this.ctx.body.tailIndex = this.tailIndex;
         this.ctx.body.visibleRows = this.visibleRows;
 
-        const rows: Row[] = [];
+        const rows: (Row | ExtendRow)[] = [];
+        
         for (let i = 0; i < this.visibleRows.length; i++) {
             const index = this.headIndex + i;
             const data = this.visibleRows[i];
             const { height, top } = this.ctx.database.getPositionForRowIndex(index);
-            const row = new Row(this.ctx, index, 0, top + this.y, header.width, height, data);
+            
+            // 计算当前行之前所有扩展行的累积高度偏移
+            const yOffset = this.calculateYOffsetForRow(index);
+            
+            // 创建普通行，应用累积偏移
+            const adjustedY = top + this.y + yOffset;
+            const row = new Row(this.ctx, index, 0, adjustedY, header.width, height, data);
             rows.push(row);
+            
+            // 检查是否需要创建扩展行
+            const extendRows = this.createExtendRowsForRow(row, data);
+            if (extendRows.length > 0) {
+                extendRows.forEach(extendRow => {
+                    // 扩展行位于普通行之后
+                    extendRow.y = row.y + row.height;
+                    
+                    // 如果已经有记录的高度，直接使用，避免重复计算
+                    const recordedHeight = this.extendRowHeights.get(extendRow.sourceRowKey);
+                    if (recordedHeight && recordedHeight > 0) {
+                        extendRow.height = recordedHeight;
+                    }
+                    
+                    extendRow.update();
+                    rows.push(extendRow);
+                });
+            }
         }
         this.renderRows = rows;
         this.ctx.body.renderRows = rows;
+        
+        // 重新计算包含ExtendRow的总高度
+        this.updateTotalHeight();
+        
     }
+    
+    /**
+     * 更新包含ExtendRow的总高度
+     */
+    private updateTotalHeight() {
+        // 获取原始总高度
+        const { sumHeight } = this.ctx.database.getData();
+        
+        // 计算所有扩展行的额外高度
+        let extendRowsHeight = 0;
+        this.ctx.rowExtendMap.forEach((_colKey, rowKey) => {
+            // 使用实际记录的高度，如果没有记录则使用默认值
+            const actualHeight = this.extendRowHeights.get(rowKey) || 150;
+            extendRowsHeight += actualHeight;
+        });
+        
+        // 更新body的总高度，这会影响滚动条
+        this.height = sumHeight + extendRowsHeight;
+        
+    }
+
+    /**
+     * 为指定行创建扩展行
+     */
+    private createExtendRowsForRow(row: Row, data: any): ExtendRow[] {
+        const extendRows: ExtendRow[] = [];
+        const rowKey = row.rowKey;
+        
+        // 检查是否有扩展状态
+        const extendColKey = this.ctx.getRowExtend(rowKey);
+        if (!extendColKey) {
+            return extendRows;
+        }
+        
+        // 查找有extendRender的列
+        const columns = this.ctx.header.visibleLeafColumns;
+        const extendColumn = columns.find(col => col.key === extendColKey && col.extendRender);
+        
+        if (!extendColumn || !extendColumn.extendRender) {
+            return extendRows;
+        }
+        
+        // 检查是否满足扩展条件
+        if (!this.ctx.config.AUTO_ROW_HEIGHT) {
+            return extendRows;
+        }
+        
+        if (['tree', 'selection-tree', 'tree-selection'].includes(extendColumn.type || '')) {
+            return extendRows;
+        }
+        
+        // 创建扩展行，使用更合理的默认高度
+        const extendRow = new ExtendRow(
+            this.ctx,
+            rowKey,
+            extendColKey,
+            extendColumn.extendRender,
+            row.rowIndex,
+            0, // x位置
+            row.y + row.height, // y位置在原行下方
+            this.visibleWidth, // 占据整个可视宽度
+            150, // 更合理的默认高度，会根据内容自动调整
+            data
+        );
+        
+        extendRows.push(extendRow);
+        return extendRows;
+    }
+    
     updateAutoHeight() {
         const rows = this.ctx.body.renderRows;
+        
+        // 分离普通行和扩展行
+        const normalRows = rows.filter((row) => row.rowType !== 'extend');
+        
         const hasAutoHeight = rows.some((row) => row.calculatedHeightCells.length > 0);
+        
         // 如果没有计算格子，不更新
         if (!hasAutoHeight) {
             return;
         }
-        // 更新计算高度
+        
+        // 更新所有行的计算高度（包括 ExtendRow）
         rows.forEach((row) => {
             row.updateCalculatedHeight();
         });
-        // 如果有计算格子，重新计算行高
-        const heights = rows.map((row) => ({
+        
+        // 只对普通行更新数据库中的行高，ExtendRow 不影响原始数据行高
+        const heights = normalRows.map((row) => ({
             height: row.calculatedHeight,
             rowIndex: row.rowIndex,
         }));
+        
+        
+        // 只更新普通行的高度到数据库，保持原始数据行高度不变
         this.ctx.database.setBatchCalculatedRowHeight(heights);
     }
     draw() {

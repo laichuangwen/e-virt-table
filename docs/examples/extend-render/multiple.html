@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>行内渲染 - 多个展开</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <style>
+        .content {
+            position: relative;
+        }
+        
+        /* 卡片样式 */
+        .info-card {
+            padding: 16px;
+            margin: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            box-sizing: border-box;
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+        .card-item {
+            background: rgba(255,255,255,0.1);
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .card-label {
+            opacity: 0.8;
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+        
+        /* 表中表样式 */
+        .sub-table-container {
+            padding: 16px;
+            margin: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        .sub-table-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+        }
+        .sub-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .sub-table th,
+        .sub-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e8e8e8;
+            font-size: 14px;
+        }
+        .sub-table th {
+            background: #fafafa;
+            font-weight: 600;
+            color: #333;
+        }
+        .sub-table tr:hover {
+            background: #f5f5f5;
+        }
+        .sub-table tr:last-child td {
+            border-bottom: none;
+        }
+        .status-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-completed { background: #f6ffed; color: #52c41a; }
+        .status-pending { background: #fff7e6; color: #faad14; }
+        .status-cancelled { background: #fff2f0; color: #ff4d4f; }
+    </style>
+    <body>
+        <div class="content">
+            <div id="e-virt-table"></div>
+            <div id="e-virt-table-overlayer"></div>
+        </div>
+    </body>
+    <script>
+        // 生成项目数据
+        function generateProjectData() {
+            const data = [];
+            for (let i = 0; i < 20; i++) {
+                // 生成任务数据
+                const tasks = [];
+                const taskCount = Math.floor(Math.random() * 5) + 3;
+                for (let j = 0; j < taskCount; j++) {
+                    tasks.push({
+                        id: `T${i + 1}-${j + 1}`,
+                        name: `任务${j + 1}`,
+                        assignee: `开发者${j + 1}`,
+                        status: ['已完成', '进行中', '已取消'][j % 3],
+                        progress: Math.floor(Math.random() * 100),
+                        deadline: `2024-${String((j % 12) + 1).padStart(2, '0')}-${String((j % 28) + 1).padStart(2, '0')}`
+                    });
+                }
+                
+                data.push({
+                    id: `PRJ${String(i + 1).padStart(3, '0')}`,
+                    name: `项目${i + 1}`,
+                    manager: `项目经理${Math.floor(i / 3) + 1}`,
+                    department: ['技术部', '产品部', '设计部'][i % 3],
+                    status: ['进行中', '已完成', '暂停'][i % 3],
+                    budget: (Math.random() * 500000 + 100000).toFixed(0),
+                    startDate: `2024-${String((i % 12) + 1).padStart(2, '0')}-01`,
+                    endDate: `2024-${String((i % 12) + 1).padStart(2, '0')}-28`,
+                    description: `这是项目${i + 1}的详细描述，包含项目目标、范围和关键里程碑。`,
+                    teamSize: Math.floor(Math.random() * 10) + 3,
+                    tasks: tasks
+                });
+            }
+            return data;
+        }
+
+        const columns = [
+            {
+                key: 'id',
+                title: '项目ID',
+                width: 100,
+                fixed: 'left',
+                extendRender: (pEl, cell) => {
+                    const project = cell.row;
+                    const cardEl = document.createElement('div');
+                    cardEl.className = 'info-card';
+                    
+                    cardEl.innerHTML = `
+                        <div class="card-title">📋 项目详情</div>
+                        <div class="card-grid">
+                            <div class="card-item">
+                                <div class="card-label">项目经理</div>
+                                <div>${project.manager}</div>
+                            </div>
+                            <div class="card-item">
+                                <div class="card-label">所属部门</div>
+                                <div>${project.department}</div>
+                            </div>
+                            <div class="card-item">
+                                <div class="card-label">项目预算</div>
+                                <div>¥${parseInt(project.budget).toLocaleString()}</div>
+                            </div>
+                            <div class="card-item">
+                                <div class="card-label">团队规模</div>
+                                <div>${project.teamSize} 人</div>
+                            </div>
+                            <div class="card-item">
+                                <div class="card-label">开始日期</div>
+                                <div>${project.startDate}</div>
+                            </div>
+                            <div class="card-item">
+                                <div class="card-label">结束日期</div>
+                                <div>${project.endDate}</div>
+                            </div>
+                        </div>
+                    `;
+                    pEl.appendChild(cardEl);
+                }
+            },
+            {
+                key: 'name',
+                title: '项目名称',
+                width: 150,
+                extendRender: (pEl, cell) => {
+                    const project = cell.row;
+                    const tableEl = document.createElement('div');
+                    tableEl.className = 'sub-table-container';
+                    
+                    let tasksHtml = project.tasks.map(task => {
+                        const statusClass = task.status === '已完成' ? 'status-completed' : 
+                                          task.status === '进行中' ? 'status-pending' : 'status-cancelled';
+                        return `
+                            <tr>
+                                <td>${task.id}</td>
+                                <td>${task.name}</td>
+                                <td>${task.assignee}</td>
+                                <td><span class="status-tag ${statusClass}">${task.status}</span></td>
+                                <td>${task.progress}%</td>
+                                <td>${task.deadline}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                    
+                    tableEl.innerHTML = `
+                        <div class="sub-table-title">📝 任务列表</div>
+                        <table class="sub-table">
+                            <thead>
+                                <tr>
+                                    <th>任务ID</th>
+                                    <th>任务名称</th>
+                                    <th>负责人</th>
+                                    <th>状态</th>
+                                    <th>进度</th>
+                                    <th>截止日期</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tasksHtml}
+                            </tbody>
+                        </table>
+                    `;
+                    pEl.appendChild(tableEl);
+                }
+            },
+            {
+                key: 'manager',
+                title: '项目经理',
+                width: 120
+            },
+            {
+                key: 'department',
+                title: '部门',
+                width: 100
+            },
+            {
+                key: 'status',
+                title: '状态',
+                width: 80,
+                align: 'center',
+                render: (pEl, cell) => {
+                    const status = cell.getValue();
+                    const color = status === '已完成' ? '#52c41a' : 
+                                 status === '进行中' ? '#faad14' : '#ff4d4f';
+                    pEl.style.color = color;
+                    pEl.style.fontWeight = 'bold';
+                    pEl.textContent = status;
+                }
+            },
+            {
+                key: 'budget',
+                title: '预算',
+                width: 120,
+                align: 'right',
+                render: (pEl, cell) => {
+                    pEl.textContent = `¥${parseInt(cell.getValue()).toLocaleString()}`;
+                }
+            },
+            {
+                key: 'teamSize',
+                title: '团队规模',
+                width: 100,
+                align: 'center',
+                render: (pEl, cell) => {
+                    pEl.textContent = `${cell.getValue()} 人`;
+                }
+            }
+        ];
+
+        const data = generateProjectData();
+        const target = document.getElementById('e-virt-table');
+        const overlayerEl = document.getElementById('e-virt-table-overlayer');
+
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                AUTO_ROW_HEIGHT: true,
+                ENABLE_SELECTOR: true,
+                ENABLE_OFFSET_HEIGHT: true,
+                OFFSET_HEIGHT: 24,
+            },
+            overlayerElement: overlayerEl,
+        });
+
+        // 处理覆盖层渲染
+        grid.on('overlayerChange', (container) => {
+            if (!overlayerEl) return;
+            
+            overlayerEl.replaceChildren();
+            Object.assign(overlayerEl.style, container.style);
+            
+            container.views.forEach((typeView) => {
+                const typeDiv = document.createElement('div');
+                typeDiv.className = typeView.class;
+                Object.assign(typeDiv.style, typeView.style);
+                
+                typeView.views.forEach((cellWrapView) => {
+                    const cellWrap = document.createElement('div');
+                    Object.assign(cellWrap.style, cellWrapView.style);
+                    
+                    cellWrapView.cells.forEach((cell) => {
+                        const cellEl = document.createElement('div');
+                        Object.assign(cellEl.style, cell.style);
+                        Object.keys(cell.domDataset).forEach((key) => {
+                            cellEl.setAttribute(key, cell.domDataset[key]);
+                        });
+                        
+                        if (typeof cell.render === 'function') {
+                            cell.render(cellEl, cell);
+                        }
+                        cellWrap.appendChild(cellEl);
+                    });
+                    typeDiv.appendChild(cellWrap);
+                });
+                overlayerEl.appendChild(typeDiv);
+            });
+        });
+    </script>
+</html>
