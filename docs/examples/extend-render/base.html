@@ -236,7 +236,9 @@
                     cellWrapView.cells.forEach((cell) => {
                         const cellEl = document.createElement('div');
                         Object.assign(cellEl.style, cell.style);
-                        Object.assign(cellEl.dataset, cell.domDataset || {});
+                        Object.keys(cell.domDataset).forEach((key) => {
+                            cellEl.setAttribute(key, cell.domDataset[key]);
+                        });
                         
                         if (typeof cell.render === 'function') {
                             cell.render(cellEl, cell);

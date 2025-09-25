@@ -345,7 +345,7 @@ export default class Cell extends BaseCell {
         if (this.isExtendContent) {
             this.domDataset = {
                 ...this.domDataset,
-                'data-extend-content': true,
+                'data-extend-content': 'true',
             };
         }
         
