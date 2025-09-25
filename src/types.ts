@@ -58,10 +58,10 @@ export type MenuItemEvent =
     | 'clearSelected'
     | 'fixedLeft'
     | 'fixedRight'
-    | 'noFixed'
+    | 'fixedNone'
     | 'hide'
     | 'resetHeader'
-    | 'cancelHide';
+    | 'visible';
 export type MenuItem = {
     label: string;
     value: string | MenuItemEvent;

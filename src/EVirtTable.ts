@@ -171,8 +171,8 @@ export default class EVirtTable {
         this.ctx.database.setFooterData(data);
         this.ctx.emit('draw');
     }
-    setCustomHeader(customHeader: CustomHeader) {
-        this.ctx.database.setCustomHeader(customHeader, true);
+    setCustomHeader(customHeader: CustomHeader, ignoreEmit = true) {
+        this.ctx.database.setCustomHeader(customHeader, ignoreEmit);
         this.ctx.database.init(false);
         this.header.init();
         this.ctx.emit('draw');

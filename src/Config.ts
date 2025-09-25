@@ -309,11 +309,11 @@ export default class Config {
     HEADER_CONTEXT_MENU: MenuItem[] = [
         { label: '左固定', value: 'fixedLeft' },
         { label: '右固定', value: 'fixedRight' },
-        { label: '取消固定', value: 'noFixed' },
+        { label: '取消固定', value: 'fixedNone' },
         { label: '隐藏', value: 'hide' },
         {
-            label: '已隐藏',
-            value: 'cancelHide',
+            label: '显示',
+            value: 'visible',
         },
         { label: '恢复默认', value: 'resetHeader' },
     ];

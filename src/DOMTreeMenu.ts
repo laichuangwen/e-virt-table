@@ -280,8 +280,9 @@ export class DOMTreeMenu {
         });
     }
 
-    public hide(): void {
+    private hide(): void {
         // 隐藏菜单
+        this.cleanupAllSubmenus(this.container);
         this.container.style.display = 'none';
     }
 

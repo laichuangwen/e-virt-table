@@ -4,16 +4,21 @@ import Cell from './Cell';
 import CellHeader from './CellHeader';
 import { DOMTreeMenu } from './DOMTreeMenu';
 import { toLeaf } from './util';
+import { autoUpdate, computePosition, flip, offset, shift } from '@floating-ui/dom';
 export default class ContextMenu {
     private ctx: Context;
     private contextMenuEl: HTMLDivElement;
     private currentDOMTreeMenu?: DOMTreeMenu;
+    private isCustom = false;
     constructor(ctx: Context) {
         this.ctx = ctx;
         if (this.ctx.contextMenuElement) {
             this.contextMenuEl = this.ctx.contextMenuElement;
+            this.contextMenuEl.className = 'e-virt-table-main-menu';
+            this.isCustom = true;
         } else {
             this.contextMenuEl = document.createElement('div');
+            this.isCustom = false;
         }
         this.ctx.containerElement.appendChild(this.contextMenuEl);
         this.init();
@@ -23,8 +28,13 @@ export default class ContextMenu {
             this.hide();
         });
         this.ctx.on('cellContextMenuClick', (cell: Cell, e: MouseEvent) => {
+            if (this.isCustom) {
+                this.contextMenuEl.style.display = 'block';
+                this.positionMenu(e);
+                return;
+            }
             const { ENABLE_CONTEXT_MENU, CUSTOM_BODY_CONTEXT_MENU, CONTEXT_MENU } = this.ctx.config;
-            const list = [...CUSTOM_BODY_CONTEXT_MENU, ...CONTEXT_MENU];
+            const list = [...CONTEXT_MENU, ...CUSTOM_BODY_CONTEXT_MENU];
             if (!ENABLE_CONTEXT_MENU || list.length === 0) return;
             e.preventDefault();
             const { xArr, yArr } = this.ctx.selector;
@@ -61,6 +71,11 @@ export default class ContextMenu {
             this.currentDOMTreeMenu.positionMenu(e);
         });
         this.ctx.on('cellHeaderContextMenuClick', (cell: CellHeader, e: MouseEvent) => {
+            if (this.isCustom) {
+                this.contextMenuEl.style.display = 'block';
+                this.positionMenu(e);
+                return;
+            }
             const { HEADER_CONTEXT_MENU, CUSTOM_HEADER_CONTEXT_MENU, ENABLE_HEADER_CONTEXT_MENU } = this.ctx.config;
             const list = [...HEADER_CONTEXT_MENU, ...CUSTOM_HEADER_CONTEXT_MENU];
             if (!ENABLE_HEADER_CONTEXT_MENU || list.length === 0) return;
@@ -81,12 +96,12 @@ export default class ContextMenu {
             const leafColumns = toLeaf(columns);
             const hideColumns = leafColumns.filter((item) => item.hide);
             const menuData = list.map((item) => {
-                if (item.value === 'cancelHide') {
+                if (item.value === 'visible') {
                     return {
                         ...item,
                         children: hideColumns.map((column) => ({
                             label: column.title,
-                            value: `cancelHide_${column.key}`, // 使用唯一的值来标识每个隐藏的列
+                            value: `visible_${column.key}`, // 使用唯一的值来标识每个隐藏的列
                         })),
                     };
                 }
@@ -97,7 +112,7 @@ export default class ContextMenu {
                 onClick: (_itemData: MenuItem, value: string) => {
                     const { xArr } = this.ctx.selector;
                     const [minX, maxX] = xArr;
-                    if (value === 'fixedLeft' || value === 'fixedRight' || value === 'noFixed') {
+                    if (value === 'fixedLeft' || value === 'fixedRight' || value === 'fixedNone') {
                         const fixedKeys = this.ctx.header.allCellHeaders
                             .filter((item) => item.colIndex >= minX && item.colIndex <= maxX)
                             .filter((item) => item.level === 0)
@@ -114,11 +129,11 @@ export default class ContextMenu {
                             .map((item) => item.key);
                         this.ctx.database.setCustomHeaderHideData(hideKeys, true);
                         this.hide();
-                    } else if (value === 'cancelHide') {
-                        // 这个分支不应该被触发，因为 cancelHide 是父菜单项
-                    } else if (value.startsWith('cancelHide_')) {
+                    } else if (value === 'visible') {
+                        // 这个分支不应该被触发，因为 visible 是父菜单项
+                    } else if (value.startsWith('visible_')) {
                         // 处理取消隐藏特定列
-                        const columnKey = value.replace('cancelHide_', '');
+                        const columnKey = value.replace('visible_', '');
                         this.ctx.database.setCustomHeaderHideData([columnKey], false);
                         // 直接删除对应的子菜单项
                         if (this.currentDOMTreeMenu) {
@@ -138,7 +153,7 @@ export default class ContextMenu {
                     }
                 },
             });
-            this.currentDOMTreeMenu.positionMenu(e);
+            this.positionMenu(e);
         });
         this.ctx.on('click', () => {
             this.hide();
@@ -146,20 +161,44 @@ export default class ContextMenu {
         this.ctx.on('onScroll', this.hide.bind(this));
         this.ctx.on('resize', this.hide.bind(this));
     }
-
+    private positionMenu(e: MouseEvent): void {
+        const virtualReference = {
+            getBoundingClientRect: () => ({
+                width: 0,
+                height: 0,
+                top: e.clientY,
+                left: e.clientX,
+                right: e.clientX,
+                bottom: e.clientY,
+                x: e.clientX,
+                y: e.clientY,
+            }),
+            contextElement: document.body,
+        };
+        autoUpdate(virtualReference, this.contextMenuEl, () => {
+            computePosition(virtualReference, this.contextMenuEl, {
+                placement: 'right-start',
+                middleware: [offset(), shift(), flip()],
+            }).then(({ x, y }) => {
+                if (this.contextMenuEl) {
+                    Object.assign(this.contextMenuEl.style, {
+                        left: `${x}px`,
+                        top: `${y}px`,
+                    });
+                }
+            });
+        });
+    }
     hide() {
         if (this.currentDOMTreeMenu) {
-            this.currentDOMTreeMenu.hide();
             this.currentDOMTreeMenu.destroy();
             this.currentDOMTreeMenu = undefined;
         }
+        this.contextMenuEl.style.display = 'none';
         this.ctx.contextMenuIng = false;
     }
     destroy() {
-        if (this.currentDOMTreeMenu) {
-            this.currentDOMTreeMenu.destroy();
-            this.currentDOMTreeMenu = undefined;
-        }
+        this.hide();
         this.contextMenuEl?.remove();
     }
 }
