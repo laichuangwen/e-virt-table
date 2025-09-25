@@ -39,13 +39,7 @@ h:400px
 :::
 
 ## Custom Header
-- Implement custom header by combining column width adjustment and header dragging
-- 
-::: demo
-
-column-drag/customHeader
-h:400px
-:::
+- Refer to [Custom Header](/en/table/custom-header)
 
 ## Types
 

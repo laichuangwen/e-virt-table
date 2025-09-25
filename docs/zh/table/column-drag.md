@@ -2,29 +2,29 @@
 
 ## Config
 
-| 参数              | 说明         | 类型   | 默认值            |
-| ----------------- | ------------ | ------ | ----------------- |
-| ENABLE_DRAG_COLUMN     | 启用拖拽     | boolean | false                |
+| 参数               | 说明       | 类型    | 默认值 |
+| ------------------ | ---------- | ------- | ------ |
+| ENABLE_DRAG_COLUMN | 启用拖拽列 | boolean | false  |
 
 ## Column
 
-| 参数  | 说明       | 类型                | 默认值 |
-| ----- | ---------- | ------------------- | ------ |
-| columnDragDisabled | 禁用列拖动 | boolean | false    |
+| 参数               | 说明       | 类型    | 默认值 |
+| ------------------ | ---------- | ------- | ------ |
+| columnDragDisabled | 禁用列拖动 | boolean | false  |
 
 ## Events
 
-| 事件名称    | 说明       | 回调参数                                      |
-| ----------- | ---------- | --------------------------------------------- |
-| columnDragChange | 列拖拽事件 | `ColumnDragChangeEvent` |
-| customHeaderChange | 自定义表头事件 | `CustomHeader` |
+| 事件名称           | 说明           | 回调参数                |
+| ------------------ | -------------- | ----------------------- |
+| columnDragChange   | 列拖拽事件     | `ColumnDragChangeEvent` |
+| customHeaderChange | 自定义表头事件 | `CustomHeader`          |
 
 ## Methods
 
-| 方法名称             | 说明                             | 参数                                                  |
-| -------------------- | -------------------------------- | ----------------------------------------------------- |
-| setCustomHeader | 设置自定义表头 | `CustomHeader` |
-| getCustomHeader | 更新数据方法可实现拓展任意编辑器 | `{CustomHeader，Column[]}` |
+| 方法名称        | 说明               | 参数                       |
+| --------------- | ------------------ | -------------------------- |
+| setCustomHeader | 设置自定义表头     | `CustomHeader`             |
+| getCustomHeader | 获取自定义表头数据 | `{CustomHeader，Column[]}` |
 
 ## 列拖拽
 
@@ -39,13 +39,7 @@ h:400px
 :::
 
 ## 自定义表头
-- 配合调整列宽和拖动表头实现自定义表头
-- 
-::: demo
-
-column-drag/customHeader
-h:400px
-:::
+- 参考[自定义表头](/zh/table/custom-header)
 
 ## 类型
 

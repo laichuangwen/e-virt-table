@@ -96,7 +96,7 @@ type EVirtTableOptions = {
 | ENABLE_SELECTOR_ALL_COLS | Enable selector for all columns | boolean | — | true |
 | ENABLE_MERGE_CELL_LINK | Enable merge cell data association | boolean | — | false |
 | ENABLE_AUTOFILL | Enable autofill | boolean | — | true |
-| ENABLE_CONTEXT_MENU | Enable context menu | boolean | — | true |
+| ENABLE_CONTEXT_MENU | Enable context menu | boolean | — | false |
 | ENABLE_COPY | Enable copy | boolean | — | true |
 | ENABLE_PASTER | Enable paste | boolean | — | true |
 | ENABLE_RESIZE_ROW | Enable row height adjustment | boolean | — | true |
@@ -132,6 +132,12 @@ type EVirtTableOptions = {
 | BODY_CELL_RENDER_METHOD | Custom cell render method | ^[Function]`({row, column, rowIndex, colIndex,headIndex,visibleRows,rows})=>string\|void` | — | — |
 | SPAN_METHOD | Custom span method for column/row rendering | ^[Function]`({row, column, rowIndex, colIndex,value,visibleLeafColumns,headIndex,headPosition,visibleRows,rows})=>SpanType` | — | — |
 | SELECTABLE_METHOD | Custom selectable method | ^[Function]`({row, rowIndex})=>boolean\|void` | — | — |
+| EXPAND_LAZY | Enable tree lazy loading | boolean | — | false |
+| FOOTER_POSITION | Footer position | `"top"`, `"bottom"` | — | `"bottom"` |
+| ENABLE_HEADER_CONTEXT_MENU | Enable header area context menu | boolean | — | false |
+| HEADER_CONTEXT_MENU | Default header area context menu items | MenuItem[] | — | — |
+| CUSTOM_BODY_CONTEXT_MENU | Custom body area context menu items | MenuItem[] | — | [] |
+| CUSTOM_HEADER_CONTEXT_MENU | Custom header area context menu items | MenuItem[] | — | [] |
 | EXPAND_LAZY_METHOD | Tree lazy load expand method | ^[Function]`({row, column, rowIndex, colIndex,value})=>Promise<any[]>` | — | — |
 | BEFORE_VALUE_CHANGE_METHOD | Callback before value change | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — | — |
 | BEFORE_PASTE_DATA_METHOD | Callback before paste change | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — | — |
@@ -183,6 +189,7 @@ type EVirtTableOptions = {
 | onPastedDataOverflow | Callback when paste overflows | `PastedDataOverflow` |
 | sortChange | Triggered when table sorting conditions change | Map<string, SortStateMapItem> |
 | error | Error callback | — |
+| customHeaderChange | Custom header event | `CustomHeader` |
 
 ## Methods
 
@@ -236,6 +243,8 @@ type EVirtTableOptions = {
 | clearSort              | Clear sorting                  | —                                                         |
 | contextMenuHide        | Hide context menu             | —                                                         |
 | destroy                | Destroy                       | —                                                         |
+| setCustomHeader | Set custom header | `(CustomHeader, ignoreEmit)` |
+| getCustomHeader | Get custom header data | `{CustomHeader, Column[]}` |
 
 ## Column
 
@@ -281,6 +290,7 @@ type EVirtTableOptions = {
 | maxLineClamp | Maximum overflow truncation lines, default `auto` expands based on content | `auto,number` | auto |
 | maxLineClampHeader | Maximum overflow truncation lines, default `auto` expands based on content | `auto,number` | auto |
 | autoRowHeight | Adaptive row height | boolean | false |
+| columnDragDisabled | Disable column drag for current column | boolean | false |
 
 ## Row
 
@@ -310,10 +320,10 @@ type Rules = Rule[];
  
 ```ts
 CONTEXT_MENU: MenuItem[] = [
-        { label: '复制', value: 'copy' },
-        { label: '剪切', value: 'cut' },
-        { label: '粘贴', value: 'paste' },
-        { label: '清空选中内容', value: 'clearSelected' },
+        { label: 'Copy', value: 'copy' },
+        { label: 'Cut', value: 'cut' },
+        { label: 'Paste', value: 'paste' },
+        { label: 'Clear Selected', value: 'clearSelected' },
 ];
 ```
 
@@ -393,4 +403,44 @@ type PastedDataOverflow = {
 type SortDirection = 'asc' | 'desc' | 'none';
 type SortStateMapItem = { direction: SortDirection; timestamp: number };
 type SortStateMap = Map<string, SortStateMapItem>;
+
+type MenuItemEvent =
+    | 'copy'
+    | 'paste'
+    | 'cut'
+    | 'clearSelected'
+    | 'fixedLeft'
+    | 'fixedRight'
+    | 'fixedNone'
+    | 'hide'
+    | 'resetHeader'
+    | 'visible';
+
+type MenuItem = {
+    label: string;
+    value: string | MenuItemEvent;
+    event?: Function;
+    icon?: string;
+    divider?: boolean;
+    disabled?: boolean;
+    children?: MenuItem[];
+};
+
+const HEADER_CONTEXT_MENU: MenuItem[] = [
+    { label: 'Fix Left', value: 'fixedLeft' },
+    { label: 'Fix Right', value: 'fixedRight' },
+    { label: 'Unfix', value: 'fixedNone' },
+    { label: 'Hide', value: 'hide' },
+    { label: 'Show', value: 'visible' },
+    { label: 'Reset Default', value: 'resetHeader' },
+];
+
+type Fixed = 'left' | 'right' | '';
+
+type CustomHeader = {
+    fixedData?: Record<string, Fixed | ''>;
+    sortData?: Record<string, number>;
+    hideData?: Record<string, boolean>;
+    resizableData?: Record<string, number>;
+};
 ```
