@@ -62,7 +62,7 @@ h:320px
 
 ::: demo
 
-footer/fixedNone
+footer/noFixed
 h:320px
 :::
 
