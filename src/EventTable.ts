@@ -339,6 +339,14 @@ export default class EventTable {
                     .then((res: any) => {
                         this.ctx.database.setExpandChildren(cell.rowKey, res);
                         this.ctx.database.expandLoading(cell.rowKey, false);
+                        
+                        // 懒加载成功时，也要收起同一行的所有扩展行（extendRender）
+                        const currentRowExtend = this.ctx.getRowExtend(cell.rowKey);
+                        if (currentRowExtend) {
+                            // 收起当前行的扩展行
+                            this.ctx.setRowExtend(cell.rowKey, currentRowExtend);
+                        }
+                        
                         this.ctx.emit('expandChange', this.ctx.database.getExpandRowKeys());
                     })
                     .catch((err: any) => {
@@ -350,6 +358,14 @@ export default class EventTable {
         } else {
             const isExpand = this.ctx.database.getIsExpand(cell.rowKey);
             this.ctx.database.expandItem(cell.rowKey, !isExpand);
+            
+            // 无论树形展开还是收起，都要收起同一行的所有扩展行（extendRender）
+            const currentRowExtend = this.ctx.getRowExtend(cell.rowKey);
+            if (currentRowExtend) {
+                // 收起当前行的扩展行
+                this.ctx.setRowExtend(cell.rowKey, currentRowExtend);
+            }
+            
             this.ctx.emit('expandChange', this.ctx.database.getExpandRowKeys());
         }
         
