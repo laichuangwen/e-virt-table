@@ -8,7 +8,9 @@ type ConfigColorNameType =
     | 'ICON_EDIT_COLOR'
     | 'ICON_SELECT_COLOR'
     | 'CHECKBOX_DISABLED_COLOR'
-    | 'CHECKBOX_UNCHECK_COLOR';
+    | 'CHECKBOX_UNCHECK_COLOR'
+    | 'EXPAND_ROW_ICON_COLOR'
+    | 'COLLAPSE_ROW_ICON_COLOR';
 type ConfigTypeName =
     | 'LOADING_ICON_SVG'
     | 'EXPAND_ICON_SVG'
@@ -22,7 +24,9 @@ type ConfigTypeName =
     | 'CHECKBOX_INDETERMINATE_SVG'
     | 'SORT_ASC_ICON_SVG'
     | 'SORT_DESC_ICON_SVG'
-    | 'SORTABLE_ICON_SVG';
+    | 'SORTABLE_ICON_SVG'
+    | 'EXPAND_ROW_ICON_SVG'
+    | 'COLLAPSE_ROW_ICON_SVG';
 
 interface SvgIcon extends IconType {
     configName?: ConfigTypeName;
@@ -40,6 +44,8 @@ const svgSelect =
 const svgSortable = `<svg t="1755138507987" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5079" width="200" height="200"><path d="M512 938.688a42.688 42.688 0 0 1-35.072-18.432l-192-277.312A42.56 42.56 0 0 1 320 576h384a42.752 42.752 0 0 1 35.072 66.944l-192 277.312a42.688 42.688 0 0 1-35.072 18.432" fill="currentColor" p-id="2016"></path><path d="M704 448H320a42.752 42.752 0 0 1-35.072-66.944l192-277.312c16-23.04 54.208-23.04 70.144 0l192 277.312A42.56 42.56 0 0 1 704 448" fill="currentColor" p-id="2015"></path></svg>`;
 const svgSortAsc = svgSortable.replace(`fill="currentColor" p-id="2016"`, `fill="#bec4c7" p-id="2016"`);
 const svgSortDesc = svgSortable.replace(`fill="currentColor" p-id="2015"`, `fill="#bec4c7" p-id="2015"`);
+const svgExpand = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M20 5a1 1 0 0 0-1-1h-5a1 1 0 0 0 0 2h2.57l-3.28 3.29a1 1 0 0 0 0 1.42a1 1 0 0 0 1.42 0L18 7.42V10a1 1 0 0 0 1 1a1 1 0 0 0 1-1Zm-9.29 8.29a1 1 0 0 0-1.42 0L6 16.57V14a1 1 0 0 0-1-1a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 0-2H7.42l3.29-3.29a1 1 0 0 0 0-1.42"/></svg>`
+const svgCollapse = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M19 9h-2.58l3.29-3.29a1 1 0 1 0-1.42-1.42L15 7.57V5a1 1 0 0 0-1-1a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 0-2m-9 4H5a1 1 0 0 0 0 2h2.57l-3.28 3.29a1 1 0 0 0 0 1.42a1 1 0 0 0 1.42 0L9 16.42V19a1 1 0 0 0 1 1a1 1 0 0 0 1-1v-5a1 1 0 0 0-1-1"/></svg>`
 
 export default class Icons {
     private ctx: Context;
@@ -132,6 +138,20 @@ export default class Icons {
             configName: 'SORTABLE_ICON_SVG',
             svg: svgSortable,
             color: '#bec4c7',
+        },
+        {
+            name: 'expand-row',
+            configName: 'EXPAND_ROW_ICON_SVG',
+            configColorName: 'EXPAND_ROW_ICON_COLOR',
+            svg: svgExpand,
+            color: '#4E5969',
+        },
+        {
+            name: 'collapse-row',
+            configName: 'COLLAPSE_ROW_ICON_SVG',
+            configColorName: 'COLLAPSE_ROW_ICON_COLOR',
+            svg: svgCollapse,
+            color: '#4E5969',
         },
     ];
     icons = new Map<string, HTMLImageElement>();

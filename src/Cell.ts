@@ -443,14 +443,26 @@ export default class Cell extends BaseCell {
         // 判断当前是否展开
         const isExtended = this.ctx.isRowExtended(rowKey, this.key);
         
-        // 使用和树形一样的图标
-        const expandIcon = this.ctx.icons.get('expand');
-        const shrinkIcon = this.ctx.icons.get('shrink');
+        // 优先使用专用的扩展行图标
+        let expandIcon = this.ctx.icons.get('expand-row');
+        let shrinkIcon = this.ctx.icons.get('collapse-row');
+        let expandIconName = 'expand-row';
+        let shrinkIconName = 'collapse-row';
+        
+        // 如果扩展行图标不存在，则回退到树形图标
+        if (!expandIcon || !shrinkIcon) {
+            expandIcon = this.ctx.icons.get('expand');
+            shrinkIcon = this.ctx.icons.get('shrink');
+            expandIconName = 'expand';
+            shrinkIconName = 'shrink';
+        }
+        
         const icon = !isExtended ? expandIcon : shrinkIcon;
-        const iconName = !isExtended ? 'expand' : 'shrink';
+        const iconName = !isExtended ? expandIconName : shrinkIconName;
 
-        let iconWidth = TREE_ICON_SIZE;
-        let iconHeight = TREE_ICON_SIZE;
+        // 扩展行图标使用比树形图标稍小的尺寸
+        let iconWidth = Math.max(12, TREE_ICON_SIZE * 0.8);
+        let iconHeight = Math.max(12, TREE_ICON_SIZE * 0.8);
         let drawX = this.drawX;
         
         // 参考树形图标的对齐逻辑
