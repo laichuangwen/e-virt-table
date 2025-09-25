@@ -540,7 +540,7 @@ const eVirtTable = new EVirtTable(canvas, {
             {
                 label: '新增',
                 value: 'add',
-                event: (_e,callback) => {
+                event: (_e, callback) => {
                     callback();
                     console.log('新增');
                 },
@@ -720,15 +720,15 @@ const eVirtTable = new EVirtTable(canvas, {
         //     });
         // },
 
-        BODY_CELL_STYLE_METHOD: (cell: any) => {
-            const { rowIndex, column } = cell;
-            if (rowIndex == 5 && column.key === 'phone')
-                return {
-                    color: 'blue',
-                    backgroundColor: 'red',
-                };
-            return {};
-        },
+        // BODY_CELL_STYLE_METHOD: (cell: any) => {
+        //     const { rowIndex, column } = cell;
+        //     if (rowIndex == 5 && column.key === 'phone')
+        //         return {
+        //             color: 'blue',
+        //             backgroundColor: 'red',
+        //         };
+        //     return {};
+        // },
         BODY_CELL_READONLY_METHOD: (params: any) => {
             const { rowIndex, column } = params;
             if (rowIndex == 15 && ['emp_name221', 'emp_name2'].includes(column.key)) {
@@ -1197,11 +1197,17 @@ document.getElementById('hide')?.addEventListener('click', () => {
 
 const customHeader = localStorage.getItem('customHeader');
 if (customHeader) {
+    console.log('有缓存自定义表头');
     eVirtTable.setCustomHeader(JSON.parse(customHeader));
 }
 eVirtTable.on('customHeaderChange', (customHeader) => {
     console.log('customHeaderChange', customHeader);
-    localStorage.setItem('customHeader', JSON.stringify(customHeader));
+    // 如果customHeader为空，则删除localStorage
+    if (Object.keys(customHeader).length === 0) {
+        localStorage.removeItem('customHeader');
+    } else {
+        localStorage.setItem('customHeader', JSON.stringify(customHeader));
+    }
 });
 // 销毁
 function destroy() {

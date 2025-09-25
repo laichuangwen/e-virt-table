@@ -39,7 +39,7 @@ export type OverflowTooltipPlacement =
 
 export type VerticalAlign = 'top' | 'middle' | 'bottom';
 export type Align = 'left' | 'center' | 'right';
-export type Fixed = 'left' | 'right';
+export type Fixed = 'left' | 'right' | '';
 export type Type = 'index' | 'selection' | 'index-selection' | 'tree' | 'selection-tree' | 'tree-selection' | 'number';
 
 export type TypeCheckbox =

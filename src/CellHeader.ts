@@ -84,7 +84,7 @@ export default class CellHeader extends BaseCell {
         this.align = column.headerAlign || column.align || this.ctx.config.COLUMNS_ALIGN;
         this.verticalAlign =
             column.headerVerticalAlign || column.verticalAlign || this.ctx.config.COLUMNS_VERTICAL_ALIGN;
-        this.fixed = column.fixed;
+        this.fixed = column.fixed || '';
         this.level = column.level || 0;
         this.operation = column.operation || false;
         this.text = column.title;

@@ -172,7 +172,7 @@ export default class EVirtTable {
         this.ctx.emit('draw');
     }
     setCustomHeader(customHeader: CustomHeader) {
-        this.ctx.database.setCustomHeader(customHeader);
+        this.ctx.database.setCustomHeader(customHeader, true);
         this.ctx.database.init(false);
         this.header.init();
         this.ctx.emit('draw');
@@ -180,7 +180,6 @@ export default class EVirtTable {
     getCustomHeader() {
         return this.header.getCustomHeader();
     }
-
 
     setLoading(loading: boolean) {
         this.ctx.loading = loading;

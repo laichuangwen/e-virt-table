@@ -1812,15 +1812,17 @@ export default class Database {
         const height = this.overlayerAutoHeightMap.get(key) || 0;
         return height;
     }
-    setCustomHeader(customHeader: CustomHeader) {
+    setCustomHeader(customHeader: CustomHeader, ignoreEmit = false) {
         (['fixedData', 'sortData', 'hideData', 'resizableData'] as (keyof CustomHeader)[]).forEach((key) => {
             const value = customHeader[key];
             if (value !== undefined) {
                 this.customHeader[key] = value as any;
             }
         });
-        const obj = this.clearCustomHeaderInvalidValues(this.originalColumns);
-        this.ctx.emit('customHeaderChange', obj);
+        if (!ignoreEmit) {
+            const obj = this.clearCustomHeaderInvalidValues(this.originalColumns);
+            this.ctx.emit('customHeaderChange', obj);
+        }
     }
     resetCustomHeader() {
         this.customHeader = {};
@@ -1880,10 +1882,9 @@ export default class Database {
                             customHeader[field] = {} as any;
                         }
                         (customHeader[field] as any)[column.key] = value;
-                        if (field === 'fixedData' && columnValue === undefined && value === '') {
-                            console.log('shanhcu');
-                            
-                            delete customHeader[field];
+                        // 如果固定源数据为空，则删除
+                        if (field === 'fixedData' && !value && !columnValue) {
+                            delete customHeader[field]?.[column.key];
                         }
                     }
                 };

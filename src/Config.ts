@@ -304,22 +304,13 @@ export default class Config {
         { label: '清空选中内容', value: 'clearSelected' },
     ];
     CONTEXT_HEADER_MENU: MenuItem[] = [
-        { label: '左固定', value: 'fixedLeft' },
+        { label: '左固定', value: 'fixedLeft', disabled: true },
         { label: '右固定', value: 'fixedRight' },
         { label: '取消固定', value: 'noFixed' },
         { label: '隐藏', value: 'hide' },
         {
             label: '已隐藏',
             value: 'cancelHide',
-            children: [
-                {
-                    label: '恢复默认',
-                    value: 'resetHeader',
-                    event: () => {
-                        console.log('3333');
-                    },
-                },
-            ],
         },
         { label: '恢复默认', value: 'resetHeader' },
     ];

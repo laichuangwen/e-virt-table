@@ -325,6 +325,7 @@ export default class Header {
             level,
             fixed,
         } = this.dragTarget;
+        
         const dragCellHeader = this.allCellHeaders.find(
             (item) =>
                 item.key !== key &&
