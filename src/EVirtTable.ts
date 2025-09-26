@@ -41,6 +41,7 @@ export default class EVirtTable {
     private overlayer: Overlayer;
     private contextMenu: ContextMenu;
     private loading: Loading;
+    private animationFrameId: number|undefined = undefined;
     ctx: Context;
 
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
@@ -121,7 +122,10 @@ export default class EVirtTable {
         };
     }
     draw(ignoreOverlayer = false) {
-        requestAnimationFrame(() => {
+        if(this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+        }
+        this.animationFrameId = requestAnimationFrame(() => {
             const startTime = performance.now();
             this.header.update();
             this.footer.update();
