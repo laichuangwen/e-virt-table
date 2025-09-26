@@ -41,7 +41,8 @@ export default class EVirtTable {
     private overlayer: Overlayer;
     private contextMenu: ContextMenu;
     private loading: Loading;
-    private animationFrameId: number|undefined = undefined;
+    private animationFrameId: number | undefined = undefined;
+    private animationFrameId2: number | undefined = undefined;
     ctx: Context;
 
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
@@ -122,7 +123,7 @@ export default class EVirtTable {
         };
     }
     draw(ignoreOverlayer = false) {
-        if(this.animationFrameId) {
+        if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
         }
         this.animationFrameId = requestAnimationFrame(() => {
@@ -140,7 +141,10 @@ export default class EVirtTable {
                 this.overlayer.draw();
             }
             // 更新自动高度放在第二帧，避免影响绘制性能
-            requestAnimationFrame(() => {
+            if (this.animationFrameId2) {
+                cancelAnimationFrame(this.animationFrameId2);
+            }
+            this.animationFrameId2 = requestAnimationFrame(() => {
                 this.body.updateAutoHeight();
             });
             const endTime = performance.now();
