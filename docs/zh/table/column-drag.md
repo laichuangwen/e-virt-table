@@ -10,7 +10,7 @@
 
 | 参数               | 说明       | 类型    | 默认值 |
 | ------------------ | ---------- | ------- | ------ |
-| columnDragDisabled | 禁用列拖动 | boolean | false  |
+| dragDisabled | 禁用列拖动 | boolean | false  |
 
 ## Events
 
@@ -30,7 +30,7 @@
 
 - ENABLE_DRAG_COLUMN为true启用拖拽表头
 - 表头拖拽只支持同级拖拽
-- columnDragDisabled 禁用拖动
+- dragDisabled 禁用拖动
 
 ::: demo
 

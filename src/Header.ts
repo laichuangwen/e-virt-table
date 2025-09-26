@@ -217,7 +217,7 @@ export default class Header {
             if (!this.ctx.config.ENABLE_DRAG_COLUMN) {
                 return;
             }
-            if (cellHeader.column.columnDragDisabled) {
+            if (cellHeader.column.dragDisabled) {
                 return;
             }
             if (this.dragTarget === cellHeader) {
@@ -298,7 +298,7 @@ export default class Header {
             if (!this.ctx.config.ENABLE_DRAG_COLUMN) {
                 return;
             }
-            if (cell.column.columnDragDisabled) {
+            if (cell.column.dragDisabled) {
                 return;
             }
             this.dragingCell = this.getDragCellHeader(cell.colIndex);
@@ -307,7 +307,7 @@ export default class Header {
             if (!this.ctx.config.ENABLE_DRAG_COLUMN) {
                 return;
             }
-            if (cellHeader.column.columnDragDisabled) {
+            if (cellHeader.column.dragDisabled) {
                 return;
             }
             this.dragingCell = this.getDragCellHeader(cellHeader.colIndex);
