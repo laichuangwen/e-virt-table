@@ -175,6 +175,7 @@ export interface Column {
     options?: any;
     dragDisabled?: boolean;
     hideDisabled?: boolean;
+    fixedDisabled?: boolean;
     selectorCellValueType?: SelectorCellValueType;
     maxLineClamp?: LineClampType; // 行高超出多少行显示省略号
     maxLineClampHeader?: LineClampType; // 表头行高超出多少行显示省略号

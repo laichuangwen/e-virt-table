@@ -116,6 +116,7 @@ export default class ContextMenu {
                         const fixedKeys = this.ctx.header.allCellHeaders
                             .filter((item) => item.colIndex >= minX && item.colIndex <= maxX)
                             .filter((item) => item.level === 0)
+                            .filter((item) => !item.column.fixedDisabled)
                             .map((item) => item.key);
                         this.ctx.database.setCustomHeaderFixedData(
                             fixedKeys,
