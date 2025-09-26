@@ -290,7 +290,7 @@ type EVirtTableOptions = {
 | maxLineClamp | Maximum overflow truncation lines, default `auto` expands based on content | `auto,number` | auto |
 | maxLineClampHeader | Maximum overflow truncation lines, default `auto` expands based on content | `auto,number` | auto |
 | autoRowHeight | Adaptive row height | boolean | false |
-| columnDragDisabled | Disable column drag for current column | boolean | false |
+| dragDisabled | Disable column drag for current column | boolean | false |
 
 ## Row
 

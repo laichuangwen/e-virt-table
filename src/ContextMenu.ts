@@ -116,6 +116,7 @@ export default class ContextMenu {
                         const fixedKeys = this.ctx.header.allCellHeaders
                             .filter((item) => item.colIndex >= minX && item.colIndex <= maxX)
                             .filter((item) => item.level === 0)
+                            .filter((item) => !item.column.fixedDisabled)
                             .map((item) => item.key);
                         this.ctx.database.setCustomHeaderFixedData(
                             fixedKeys,
@@ -126,8 +127,11 @@ export default class ContextMenu {
                         const hideKeys = this.ctx.header.leafCellHeaders
                             .filter((item) => item.colIndex >= minX && item.colIndex <= maxX)
                             .filter((item) => !item.children.length)
+                            .filter((item) => !item.column.hideDisabled)
                             .map((item) => item.key);
-                        this.ctx.database.setCustomHeaderHideData(hideKeys, true);
+                        if (hideKeys.length > 0) {
+                            this.ctx.database.setCustomHeaderHideData(hideKeys, true);
+                        }
                         this.hide();
                     } else if (value === 'visible') {
                         // 这个分支不应该被触发，因为 visible 是父菜单项

@@ -292,7 +292,7 @@ type EVirtTableOptions = {
 | maxLineClamp | 最大溢出截断行数，默认`auto`根据内容撑开 | `auto,number` | auto |
 | maxLineClampHeader | 表头最大溢出截断行数，默认`auto`根据内容撑开 | `auto,number` | auto |
 | autoRowHeight | 当前列行自适应高度 | boolean | false |
-| columnDragDisabled | 当前列禁用拖拽 | boolean | false |
+| dragDisabled | 当前列禁用拖拽 | boolean | false |
 
 ## Row
 

@@ -217,7 +217,7 @@ export default class Header {
             if (!this.ctx.config.ENABLE_DRAG_COLUMN) {
                 return;
             }
-            if (cellHeader.column.columnDragDisabled) {
+            if (cellHeader.column.dragDisabled) {
                 return;
             }
             if (this.dragTarget === cellHeader) {
@@ -298,7 +298,7 @@ export default class Header {
             if (!this.ctx.config.ENABLE_DRAG_COLUMN) {
                 return;
             }
-            if (cell.column.columnDragDisabled) {
+            if (cell.column.dragDisabled) {
                 return;
             }
             this.dragingCell = this.getDragCellHeader(cell.colIndex);
@@ -307,7 +307,7 @@ export default class Header {
             if (!this.ctx.config.ENABLE_DRAG_COLUMN) {
                 return;
             }
-            if (cellHeader.column.columnDragDisabled) {
+            if (cellHeader.column.dragDisabled) {
                 return;
             }
             this.dragingCell = this.getDragCellHeader(cellHeader.colIndex);
@@ -325,7 +325,7 @@ export default class Header {
             level,
             fixed,
         } = this.dragTarget;
-        
+
         const dragCellHeader = this.allCellHeaders.find(
             (item) =>
                 item.key !== key &&
@@ -487,7 +487,8 @@ export default class Header {
             this.ctx.paint.drawLine(poins, {
                 borderColor: RESIZE_COLUMN_LINE_COLOR,
             });
-            const text = `${resizeTargetWidth + this.resizeDiff}px`;
+            const newWidth = Math.floor(resizeTargetWidth + this.resizeDiff);
+            const text = `${newWidth}px`;
             const rw = 45;
             const rh = 24;
             this.ctx.paint.drawRect(x + rw / 2, this.ctx.mouseY - rh / 2, rw, rh, {

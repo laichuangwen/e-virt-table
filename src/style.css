@@ -265,7 +265,6 @@
     user-select: none;
     padding: var(--evt-context-menu-item-padding);
     cursor: pointer;
-    border-bottom: 1px solid var(--evt-border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;

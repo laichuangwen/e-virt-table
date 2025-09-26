@@ -10,7 +10,7 @@
 
 | Parameter  | Description       | Type                | Default |
 | ----- | ---------- | ------------------- | ------ |
-| columnDragDisabled | Disable column drag | boolean | false    |
+| dragDisabled | Disable column drag | boolean | false    |
 
 ## Events
 
@@ -30,7 +30,7 @@
 
 - Set ENABLE_DRAG_COLUMN to true to enable column header drag
 - Column header drag only supports same-level dragging
-- columnDragDisabled disables dragging
+- dragDisabled disables dragging
 
 ::: demo
 
