@@ -282,6 +282,7 @@
     display: flex;
     align-items: center;
     flex: 1;
+    min-width: 0;
 }
 .menu-item-icon {
     display: inline-flex;
@@ -299,6 +300,10 @@
 }
 .menu-item-text {
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* 箭头图标 */

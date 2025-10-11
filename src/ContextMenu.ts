@@ -100,7 +100,7 @@ export default class ContextMenu {
                     return {
                         ...item,
                         children: hideColumns.map((column) => ({
-                            label: column.title,
+                            label: column.hideTitleInMenu || column.title,
                             value: `visible_${column.key}`, // 使用唯一的值来标识每个隐藏的列
                         })),
                     };

@@ -56,6 +56,7 @@ let columns: Column[] = [
     },
     {
         title: '姓名',
+        hideTitleInMenu: '姓名自定义标题11111111111111111111111',
         key: 'emp_name',
         width: 100,
         fixed: 'left',
