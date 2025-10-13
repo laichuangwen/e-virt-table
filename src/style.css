@@ -232,6 +232,7 @@
     left: -99999px;
     top: -99999px;
     display: none;
+    position: fixed;
     background-color: var(--evt-body-bg-color);
 }
 .e-virt-table-submenu {

@@ -149,6 +149,7 @@ let columns: Column[] = [
                             {
                                 title: '姓名223',
                                 key: 'emp_name223',
+                                hideDisabled: true,
                             },
                         ],
                     },

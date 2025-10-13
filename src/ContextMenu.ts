@@ -1,4 +1,4 @@
-import { MenuItem } from './types';
+import { Column, MenuItem } from './types';
 import Context from './Context';
 import Cell from './Cell';
 import CellHeader from './CellHeader';
@@ -76,6 +76,13 @@ export default class ContextMenu {
                 this.positionMenu(e);
                 return;
             }
+            // 判断是否在范围内
+            const { SELECTOR_AREA_MIN_X, SELECTOR_AREA_MAX_X, SELECTOR_AREA_MAX_X_OFFSET } = this.ctx.config;
+            const areaMinX = SELECTOR_AREA_MIN_X;
+            const areaMaxX = SELECTOR_AREA_MAX_X || this.ctx.maxColIndex - SELECTOR_AREA_MAX_X_OFFSET;
+            if (cell.colIndex < areaMinX || cell.colIndex > areaMaxX) {
+                return;
+            }
             const { HEADER_CONTEXT_MENU, CUSTOM_HEADER_CONTEXT_MENU, ENABLE_HEADER_CONTEXT_MENU } = this.ctx.config;
             const list = [...HEADER_CONTEXT_MENU, ...CUSTOM_HEADER_CONTEXT_MENU];
             if (!ENABLE_HEADER_CONTEXT_MENU || list.length === 0) return;
@@ -93,16 +100,11 @@ export default class ContextMenu {
                 this.currentDOMTreeMenu.destroy();
             }
             const columns = this.ctx.database.getColumns();
-            const leafColumns = toLeaf(columns);
-            const hideColumns = leafColumns.filter((item) => item.hide);
             const menuData = list.map((item) => {
                 if (item.value === 'visible') {
                     return {
                         ...item,
-                        children: hideColumns.map((column) => ({
-                            label: column.hideTitleInMenu || column.title,
-                            value: `visible_${column.key}`, // 使用唯一的值来标识每个隐藏的列
-                        })),
+                        children: this.filterColumns(columns),
                     };
                 }
                 return item;
@@ -192,6 +194,30 @@ export default class ContextMenu {
                 }
             });
         });
+    }
+    private filterColumns(columns: Column[]): MenuItem[] {
+        const result: MenuItem[] = [];
+
+        for (const col of columns) {
+            // 有 children，递归过滤
+            if (col.children && col.children.length > 0) {
+                const filteredChildren = this.filterColumns(col.children);
+                if (filteredChildren.length > 0) {
+                    result.push({
+                        label: col.title,
+                        value: `visible_${col.key}`,
+                        disabled: true, // 非末级，且有子项保留 → disabled
+                        children: filteredChildren,
+                    });
+                }
+            }
+            // 末级节点，保留 hide===true 的
+            else if (col.hide) {
+                result.push({ label: col.title, value: `visible_${col.key}` });
+            }
+        }
+
+        return result;
     }
     hide() {
         if (this.currentDOMTreeMenu) {
