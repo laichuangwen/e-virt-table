@@ -28,7 +28,6 @@ type EVirtTableOptions = {
 | HEADER_FONT | 表头字体 | string | 12px normal Arial |
 | BODY_FONT | 单元格字体 | string | 12px normal Arial |
 | BORDER_COLOR | 区域边框颜色 | string | #e1e6eb |
-| WIDTH | 宽度为 0 表示自适应100% | number | 0 |
 | RESIZE_MIN_WIDTH | 最小可调整宽度 | number | 40 |
 | HEIGHT | 高度，高度为 0 表示自适应 | number | 0 |
 | COLUMNS_ALIGN | 全局水平对齐方式 | `"left"`, `"center"`, `"right"` | left |

@@ -86,7 +86,10 @@ export default class Header {
         if (this.resizeNum > 0) {
             this.ctx.stageWidth = Math.floor(containerElement.width);
         } else {
-            this.ctx.stageWidth = Math.floor(this.width + SCROLLER_TRACK_SIZE);
+            this.ctx.stageWidth = Math.min(
+                Math.floor(this.width + SCROLLER_TRACK_SIZE),
+                Math.floor(containerElement.width),
+            );
         }
         this.ctx.stageElement.style.width = this.ctx.stageWidth + 'px';
         this.visibleWidth = this.ctx.stageWidth - SCROLLER_TRACK_SIZE;

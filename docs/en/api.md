@@ -28,7 +28,6 @@ type EVirtTableOptions = {
 | HEADER_FONT | Header font | string | — | 12px normal Arial |
 | BODY_FONT | Cell font | string | — | 12px normal Arial |
 | BORDER_COLOR | Border color | string | — | #e1e6eb |
-| WIDTH | Width (0 means auto fit to 100%) | number | — | 0 |
 | RESIZE_MIN_WIDTH | Minimum resizable width | number | — | 40 |
 | HEIGHT | Height (0 means auto fit) | number | — | 0 |
 | COLUMNS_ALIGN | Horizontal alignment | `"left"`, `"center"`, `"right"` | left |
