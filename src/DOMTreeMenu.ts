@@ -132,6 +132,7 @@ export class DOMTreeMenu {
 
         const submenu = menuItem._submenu || (menuItem.querySelector('.e-virt-table-submenu') as HTMLElement | null);
         if (submenu) {
+            this.hideSiblingSubmenus(menuItem);
             this.showSubmenu(menuItem, submenu);
         }
     }
@@ -150,6 +151,31 @@ export class DOMTreeMenu {
         }, 150);
     }
 
+    private hideSiblingSubmenus(menuItem: MenuElement): void {
+        // 找到同级的所有菜单项
+        let siblings: NodeListOf<MenuElement>;
+        
+        if (menuItem.classList.contains('e-virt-table-menu-item')) {
+            // 主菜单项：隐藏其他主菜单项的子菜单
+            siblings = this.container.querySelectorAll('.e-virt-table-menu-item') as NodeListOf<MenuElement>;
+        } else {
+            // 子菜单项：隐藏同一个子菜单容器中其他子菜单项的子菜单
+            const parentSubmenu = menuItem.closest('.e-virt-table-submenu');
+            if (parentSubmenu) {
+                siblings = parentSubmenu.querySelectorAll('.e-virt-table-submenu-item') as NodeListOf<MenuElement>;
+            } else {
+                return;
+            }
+        }
+        
+        // 隐藏所有同级菜单项的子菜单（除了当前项）
+        siblings.forEach((sibling) => {
+            if (sibling !== menuItem && sibling._submenu) {
+                this.hideSubmenu(sibling._submenu);
+            }
+        });
+    }
+
     private async showSubmenu(trigger: HTMLElement, submenu: HTMLElement): Promise<void> {
         if (this.activeSubmenus.has(submenu)) return;
 
@@ -157,9 +183,21 @@ export class DOMTreeMenu {
         submenu.classList.add('show');
 
         const cleanup = autoUpdate(trigger, submenu, async () => {
+            // 根据主菜单容器的整体位置判断子菜单显示方向
+            const containerRect = this.container.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const submenuWidth = submenu.offsetWidth || 200; // 预估宽度
+            
+            // 计算主菜单右侧和左侧可用空间
+            const rightSpace = viewportWidth - containerRect.right;
+            const leftSpace = containerRect.left;
+            
+            // 根据主菜单位置决定所有子菜单的统一方向
+            const placement = (rightSpace >= submenuWidth || rightSpace >= leftSpace) ? 'right-start' : 'left-start';
+            
             const { x, y } = await computePosition(trigger, submenu, {
-                placement: 'right-start',
-                middleware: [offset(8), flip(), shift({ padding: 8 })],
+                placement,
+                middleware: [offset(8), shift({ padding: 8 })],
             });
 
             Object.assign(submenu.style, {
@@ -335,8 +373,46 @@ export class DOMTreeMenu {
             return false;
         }
 
+        // 找到所属的父级子菜单容器
+        const parentSubmenu = subMenuItem.closest('.e-virt-table-submenu') as HTMLElement;
+        
+        // 如果子菜单项有子菜单，先清理子菜单
+        const childSubmenu = (subMenuItem as MenuElement)._submenu;
+        if (childSubmenu) {
+            this.cleanupSubmenuRecursively(childSubmenu);
+        }
+        
         // 从 DOM 中移除子菜单项
         subMenuItem.remove();
+
+        // 检查父级子菜单容器是否还有其他子菜单项
+        if (parentSubmenu) {
+            const remainingItems = parentSubmenu.querySelectorAll('.e-virt-table-submenu-item');
+            if (remainingItems.length === 0) {
+                // 没有子项了，找到拥有这个子菜单的父级菜单项并移除
+                const parentMenuItem = this.container.querySelector(`[data-menu]`) as MenuElement | null;
+                if (parentMenuItem && parentMenuItem._submenu === parentSubmenu) {
+                    this.removeMenuItem(parentMenuItem.getAttribute('data-menu') || '');
+                } else {
+                    // 可能是嵌套子菜单，需要查找所有可能的父级
+                    const allMenuItems = this.container.querySelectorAll('[data-menu], [data-submenu]') as NodeListOf<MenuElement>;
+                    for (const item of allMenuItems) {
+                        if (item._submenu === parentSubmenu) {
+                            const parentValue = item.getAttribute('data-menu') || item.getAttribute('data-submenu');
+                            if (parentValue) {
+                                if (item.hasAttribute('data-menu')) {
+                                    this.removeMenuItem(parentValue);
+                                } else {
+                                    this.removeSubMenuItem(parentValue);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         return true;
     }
 

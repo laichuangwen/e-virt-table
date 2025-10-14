@@ -69,7 +69,7 @@ function calCrossSpan(arr: Column[] = [], maxRow: number = 1, level: number = 0,
                 config.children.forEach((item) => {
                     item.fixed = fixed;
                 });
-                const children = calCrossSpan(config.children, maxRow - 1, level + 1, parentKey);
+                const children = calCrossSpan(config.children, maxRow - 1, level + 1, config.key);
                 if (children) {
                     children.forEach((item) => {
                         colspan += item.colspan ?? 0;

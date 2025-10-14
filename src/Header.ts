@@ -1,5 +1,5 @@
 import Context from './Context';
-import { getMaxRow, calCrossSpan, toLeaf, sortFixed, throttle, filterHiddenColumns } from './util';
+import { getMaxRow, calCrossSpan, toLeaf, sortFixed, throttle, filterHiddenColumns, deepClone } from './util';
 import CellHeader from './CellHeader';
 import type { Column, ColumnDragChangeEvent } from './types';
 import { TreeUtil } from './TreeUtil';
@@ -86,7 +86,10 @@ export default class Header {
         if (this.resizeNum > 0) {
             this.ctx.stageWidth = Math.floor(containerElement.width);
         } else {
-            this.ctx.stageWidth = Math.floor(this.width + SCROLLER_TRACK_SIZE);
+            this.ctx.stageWidth = Math.min(
+                Math.floor(this.width + SCROLLER_TRACK_SIZE),
+                Math.floor(containerElement.width),
+            );
         }
         this.ctx.stageElement.style.width = this.ctx.stageWidth + 'px';
         this.visibleWidth = this.ctx.stageWidth - SCROLLER_TRACK_SIZE;
@@ -195,17 +198,28 @@ export default class Header {
                 for (const col of renderAllCellHeaders) {
                     const { offsetX, offsetY } = this.ctx.getOffset(e);
                     const x = offsetX;
+                    const y = offsetY;
                     const drawX = col.getDrawX();
+                    const drawY = col.getDrawY();
                     if (
                         x > drawX + col.width - 5 &&
                         x < drawX + col.width + 4 &&
                         x < stageWidth - 4 && // 视窗中最后一列不允许调整宽
-                        col.colspan <= 1 // 父级表头不触发
+                        y > drawY
                     ) {
+                        const colIndex = col.colIndex + col.colspan - 1;
+                        const resizeTarget = this.leafCellHeaders.find((item) => item.colIndex === colIndex);
+                        if (!resizeTarget) {
+                            return;
+                        }
+                        // 中间部分到固定位置
+                        if (!resizeTarget.fixed && this.ctx.stageWidth - this.ctx.fixedRightWidth < drawX + col.width) {
+                            return;
+                        }
                         // 在表头内
                         if (this.ctx.isTarget(e) && offsetY <= this.height) {
                             this.ctx.stageElement.style.cursor = 'col-resize';
-                            this.resizeTarget = col;
+                            this.resizeTarget = resizeTarget;
                         }
                     }
                 }
@@ -253,7 +267,7 @@ export default class Header {
                 };
                 const columns = this.ctx.database.getColumns();
                 const sortColumns = calCrossSpan(columns, getMaxRow(columns));
-                const tree = new TreeUtil(JSON.parse(JSON.stringify(sortColumns)), {
+                const tree = new TreeUtil(deepClone(sortColumns), {
                     key: 'key', // 节点唯一标识字段（对应我们之前的field）
                     childrenKey: 'children', // 子节点数组字段
                 });

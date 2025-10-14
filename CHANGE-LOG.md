@@ -5,7 +5,17 @@ Vx.x.x(TPL)
 -   Performance Improvements
 -   Style changes
 -   Dependencies Changes
-  
+
+V1.3.2
+### Bug Fixes
+
+- fix:修复所有列为widthFillDisable时表格没有滚动条
+- fix:修复拖宽度提示手势错位bug
+- fix:修复多级表头不是同级也提示可移动
+- fix:修复右键多个子项时hover会叠加
+- feat:自定义表头隐藏改为多级
+- fix:解决自定义表头Converting circular structure to JSON的bug
+---  
 
 V1.3.1
 ### Bug Fixes

@@ -52,8 +52,6 @@ export default class Config {
     STRIPE_COLOR = '#fafafa';
     /** 区域边框颜色 */
     BORDER_COLOR = '#e1e6eb';
-    /** 宽度为 0 表示自适应100% */
-    WIDTH = 0;
     /** 高度，为 0 表示自适应 */
     HEIGHT = 0;
     /** 占位文本颜色 */
