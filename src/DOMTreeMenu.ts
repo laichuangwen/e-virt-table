@@ -132,6 +132,7 @@ export class DOMTreeMenu {
 
         const submenu = menuItem._submenu || (menuItem.querySelector('.e-virt-table-submenu') as HTMLElement | null);
         if (submenu) {
+            this.hideSiblingSubmenus(menuItem);
             this.showSubmenu(menuItem, submenu);
         }
     }
@@ -148,6 +149,31 @@ export class DOMTreeMenu {
                 }
             }
         }, 150);
+    }
+
+    private hideSiblingSubmenus(menuItem: MenuElement): void {
+        // 找到同级的所有菜单项
+        let siblings: NodeListOf<MenuElement>;
+        
+        if (menuItem.classList.contains('e-virt-table-menu-item')) {
+            // 主菜单项：隐藏其他主菜单项的子菜单
+            siblings = this.container.querySelectorAll('.e-virt-table-menu-item') as NodeListOf<MenuElement>;
+        } else {
+            // 子菜单项：隐藏同一个子菜单容器中其他子菜单项的子菜单
+            const parentSubmenu = menuItem.closest('.e-virt-table-submenu');
+            if (parentSubmenu) {
+                siblings = parentSubmenu.querySelectorAll('.e-virt-table-submenu-item') as NodeListOf<MenuElement>;
+            } else {
+                return;
+            }
+        }
+        
+        // 隐藏所有同级菜单项的子菜单（除了当前项）
+        siblings.forEach((sibling) => {
+            if (sibling !== menuItem && sibling._submenu) {
+                this.hideSubmenu(sibling._submenu);
+            }
+        });
     }
 
     private async showSubmenu(trigger: HTMLElement, submenu: HTMLElement): Promise<void> {
