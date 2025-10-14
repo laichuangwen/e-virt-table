@@ -195,17 +195,28 @@ export default class Header {
                 for (const col of renderAllCellHeaders) {
                     const { offsetX, offsetY } = this.ctx.getOffset(e);
                     const x = offsetX;
+                    const y = offsetY;
                     const drawX = col.getDrawX();
+                    const drawY = col.getDrawY();
                     if (
                         x > drawX + col.width - 5 &&
                         x < drawX + col.width + 4 &&
                         x < stageWidth - 4 && // 视窗中最后一列不允许调整宽
-                        col.colspan <= 1 // 父级表头不触发
+                        y > drawY
                     ) {
+                        const colIndex = col.colIndex + col.colspan - 1;
+                        const resizeTarget = this.leafCellHeaders.find((item) => item.colIndex === colIndex);
+                        if (!resizeTarget) {
+                            return;
+                        }
+                        // 中间部分到固定位置
+                        if (!resizeTarget.fixed && this.ctx.stageWidth - this.ctx.fixedRightWidth < drawX + col.width) {
+                            return;
+                        }
                         // 在表头内
                         if (this.ctx.isTarget(e) && offsetY <= this.height) {
                             this.ctx.stageElement.style.cursor = 'col-resize';
-                            this.resizeTarget = col;
+                            this.resizeTarget = resizeTarget;
                         }
                     }
                 }
