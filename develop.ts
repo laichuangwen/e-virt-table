@@ -129,6 +129,24 @@ let columns: Column[] = [
                             //     }
                             // },
                         },
+                        children: [
+                            {
+                                title: '姓名111',
+                                key: 'emp_name111',
+                                align: 'left',
+                                width: 200,
+                            },
+                            {
+                                title: '姓名112',
+                                key: 'emp_name112',
+                                // hide: true,
+                            },
+                            {
+                                title: '姓名113',
+                                key: 'emp_name113',
+                                hideDisabled: true,
+                            },
+                        ],
                     },
                     {
                         title: '姓名22',
