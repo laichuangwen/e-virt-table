@@ -58,11 +58,12 @@
     --evt-drag-tip-line-color: var(--evt-color-primary);
     --evt-context-menu-min-width: 150px;
     --evt-context-menu-max-width: 220px;
-    --evt-context-menu-item-padding: 8px 8px 8px 14px;
+    --evt-context-menu-item-padding: 8px 12px;
     --evt-context-menu-bg-color: #fff;
     --evt-context-menu-text-color: #333;
     --evt-context-menu-item-hover-text-color: var(--evt-color-primary);
     --evt-context-menu-item-hover-bg-color: #f5f5f5;
+    --evt-context-menu-text-size: 13px;
 }
 .dark {
     --evt-border-color: #363637;
@@ -271,11 +272,14 @@
     align-items: center;
     transition: background 0.2s, color 0.2s;
     color: var(--evt-context-menu-text-color);
-    font-size: 14px;
+    font-size: var(--evt-context-menu-text-size);
 }
 .e-virt-table-menu-item:last-child,
 .e-virt-table-submenu-item:last-child {
     border-bottom: none;
+}
+.e-virt-table-menu-item:has(.menu-item-icon) {
+    padding-left: 8px;
 }
 
 /* 菜单项内容布局 */
