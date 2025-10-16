@@ -91,6 +91,7 @@ export default class Context {
     isMouseoverTargetContainer = false;
     mousedown = false;
     isPointer = false;
+    isEmpty = false; // 是否空数据
     rowResizing = false; // 行调整大小中
     columnResizing = false; // 列调整大小中
     scrollerMove = false; // 滚动条移动中

@@ -6,6 +6,14 @@ Vx.x.x(TPL)
 -   Style changes
 -   Dependencies Changes
 
+V1.3.3
+### Bug Fixes
+
+- fix:空数据时去除body的fixed阴影
+- fix:修复双击事件重绘导致失效
+- fix:编辑时hover图标不隐藏
+---  
+
 V1.3.2
 ### Bug Fixes
 
