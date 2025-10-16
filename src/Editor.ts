@@ -336,8 +336,6 @@ export default class Editor {
         if (this.enable) {
             return;
         }
-        // 触发绘制，刷新
-        // this.ctx.emit('drawView');
         // 可视区可见
         const isVisible = focusCell.isVerticalVisible() && focusCell.isHorizontalVisible();
         if (!isVisible) {
@@ -350,6 +348,8 @@ export default class Editor {
         }
         const readonly = this.ctx.database.getReadonly(rowKey, key);
         if (focusCell && !readonly) {
+            // 触发绘制，刷新
+            this.ctx.emit('drawView');
             this.enable = true;
             this.ctx.editing = true;
             this.cellTarget = focusCell;
