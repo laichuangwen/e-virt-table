@@ -492,7 +492,12 @@ export default class Header {
         if (this.isResizing && this.resizeTarget) {
             const {
                 stageHeight,
-                config: { RESIZE_COLUMN_LINE_COLOR, RESIZE_COLUMN_TEXT_COLOR, RESIZE_COLUMN_TEXT_BG_COLOR },
+                config: {
+                    RESIZE_COLUMN_LINE_COLOR,
+                    RESIZE_COLUMN_TEXT_COLOR,
+                    RESIZE_COLUMN_TEXT_BG_COLOR,
+                    ENABLE_RESIZE_COLUMN_TEXT,
+                },
             } = this.ctx;
             const resizeTargetDrawX = this.resizeTarget.getDrawX();
             const resizeTargetWidth = this.resizeTarget.width;
@@ -501,21 +506,23 @@ export default class Header {
             this.ctx.paint.drawLine(poins, {
                 borderColor: RESIZE_COLUMN_LINE_COLOR,
             });
-            const newWidth = Math.floor(resizeTargetWidth + this.resizeDiff);
-            const text = `${newWidth}px`;
-            const rw = 45;
-            const rh = 24;
-            this.ctx.paint.drawRect(x + rw / 2, this.ctx.mouseY - rh / 2, rw, rh, {
-                fillColor: RESIZE_COLUMN_TEXT_BG_COLOR,
-                borderWidth: 0,
-                borderColor: 'transparent',
-            });
-            this.ctx.paint.drawText(text, x + rw / 2, this.ctx.mouseY - rh / 2, rw, rh + 2, {
-                padding: 0,
-                color: RESIZE_COLUMN_TEXT_COLOR,
-                align: 'center',
-                verticalAlign: 'middle',
-            });
+            if (ENABLE_RESIZE_COLUMN_TEXT) {
+                const newWidth = Math.floor(resizeTargetWidth + this.resizeDiff);
+                const text = `${newWidth}px`;
+                const rw = 45;
+                const rh = 24;
+                this.ctx.paint.drawRect(x + rw / 2, this.ctx.mouseY - rh / 2, rw, rh, {
+                    fillColor: RESIZE_COLUMN_TEXT_BG_COLOR,
+                    borderWidth: 0,
+                    borderColor: 'transparent',
+                });
+                this.ctx.paint.drawText(text, x + rw / 2, this.ctx.mouseY - rh / 2, rw, rh + 2, {
+                    padding: 0,
+                    color: RESIZE_COLUMN_TEXT_COLOR,
+                    align: 'center',
+                    verticalAlign: 'middle',
+                });
+            }
         }
     }
     private drawDragTip() {
