@@ -693,7 +693,14 @@ export default class Database {
                 this.ctx.emit('validateChangedData', this.getChangedData());
             }
         });
-        this.ctx.emit('change', changeList, rows);
+        const changeListValid = changeList.map((item) => {
+            const errorTip = !!this.getValidationError(item.rowKey, item.key).length;
+            return {
+                ...item,
+                errorTip,
+            };
+        });
+        this.ctx.emit('change', changeListValid, rows);
         // 推历史记录
         if (history) {
             this.ctx.history.pushState({
@@ -905,7 +912,7 @@ export default class Database {
             } else {
                 // 递归选中所有子项
                 this.selectTreeSelectionRecursive(rowKey);
-                 // 如果未选中或半选，则选中
+                // 如果未选中或半选，则选中
                 this.setRowSelection(rowKey, true, false);
             }
         } else if (mode === 'cautious') {

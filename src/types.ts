@@ -241,6 +241,7 @@ export type BeforeValueChangeItem = {
     value: any;
     oldValue?: any;
     row?: any;
+    errorTip?: boolean;
 };
 export type BeforeSetSelectorParams = {
     focusCell?: Cell;
