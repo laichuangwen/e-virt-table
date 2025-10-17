@@ -1834,7 +1834,6 @@ export default class Database {
     resetCustomHeader() {
         this.customHeader = {};
         this.columns = this.originalColumns;
-        this.init(false);
         this.ctx.emit('resetHeader');
         this.ctx.emit('customHeaderChange', this.customHeader);
     }
@@ -1857,7 +1856,6 @@ export default class Database {
         this.setCustomHeader({
             hideData,
         });
-        this.init(false);
         this.ctx.emit('resetHeader');
     }
     setCustomHeaderFixedData(keys: string[], fixed: Fixed | '') {
@@ -1868,7 +1866,6 @@ export default class Database {
         this.setCustomHeader({
             fixedData,
         });
-        this.init(false);
         this.ctx.emit('resetHeader');
     }
     setOriginalColumns(columns: Column[]) {

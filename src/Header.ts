@@ -276,7 +276,6 @@ export default class Header {
                 const columnsTree = tree.getTree();
                 const sortData = genSortObj(columnsTree);
                 this.ctx.database.setCustomHeader({ sortData });
-                this.ctx.database.init(false);
                 this.init();
                 const data: ColumnDragChangeEvent = {
                     source: this.dragTarget,
@@ -387,7 +386,6 @@ export default class Header {
             columns: this.columns,
         });
         this.ctx.database.setCustomHeaderResizableData(cell.key, width);
-        this.ctx.database.init(false);
         this.init();
         this.ctx.emit('draw');
     }
