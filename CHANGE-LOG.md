@@ -5,6 +5,16 @@ Vx.x.x(TPL)
 -   Performance Improvements
 -   Style changes
 -   Dependencies Changes
+-   
+
+V1.3.4
+### Bug Fixes
+
+- fix:处理自定义表头大数据出现性能卡顿问题
+- feat:添加列调整宽度文本可控制显示
+- feat:chang回调，改变值时changeItem添加errorTip标识
+- fix:修复深拷贝支持正则
+---  
 
 V1.3.3
 ### Bug Fixes
