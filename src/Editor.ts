@@ -44,10 +44,6 @@ export default class Editor {
             this.cellTarget = null;
         });
         this.ctx.on('hoverIconClick', (cell) => {
-            // 没有编辑器就不进入编辑模式
-            if (cell.editorType === 'none') {
-                return;
-            }
             this.editCell(cell.rowIndex, cell.colIndex);
         });
         this.ctx.on('keydown', (e) => {
@@ -257,6 +253,10 @@ export default class Editor {
     private startEditByInput(cell: Cell, ignoreValue = false) {
         const value = ignoreValue ? null : cell.getValue();
         const { editorType } = cell;
+        // 没有编辑器的情况下不进入编辑模式
+        if (editorType === 'none') {
+            return;
+        }
         cell.update(); // 更新单元格信息
         if (this.ctx.config.ENABLE_MERGE_CELL_LINK) {
             cell.updateSpanInfo(); // 更新合并单元格信息
@@ -341,20 +341,16 @@ export default class Editor {
         if (!isVisible) {
             return;
         }
-        const { rowKey, key, editorType } = focusCell;
-        // 没有编辑器的情况下不进入编辑模式
-        if (editorType === 'none') {
-            return;
-        }
+        const { rowKey, key } = focusCell;
         const readonly = this.ctx.database.getReadonly(rowKey, key);
         if (focusCell && !readonly) {
-            // 触发绘制，刷新
-            this.ctx.emit('drawView');
             this.enable = true;
             this.ctx.editing = true;
             this.cellTarget = focusCell;
             this.startEditByInput(this.cellTarget, ignoreValue);
             this.ctx.emit('startEdit', this.cellTarget);
+            // 触发绘制，刷新
+            this.ctx.emit('drawView');
         }
     }
     editCell(rowIndex: number, colIndex: number) {
@@ -386,6 +382,8 @@ export default class Editor {
             this.cellTarget = focusCell;
             this.startEditByInput(this.cellTarget);
             this.ctx.emit('startEdit', this.cellTarget);
+            // 触发绘制，刷新
+            this.ctx.emit('drawView');
         }
     }
     doneEdit() {
