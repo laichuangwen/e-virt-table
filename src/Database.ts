@@ -1500,7 +1500,7 @@ export default class Database {
             const row = this.rowKeyMap.get(rowKey);
             const colHeader = this.headerMap.get(key);
             const { BODY_CELL_RULES_METHOD } = this.ctx.config;
-            if (colHeader === undefined) {
+            if (row === undefined || colHeader === undefined) {
                 return resolve([]);
             }
             const column = colHeader.column;
