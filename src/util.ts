@@ -474,28 +474,8 @@ function compareDates(a: any, b: any): number {
 
     return aDate.getTime() - bDate.getTime();
 }
-function deepClone<T>(obj: T, hash = new WeakMap()): T {
-    if (obj === null || typeof obj !== 'object') return obj;
-
-    if (hash.has(obj)) return hash.get(obj);
-    // 支持正则
-    if (obj instanceof RegExp) {
-        const re = new RegExp(obj.source, obj.flags);
-        re.lastIndex = obj.lastIndex; // 保留 lastIndex
-        return re as any;
-    }
-    const result = Array.isArray(obj) ? [] : ({} as T);
-    hash.set(obj, result);
-
-    Reflect.ownKeys(obj).forEach((key) => {
-        (result as any)[key] = deepClone((obj as any)[key], hash);
-    });
-
-    return result as T;
-}
 
 export {
-    deepClone,
     debounce,
     throttle,
     generateShortUUID,

@@ -22,7 +22,7 @@ import type {
     CustomHeader,
     Fixed,
 } from './types';
-import { generateShortUUID, toLeaf, compareDates, deepClone } from './util';
+import { generateShortUUID, toLeaf, compareDates } from './util';
 import { HistoryItemData } from './History';
 import Cell from './Cell';
 export default class Database {
@@ -43,7 +43,6 @@ export default class Database {
     private validationErrorMap = new Map<string, ValidateResult>();
     private itemRowKeyMap = new WeakMap();
     private bufferData: any[] = [];
-    private originalColumns: Column[] = [];
     private customHeader: CustomHeader = {
         fixedData: {},
         sortData: {},
@@ -68,7 +67,6 @@ export default class Database {
         this.data = data;
         this.footerData = footerData;
         this.columns = columns;
-        this.originalColumns = deepClone(columns);
         this.init();
     }
     // 初始化默认不忽略清空改变值和校验map
@@ -244,12 +242,11 @@ export default class Database {
         recursiveData(this.data);
         return list;
     }
-    private generateColumns(columns: Column[]) {
-        const _generateColumns = (columns: Column[]) => {
+    private generateColumns(columns: Column[]): Column[] {
+        const _generateColumns = (columns: Column[]): Column[] => {
             return columns.map((column: Column) => {
-                if (column.children && Array.isArray(column.children)) {
-                    column.children = _generateColumns(column.children);
-                }
+                const children =
+                    column.children && Array.isArray(column.children) ? _generateColumns(column.children) : undefined;
                 const dataMap = {
                     hide: this.customHeader?.hideData?.[column.key],
                     fixed: this.customHeader?.fixedData?.[column.key],
@@ -262,6 +259,8 @@ export default class Database {
                 }
                 return {
                     ...column,
+                    children,
+                    hide: typeof column.hide === 'function' ? column.hide(column) : column.hide,
                     ...obj,
                 };
             });
@@ -269,8 +268,8 @@ export default class Database {
         return _generateColumns(columns);
     }
     getColumns() {
-        const _columns = deepClone(this.columns);
-        return this.generateColumns(_columns);
+        const list = this.generateColumns(this.columns);
+        return list;
     }
     setColumns(columns: Column[]) {
         this.columns = columns;
@@ -1827,13 +1826,12 @@ export default class Database {
             }
         });
         if (!ignoreEmit) {
-            const obj = this.clearCustomHeaderInvalidValues(this.originalColumns);
+            const obj = this.clearCustomHeaderInvalidValues(this.columns);
             this.ctx.emit('customHeaderChange', obj);
         }
     }
     resetCustomHeader() {
         this.customHeader = {};
-        this.columns = this.originalColumns;
         this.ctx.emit('resetHeader');
         this.ctx.emit('customHeaderChange', this.customHeader);
     }
@@ -1867,9 +1865,6 @@ export default class Database {
             fixedData,
         });
         this.ctx.emit('resetHeader');
-    }
-    setOriginalColumns(columns: Column[]) {
-        this.originalColumns = columns;
     }
     // 递归处理
     clearCustomHeaderInvalidValues(columns: Column[]) {

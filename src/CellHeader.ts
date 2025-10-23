@@ -77,7 +77,7 @@ export default class CellHeader extends BaseCell {
         this.key = column.key;
         this.minWidth = column.minWidth;
         this.maxWidth = column.maxWidth;
-        this.hide = column.hide || false;
+        this.hide = (typeof column.hide === 'function' ? column.hide(column) : column.hide) || false;
         this.type = column.type || '';
         this.editorType = column.editorType || 'text';
         this.hideHeaderSelection = column.hideHeaderSelection || false;

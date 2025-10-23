@@ -1,5 +1,5 @@
 import Context from './Context';
-import { getMaxRow, calCrossSpan, toLeaf, sortFixed, throttle, filterHiddenColumns, deepClone } from './util';
+import { getMaxRow, calCrossSpan, toLeaf, sortFixed, throttle, filterHiddenColumns } from './util';
 import CellHeader from './CellHeader';
 import type { Column, ColumnDragChangeEvent } from './types';
 import { TreeUtil } from './TreeUtil';
@@ -267,7 +267,7 @@ export default class Header {
                 };
                 const columns = this.ctx.database.getColumns();
                 const sortColumns = calCrossSpan(columns, getMaxRow(columns));
-                const tree = new TreeUtil(deepClone(sortColumns), {
+                const tree = new TreeUtil(sortColumns, {
                     key: 'key', // 节点唯一标识字段（对应我们之前的field）
                     childrenKey: 'children', // 子节点数组字段
                 });
