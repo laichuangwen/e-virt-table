@@ -7,6 +7,14 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -   
 
+V1.3.5
+### Bug Fixes
+
+- fix:解决vue2中循环引用卡顿问题，更改生成列方法移除内部深拷贝方法
+- fix:添加getValidator判空处理
+- fix:优化空编辑器编辑逻辑
+---  
+
 V1.3.4
 ### Bug Fixes
 
