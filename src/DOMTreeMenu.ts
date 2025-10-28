@@ -54,17 +54,17 @@ export class DOMTreeMenu {
 
         if (item.disabled) menuItem.classList.add('disabled');
 
-        const contentContainer = this.createElement('div', 'menu-item-content');
+        const contentContainer = this.createElement('div', 'e-virt-table-menu-item-content');
 
         if (item.icon) {
-            const iconContainer = this.createElement('span', 'menu-item-icon');
+            const iconContainer = this.createElement('span', 'e-virt-table-menu-item-icon');
             iconContainer.innerHTML = item.icon;
             contentContainer.appendChild(iconContainer);
         } else {
             contentContainer.classList.add('menu-item-no-icon');
         }
 
-        const textSpan = this.createElement('span', 'menu-item-text');
+        const textSpan = this.createElement('span', 'e-virt-table-menu-item-text');
         textSpan.textContent = item.label;
         contentContainer.appendChild(textSpan);
         menuItem.appendChild(contentContainer);
