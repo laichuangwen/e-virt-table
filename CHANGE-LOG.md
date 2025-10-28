@@ -7,6 +7,14 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -   
 
+V1.3.6
+### Bug Fixes
+
+- feat:设置错误支持用rowkey设置
+- fix:修复样式没写前缀导致篡改业务系统样式
+
+---  
+
 V1.3.5
 ### Bug Fixes
 
