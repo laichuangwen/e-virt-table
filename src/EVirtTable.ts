@@ -328,13 +328,22 @@ export default class EVirtTable {
     }
     setValidations(errors: ValidateItemError[]) {
         errors.forEach((item) => {
-            const { rowIndex, key, message } = item;
-            this.ctx.database.setValidationErrorByRowIndex(rowIndex, key, message);
+            const { rowIndex, key, message, rowKey } = item;
+            if (rowIndex !== undefined && rowKey === undefined) {
+                const _rowKey = this.ctx.database.getRowKeyForRowIndex(rowIndex);
+                this.ctx.database.setValidationErrorByRowKey(_rowKey, key, message);
+            }
+            if (rowKey) {
+                this.ctx.database.setValidationErrorByRowKey(rowKey, key, message);
+            }
         });
         // 滚动到错误位置，取第一个错误
         if (errors && Array.isArray(errors) && errors.length) {
             const [err] = errors;
-            if (err && err.rowIndex >= 0 && err.key) {
+            if (err && err.rowKey) {
+                this.scrollToRowkey(err.rowKey);
+                this.scrollToColkey(err.key);
+            } else if (err && err.rowIndex !== undefined && err.rowIndex >= 0 && err.key) {
                 const { rowIndex, key } = err;
                 this.scrollToRowIndex(rowIndex);
                 this.scrollToColkey(key);

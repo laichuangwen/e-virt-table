@@ -93,7 +93,8 @@ export type ContextmenuItem = {
 export type Render = Function | string | undefined;
 
 export type ValidateItemError = {
-    rowIndex: number;
+    rowKey: string;
+    rowIndex?: number; // 废弃
     key: string;
     message: string;
 };

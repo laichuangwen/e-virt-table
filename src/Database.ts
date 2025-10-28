@@ -1719,10 +1719,10 @@ export default class Database {
             dataList,
         };
     }
-    setValidationErrorByRowIndex(rowIndex: number, key: string, message: string) {
-        const rowKey = this.rowIndexRowKeyMap.get(rowIndex);
+    setValidationErrorByRowKey(rowKey: string, key: string, message: string) {
         const _key = `${rowKey}\u200b_${key}`;
-        const row = this.getRowForRowIndex(rowIndex);
+        const row = this.getRowForRowKey(rowKey);
+        const rowIndex = row?.rowIndex;
         const cellHeader = this.getColumnByKey(key);
         if (!rowKey || !cellHeader || !row) {
             return;
