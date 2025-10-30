@@ -36,6 +36,12 @@ export default class ExtendRow extends Row {
         
         // 扩展行的rowKey基于源行
         this.rowKey = `${sourceRowKey}_extend_${extendColKey}`;
+        
+        // 确保 sourceRowKey 不为空
+        if (!sourceRowKey) {
+            console.error('❌ ExtendRow 创建失败: sourceRowKey 为空');
+            throw new Error('ExtendRow 创建失败: sourceRowKey 不能为空');
+        }
 
         // 创建一个占据整行宽度的单元格来渲染扩展内容
         const extendCell = new Cell(
@@ -108,7 +114,6 @@ export default class ExtendRow extends Row {
             
             this.height = newHeight;
             
-            
             // 使用 setTimeout 避免同步循环
             setTimeout(() => {
                 this.ctx.emit('extendRowHeightChange', {
@@ -158,6 +163,5 @@ export default class ExtendRow extends Row {
             fillColor: '#f8f9fa', // 扩展行使用稍微不同的背景色
             borderWidth: 1,
         });
-        
     }
 }

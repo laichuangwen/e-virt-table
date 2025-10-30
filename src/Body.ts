@@ -42,6 +42,13 @@ export default class Body {
             // 更新后续行的位置（在下次渲染时生效）
             this.updateRowPositionsAfterExtend(event.rowIndex, event.action);
             
+            // 如果是展开操作，确保扩展行可见
+            if (event.action === 'expand') {
+                setTimeout(() => {
+                    this.ensureExtendRowVisible(event.rowKey, event.rowIndex);
+                }, 100);
+            }
+            
             // 触发重绘
             this.ctx.emit('draw');
         });
@@ -62,15 +69,14 @@ export default class Body {
                 return;
             }
             
-            // 更新实际高度记录
+            // 更新实际高度记录（这个方法内部会调用 updateTotalHeight）
             this.updateExtendRowHeight(event.sourceRowKey, event.newHeight);
-            
-            // 重新计算总高度
-            this.updateTotalHeight();
             
             // 延迟触发重绘，避免同步循环
             setTimeout(() => {
                 this.isUpdatingExtendHeight = false;
+                // 高度变化后，确保扩展行仍然可见
+                this.ensureExtendRowVisible(event.sourceRowKey, event.rowIndex);
                 this.ctx.emit('draw');
             }, 16); // 约一帧的时间
         });
@@ -87,6 +93,34 @@ export default class Body {
     private updateRowPositionsAfterExtend(_extendRowIndex: number, _action: 'expand' | 'collapse') {
         // 这里主要是为了在下次 update() 时正确计算 yOffset
         // 实际的位置更新会在 update() 方法中的 yOffset 计算中体现
+    }
+    
+    /**
+     * 确保扩展行在可视区域内
+     */
+    private ensureExtendRowVisible(rowKey: string, rowIndex: number) {
+        const { height: rowHeight, top: rowTop } = this.ctx.database.getPositionForRowIndex(rowIndex);
+        const extendHeight = this.extendRowHeights.get(rowKey) || 150;
+        
+        // 计算扩展行的实际位置
+        const yOffset = this.calculateYOffsetForRow(rowIndex);
+        const actualRowTop = rowTop + yOffset;
+        const extendRowTop = actualRowTop + rowHeight;
+        const extendRowBottom = extendRowTop + extendHeight;
+        
+        const visibleTop = this.ctx.scrollY;
+        const visibleBottom = visibleTop + this.visibleHeight;
+        
+        // 如果扩展行不完全可见，滚动到合适位置
+        if (extendRowBottom > visibleBottom) {
+            // 扩展行底部超出可视区域，向下滚动
+            const newScrollY = extendRowBottom - this.visibleHeight + 20; // 留20px边距
+            this.ctx.setScrollY(newScrollY);
+        } else if (extendRowTop < visibleTop) {
+            // 扩展行顶部在可视区域上方，向上滚动
+            const newScrollY = extendRowTop - 20; // 留20px边距
+            this.ctx.setScrollY(newScrollY);
+        }
     }
     
     /**
@@ -114,8 +148,12 @@ export default class Body {
      * 更新扩展行的实际高度
      */
     private updateExtendRowHeight(sourceRowKey: string, newHeight: number) {
+        const oldHeight = this.extendRowHeights.get(sourceRowKey) || 150;
         this.extendRowHeights.set(sourceRowKey, newHeight);
         
+        
+        // 立即更新总高度
+        this.updateTotalHeight();
     }
     private init() {
         const {
@@ -491,7 +529,6 @@ export default class Body {
         headIndex = Math.max(0, headIndex - 1);
         tailIndex = Math.min(this.ctx.maxRowIndex, tailIndex + 1);
         
-        
         return { headIndex, tailIndex };
     }
     update() {
@@ -572,9 +609,17 @@ export default class Body {
             extendRowsHeight += actualHeight;
         });
         
-        // 更新body的总高度，这会影响滚动条
-        this.height = sumHeight + extendRowsHeight;
+        const newTotalHeight = sumHeight + extendRowsHeight;
         
+        
+        // 更新body的总高度，这会影响滚动条
+        this.height = newTotalHeight;
+        
+        // 更新 Context 中的 body 高度信息
+        this.ctx.body.height = newTotalHeight;
+        
+        // 触发重绘以更新滚动条
+        this.ctx.emit('draw');
     }
 
     /**
@@ -620,6 +665,11 @@ export default class Body {
             150, // 更合理的默认高度，会根据内容自动调整
             data
         );
+        
+        // 立即记录扩展行的初始高度
+        if (!this.extendRowHeights.has(rowKey)) {
+            this.extendRowHeights.set(rowKey, 150);
+        }
         
         extendRows.push(extendRow);
         return extendRows;
