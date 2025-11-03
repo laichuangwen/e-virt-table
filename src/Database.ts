@@ -51,6 +51,7 @@ export default class Database {
     };
 
     overlayerAutoHeightMap = new Map<string, number>();
+    private maxRowHeightMap = new Map<string, number>(); // 记录每行的最大渲染高度（按 rowKey 存储）
     private bufferCheckState = {
         buffer: false,
         check: false,
@@ -78,6 +79,8 @@ export default class Database {
         this.colIndexKeyMap.clear();
         this.rowIndexRowKeyMap.clear();
         this.rowKeyRowIndexMap.clear();
+        // 清空最大行高记录
+        this.maxRowHeightMap.clear();
         // 判断是否有选择和树形结构
         const _columns = this.getColumns();
         const leafColumns = toLeaf(_columns);
@@ -219,8 +222,25 @@ export default class Database {
             if (rowKey) {
                 const row = this.rowKeyMap.get(rowKey);
                 row.calculatedHeight = height;
+                
+                // 如果开启了记录最大行高功能，更新最大高度记录
+                if (this.ctx.config.REMEMBER_MAX_ROW_HEIGHT) {
+                    const maxHeight = this.maxRowHeightMap.get(rowIndex) || row.height;
+                    if (height > maxHeight) {
+                        this.maxRowHeightMap.set(rowIndex, height);
+                    }
+                }
             }
         });
+        this.clearBufferData(); // 清除缓存数据
+        this.getData(); // 重新获取数据
+        this.ctx.emit('draw');
+    }
+    /**
+     * 清除最大行高记录
+     */
+    clearMaxRowHeight() {
+        this.maxRowHeightMap.clear();
         this.clearBufferData(); // 清除缓存数据
         this.getData(); // 重新获取数据
         this.ctx.emit('draw');
@@ -301,8 +321,24 @@ export default class Database {
                 const rowKey = this.itemRowKeyMap.get(item);
                 const { expand, hasChildren, height, calculatedHeight } = this.rowKeyMap.get(rowKey);
                 const top = this.sumHeight;
+                
                 // 计算行高度和设置高度取最大
-                const _height = Math.max(calculatedHeight, height);
+                let _height = Math.max(calculatedHeight, height);
+                
+                // 如果开启了记录最大行高功能
+                if (this.ctx.config.REMEMBER_MAX_ROW_HEIGHT) {
+                    // 使用 rowKey 作为键，获取该行历史最大高度
+                    const maxHeight = this.maxRowHeightMap.get(rowKey) || height;
+                    // 如果当前计算高度大于历史最大高度，更新最大高度
+                    if (_height > maxHeight) {
+                        this.maxRowHeightMap.set(rowKey, _height);
+                        _height = _height;
+                    } else {
+                        // 使用历史最大高度
+                        _height = maxHeight;
+                    }
+                }
+                
                 this.sumHeight += _height;
                 this.rowIndexRowKeyMap.set(rowIndex, rowKey);
                 this.rowKeyRowIndexMap.set(rowKey, rowIndex);

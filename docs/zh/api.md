@@ -37,6 +37,7 @@ type EVirtTableOptions = {
 | EMPTY_TEXT | 空数据文本 | string | 暂无数据 |
 | MAX_HEIGHT | 最大高度，高度为 0 表示自适应 | number | 1000 |
 | AUTO_ROW_HEIGHT | 所有行自适应高度 | boolean | false |
+| REMEMBER_MAX_ROW_HEIGHT | 记录最大行高（开启后横向滚动不会导致行高变小） | boolean | false |
 | BORDER_RADIUS | 区域边框圆角 | number | 8 |
 | HEADER_HEIGHT | 表头行高 | number | 36 |
 | HEADER_BG_COLOR | 表头背景色 | string | #F8FAFF |
@@ -243,6 +244,7 @@ type EVirtTableOptions = {
 | getCellValue           | 通过 rowKey 和 key 获取格子值 | (rowKey, key)                                             |
 | getUtils               | 获取工具类方法，如内置合并行列方法                  | —                                     |
 | clearSort              | 清除排序                      | —                                                         |
+| clearMaxRowHeight      | 清除最大行高记录（重置所有行高） | —                                                       |
 | contextMenuHide        | 隐藏右键菜单                  | —                                                         |
 | destroy                | 销毁                          | —                                                         |
 | setCustomHeader | 设置自定义表头                   | `(CustomHeader,ignoreEmit)` |

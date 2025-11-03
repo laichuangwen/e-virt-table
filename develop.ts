@@ -289,7 +289,7 @@ let columns: Column[] = [
             cellEl.style.userSelect = 'text';
             // cellEl.style.border = '1px solid red';
             cellEl.style.overflowWrap = 'break-word';
-            cellEl.textContent = cell.value;
+            cellEl.innerHTML = cell.value || ''; // 设置单元格内容
             pEl.appendChild(cellEl);
         },
     },
@@ -421,7 +421,7 @@ for (let i = 0; i < 5000; i += 1) {
             i === 1
                 ? `海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地${i}号`
                 : i === 4
-                ? ''
+                ? '海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地'
                 : `海淀区北京路${i}号`,
         work_type: `兼职${i}`,
         work_status: `在职${i}`,
@@ -527,7 +527,8 @@ const eVirtTable = new EVirtTable(canvas, {
         // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
         ENABLE_DRAG_COLUMN: true,
-        AUTO_ROW_HEIGHT: false,
+        AUTO_ROW_HEIGHT: true,
+        REMEMBER_MAX_ROW_HEIGHT: true,
         ROW_KEY: 'id',
         CELL_HEIGHT: 36,
         SELECTOR_AREA_MIN_X: 1,
