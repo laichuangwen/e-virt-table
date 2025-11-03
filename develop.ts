@@ -186,13 +186,13 @@ let columns: Column[] = [
                             //     }
                             // },
                         },
-                        extendRender: testRenderExtend('#42b983','8px'),
                         children: [
                             {
                                 title: '姓名111',
                                 key: 'emp_name111',
                                 align: 'left',
                                 width: 200,
+                                extendRender: testRenderExtend('#42b983','8px'),
                             },
                             {
                                 title: '姓名112',
@@ -585,7 +585,7 @@ const eVirtTable = new EVirtTable(canvas, {
         // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
         ENABLE_DRAG_COLUMN: true,
-        AUTO_ROW_HEIGHT: false,
+        AUTO_ROW_HEIGHT: true,
         ROW_KEY: 'id',
         CELL_HEIGHT: 36,
         SELECTOR_AREA_MIN_X: 1,

@@ -401,10 +401,10 @@ export default class EventTable {
             !this.isInsideElement(
                 clickX,
                 clickY,
-                cell.drawTreeImageX,
-                cell.drawTreeImageY,
-                cell.drawTreeImageWidth,
-                cell.drawTreeImageHeight,
+                cell.drawExtendImageX,
+                cell.drawExtendImageY,
+                cell.drawExtendImageWidth,
+                cell.drawExtendImageHeight,
             )
         ) {
             return false;
@@ -541,6 +541,23 @@ export default class EventTable {
                     cell.drawTreeImageY,
                     cell.drawTreeImageWidth,
                     cell.drawTreeImageHeight,
+                )
+            ) {
+                this.ctx.stageElement.style.cursor = 'pointer';
+                this.ctx.isPointer = true;
+                return;
+            }
+            // 扩展图标
+            if (
+                cell.hasExtendIcon &&
+                cell.drawExtendImageSource &&
+                this.isInsideElement(
+                    x,
+                    y,
+                    cell.drawExtendImageX,
+                    cell.drawExtendImageY,
+                    cell.drawExtendImageWidth,
+                    cell.drawExtendImageHeight,
                 )
             ) {
                 this.ctx.stageElement.style.cursor = 'pointer';

@@ -75,6 +75,13 @@ export default class Cell extends BaseCell {
     drawTreeImageHeight = 0;
     drawTreeImageName = '';
     drawTreeImageSource?: HTMLImageElement;
+    // 画extend图标
+    drawExtendImageX = 0;
+    drawExtendImageY = 0;
+    drawExtendImageWidth = 0;
+    drawExtendImageHeight = 0;
+    drawExtendImageName = '';
+    drawExtendImageSource?: HTMLImageElement;
     // 画selection图标
     drawSelectionImageX = 0;
     drawSelectionImageY = 0;
@@ -490,16 +497,16 @@ export default class Cell extends BaseCell {
         this.drawTextWidth = this.drawX + this.visibleWidth - drawTextX; // 减去扩展图标的宽度
         
         // 不论是否需要绘制图标，都更新图标的"基准位置"，供扩展功能使用
-        this.drawTreeImageX = iconX;
-        this.drawTreeImageY = iconY;
-        this.drawTreeImageWidth = iconWidth;
-        this.drawTreeImageHeight = iconHeight;
+        this.drawExtendImageX = iconX;
+        this.drawExtendImageY = iconY;
+        this.drawExtendImageWidth = iconWidth;
+        this.drawExtendImageHeight = iconHeight;
         if (icon) {
-            this.drawTreeImageName = iconName;
-            this.drawTreeImageSource = icon;
+            this.drawExtendImageName = iconName;
+            this.drawExtendImageSource = icon;
         } else {
-            this.drawTreeImageName = '';
-            this.drawTreeImageSource = undefined;
+            this.drawExtendImageName = '';
+            this.drawExtendImageSource = undefined;
         }
         
     }
@@ -1244,6 +1251,15 @@ export default class Cell extends BaseCell {
                 this.drawTreeImageY,
                 this.drawTreeImageWidth,
                 this.drawTreeImageHeight,
+            );
+        }
+        if (this.drawExtendImageSource) {
+            this.ctx.paint.drawImage(
+                this.drawExtendImageSource,
+                this.drawExtendImageX,
+                this.drawExtendImageY,
+                this.drawExtendImageWidth,
+                this.drawExtendImageHeight,
             );
         }
         if (this.drawHoverImageSource) {
