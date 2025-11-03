@@ -400,7 +400,6 @@ export default class EventTable {
             return false;
         }
 
-        
         // 切换扩展状态
         this.ctx.setRowExtend(cell.rowKey, cell.key);
         
@@ -603,10 +602,37 @@ export default class EventTable {
         if (!this.isInsideBody(y)) {
             return;
         }
+        
+        // 第一遍：优先检测扩展内容单元格（isExtendContent），如果点击到扩展内容则直接返回，不触发背后单元格
+        for (const row of renderRows) {
+            const cells = row.fixedCells.concat(row.noFixedCells);
+            for (const cell of cells) {
+                if (cell.isExtendContent) {
+                    const drawX = cell.getDrawX();
+                    const drawY = cell.getDrawY();
+                    if (visible) {
+                        if (x > drawX && x < drawX + cell.visibleWidth && y > drawY && y < drawY + cell.visibleHeight) {
+                            // 点击到扩展内容，不触发任何回调，直接返回
+                            return;
+                        }
+                    } else if (x > drawX && x < drawX + cell.width && y > drawY && y < drawY + cell.height) {
+                        // 点击到扩展内容，不触发任何回调，直接返回
+                        return;
+                    }
+                }
+            }
+        }
+        
+        // 第二遍：检测普通单元格
         for (const row of renderRows) {
             // 优先处理固定列
             const cells = row.fixedCells.concat(row.noFixedCells);
             for (const cell of cells) {
+                // 跳过扩展内容单元格，已经在第一遍处理过了
+                if (cell.isExtendContent) {
+                    continue;
+                }
+                
                 const drawX = cell.getDrawX();
                 const drawY = cell.getDrawY();
                 if (visible) {

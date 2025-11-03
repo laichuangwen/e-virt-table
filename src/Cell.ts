@@ -1037,7 +1037,7 @@ export default class Cell extends BaseCell {
                 top,
                 width: `${this.ctx.body.visibleWidth}px`, // 使用整个可视宽度
                 height: this.autoRowHeight ? `auto` : `${this.visibleHeight}px`,
-                pointerEvents: 'initial', // 扩展内容需要响应点击
+                pointerEvents: 'auto', // 扩展内容需要响应点击，但不会阻止事件穿透容器
                 userSelect: 'none',
                 zIndex: '10', // 确保在固定列之上
                 backgroundColor: '#f8f9fa', // 添加背景色以区分

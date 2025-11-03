@@ -635,8 +635,9 @@ export default class Body {
             return extendRows;
         }
         
-        // 查找有extendRender的列
-        const columns = this.ctx.header.visibleLeafColumns;
+        // 查找有extendRender的列 - 使用所有列而不是仅可见列
+        // 这样即使列滚出可视区域，扩展行仍然会被渲染
+        const columns = this.ctx.header.leafCellHeaders.map(cellHeader => cellHeader.column);
         const extendColumn = columns.find(col => col.key === extendColKey && col.extendRender);
         
         if (!extendColumn || !extendColumn.extendRender) {

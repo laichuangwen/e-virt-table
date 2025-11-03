@@ -405,25 +405,56 @@ export default class Context {
         const currentColKey = this.rowExtendMap.get(rowKey);
         const wasExtended = !!currentColKey;
         
+        // 收集需要收起的其他行
+        const otherExtendedRows: Array<{ rowKey: string; colKey: string; rowIndex: number }> = [];
+        this.rowExtendMap.forEach((extendColKey, extendRowKey) => {
+            if (extendRowKey !== rowKey) {
+                const otherRowIndex = this.database.getRowIndexForRowKey(extendRowKey);
+                otherExtendedRows.push({ 
+                    rowKey: extendRowKey, 
+                    colKey: extendColKey,
+                    rowIndex: otherRowIndex
+                });
+            }
+        });
+        
         if (currentColKey === colKey) {
             // 如果点击的是同一个扩展，则收起
             this.rowExtendMap.delete(rowKey);
         } else {
             // 否则设置新的扩展
+            // 先批量收起所有其他已展开的行（单选行为）
+            otherExtendedRows.forEach(({ rowKey: otherRowKey }) => {
+                this.rowExtendMap.delete(otherRowKey);
+            });
+            
+            // 设置新的扩展
             this.rowExtendMap.set(rowKey, colKey);
         }
         
+        // 先发出其他行的收起事件（批量）
+        otherExtendedRows.forEach(({ rowKey: otherRowKey, rowIndex: otherRowIndex }) => {
+            this.emit('rowExtendChange', {
+                rowKey: otherRowKey,
+                colKey: null,
+                rowIndex: otherRowIndex,
+                wasExtended: true,
+                isExtended: false,
+                action: 'collapse'
+            });
+        });
+        
+        // 最后发出当前行的扩展变化事件
         const isExtended = this.rowExtendMap.has(rowKey);
         const rowIndex = this.database.getRowIndexForRowKey(rowKey);
-        
-        // 发出扩展变化事件，包含位置信息
+        const action = isExtended ? 'expand' : 'collapse';
         this.emit('rowExtendChange', { 
             rowKey, 
-            colKey: this.rowExtendMap.get(rowKey),
+            colKey: this.rowExtendMap.get(rowKey) || null,
             rowIndex,
             wasExtended,
             isExtended,
-            action: isExtended ? 'expand' : 'collapse'
+            action
         });
     }
 
