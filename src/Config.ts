@@ -322,6 +322,8 @@ export default class Config {
     CELL_LINE_HEIGHT = 1.3;
     /** 全局自动行高 */
     AUTO_ROW_HEIGHT = false;
+    /** 记录最大行高（开启后横向滚动不会导致行高变小） */
+    REMEMBER_MAX_ROW_HEIGHT = false;
     /** 启用拖拽表头 */
     ENABLE_DRAG_COLUMN = false;
     /** header 格子样式 */
