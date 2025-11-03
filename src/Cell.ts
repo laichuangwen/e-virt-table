@@ -75,6 +75,13 @@ export default class Cell extends BaseCell {
     drawTreeImageHeight = 0;
     drawTreeImageName = '';
     drawTreeImageSource?: HTMLImageElement;
+    // 画extend图标
+    drawExtendImageX = 0;
+    drawExtendImageY = 0;
+    drawExtendImageWidth = 0;
+    drawExtendImageHeight = 0;
+    drawExtendImageName = '';
+    drawExtendImageSource?: HTMLImageElement;
     // 画selection图标
     drawSelectionImageX = 0;
     drawSelectionImageY = 0;
@@ -134,7 +141,7 @@ export default class Cell extends BaseCell {
         this.cellType = cellType;
         this.align = column.align || this.ctx.config.COLUMNS_ALIGN;
         this.verticalAlign = column.verticalAlign || this.ctx.config.COLUMNS_VERTICAL_ALIGN;
-        this.fixed = column.fixed;
+        this.fixed = column.fixed || '';
         this.level = column.level || 0;
         this.operation = column.operation || false;
         this.column = column;
@@ -229,6 +236,7 @@ export default class Cell extends BaseCell {
             } else {
                 this.relationRowKeys = [this.key];
             }
+
             if (Array.isArray(relationColKeys) && relationColKeys.length > 0) {
                 this.relationColKeys = relationColKeys;
             } else {
@@ -489,16 +497,16 @@ export default class Cell extends BaseCell {
         this.drawTextWidth = this.drawX + this.visibleWidth - drawTextX; // 减去扩展图标的宽度
         
         // 不论是否需要绘制图标，都更新图标的"基准位置"，供扩展功能使用
-        this.drawTreeImageX = iconX;
-        this.drawTreeImageY = iconY;
-        this.drawTreeImageWidth = iconWidth;
-        this.drawTreeImageHeight = iconHeight;
+        this.drawExtendImageX = iconX;
+        this.drawExtendImageY = iconY;
+        this.drawExtendImageWidth = iconWidth;
+        this.drawExtendImageHeight = iconHeight;
         if (icon) {
-            this.drawTreeImageName = iconName;
-            this.drawTreeImageSource = icon;
+            this.drawExtendImageName = iconName;
+            this.drawExtendImageSource = icon;
         } else {
-            this.drawTreeImageName = '';
-            this.drawTreeImageSource = undefined;
+            this.drawExtendImageName = '';
+            this.drawExtendImageSource = undefined;
         }
         
     }
@@ -615,7 +623,7 @@ export default class Cell extends BaseCell {
             let textColor = FOOTER_TEXT_COLOR;
             if (typeof FOOTER_CELL_STYLE_METHOD === 'function') {
                 const footerCellStyleMethod: CellStyleMethod = FOOTER_CELL_STYLE_METHOD;
-                const { backgroundColor, color,font } =
+                const { backgroundColor, color, font } =
                     footerCellStyleMethod({
                         row: this.row,
                         rowIndex: this.rowIndex,
@@ -630,7 +638,7 @@ export default class Cell extends BaseCell {
                 if (color) {
                     textColor = color;
                 }
-                if(font){
+                if (font) {
                     this.drawTextFont = font;
                 }
             }
@@ -709,7 +717,7 @@ export default class Cell extends BaseCell {
             if (color) {
                 textColor = color;
             }
-            if(font){
+            if (font) {
                 this.drawTextFont = font;
             }
         }
@@ -1037,7 +1045,7 @@ export default class Cell extends BaseCell {
                 top,
                 width: `${this.ctx.body.visibleWidth}px`, // 使用整个可视宽度
                 height: this.autoRowHeight ? `auto` : `${this.visibleHeight}px`,
-                pointerEvents: 'initial', // 扩展内容需要响应点击
+                pointerEvents: 'auto', // 扩展内容需要响应点击，但不会阻止事件穿透容器
                 userSelect: 'none',
                 zIndex: '10', // 确保在固定列之上
                 backgroundColor: '#f8f9fa', // 添加背景色以区分
@@ -1243,6 +1251,15 @@ export default class Cell extends BaseCell {
                 this.drawTreeImageY,
                 this.drawTreeImageWidth,
                 this.drawTreeImageHeight,
+            );
+        }
+        if (this.drawExtendImageSource) {
+            this.ctx.paint.drawImage(
+                this.drawExtendImageSource,
+                this.drawExtendImageX,
+                this.drawExtendImageY,
+                this.drawExtendImageWidth,
+                this.drawExtendImageHeight,
             );
         }
         if (this.drawHoverImageSource) {

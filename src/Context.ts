@@ -35,6 +35,7 @@ export type HeaderOptions = {
     fixedLeftCellHeaders: [];
     fixedRightCellHeaders: [];
     renderCenterCellHeaders: [];
+    allCellHeaders: CellHeader[];
 };
 export type BodyOptions = {
     x: number;
@@ -90,6 +91,7 @@ export default class Context {
     isMouseoverTargetContainer = false;
     mousedown = false;
     isPointer = false;
+    isEmpty = false; // 是否空数据
     rowResizing = false; // 行调整大小中
     columnResizing = false; // 列调整大小中
     scrollerMove = false; // 滚动条移动中
@@ -98,7 +100,9 @@ export default class Context {
     selectorMove = false; // 选择器移动中
     selectColsIng = false; // 选择列中
     selectRowsIng = false; // 选择行中
+    dragHeaderIng = false; // 拖拽表头中
     adjustPositioning = false; // 调整位置中
+    contextMenuIng = false; // 右键菜单中
     editing = false; // 编辑中
     loading = false; // 加载中
     onlyMergeCell = false; // 只有合并单元格
@@ -120,6 +124,8 @@ export default class Context {
     clickCellHeader?: CellHeader;
     focusCellHeader?: CellHeader;
     hoverCellHeader?: CellHeader;
+    mouseX = 0;
+    mouseY = 0;
     body: BodyOptions = {
         x: 0,
         y: 0,
@@ -151,6 +157,7 @@ export default class Context {
         visibleWidth: 0,
         visibleLeafColumns: [],
         leafCellHeaders: [],
+        allCellHeaders: [],
         renderLeafCellHeaders: [],
         renderCellHeaders: [],
         fixedLeftCellHeaders: [],
@@ -405,25 +412,58 @@ export default class Context {
         const currentColKey = this.rowExtendMap.get(rowKey);
         const wasExtended = !!currentColKey;
         
+        // 收集需要收起的其他行
+        const otherExtendedRows: Array<{ rowKey: string; colKey: string; rowIndex: number }> = [];
+        this.rowExtendMap.forEach((extendColKey, extendRowKey) => {
+            if (extendRowKey !== rowKey) {
+                const otherRowIndex = this.database.getRowIndexForRowKey(extendRowKey);
+                if (otherRowIndex !== undefined) {
+                    otherExtendedRows.push({ 
+                        rowKey: extendRowKey, 
+                        colKey: extendColKey,
+                        rowIndex: otherRowIndex
+                    });
+                }
+            }
+        });
+        
         if (currentColKey === colKey) {
             // 如果点击的是同一个扩展，则收起
             this.rowExtendMap.delete(rowKey);
         } else {
             // 否则设置新的扩展
+            // 先批量收起所有其他已展开的行（单选行为）
+            otherExtendedRows.forEach(({ rowKey: otherRowKey }) => {
+                this.rowExtendMap.delete(otherRowKey);
+            });
+            
+            // 设置新的扩展
             this.rowExtendMap.set(rowKey, colKey);
         }
         
+        // 先发出其他行的收起事件（批量）
+        otherExtendedRows.forEach(({ rowKey: otherRowKey, rowIndex: otherRowIndex }) => {
+            this.emit('rowExtendChange', {
+                rowKey: otherRowKey,
+                colKey: null,
+                rowIndex: otherRowIndex,
+                wasExtended: true,
+                isExtended: false,
+                action: 'collapse'
+            });
+        });
+        
+        // 最后发出当前行的扩展变化事件
         const isExtended = this.rowExtendMap.has(rowKey);
         const rowIndex = this.database.getRowIndexForRowKey(rowKey);
-        
-        // 发出扩展变化事件，包含位置信息
+        const action = isExtended ? 'expand' : 'collapse';
         this.emit('rowExtendChange', { 
             rowKey, 
-            colKey: this.rowExtendMap.get(rowKey),
+            colKey: this.rowExtendMap.get(rowKey) || null,
             rowIndex,
             wasExtended,
             isExtended,
-            action: isExtended ? 'expand' : 'collapse'
+            action
         });
     }
 

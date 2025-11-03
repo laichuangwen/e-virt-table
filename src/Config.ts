@@ -52,8 +52,6 @@ export default class Config {
     STRIPE_COLOR = '#fafafa';
     /** 区域边框颜色 */
     BORDER_COLOR = '#e1e6eb';
-    /** 宽度为 0 表示自适应100% */
-    WIDTH = 0;
     /** 高度，为 0 表示自适应 */
     HEIGHT = 0;
     /** 占位文本颜色 */
@@ -254,8 +252,10 @@ export default class Config {
     ENABLE_MERGE_CELL_LINK = false;
     /** 启用填充器 */
     ENABLE_AUTOFILL = false;
-    /** 启用右键菜单 */
+    /** 启用body右键菜单 */
     ENABLE_CONTEXT_MENU = false;
+    /** 启用表头右键菜单 */
+    ENABLE_HEADER_CONTEXT_MENU = false;
     /** 启用复制 */
     ENABLE_COPY = true;
     /** 启用粘贴 */
@@ -268,10 +268,21 @@ export default class Config {
     RESIZE_ROW_LINE_COLOR = '#e1e6eb';
     /** 列调整线颜色 */
     RESIZE_COLUMN_LINE_COLOR = '#e1e6eb';
+    /** 启用列调整文本 */
+    ENABLE_RESIZE_COLUMN_TEXT = true;
+    /** 列调整线颜色 */
+    RESIZE_COLUMN_TEXT_COLOR = '#fff';
+    /** 列调整线文本背景色 */
+    RESIZE_COLUMN_TEXT_BG_COLOR = 'rgb(82,146,247)';
     /** 最小调整行高 */
     RESIZE_ROW_MIN_HEIGHT = 36;
     /** 列宽最小值 */
     RESIZE_COLUMN_MIN_WIDTH = 40;
+    /** 拖拽提示背景色 */
+    DRAG_TIP_BG_COLOR = 'rgba(82,146,247,0.1)';
+    /** 拖拽提示线颜色 */
+    DRAG_TIP_LINE_COLOR = 'rgb(82,146,247)';
+    /** 拖拽提示文本颜色 */
     /** 启用键盘 */
     ENABLE_KEYBOARD = true;
     /** 启用历史 */
@@ -302,10 +313,25 @@ export default class Config {
         { label: '粘贴', value: 'paste' },
         { label: '清空选中内容', value: 'clearSelected' },
     ];
+    CUSTOM_BODY_CONTEXT_MENU: MenuItem[] = [];
+    HEADER_CONTEXT_MENU: MenuItem[] = [
+        { label: '左固定', value: 'fixedLeft' },
+        { label: '右固定', value: 'fixedRight' },
+        { label: '取消固定', value: 'fixedNone' },
+        { label: '隐藏', value: 'hide' },
+        {
+            label: '显示',
+            value: 'visible',
+        },
+        { label: '恢复默认', value: 'resetHeader' },
+    ];
+    CUSTOM_HEADER_CONTEXT_MENU: MenuItem[] = [];
     /** 格子多行文本行高,isAutoRowHeight才会生效 */
     CELL_LINE_HEIGHT = 1.3;
     /** 全局自动行高 */
     AUTO_ROW_HEIGHT = false;
+    /** 启用拖拽表头 */
+    ENABLE_DRAG_COLUMN = false;
     /** header 格子样式 */
     HEADER_CELL_STYLE_METHOD?: CellHeaderStyleMethod;
     /** body 格子样式 */

@@ -57,40 +57,6 @@ export default class Overlayer {
     draw() {
         const overlayer = this.getContainer();
         this.ctx.emit('overlayerChange', overlayer);
-        
-        // 为扩展容器添加事件处理
-        this.setupExtendContainerEvents();
-    }
-    
-    /**
-     * 为扩展容器设置事件处理，防止点击穿透引发滚动
-     */
-    private setupExtendContainerEvents() {
-        // 延迟执行，确保 DOM 已经渲染
-        setTimeout(() => {
-            // 查找所有扩展单元格的容器
-            const extendCells = this.ctx.overlayerElement.querySelectorAll('[data-extend-content="true"]');
-            extendCells.forEach((cellElement) => {
-                // 移除之前的事件监听器（如果存在）
-                cellElement.removeEventListener('mousedown', this.preventScrollEvent);
-                cellElement.removeEventListener('click', this.preventScrollEvent);
-                
-                // 只添加必要的事件监听器，不阻止滚轮
-                cellElement.addEventListener('mousedown', this.preventScrollEvent);
-                cellElement.addEventListener('click', this.preventScrollEvent);
-            });
-        }, 0);
-    }
-    
-    /**
-     * 阻止滚动事件的处理函数
-     */
-    private preventScrollEvent = (e: Event) => {
-        // 只阻止 mousedown 和 click 事件的冒泡，保留滚轮功能
-        if (e.type === 'mousedown' || e.type === 'click') {
-            e.stopPropagation();
-        }
-        // 不阻止滚轮事件，让它正常传播以保持滚动功能
     }
     destroy() {
         // 清除MutationObserver
@@ -278,7 +244,7 @@ export default class Overlayer {
                 width: `${visibleWidth}px`, // 占据整个可视宽度
                 height: `${visibleHeight}px`,
                 zIndex: '10', // 确保在固定列之上
-                pointerEvents: 'auto', // 允许扩展容器响应点击事件，防止穿透
+                pointerEvents: 'none', // 容器不拦截事件，让事件穿透到下层的图标
             },
             cells: extendCells,
         };

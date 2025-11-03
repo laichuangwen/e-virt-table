@@ -110,6 +110,76 @@
                 ENABLE_AUTOFILL: true,
                 ENABLE_CONTEXT_MENU: true,
                 ENABLE_HEADER_CONTEXT_MENU: true,
+                CONTEXT_MENU: [], // 清空默认
+                HEADER_CONTEXT_MENU: [], // 清空默认
+                CUSTOM_BODY_CONTEXT_MENU: [
+                    {
+                        label: 'custom',
+                        value: 'custom',
+                        icon: copyIcon,
+                        event: (_e, callback) => {
+                            console.log('custom');
+                            callback();
+                        },
+                    },
+                    {
+                        label: 'custom1',
+                        value: 'custom1',
+                        icon: copyIcon,
+                        children: [
+                            {
+                                label: 'custom1-1',
+                                value: 'custom1-1',
+                                icon: copyIcon,
+                                event: (_e, callback) => {
+                                    console.log('custom1-1');
+                                    callback();
+                                },
+                            },
+                            {
+                                label: 'custom1-2',
+                                value: 'custom1-2',
+                                icon: copyIcon,
+                                event: (_e, callback) => {
+                                    console.log('custom1-2');
+                                    callback();
+                                },
+                            },
+                        ],
+                    },
+                ],
+                CUSTOM_HEADER_CONTEXT_MENU: [
+                    {
+                        label: 'custom',
+                        value: 'custom',
+                        event: (_e, callback) => {
+                            console.log('custom');
+                            callback();
+                        },
+                    },
+                    {
+                        label: 'custom1',
+                        value: 'custom1',
+                        children: [
+                            {
+                                label: 'custom1-1',
+                                value: 'custom1-1',
+                                event: (_e, callback) => {
+                                    console.log('custom1-1');
+                                    callback();
+                                },
+                            },
+                            {
+                                label: 'custom1-2',
+                                value: 'custom1-2',
+                                event: (_e, callback) => {
+                                    console.log('custom1-2');
+                                    callback();
+                                },
+                            },
+                        ],
+                    },
+                ],
             },
         });
     </script>

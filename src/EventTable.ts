@@ -50,10 +50,12 @@ export default class EventTable {
             const x = offsetX;
             this.handleHeaderEvent(x, y, this.ctx.header.renderCellHeaders, (cell: CellHeader) => {
                 this.ctx.focusCellHeader = cell;
+                this.ctx.focusCell = undefined;
                 this.ctx.emit('cellHeaderMousedown', cell, e);
             });
             this.handleBodyEvent(x, y, this.ctx.body.renderRows, (cell: Cell) => {
                 this.ctx.setFocusCell(cell);
+                this.ctx.focusCellHeader = undefined;
                 this.ctx.emit('cellMousedown', cell, e);
             });
         });
@@ -237,6 +239,14 @@ export default class EventTable {
                 this.ctx.hoverCell = cell;
                 this.ctx.emit('cellHoverChange', cell, e);
             });
+            this.handleFooterEvent(x, y, this.ctx.footer.renderRows, (cell: Cell) => {
+                this.ctx.emit('cellFooterMouseenter', cell, e);
+                // 移出事件
+                if (this.ctx.hoverCell && this.ctx.hoverCell !== cell) {
+                    this.ctx.emit('cellFooterMouseleave', cell, e);
+                }
+                this.ctx.emit('cellFooterHoverChange', cell, e);
+            });
         });
     }
     private hoverIconClick(cell: Cell) {
@@ -391,16 +401,15 @@ export default class EventTable {
             !this.isInsideElement(
                 clickX,
                 clickY,
-                cell.drawTreeImageX,
-                cell.drawTreeImageY,
-                cell.drawTreeImageWidth,
-                cell.drawTreeImageHeight,
+                cell.drawExtendImageX,
+                cell.drawExtendImageY,
+                cell.drawExtendImageWidth,
+                cell.drawExtendImageHeight,
             )
         ) {
             return false;
         }
 
-        
         // 切换扩展状态
         this.ctx.setRowExtend(cell.rowKey, cell.key);
         
@@ -538,6 +547,23 @@ export default class EventTable {
                 this.ctx.isPointer = true;
                 return;
             }
+            // 扩展图标
+            if (
+                cell.hasExtendIcon &&
+                cell.drawExtendImageSource &&
+                this.isInsideElement(
+                    x,
+                    y,
+                    cell.drawExtendImageX,
+                    cell.drawExtendImageY,
+                    cell.drawExtendImageWidth,
+                    cell.drawExtendImageHeight,
+                )
+            ) {
+                this.ctx.stageElement.style.cursor = 'pointer';
+                this.ctx.isPointer = true;
+                return;
+            }
         }
     }
     private isInsideElement(
@@ -603,10 +629,37 @@ export default class EventTable {
         if (!this.isInsideBody(y)) {
             return;
         }
+        
+        // 第一遍：优先检测扩展内容单元格（isExtendContent），如果点击到扩展内容则直接返回，不触发背后单元格
+        for (const row of renderRows) {
+            const cells = row.fixedCells.concat(row.noFixedCells);
+            for (const cell of cells) {
+                if (cell.isExtendContent) {
+                    const drawX = cell.getDrawX();
+                    const drawY = cell.getDrawY();
+                    if (visible) {
+                        if (x > drawX && x < drawX + cell.visibleWidth && y > drawY && y < drawY + cell.visibleHeight) {
+                            // 点击到扩展内容，不触发任何回调，直接返回
+                            return;
+                        }
+                    } else if (x > drawX && x < drawX + cell.width && y > drawY && y < drawY + cell.height) {
+                        // 点击到扩展内容，不触发任何回调，直接返回
+                        return;
+                    }
+                }
+            }
+        }
+        
+        // 第二遍：检测普通单元格
         for (const row of renderRows) {
             // 优先处理固定列
             const cells = row.fixedCells.concat(row.noFixedCells);
             for (const cell of cells) {
+                // 跳过扩展内容单元格，已经在第一遍处理过了
+                if (cell.isExtendContent) {
+                    continue;
+                }
+                
                 const drawX = cell.getDrawX();
                 const drawY = cell.getDrawY();
                 if (visible) {
@@ -628,6 +681,25 @@ export default class EventTable {
             if (x > drawX && x < drawX + cell.width && y > drawY && y < drawY + cell.height) {
                 callback(cell);
                 return; // 找到后直接返回
+            }
+        }
+    }
+    private handleFooterEvent(x: number, y: number, renderRows: Row[], callback: Function, visible = false) {
+        for (const row of renderRows) {
+            // 优先处理固定列
+            const cells = row.fixedCells.concat(row.noFixedCells);
+            for (const cell of cells) {
+                const drawX = cell.getDrawX();
+                const drawY = cell.getDrawY();
+                if (visible) {
+                    if (x > drawX && x < drawX + cell.visibleWidth && y > drawY && y < drawY + cell.visibleHeight) {
+                        callback(cell);
+                        return; // 找到后直接返回
+                    }
+                } else if (x > drawX && x < drawX + cell.width && y > drawY && y < drawY + cell.height) {
+                    callback(cell);
+                    return; // 找到后直接返回
+                }
             }
         }
     }
