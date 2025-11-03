@@ -28,7 +28,6 @@ type EVirtTableOptions = {
 | HEADER_FONT | 表头字体 | string | 12px normal Arial |
 | BODY_FONT | 单元格字体 | string | 12px normal Arial |
 | BORDER_COLOR | 区域边框颜色 | string | #e1e6eb |
-| WIDTH | 宽度为 0 表示自适应100% | number | 0 |
 | RESIZE_MIN_WIDTH | 最小可调整宽度 | number | 40 |
 | HEIGHT | 高度，高度为 0 表示自适应 | number | 0 |
 | COLUMNS_ALIGN | 全局水平对齐方式 | `"left"`, `"center"`, `"right"` | left |
@@ -98,7 +97,6 @@ type EVirtTableOptions = {
 | ENABLE_SELECTOR_ALL_COLS | 启用选择器-批量选中行 | boolean | true |
 | ENABLE_MERGE_CELL_LINK | 启用合并格子数据关联 | boolean | false |
 | ENABLE_AUTOFILL | 启用填充 | boolean | true |
-| ENABLE_CONTEXT_MENU | 启用右键 | boolean | true |
 | ENABLE_COPY | 启用复制 | boolean | true |
 | ENABLE_PASTER | 启用粘贴 | boolean | true |
 | ENABLE_RESIZE_ROW | 启用调整行高 | boolean | true |
@@ -123,6 +121,12 @@ type EVirtTableOptions = {
 | PLACEHOLDER_COLOR | 占位文本颜色 | string | `#CDD0DC` |
 | CELL_HOVER_ICON_BG_COLOR | hover编辑图标背景色 | string | `#fff` |
 | CELL_HOVER_ICON_BORDER_COLOR | hover编辑图标边框 | string | `#DDE0EA` |
+| ENABLE_CONTEXT_MENU        | 是否启用 body 区域右键菜单    | boolean    | false  |
+| ENABLE_HEADER_CONTEXT_MENU | 是否启用 header 区域右键菜单  | boolean    | false  |
+| CONTEXT_MENU               | body 区域默认右键菜单项配置   | MenuItem[] | - |
+| HEADER_CONTEXT_MENU        | header 区域默认右键菜单项配置 | MenuItem[] | - |
+| CUSTOM_BODY_CONTEXT_MENU   | 自定义 body 区域右键菜单项    | MenuItem[] | []     |
+| CUSTOM_HEADER_CONTEXT_MENU | 自定义 header 区域右键菜单项  | MenuItem[] | []     |
 | HEADER_CELL_STYLE_METHOD | 自定义表头单元格样式 | ^[Function]`({column,colIndex})=>CellStyleOptions` | — |
 | BODY_CELL_STYLE_METHOD | 自定义 body 单元格样式 | ^[Function]`({row, column, rowIndex, colIndex,value,isHasChanged})=>CellStyleOptions` | — |
 | FOOTER_CELL_STYLE_METHOD | 自定 footer 义单元格样式 | ^[Function]`({row, column, rowIndex, colIndex,value})=>CellStyleOptions` | — |
@@ -185,6 +189,8 @@ type EVirtTableOptions = {
 | onPastedDataOverflow | 粘贴溢出时回调 | `PastedDataOverflow`  |
 | sortChange | 当表格的排序条件发生变化的时候会触发该事件 | Map<string, SortStateMapItem> |
 | error | error回调 | — |
+| customHeaderChange | 自定义表头事件 | `CustomHeader` |
+
 
 ## Methods
 
@@ -239,6 +245,8 @@ type EVirtTableOptions = {
 | clearSort              | 清除排序                      | —                                                         |
 | contextMenuHide        | 隐藏右键菜单                  | —                                                         |
 | destroy                | 销毁                          | —                                                         |
+| setCustomHeader | 设置自定义表头                   | `(CustomHeader,ignoreEmit)` |
+| getCustomHeader | 获取自定义表头数据 | `{CustomHeader，Column[]}`  |
 
 ## Column
 | 参数 | 说明 | 类型 | 默认值 |
@@ -283,6 +291,7 @@ type EVirtTableOptions = {
 | maxLineClamp | 最大溢出截断行数，默认`auto`根据内容撑开 | `auto,number` | auto |
 | maxLineClampHeader | 表头最大溢出截断行数，默认`auto`根据内容撑开 | `auto,number` | auto |
 | autoRowHeight | 当前列行自适应高度 | boolean | false |
+| dragDisabled | 当前列禁用拖拽 | boolean | false |
 
 ## Row
 
@@ -396,5 +405,42 @@ type PastedDataOverflow = {
 type SortDirection = 'asc' | 'desc' | 'none';
 type SortStateMapItem = { direction: SortDirection; timestamp: number };
 type SortStateMap = Map<string, SortStateMapItem>;
+type MenuItemEvent =
+    | 'copy'
+    | 'paste'
+    | 'cut'
+    | 'clearSelected'
+    | 'fixedLeft'
+    | 'fixedRight'
+    | 'fixedNone'
+    | 'hide'
+    | 'resetHeader'
+    | 'visible';
+
+type MenuItem = {
+    label: string;
+    value: string | MenuItemEvent;
+    event?: Function;
+    icon?: string;
+    divider?: boolean;
+    disabled?: boolean;
+    children?: MenuItem[];
+};
+
+const HEADER_CONTEXT_MENU: MenuItem[] = [
+    { label: '左固定', value: 'fixedLeft' },
+    { label: '右固定', value: 'fixedRight' },
+    { label: '取消固定', value: 'fixedNone' },
+    { label: '隐藏', value: 'hide' },
+    { label: '显示', value: 'visible' },
+    { label: '恢复默认', value: 'resetHeader' },
+];
+
+type CustomHeader = {
+    fixedData?: Record<string, Fixed | ''>;
+    sortData?: Record<string, number>;
+    hideData?: Record<string, boolean>;
+    resizableData?: Record<string, number>;
+};
 
 ```

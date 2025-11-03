@@ -2,6 +2,7 @@ import {
     ChangeItem,
     Column,
     ConfigType,
+    CustomHeader,
     EventCallback,
     EVirtTableOptions,
     FilterMethod,
@@ -40,6 +41,8 @@ export default class EVirtTable {
     private overlayer: Overlayer;
     private contextMenu: ContextMenu;
     private loading: Loading;
+    private animationFrameId: number | undefined = undefined;
+    private animationFrameId2: number | undefined = undefined;
     ctx: Context;
 
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
@@ -120,7 +123,10 @@ export default class EVirtTable {
         };
     }
     draw(ignoreOverlayer = false) {
-        requestAnimationFrame(() => {
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+        }
+        this.animationFrameId = requestAnimationFrame(() => {
             const startTime = performance.now();
             this.header.update();
             this.footer.update();
@@ -135,7 +141,10 @@ export default class EVirtTable {
                 this.overlayer.draw();
             }
             // 更新自动高度放在第二帧，避免影响绘制性能
-            requestAnimationFrame(() => {
+            if (this.animationFrameId2) {
+                cancelAnimationFrame(this.animationFrameId2);
+            }
+            this.animationFrameId2 = requestAnimationFrame(() => {
                 this.body.updateAutoHeight();
             });
             const endTime = performance.now();
@@ -148,8 +157,6 @@ export default class EVirtTable {
         //重新加载config，初始化表格，但是默认不清除用户操作
         this.ctx.database.init(false);
         this.header.init();
-        // 更新右键菜单，有可能配置项变化
-        this.contextMenu.updated();
         this.ctx.emit('draw');
     }
     loadColumns(columns: Column[]) {
@@ -170,6 +177,14 @@ export default class EVirtTable {
     loadFooterData(data: any[]) {
         this.ctx.database.setFooterData(data);
         this.ctx.emit('draw');
+    }
+    setCustomHeader(customHeader: CustomHeader, ignoreEmit = true) {
+        this.ctx.database.setCustomHeader(customHeader, ignoreEmit);
+        this.header.init();
+        this.ctx.emit('draw');
+    }
+    getCustomHeader() {
+        return this.header.getCustomHeader();
     }
 
     setLoading(loading: boolean) {
@@ -313,13 +328,22 @@ export default class EVirtTable {
     }
     setValidations(errors: ValidateItemError[]) {
         errors.forEach((item) => {
-            const { rowIndex, key, message } = item;
-            this.ctx.database.setValidationErrorByRowIndex(rowIndex, key, message);
+            const { rowIndex, key, message, rowKey } = item;
+            if (rowIndex !== undefined && rowKey === undefined) {
+                const _rowKey = this.ctx.database.getRowKeyForRowIndex(rowIndex);
+                this.ctx.database.setValidationErrorByRowKey(_rowKey, key, message);
+            }
+            if (rowKey) {
+                this.ctx.database.setValidationErrorByRowKey(rowKey, key, message);
+            }
         });
         // 滚动到错误位置，取第一个错误
         if (errors && Array.isArray(errors) && errors.length) {
             const [err] = errors;
-            if (err && err.rowIndex >= 0 && err.key) {
+            if (err && err.rowKey) {
+                this.scrollToRowkey(err.rowKey);
+                this.scrollToColkey(err.key);
+            } else if (err && err.rowIndex !== undefined && err.rowIndex >= 0 && err.key) {
                 const { rowIndex, key } = err;
                 this.scrollToRowIndex(rowIndex);
                 this.scrollToColkey(key);

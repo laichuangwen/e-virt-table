@@ -69,6 +69,12 @@ export default class EventBrowser {
         this.ctx.emit('mousedown', e);
     }
     private handleMousemove(e: Event) {
+        const _e = e as MouseEvent;
+        const rect = this.ctx.containerElement.getBoundingClientRect();
+        const x = _e.clientX - rect.left;
+        const y = _e.clientY - rect.top;
+        this.ctx.mouseX = x;
+        this.ctx.mouseY = y;
         this.ctx.emit('mousemove', e);
     }
     private handleMouseUp(e: Event) {
@@ -85,6 +91,10 @@ export default class EventBrowser {
         const { ENABLE_KEYBOARD } = this.ctx.config;
         if (!ENABLE_KEYBOARD) return;
         if (!this.ctx.isTarget(e)) {
+            return;
+        }
+        // 拖拽表头中不处理
+        if(this.ctx.dragHeaderIng){
             return;
         }
         this.ctx.emit('keydown', e);

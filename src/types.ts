@@ -39,7 +39,7 @@ export type OverflowTooltipPlacement =
 
 export type VerticalAlign = 'top' | 'middle' | 'bottom';
 export type Align = 'left' | 'center' | 'right';
-export type Fixed = 'left' | 'right';
+export type Fixed = 'left' | 'right' | '';
 export type Type = 'index' | 'selection' | 'index-selection' | 'tree' | 'selection-tree' | 'tree-selection' | 'number';
 
 export type TypeCheckbox =
@@ -51,10 +51,25 @@ export type TypeCheckbox =
 export type CellType = 'header' | 'body' | 'footer' | 'extend';
 export type FooterPosition = 'top' | 'bottom';
 export type RowType = CellType;
+export type MenuItemEvent =
+    | 'copy'
+    | 'paste'
+    | 'cut'
+    | 'clearSelected'
+    | 'fixedLeft'
+    | 'fixedRight'
+    | 'fixedNone'
+    | 'hide'
+    | 'resetHeader'
+    | 'visible';
 export type MenuItem = {
     label: string;
-    value: string | 'copy' | 'paste' | 'cut' | 'clearSelected';
+    value: string | MenuItemEvent;
     event?: Function;
+    icon?: string;
+    divider?: boolean;
+    disabled?: boolean;
+    children?: MenuItem[];
 };
 export type OverlayerView = {
     key: 'left' | 'center' | 'right' | 'extend';
@@ -78,7 +93,8 @@ export type ContextmenuItem = {
 export type Render = Function | string | undefined;
 
 export type ValidateItemError = {
-    rowIndex: number;
+    rowKey: string;
+    rowIndex?: number; // 废弃
     key: string;
     message: string;
 };
@@ -110,12 +126,7 @@ export type SelectionMap = {
 export type SortDirection = 'asc' | 'desc' | 'none';
 export type SortStateMapItem = { direction: SortDirection; timestamp: number };
 export type SortStateMap = Map<string, SortStateMapItem>;
-export type SortByType =
-    | 'number'
-    | 'string'
-    | 'date'
-    | 'api'
-    | ((a: any, b: any) => number);
+export type SortByType = 'number' | 'string' | 'date' | 'api' | ((a: any, b: any) => number);
 
 export interface Column {
     key: string;
@@ -145,6 +156,7 @@ export interface Column {
     sortIconName?: string; // 默认排序图标
     sortAscIconName?: string; // 升序排序图标
     sortDescIconName?: string; // 降序排序图标
+    parentKey?: string;
     hide?: boolean | Function;
     render?: Function | string;
     renderFooter?: Function | string;
@@ -162,6 +174,9 @@ export interface Column {
     column?: Column;
     rules?: Rules | Rule;
     options?: any;
+    dragDisabled?: boolean;
+    hideDisabled?: boolean;
+    fixedDisabled?: boolean;
     selectorCellValueType?: SelectorCellValueType;
     maxLineClamp?: LineClampType; // 行高超出多少行显示省略号
     maxLineClampHeader?: LineClampType; // 表头行高超出多少行显示省略号
@@ -177,6 +192,18 @@ export type OverlayerTooltip = {
     text: string;
     show: boolean;
 };
+export type CustomHeader = {
+    fixedData?: Record<string, Fixed | ''>;
+    sortData?: Record<string, number>;
+    hideData?: Record<string, boolean>;
+    resizableData?: Record<string, number>;
+};
+export interface ColumnDragChangeEvent {
+    source: CellHeader;
+    target: CellHeader;
+    columns: Column[];
+}
+
 export type OverlayerContextmenu = {
     style: any;
     list: any[];
@@ -216,6 +243,7 @@ export type BeforeValueChangeItem = {
     value: any;
     oldValue?: any;
     row?: any;
+    errorTip?: boolean;
 };
 export type BeforeSetSelectorParams = {
     focusCell?: Cell;
