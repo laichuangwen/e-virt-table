@@ -46,6 +46,9 @@ export default class Editor {
         this.ctx.on('hoverIconClick', (cell) => {
             this.editCell(cell.rowIndex, cell.colIndex);
         });
+        this.ctx.on('cellMousedown', () => {
+            this.inputEl.focus({ preventScroll: true });
+        });
         this.ctx.on('keydown', (e) => {
             if (!this.ctx.isTarget(e)) {
                 return;
@@ -141,7 +144,6 @@ export default class Editor {
             if (functionKeys.includes(key)) {
                 return;
             }
-            // 除了上面的建其他都开始编辑
             this.startEdit(true);
         });
         // 重绘可能会导致cellClick事件不能触发，调整用按下cellMouseup按下延时赋值cellTarget
@@ -215,6 +217,7 @@ export default class Editor {
         // 初始化文本编辑器
         this.inputEl = document.createElement('textarea');
         this.inputEl.setAttribute('rows', '1');
+        this.inputEl.setAttribute('tabindex', '-1');
         // 监听输入事件，自动调整高度
         this.inputEl.addEventListener('input', this.autoSize.bind(this));
         this.inputEl.addEventListener('blur', () => {
@@ -274,6 +277,7 @@ export default class Editor {
         }
         // 显示编辑器
         this.editorEl.style.display = 'inline-block';
+        this.editorEl.style.zIndex = '100';
         this.editorEl.style.left = `${this.drawX - 1}px`;
         this.editorEl.style.top = `${this.drawY - 1}px`;
         this.editorEl.style.bottom = `auto`;
@@ -286,14 +290,14 @@ export default class Editor {
             this.inputEl.style.width = `${width - 1}px`;
             this.inputEl.style.height = `auto`;
             this.inputEl.style.padding = `${CELL_PADDING}px`;
+            this.inputEl.value = ''; // 清空
             if (value !== null) {
                 this.inputEl.value = value;
             }
-            this.inputEl.focus({ preventScroll: true });
-            const length = this.inputEl.value.length;
-            this.inputEl.setSelectionRange(length, length);
         } else {
-            this.inputEl.style.display = 'none';
+            this.editorEl.style.zIndex = '-1';
+            // this.editorEl.style.top = '-9999px';
+            // this.editorEl.style.left = '-9999px';
         }
 
         if (this.inputEl.scrollHeight > height || this.drawY < header.height) {
@@ -314,7 +318,6 @@ export default class Editor {
                 this.ctx.setItemValueByEditor(rowKey, key, textContent, true);
                 // this.cellTarget.setValue(textContent);
             }
-            this.inputEl.value = '';
         }
     }
     startEdit(ignoreValue = false) {
@@ -394,9 +397,8 @@ export default class Editor {
         this.ctx.emit('doneEdit', this.cellTarget);
         this.enable = false;
         this.ctx.editing = false;
-        this.ctx.containerElement.focus({ preventScroll: true });
-        // 隐藏编辑器
-        this.editorEl.style.display = 'none';
+        this.inputEl.focus({ preventScroll: true });
+        this.editorEl.style.zIndex = '-1';
         this.ctx.emit('draw');
     }
     clearEditor() {
