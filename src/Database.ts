@@ -223,11 +223,11 @@ export default class Database {
                 const row = this.rowKeyMap.get(rowKey);
                 row.calculatedHeight = height;
                 
-                // 如果开启了记录最大行高功能，更新最大高度记录
+                // 如果开启了记录最大行高功能，更新最大高度记录（使用 rowKey）
                 if (this.ctx.config.REMEMBER_MAX_ROW_HEIGHT) {
-                    const maxHeight = this.maxRowHeightMap.get(rowIndex) || row.height;
+                    const maxHeight = this.maxRowHeightMap.get(rowKey) || row.height;
                     if (height > maxHeight) {
-                        this.maxRowHeightMap.set(rowIndex, height);
+                        this.maxRowHeightMap.set(rowKey, height);
                     }
                 }
             }
