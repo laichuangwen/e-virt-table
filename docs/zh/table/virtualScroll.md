@@ -51,7 +51,7 @@ table.clearMaxRowHeight();
 
 ::: demo 记录最大行高示例
 
-overlayer/remember-max-row-height
+virtualScroll/remember-max-row-height
 h:700px
 :::
 
