@@ -7,7 +7,7 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -   
 
-V1.3.7
+V1.3.8
 ### Bug Fixes
 
 - feat:添加个containerResize事件

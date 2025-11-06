@@ -219,13 +219,11 @@ export default class Editor {
     private initTextEditor() {
         // 初始化文本编辑器
         this.inputEl = document.createElement('textarea');
+        this.inputEl.id = 'e-virt-table-editor-textarea';
         this.inputEl.setAttribute('rows', '1');
         this.inputEl.setAttribute('tabindex', '-1');
         // 监听输入事件，自动调整高度
         this.inputEl.addEventListener('input', this.autoSize.bind(this));
-        this.inputEl.addEventListener('blur', () => {
-            this.doneEdit();
-        });
         this.editorEl = this.ctx.editorElement;
         this.inputEl.className = 'e-virt-table-editor-textarea';
         this.editorEl.appendChild(this.inputEl);
@@ -286,7 +284,7 @@ export default class Editor {
         this.editorEl.style.bottom = `auto`;
         this.editorEl.style.maxHeight = `${maxHeight}px`;
         if (editorType === 'text') {
-            this.inputEl.style.display = 'block';
+            this.inputEl.style.display = 'inline-block';
             this.inputEl.style.minWidth = `${width - 1}px`;
             this.inputEl.style.minHeight = `${height - 1}px`;
             this.inputEl.style.maxHeight = `${maxHeight}px`;
@@ -298,9 +296,7 @@ export default class Editor {
                 this.inputEl.value = value;
             }
         } else {
-            this.editorEl.style.zIndex = '-1';
-            // this.editorEl.style.top = '-9999px';
-            // this.editorEl.style.left = '-9999px';
+            this.inputEl.style.display = 'none';
         }
 
         if (this.inputEl.scrollHeight > height || this.drawY < header.height) {
@@ -400,8 +396,11 @@ export default class Editor {
         this.ctx.emit('doneEdit', this.cellTarget);
         this.enable = false;
         this.ctx.editing = false;
-        this.inputEl.focus({ preventScroll: true });
+        this.inputEl.style.display = 'inline-block';
         this.editorEl.style.zIndex = '-1';
+        setTimeout(() => {
+            this.inputEl.focus({ preventScroll: true });
+        }, 0);
         this.ctx.emit('draw');
     }
     clearEditor() {
