@@ -81,6 +81,7 @@ export default class Selector {
             // 加个setTimeout小延迟一下，使得editor cellClick 判断adjustPositioning正常
             const timer = setTimeout(() => {
                 this.ctx.adjustPositioning = false;
+                this.ctx.disableHoverIconClick = false;
                 clearTimeout(timer);
             }, 0);
         });
@@ -212,6 +213,7 @@ export default class Selector {
         ) {
             if (this.ctx.mousedown) {
                 this.ctx.selectorMove = true;
+                this.ctx.disableHoverIconClick = true;
             }
             this.ctx.selector.enable = true;
             const {

@@ -76,6 +76,7 @@ export default class Autofill {
     private setMousedown() {
         this.ctx.autofill.enable = true;
         this.ctx.autofillMove = true;
+        this.ctx.disableHoverIconClick = true;
     }
     private setMouseUp() {
         if (!this.ctx.autofill.enable) {
@@ -89,6 +90,9 @@ export default class Autofill {
         this.ctx.autofillMove = false;
         this.ctx.autofill.xArr = [-1, -1];
         this.ctx.autofill.yArr = [-1, -1];
+        setTimeout(() => {
+            this.ctx.disableHoverIconClick = false;
+        }, 0);
     }
     private setAutofill(xArr: number[], yArr: number[]) {
         const { ENABLE_AUTOFILL, ENABLE_AUTOFILL_SPAN_COL, ENABLE_AUTOFILL_SPAN_ROW } = this.ctx.config;

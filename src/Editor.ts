@@ -44,6 +44,9 @@ export default class Editor {
             this.cellTarget = null;
         });
         this.ctx.on('hoverIconClick', (cell) => {
+            if (this.ctx.disableHoverIconClick) {
+                return;
+            }
             this.editCell(cell.rowIndex, cell.colIndex);
         });
         this.ctx.on('cellMousedown', () => {

@@ -98,6 +98,7 @@ export default class Context {
     scrollerFocus = false; // 滚动条focus中
     autofillMove = false; // 自动填充移动中
     selectorMove = false; // 选择器移动中
+    disableHoverIconClick = false; // 禁用hoverIconClick,防止填充选择器移动时，触发hoverIconClick
     selectColsIng = false; // 选择列中
     selectRowsIng = false; // 选择行中
     dragHeaderIng = false; // 拖拽表头中

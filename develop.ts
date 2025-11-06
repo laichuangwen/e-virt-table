@@ -547,7 +547,7 @@ const eVirtTable = new EVirtTable(canvas, {
         ENABLE_PASTER: true,
         FOOTER_POSITION: 'bottom',
         // ENABLE_SELECTOR_SINGLE: true,
-        ENABLE_AUTOFILL_SPAN_COL: false,
+        ENABLE_AUTOFILL_SPAN_COL: true,
         ENABLE_AUTOFILL_SPAN_ROW: true,
         OFFSET_HEIGHT: 16,
         // SELECTOR_CELL_VALUE_TYPE: 'displayText', // displayText | value
