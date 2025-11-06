@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <style>
+        .content {
+            position: relative;
+        }
+    </style>
+    <body>
+        <div class="content">
+            <div id="e-virt-table"></div>
+            <div id="e-virt-table-overlayer"></div>
+        </div>
+    </body>
+    <script>
+        function generateData() {
+            let columns = [
+                {
+                    type: 'index',
+                    key: 'index',
+                    width: 70,
+                    fixed: 'left',
+                },
+                {
+                    title: '姓名Name',
+                    key: 'name',
+                    width: 220,
+                    fixed: 'left',
+                },
+                {
+                    title: '日期Date',
+                    key: 'date',
+                    width: 120,
+                },
+                {
+                    title: '城市City',
+                    key: 'city',
+                    width: 220,
+                },
+                {
+                    title: '州State',
+                    key: 'state',
+                    width: 220,
+                },
+                {
+                    title: '邮编Zip',
+                    key: 'zip',
+                    width: 200,
+                },
+                {
+                    title: '长文本1LongText1',
+                    key: 'longText1',
+                    width: 200,
+                    autoRowHeight: true,
+                    render: (pEl, cell) => {
+                        const cellEl = document.createElement('div');
+                        cellEl.setAttribute('data-auto-height', 'true');
+                        cellEl.setAttribute('data-row-index', cell.rowIndex);
+                        cellEl.setAttribute('data-col-index', cell.colIndex);
+                        cellEl.style.width = '100%';
+                        cellEl.style.padding= '3px';
+                        cellEl.style.whiteSpace = 'normal';
+                        cellEl.style.wordBreak = 'break-word';
+                        cellEl.innerHTML = cell.value || '';
+                        pEl.appendChild(cellEl);
+                    },
+                },
+                {
+                    title: '地址Address',
+                    key: 'address',
+                    width: 200,
+                },
+                {
+                    title: '长文本2LongText2',
+                    key: 'longText2',
+                    width: 200,
+                    autoRowHeight: true,
+                    render: (pEl, cell) => {
+                        const cellEl = document.createElement('div');
+                        cellEl.setAttribute('data-auto-height', 'true');
+                        cellEl.setAttribute('data-row-index', cell.rowIndex);
+                        cellEl.setAttribute('data-col-index', cell.colIndex);
+                        cellEl.style.width = '100%';
+                        cellEl.style.padding= '3px';
+                        cellEl.style.whiteSpace = 'normal';
+                        cellEl.style.wordBreak = 'break-word';
+                        cellEl.innerHTML = cell.value || '';
+                        pEl.appendChild(cellEl);
+                    },
+                },
+            ];
+
+            // 添加更多列以便横向滚动
+            for (let i = 0; i < 30; i++) {
+                columns.push({
+                    title: `列${i + 1}Col${i + 1}`,
+                    key: `col_${i}`,
+                    width: 100,
+                });
+            }
+
+            let data = [];
+            const longTexts = [
+                '这是一段很长很长的文本内容，用于测试自动行高功能。当内容很长时，单元格会自动换行并撑高行高。This is a very long text content for testing auto row height.',
+                '短文本Short',
+                '这是一段中等长度的文本内容，用于演示不同长度的文本对行高的影响。Medium length text for demonstration.',
+                '超级超级超级超级超级超级超级长的文本内容，这段文本会让单元格变得非常高，用于测试记录最大行高的功能是否正常工作。Super super super long text content.',
+                '普通文本Normal text',
+            ];
+
+            for (let i = 0; i < 1000; i++) {
+                const rowData = {
+                    id: `row_${i}`,
+                    name: `张三${i + 1}Tom${i + 1}`,
+                    date: '2016-05-02',
+                    city: '洛杉矶Los Angeles',
+                    state: '加州California',
+                    zip: 'CA 90036',
+                    longText1: longTexts[i % longTexts.length],
+                    address: `海淀区北京路${189 + i}号No. ${189 + i}, Grove St`,
+                    longText2: longTexts[(i + 2) % longTexts.length],
+                };
+                // 添加额外列数据
+                for (let j = 0; j < 30; j++) {
+                    rowData[`col_${j}`] = `数据data_${i + 1}_${j + 1}`;
+                }
+                data.push(rowData);
+            }
+
+            return { columns, data };
+        }
+
+        const { columns, data } = generateData();
+        const target = document.getElementById('e-virt-table');
+        const overlayerEl = document.getElementById('e-virt-table-overlayer');
+
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                ROW_KEY: 'id',
+                ENABLE_SELECTOR: true,
+                ENABLE_AUTOFILL: true,
+                ENABLE_OFFSET_HEIGHT: true,
+                OFFSET_HEIGHT: 24,
+                REMEMBER_MAX_ROW_HEIGHT: true, // 开启记录最大行高
+            },
+            overlayerElement: overlayerEl,
+        });
+
+        // 覆盖层渲染
+        grid.on('overlayerChange', (container) => {
+            if (!overlayerEl) {
+                return;
+            }
+            overlayerEl.replaceChildren();
+            Object.assign(overlayerEl.style, container.style);
+            container.views.forEach((typeView) => {
+                const typeDiv = document.createElement('div');
+                typeDiv.className = typeView.class;
+                Object.assign(typeDiv.style, typeView.style);
+                typeView.views.forEach((cellWrapView) => {
+                    const cellWrap = document.createElement('div');
+                    Object.assign(cellWrap.style, cellWrapView.style);
+                    cellWrapView.cells.forEach((cell) => {
+                        const cellEl = document.createElement('div');
+                        Object.assign(cellEl.style, cell.style);
+                        if (typeof cell.render === 'function') {
+                            cell.render(cellEl, cell);
+                        }
+                        cellWrap.appendChild(cellEl);
+                    });
+                    typeDiv.appendChild(cellWrap);
+                });
+                overlayerEl.appendChild(typeDiv);
+            });
+        });
+    </script>
+</html>
