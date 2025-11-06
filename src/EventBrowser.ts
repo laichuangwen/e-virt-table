@@ -65,7 +65,6 @@ export default class EventBrowser {
         if (_e.button === 0) {
             this.ctx.mousedown = true;
         }
-        this.ctx.containerElement.focus({ preventScroll: true });
         this.ctx.emit('mousedown', e);
     }
     private handleMousemove(e: Event) {
