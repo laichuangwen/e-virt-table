@@ -15,9 +15,10 @@ export default class EventTable {
     }
     private init(): void {
         // 监听窗口大小变化
-        this.resizeObserver = new ResizeObserver(() => {
+        this.resizeObserver = new ResizeObserver((entries) => {
             this.ctx.emit('resetHeader');
-            this.ctx.emit('resizeObserver');
+            this.ctx.emit('resizeObserver', entries);
+            this.ctx.emit('containerResize', this.ctx.containerElement);
         });
         this.resizeObserver.observe(this.ctx.containerElement);
         this.mutationObserver = new MutationObserver((mutations) => {
