@@ -13,6 +13,8 @@ V1.3.7
 - feat:添加个containerResize事件
 - fix:修复中文输入时，首字符不会触发输入法
 - feat:支持配置记录最大行高
+- fix:优化填充限制逻辑
+- fix:优化hoverIconClick事件
 
 ---  
 
