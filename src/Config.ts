@@ -244,6 +244,10 @@ export default class Config {
     ENABLE_MERGE_CELL_LINK = false;
     /** 启用填充器 */
     ENABLE_AUTOFILL = false;
+    /** 启用选择器-批量跨列选择 */
+    ENABLE_AUTOFILL_SPAN_COL = true;
+    /** 启用选择器-批量跨行选择 */
+    ENABLE_AUTOFILL_SPAN_ROW = true;
     /** 启用body右键菜单 */
     ENABLE_CONTEXT_MENU = false;
     /** 启用表头右键菜单 */

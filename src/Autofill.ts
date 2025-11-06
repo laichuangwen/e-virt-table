@@ -91,19 +91,19 @@ export default class Autofill {
         this.ctx.autofill.yArr = [-1, -1];
     }
     private setAutofill(xArr: number[], yArr: number[]) {
-        const { ENABLE_AUTOFILL, ENABLE_SELECTOR_SPAN_COL, ENABLE_SELECTOR_SPAN_ROW } = this.ctx.config;
+        const { ENABLE_AUTOFILL, ENABLE_AUTOFILL_SPAN_COL, ENABLE_AUTOFILL_SPAN_ROW } = this.ctx.config;
         if (!ENABLE_AUTOFILL) {
             return;
         }
         let _xArr = xArr;
         let _yArr = yArr;
-        if (!ENABLE_SELECTOR_SPAN_ROW) {
-            const [rowstart] = _yArr;
-            _yArr = [rowstart, rowstart];
+        const xArrSelector = this.ctx.selector.xArr;
+        const yArrSelector = this.ctx.selector.yArr;
+        if (!ENABLE_AUTOFILL_SPAN_ROW && JSON.stringify(yArrSelector) !== JSON.stringify(_yArr)) {
+            return;
         }
-        if (!ENABLE_SELECTOR_SPAN_COL) {
-            const [colstart] = _xArr;
-            _xArr = [colstart, colstart];
+        if (!ENABLE_AUTOFILL_SPAN_COL && JSON.stringify(xArrSelector) !== JSON.stringify(_xArr)) {
+            return;
         }
         // 减少渲染
         if (

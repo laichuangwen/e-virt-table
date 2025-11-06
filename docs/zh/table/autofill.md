@@ -9,8 +9,10 @@
 | ENABLE_SELECTOR          | 启用选择器              | boolean     | false   |
 | ENABLE_AUTOFILL          | 启用填充器              | boolean      | false   |
 | ENABLE_SELECTOR_SINGLE   | 启用选择器-选择器单选   | boolean      | false  |
-| ENABLE_SELECTOR_SPAN_COL | 启用选择器-批量跨列选择 | boolean      | true   |
-| ENABLE_SELECTOR_SPAN_ROW | 启用选择器-批量跨行选择 | boolean       | true   |
+| ENABLE_AUTOFILL_SPAN_COL | 启用填充器-支持跨列 | boolean      | true   |
+| ENABLE_AUTOFILL_SPAN_ROW | 启用选择器-支持跨行 | boolean       | true   |
+| ENABLE_SELECTOR_SPAN_COL | 启用选择器-跨列选择 | boolean      | true   |
+| ENABLE_SELECTOR_SPAN_ROW | 启用选择器-跨行选择 | boolean       | true   |
 | ENABLE_SELECTOR_ALL_ROWS | 启用选择器-批量选中列   | boolean    | true   |
 | ENABLE_SELECTOR_ALL_COLS | 启用选择器-批量选中行   | boolean      | true   |
 | BEFORE_AUTOFILL_DATA_METHOD | 数值填充前回调 | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — | — |
@@ -61,8 +63,8 @@ h:320px
 依赖选择器的设置，行填充需要设置如下:
 - 设置`config.ENABLE_SELECTOR`为`true`
 - 设置`config.ENABLE_AUTOFILL`为`true`
-- 设置`config.ENABLE_SELECTOR_SPAN_COL`为`false`
-- 设置`config.ENABLE_SELECTOR_SPAN_ROW`为`true`
+- 设置`config.ENABLE_AUTOFILL_SPAN_COL`为`false`
+- 设置`config.ENABLE_AUTOFILL_SPAN_ROW`为`true`
 - 设置`config.ENABLE_SELECTOR_ALL_ROWS`为`true`
 - 设置`config.ENABLE_SELECTOR_ALL_COLS`为`false`
 ::: demo
@@ -75,8 +77,8 @@ h:320px
 依赖选择器的设置，行填充需要设置如下:
 - 设置`config.ENABLE_SELECTOR`为`true`
 - 设置`config.ENABLE_AUTOFILL`为`true`
-- 设置`config.ENABLE_SELECTOR_SPAN_COL`为`true`
-- 设置`config.ENABLE_SELECTOR_SPAN_ROW`为`false`
+- 设置`config.ENABLE_AUTOFILL_SPAN_COL`为`true`
+- 设置`config.ENABLE_AUTOFILL_SPAN_ROW`为`false`
 - 设置`config.ENABLE_SELECTOR_ALL_ROWS`为`false`
 - 设置`config.ENABLE_SELECTOR_ALL_COLS`为`true`
 ::: demo

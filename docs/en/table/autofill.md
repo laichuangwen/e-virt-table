@@ -11,6 +11,8 @@ Autofill relies on the selector, so enabling autofill also requires enabling the
 | ENABLE_SELECTOR_SINGLE   | Enable single selector  | boolean  | false   |
 | ENABLE_SELECTOR_SPAN_COL | Enable span column selector | boolean | true   |
 | ENABLE_SELECTOR_SPAN_ROW | Enable span row selector | boolean  | true   |
+| ENABLE_AUTOFILL_SPAN_COL | Enable span column autofill | boolean | true   |
+| ENABLE_AUTOFILL_SPAN_ROW | Enable span row autofill | boolean  | true   |
 | ENABLE_SELECTOR_ALL_ROWS | Enable select all rows  | boolean  | true   |
 | ENABLE_SELECTOR_ALL_COLS | Enable select all columns | boolean | true   |
 | BEFORE_AUTOFILL_DATA_METHOD | Callback before autofill change | ^[Function]`(BeforeChangeItem[])=>BeforeChangeItem[]\|Promise<BeforeChangeItem[]>` | — | — |
@@ -59,8 +61,8 @@ h:320px
 Depending on the selector settings, column autofill requires the following settings:
 - Set `config.ENABLE_SELECTOR` to `true`
 - Set `config.ENABLE_AUTOFILL` to `true`
-- Set `config.ENABLE_SELECTOR_SPAN_COL` to `false`
-- Set `config.ENABLE_SELECTOR_SPAN_ROW` to `true`
+- Set `config.ENABLE_AUTOFILL_SPAN_COL` to `false`
+- Set `config.ENABLE_AUTOFILL_SPAN_ROW` to `true`
 - Set `config.ENABLE_SELECTOR_ALL_ROWS` to `true`
 - Set `config.ENABLE_SELECTOR_ALL_COLS` to `false`
 ::: demo
@@ -73,8 +75,8 @@ h:320px
 Depending on the selector settings, row autofill requires the following settings:
 - Set `config.ENABLE_SELECTOR` to `true`
 - Set `config.ENABLE_AUTOFILL` to `true`
-- Set `config.ENABLE_SELECTOR_SPAN_COL` to `true`
-- Set `config.ENABLE_SELECTOR_SPAN_ROW` to `false`
+- Set `config.ENABLE_AUTOFILL_SPAN_COL` to `true`
+- Set `config.ENABLE_AUTOFILL_SPAN_ROW` to `false`
 - Set `config.ENABLE_SELECTOR_ALL_ROWS` to `false`
 - Set `config.ENABLE_SELECTOR_ALL_COLS` to `true`
 ::: demo

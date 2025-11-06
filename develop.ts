@@ -547,9 +547,14 @@ const eVirtTable = new EVirtTable(canvas, {
         ENABLE_PASTER: true,
         FOOTER_POSITION: 'bottom',
         // ENABLE_SELECTOR_SINGLE: true,
+        ENABLE_AUTOFILL_SPAN_COL: false,
+        ENABLE_AUTOFILL_SPAN_ROW: true,
         OFFSET_HEIGHT: 16,
         // SELECTOR_CELL_VALUE_TYPE: 'displayText', // displayText | value
         // SELECTOR_AREA_MAX_X_OFFSET: 1,
+        // SELECTOR_AREA_MAX_Y_OFFSET: 1,
+        // SELECTOR_AREA_MAX_X_OFFSET: 5,
+        // SELECTOR_AREA_MIN_Y: 1,
         // SELECTOR_AREA_MAX_Y_OFFSET: 1,
         CONTEXT_MENU: [
             { label: '复制', value: 'copy' },
