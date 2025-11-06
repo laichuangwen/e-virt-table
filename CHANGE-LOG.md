@@ -7,6 +7,15 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -   
 
+V1.3.7
+### Bug Fixes
+
+- feat:添加个containerResize事件
+- fix:修复中文输入时，首字符不会触发输入法
+- feat:支持配置记录最大行高
+
+---  
+
 V1.3.6
 ### Bug Fixes
 
