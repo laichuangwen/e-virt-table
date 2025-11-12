@@ -23,7 +23,7 @@ import Editor from './Editor';
 import Empty from './Empty';
 import Overlayer from './Overlayer';
 import ContextMenu from './ContextMenu';
-import { mergeColCell, mergeRowCell, getSpanArrByRow, getSpanObjByColumn, throttle } from './util';
+import { mergeColCell, mergeRowCell, getSpanArrByRow, getSpanObjByColumn } from './util';
 import './style.css';
 import Loading from './Loading';
 
@@ -68,26 +68,12 @@ export default class EVirtTable {
         this.overlayer = new Overlayer(this.ctx);
         this.contextMenu = new ContextMenu(this.ctx);
         this.loading = new Loading(this.ctx);
-        // 节流绘制表格
-        this.ctx.on(
-            'draw',
-            throttle(
-                () => {
-                    this.draw();
-                },
-                () => this.ctx.drawTime,
-            ),
-        );
-        // 节流绘制视图
-        this.ctx.on(
-            'drawView',
-            throttle(
-                () => {
-                    this.draw(true);
-                },
-                () => this.ctx.drawTime,
-            ),
-        );
+        this.ctx.on('draw', () => {
+            this.draw();
+        });
+        this.ctx.on('drawView', () => {
+            this.draw(true);
+        });
         this.draw();
     }
     private createContainer(
@@ -127,7 +113,6 @@ export default class EVirtTable {
             cancelAnimationFrame(this.animationFrameId);
         }
         this.animationFrameId = requestAnimationFrame(() => {
-            const startTime = performance.now();
             this.header.update();
             this.footer.update();
             this.body.update();
@@ -147,9 +132,6 @@ export default class EVirtTable {
             this.animationFrameId2 = requestAnimationFrame(() => {
                 this.body.updateAutoHeight();
             });
-            const endTime = performance.now();
-            const drawTime = Math.round(endTime - startTime);
-            this.ctx.drawTime = drawTime * this.ctx.config.DRAW_TIME_MULTIPLIER;
         });
     }
     loadConfig(_config: ConfigType) {

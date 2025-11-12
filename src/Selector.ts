@@ -77,13 +77,8 @@ export default class Selector {
         this.ctx.on('mouseup', () => {
             this.ctx.selectorMove = false;
             this.ctx.stopAdjustPosition();
-            // mousedown销毁dom会导致click事件清除
-            // 加个setTimeout小延迟一下，使得editor cellClick 判断adjustPositioning正常
-            const timer = setTimeout(() => {
-                this.ctx.adjustPositioning = false;
-                this.ctx.disableHoverIconClick = false;
-                clearTimeout(timer);
-            }, 0);
+            this.ctx.adjustPositioning = false;
+            this.ctx.disableHoverIconClick = false;
         });
         this.ctx.on('cellHeaderHoverChange', (cell) => {
             if (this.ctx.mousedown) {
@@ -922,9 +917,9 @@ export default class Selector {
         // >1是因为上面为了可移动加1，所以这里要大于2(保险一点)
         if (Math.abs(scrollX - _scrollX) > 2 || Math.abs(scrollY - _scrollY) > 2) {
             this.ctx.adjustPositioning = true;
-            this.ctx.setScroll(_scrollX, _scrollY);
             // fix:处理移动后编辑器，需要再点击一次,编辑器那边有监听
             this.ctx.emit('adjustBoundaryPosition', focusCell);
+            this.ctx.setScroll(_scrollX, _scrollY);
         }
     }
     destroy() {}

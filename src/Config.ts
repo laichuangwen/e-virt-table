@@ -32,8 +32,6 @@ export default class Config {
     private _config: ConfigType = {};
     /** CSS 类名前缀 */
     CSS_PREFIX = 'e-virt-table';
-    /** 绘制时间 */
-    DRAW_TIME_MULTIPLIER = 2;
     /** 图标集合 */
     ICONS: IconType[] = [];
     /** 行的唯一标识键 */

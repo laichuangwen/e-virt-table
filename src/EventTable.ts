@@ -225,7 +225,7 @@ export default class EventTable {
                     this.ctx.hoverCell = cell;
                     this.ctx.hoverRow = this.ctx.body.renderRows.find((item) => item.rowKey === cell.rowKey);
                     this.ctx.emit('rowHoverChange', this.ctx.hoverRow, cell, e);
-                    this.ctx.emit('drawView');
+                    this.ctx.emit('draw');
                 }
                 this.ctx.hoverCell = cell;
                 this.ctx.emit('cellHoverChange', cell, e);

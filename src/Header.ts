@@ -358,8 +358,6 @@ export default class Header {
         return dragCellHeader;
     }
     private resizeColumn(cell: CellHeader, diff: number) {
-        console.log('resizeColumn');
-
         const setWidth = (columns: any[]) => {
             columns.forEach((column: any) => {
                 if (column.children && column.children.length > 0) {

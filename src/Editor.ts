@@ -151,10 +151,6 @@ export default class Editor {
         });
         // 重绘可能会导致cellClick事件不能触发，调整用按下cellMouseup按下延时赋值cellTarget
         this.ctx.on('cellMouseup', (cell: Cell) => {
-            // 如果是调整边界位置，不进入编辑模式
-            if (this.ctx.adjustPositioning) {
-                return;
-            }
             // 如果是选择器，不进入编辑模式
             if (this.ctx.isPointer) {
                 return;
@@ -294,6 +290,7 @@ export default class Editor {
             this.inputEl.value = ''; // 清空
             if (value !== null) {
                 this.inputEl.value = value;
+                this.inputEl.focus({ preventScroll: true });
             }
         } else {
             this.inputEl.style.display = 'none';
@@ -326,6 +323,10 @@ export default class Editor {
         if (!ENABLE_EDIT_CLICK_SELECTOR) {
             return;
         }
+        // 如果是调整边界位置，不进入编辑模式
+        if (this.ctx.adjustPositioning) {
+            return;
+        }
         const focusCell = this.ctx.focusCell;
         if (!focusCell) {
             return;
@@ -352,7 +353,7 @@ export default class Editor {
             this.startEditByInput(this.cellTarget, ignoreValue);
             this.ctx.emit('startEdit', this.cellTarget);
             // 触发绘制，刷新
-            this.ctx.emit('drawView');
+            this.ctx.emit('draw');
         }
     }
     editCell(rowIndex: number, colIndex: number) {
@@ -385,7 +386,7 @@ export default class Editor {
             this.startEditByInput(this.cellTarget);
             this.ctx.emit('startEdit', this.cellTarget);
             // 触发绘制，刷新
-            this.ctx.emit('drawView');
+            this.ctx.emit('draw');
         }
     }
     doneEdit() {
