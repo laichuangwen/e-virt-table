@@ -745,15 +745,15 @@ const eVirtTable = new EVirtTable(canvas, {
         //     });
         // },
 
-        // BODY_CELL_STYLE_METHOD: (cell: any) => {
-        //     const { rowIndex, column } = cell;
-        //     if (rowIndex == 5 && column.key === 'phone')
-        //         return {
-        //             color: 'blue',
-        //             backgroundColor: 'red',
-        //         };
-        //     return {};
-        // },
+        BODY_CELL_STYLE_METHOD: (cell: any) => {
+            const { rowIndex, column, isHasChanged } = cell;
+            if (isHasChanged)
+                return {
+                    color: 'blue',
+                    backgroundColor: 'red',
+                };
+            return {};
+        },
         BODY_CELL_READONLY_METHOD: (params: any) => {
             const { rowIndex, column } = params;
             if (rowIndex == 15 && ['emp_name221', 'emp_name2'].includes(column.key)) {
@@ -1235,6 +1235,9 @@ eVirtTable.on('customHeaderChange', (customHeader) => {
     } else {
         localStorage.setItem('customHeader', JSON.stringify(customHeader));
     }
+});
+document.getElementById('clearChangeData')?.addEventListener('click', () => {
+    eVirtTable.clearChangeData();
 });
 // 销毁
 function destroy() {

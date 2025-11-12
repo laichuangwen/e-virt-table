@@ -1933,4 +1933,7 @@ export default class Database {
         clearCustomHeaderInvalidValues(columns, obj);
         return obj;
     }
+    clearChangeData() {
+        this.changedDataMap.clear();
+    }
 }

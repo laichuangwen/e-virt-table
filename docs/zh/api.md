@@ -249,6 +249,7 @@ type EVirtTableOptions = {
 | destroy                | 销毁                          | —                                                         |
 | setCustomHeader | 设置自定义表头                   | `(CustomHeader,ignoreEmit)` |
 | getCustomHeader | 获取自定义表头数据 | `{CustomHeader，Column[]}`  |
+| clearChangeData | 清空改变值 |  —  |
 
 ## Column
 | 参数 | 说明 | 类型 | 默认值 |

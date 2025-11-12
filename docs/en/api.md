@@ -246,6 +246,7 @@ type EVirtTableOptions = {
 | destroy                | Destroy                       | —                                                         |
 | setCustomHeader | Set custom header | `(CustomHeader, ignoreEmit)` |
 | getCustomHeader | Get custom header data | `{CustomHeader, Column[]}` |
+| clearChangeData | Clear change value |  —  |
 
 ## Column
 

@@ -458,6 +458,11 @@ export default class EVirtTable {
         return this.ctx.database.getColumnByKey(key)?.column;
     }
 
+    clearChangeData() {
+        this.ctx.database.clearChangeData();
+        this.ctx.emit('draw');
+    }
+
     /**
      * 销毁
      */
