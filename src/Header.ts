@@ -48,20 +48,22 @@ export default class Header {
         this.initResizeColumn();
         this.initDragColumn();
     }
-    init() {
+    init(isBuffer = false) {
         const {
             config: { HEADER_HEIGHT, SCROLLER_TRACK_SIZE },
         } = this.ctx;
-        const columns = this.ctx.database.getColumns();
-        this.columns = columns;
+        // 防止resizeAllColumn递归
+        if (!isBuffer) {
+            const columns = this.ctx.database.getColumns();
+            this.columns = columns;
+        }
         this.allCellHeaders = [];
         this.leafCellHeaders = [];
         this.fixedLeftCellHeaders = [];
         this.fixedRightCellHeaders = [];
         this.centerCellHeaders = [];
-
         this.visibleHeight = this.height;
-        this.visibleColumns = filterHiddenColumns(columns);
+        this.visibleColumns = filterHiddenColumns(this.columns);
         const maxHeaderRow = getMaxRow(this.visibleColumns);
         const leafColumns = toLeaf(this.visibleColumns);
         this.height = HEADER_HEIGHT * maxHeaderRow;
@@ -356,6 +358,8 @@ export default class Header {
         return dragCellHeader;
     }
     private resizeColumn(cell: CellHeader, diff: number) {
+        console.log('resizeColumn');
+
         const setWidth = (columns: any[]) => {
             columns.forEach((column: any) => {
                 if (column.children && column.children.length > 0) {
@@ -368,7 +372,6 @@ export default class Header {
             });
         };
         setWidth(this.columns);
-        this.ctx.database.setColumns(this.columns);
         let overDiff = 0;
         // 如果表头宽度小于可视宽度，平均分配
         if (this.width < this.visibleWidth) {
@@ -386,7 +389,7 @@ export default class Header {
             columns: this.columns,
         });
         this.ctx.database.setCustomHeaderResizableData(cell.key, width);
-        this.init();
+        this.init(true);
         this.ctx.emit('draw');
     }
     resizeAllColumn(fellWidth: number) {
@@ -422,9 +425,8 @@ export default class Header {
             });
         };
         uptateWidth(this.columns);
-        this.ctx.database.setColumns(this.columns);
-        this.init();
-        // this.ctx.emit("draw");
+        this.init(true);
+        this.ctx.emit("draw");
     }
     getCustomHeader() {
         const columns = this.ctx.database.getColumns();
