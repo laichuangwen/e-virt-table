@@ -7,6 +7,17 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -   
 
+
+V1.3.9
+### Bug Fixes
+
+- feat:内置支持覆盖层
+- feat:拓展清空改变值方法
+- fix:优化渲染修复渲染时覆盖层偶现错乱问题
+- fix:修复拖拽更改表头宽度，重置表头不能恢复问题
+
+---  
+
 V1.3.8
 ### Bug Fixes
 
