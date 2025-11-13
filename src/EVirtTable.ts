@@ -91,6 +91,7 @@ export default class EVirtTable {
         containerElement.tabIndex = 0;
         canvasElement.className = 'e-virt-table-canvas';
         overlayerElement.className = 'e-virt-table-overlayer';
+        overlayerElement.setAttribute('data-overlayer', _overlayerElement ? 'custom' : 'default');
         const editorElement = _editorElement || document.createElement('div');
         editorElement.className = 'e-virt-table-editor';
         const emptyElement = _emptyElement;

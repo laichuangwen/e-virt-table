@@ -14,6 +14,7 @@
     <body>
         <div class="content">
             <div id="e-virt-table"></div>
+            <div id="e-virt-table-overlayer"></div>
         </div>
     </body>
     <script>
@@ -116,6 +117,7 @@
         }
         const { columns, data } = gcData(1000, 1000);
         const target = document.getElementById('e-virt-table');
+        const overlayerEl = document.getElementById('e-virt-table-overlayer');
         const grid = new EVirtTable(target, {
             data,
             columns,
@@ -130,6 +132,38 @@
                 ENABLE_OFFSET_HEIGHT: true,
                 OFFSET_HEIGHT: 24,
             },
+            overlayerElement: overlayerEl,
+        });
+        grid.on('overlayerChange', (container) => {
+            if (!overlayerEl) {
+                return;
+            }
+            // 移除所有子元素
+            overlayerEl.replaceChildren();
+            Object.assign(overlayerEl.style, container.style);
+            container.views.forEach((typeView) => {
+                const typeDiv = document.createElement('div');
+                typeDiv.className = typeView.class;
+                Object.assign(typeDiv.style, typeView.style);
+                typeView.views.forEach((cellWrapView) => {
+                    const cellWrap = document.createElement('div');
+                    Object.assign(cellWrap.style, cellWrapView.style);
+                    cellWrapView.cells.forEach((cell) => {
+                        const cellEl = document.createElement('div');
+                        Object.assign(cellEl.style, cell.style);
+                        //注意dom自适应行高需要设置domDataset
+                        Object.keys(cell.domDataset).forEach((key) => {
+                            cellEl.setAttribute(key, cell.domDataset[key]);
+                        });
+                        if (typeof cell.render === 'function') {
+                            cell.render(cellEl, cell);
+                        }
+                        cellWrap.appendChild(cellEl);
+                    });
+                    typeDiv.appendChild(cellWrap);
+                });
+                overlayerEl.appendChild(typeDiv);
+            });
         });
     </script>
 </html>
