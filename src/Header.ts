@@ -62,11 +62,11 @@ export default class Header {
         this.fixedLeftCellHeaders = [];
         this.fixedRightCellHeaders = [];
         this.centerCellHeaders = [];
-        this.visibleHeight = this.height;
         this.visibleColumns = filterHiddenColumns(this.columns);
         const maxHeaderRow = getMaxRow(this.visibleColumns);
         const leafColumns = toLeaf(this.visibleColumns);
         this.height = HEADER_HEIGHT * maxHeaderRow;
+        this.visibleHeight = this.height;
         this.width = leafColumns.reduce((sum, _item) => {
             const width = _item.width || 100;
             const { maxWidth, minWidth } = _item;
