@@ -200,6 +200,8 @@ export default class Config {
     ENABLE_SELECTOR = true;
     /** 树形选择模式 */
     TREE_SELECT_MODE: TreeSelectMode = 'auto';
+    /** 树形子项key名称 */
+    TREE_CHILDREN_KEY = 'children';
     /** 树形缩进宽度 */
     TREE_INDENT = 20;
     /** 树形图标大小 */

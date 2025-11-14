@@ -124,8 +124,18 @@ export default class Database {
      */
     private initData(dataList: any[], level: number = 0, parentRowKeys: string[] = []) {
         const siblingsLength = dataList.length;
+        const {
+            ROW_KEY = '',
+            DEFAULT_EXPAND_ALL,
+            CELL_HEIGHT,
+            SELECTABLE_METHOD,
+            CHECKBOX_KEY,
+            TREE_CHILDREN_KEY,
+        } = this.ctx.config;
         dataList.forEach((item, index) => {
-            const { ROW_KEY = '', DEFAULT_EXPAND_ALL, CELL_HEIGHT, SELECTABLE_METHOD, CHECKBOX_KEY } = this.ctx.config;
+            if (TREE_CHILDREN_KEY !== 'children') {
+                item.children = item[TREE_CHILDREN_KEY];
+            }
             const _rowKey = item[ROW_KEY]; // 行唯一标识,否则就rowKey
             const rowKey = _rowKey !== undefined && _rowKey !== null ? `${_rowKey}` : generateShortUUID();
             this.itemRowKeyMap.set(item, rowKey);
@@ -222,7 +232,7 @@ export default class Database {
             if (rowKey) {
                 const row = this.rowKeyMap.get(rowKey);
                 row.calculatedHeight = height;
-                
+
                 // 如果开启了记录最大行高功能，更新最大高度记录（使用 rowKey）
                 if (this.ctx.config.REMEMBER_MAX_ROW_HEIGHT) {
                     const maxHeight = this.maxRowHeightMap.get(rowKey) || row.height;
@@ -321,10 +331,10 @@ export default class Database {
                 const rowKey = this.itemRowKeyMap.get(item);
                 const { expand, hasChildren, height, calculatedHeight } = this.rowKeyMap.get(rowKey);
                 const top = this.sumHeight;
-                
+
                 // 计算行高度和设置高度取最大
                 let _height = Math.max(calculatedHeight, height);
-                
+
                 // 如果开启了记录最大行高功能
                 if (this.ctx.config.REMEMBER_MAX_ROW_HEIGHT) {
                     // 使用 rowKey 作为键，获取该行历史最大高度
@@ -338,7 +348,7 @@ export default class Database {
                         _height = maxHeight;
                     }
                 }
-                
+
                 this.sumHeight += _height;
                 this.rowIndexRowKeyMap.set(rowIndex, rowKey);
                 this.rowKeyRowIndexMap.set(rowKey, rowIndex);
