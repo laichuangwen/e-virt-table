@@ -70,6 +70,7 @@ export type MenuItem = {
     divider?: boolean;
     disabled?: boolean;
     children?: MenuItem[];
+    key?: string;
 };
 export type OverlayerView = {
     key: 'left' | 'center' | 'right';

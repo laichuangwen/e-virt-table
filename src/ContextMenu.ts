@@ -138,9 +138,13 @@ export default class ContextMenu {
                     } else if (value === 'visible') {
                         // 这个分支不应该被触发，因为 visible 是父菜单项
                     } else if (value.startsWith('visible_')) {
-                        // 处理取消隐藏特定列
-                        const columnKey = value.replace('visible_', '');
-                        this.ctx.database.setCustomHeaderHideData([columnKey], false);
+                        if (!_itemData.key) return;
+                        if (_itemData.children) {
+                            const childKeys = this.getLeafKeys(_itemData.children);
+                            this.ctx.database.setCustomHeaderHideData(childKeys, false);
+                        } else {
+                            this.ctx.database.setCustomHeaderHideData([_itemData.key], false);
+                        }
                         // 直接删除对应的子菜单项
                         if (this.currentDOMTreeMenu) {
                             this.currentDOMTreeMenu.removeSubMenuItem(value);
@@ -205,20 +209,35 @@ export default class ContextMenu {
                 if (filteredChildren.length > 0) {
                     result.push({
                         label: col.title,
+                        key: col.key,
                         value: `visible_${col.key}`,
-                        disabled: true, // 非末级，且有子项保留 → disabled
+                        // disabled: true, // 非末级，且有子项保留 → disabled
                         children: filteredChildren,
                     });
                 }
             }
             // 末级节点，保留 hide===true 的
             else if (col.hide) {
-                result.push({ label: col.title, value: `visible_${col.key}` });
+                result.push({ label: col.title, value: `visible_${col.key}`, key: col.key });
             }
         }
 
         return result;
     }
+    // 递归获取所有子项key
+    private getLeafKeys(tree: MenuItem[]): string[] {
+        return tree.reduce<string[]>((acc, node) => {
+            if (!node.children || node.children.length === 0) {
+                // 叶子节点，收集 value
+                acc.push(String(node.key));
+            } else {
+                // 有子节点，递归收集
+                acc.push(...this.getLeafKeys(node.children));
+            }
+            return acc;
+        }, []);
+    }
+
     hide() {
         if (this.currentDOMTreeMenu) {
             this.currentDOMTreeMenu.destroy();
