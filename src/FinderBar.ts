@@ -47,12 +47,12 @@ export class FinderBar {
                     this.hide();
                     return;
                 }
-                if (e.code === 'ArrowUp') {
+                if (e.code === 'ArrowUp' || (e.shiftKey && e.code === 'Enter')) {
                     e.preventDefault();
                     this.navigatePrevious();
                     return;
                 }
-                if (e.code === 'ArrowDown') {
+                if (e.code === 'ArrowDown' || e.code === 'Enter') {
                     e.preventDefault();
                     this.navigateNext();
                     return;
@@ -70,12 +70,9 @@ export class FinderBar {
     private async initSearchData(): Promise<void> {
         this.showLoading();
         this.searchData = [];
-        const { allCellHeaders } = this.ctx.header;
-        await this.batchRun(
-            allCellHeaders.length,
-            0,
-            10000,
-            (i) => {
+        setTimeout(() => {
+            const { allCellHeaders } = this.ctx.header;
+            for (let i = 0; i < allCellHeaders.length; i++) {
                 const header = allCellHeaders[i];
                 if (header && ['string', 'number'].includes(typeof header.text)) {
                     this.searchData.push({
@@ -86,29 +83,24 @@ export class FinderBar {
                         colKey: header.key,
                     });
                 }
-            },
-            5,
-        );
-        const { maxColIndex, maxRowIndex } = this.ctx;
-        await this.batchRun(
-            maxRowIndex,
-            maxColIndex,
-            10000,
-            (i, j) => {
-                const cell = this.ctx.database.getVirtualBodyCell(i, j, false);
-                const text = cell?.getText();
-                if (['string', 'number'].includes(typeof text)) {
-                    this.searchData.push({
-                        rowIndex: i,
-                        colIndex: j,
-                        text: `${text}`,
-                        type: 'body',
-                    });
+            }
+            const { maxColIndex, maxRowIndex } = this.ctx;
+            for (let i = 0; i < maxRowIndex; i++) {
+                for (let j = 0; j < maxColIndex; j++) {
+                    const cell = this.ctx.database.getVirtualBodyCell(i, j, false);
+                    const text = cell?.getText();
+                    if (['string', 'number'].includes(typeof text)) {
+                        this.searchData.push({
+                            rowIndex: i,
+                            colIndex: j,
+                            text: `${text}`,
+                            type: 'body',
+                        });
+                    }
                 }
-            },
-            5,
-        );
-        this.hideLoading();
+            }
+            this.hideLoading();
+        }, 0);
     }
 
     private createContainer(): HTMLElement {
@@ -194,28 +186,28 @@ export class FinderBar {
         this.currentIndex = -1;
 
         if (!searchText) {
+            this.cearFinderBar();
             this.updateCount();
             return;
         }
 
         this.showLoading();
-        this.searchResults = this.searchData.filter((item) => item.text.includes(searchText));
-        // 如果找到结果，定位到第一个
-        if (this.searchResults.length > 0) {
-            this.currentIndex = 0;
-            this.scrollToCurrentResult();
-        } else {
-            // 清空
-            this.ctx.finderBar = {
-                rowIndex: -1,
-                colIndex: -1,
-                text: '',
-                type: 'header',
-            };
-            this.ctx.emit('draw');
-        }
-        this.updateCount();
-        this.hideLoading();
+        setTimeout(() => {
+            // 支持大小写搜索
+            this.searchResults = this.searchData.filter((item) =>
+                item.text.toLowerCase().includes(searchText.toLowerCase()),
+            );
+            // 如果找到结果，定位到第一个
+            if (this.searchResults.length > 0) {
+                this.currentIndex = 0;
+                this.scrollToCurrentResult();
+            } else {
+                // 清空
+                this.cearFinderBar();
+            }
+            this.updateCount();
+            this.hideLoading();
+        }, 0);
     }
 
     private scrollToCurrentResult(): void {
@@ -281,29 +273,14 @@ export class FinderBar {
         this.loadingEl.parentElement?.classList.remove('loading');
         this.input.readOnly = false;
     }
-    private async batchRun(
-        maxRow: number,
-        maxCol: number,
-        batchSize: number,
-        fn: (i: number, j: number) => void | Promise<void>,
-        interval = 0,
-    ) {
-        for (let rowStart = 0; rowStart <= maxRow; rowStart += batchSize) {
-            const rowEnd = Math.min(rowStart + batchSize - 1, maxRow);
-            const tasks: Promise<void>[] = [];
-            // 遍历当前批次的行
-            for (let i = rowStart; i <= rowEnd; i++) {
-                for (let j = 0; j <= maxCol; j++) {
-                    tasks.push(Promise.resolve(fn(i, j)));
-                }
-            }
-            // 并行执行当前批次（更快）
-            await Promise.all(tasks);
-            // 批次之间休息，避免长时间阻塞
-            if (interval > 0) {
-                await new Promise((r) => setTimeout(r, interval));
-            }
-        }
+    private cearFinderBar(): void {
+        this.ctx.finderBar = {
+            rowIndex: -1,
+            colIndex: -1,
+            text: '',
+            type: 'header',
+        };
+        this.ctx.emit('draw');
     }
 
     public hide(): void {
@@ -314,6 +291,7 @@ export class FinderBar {
         this.ctx.finding = false;
         this.input.value = '';
         this.searchResults = [];
+        this.searchData = [];
         this.currentIndex = -1;
         this.hideLoading();
         this.ctx.finderBar = {
@@ -323,6 +301,7 @@ export class FinderBar {
             type: 'header',
         };
         this.updateCount();
+        this.ctx.emit('draw');
     }
 
     public destroy(): void {

@@ -342,9 +342,8 @@
 /* FinderBar 查找栏样式 */
 .e-virt-table-finder-bar {
     position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 8px;
+    right: 16px;
     display: none;
     z-index: 10000;
     background: #fff;
