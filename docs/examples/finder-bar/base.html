@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <style>
+        .content {
+            position: relative;
+        }
+    </style>
+    <body>
+        <div style="margin-bottom: 8px">
+            <select id="options" name="options">
+                <option value="1">100c and 1000r</option>
+                <option value="2">1000c and 100r</option>
+                <option value="3">100c and 5000r</option>
+            </select>
+        </div>
+        <div class="content">
+            <div id="e-virt-table"></div>
+        </div>
+    </body>
+    <script>
+        function generateData(c = 1000, r = 1000) {
+            let columns = [
+                {
+                    type: 'index',
+                    key: 'index',
+                    width: 70,
+                },
+                {
+                    title: 'Date',
+                    key: 'date',
+                },
+                {
+                    title: 'Name',
+                    key: 'name',
+                },
+                {
+                    title: 'State',
+                    key: 'state',
+                },
+                {
+                    title: 'City',
+                    key: 'city',
+                },
+                {
+                    title: 'Address',
+                    key: 'address',
+                    width: 200,
+                },
+                {
+                    title: 'Zip',
+                    key: 'zip',
+                },
+            ];
+            let gcData = {};
+            for (let i = 0; i < c; i += 1) {
+                columns.push({
+                    title: `Header_${i}`,
+                    key: `gc_${i}`,
+                });
+                gcData[`gc_${i}`] = `data_${i}`;
+            }
+            let data = [];
+            let _gcData = {
+                date: '2016-05-02',
+                name: 'John',
+                state: 'California',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+                zip: 'CA 90036',
+                ...gcData,
+            };
+            for (let i = 0; i < r; i += 1) {
+                data.push(JSON.parse(JSON.stringify(_gcData)));
+            }
+
+            return {
+                columns,
+                data,
+            };
+        }
+        const { columns, data } = generateData(100, 1000);
+        const target = document.getElementById('e-virt-table');
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                ENABLE_SELECTOR: true,
+                ENABLE_AUTOFILL: true,
+                ENABLE_OFFSET_HEIGHT: true,
+                OFFSET_HEIGHT: 24,
+            },
+        });
+        const selectElement = document.getElementById('options');
+        selectElement.addEventListener('change', function () {
+            const selectedValue = selectElement.value;
+            if (selectedValue === '1') {
+                const { columns, data } = generateData(1000, 100);
+                grid.loadColumns(columns);
+                grid.loadData(data);
+            } else if (selectedValue === '2') {
+                const { columns, data } = generateData(1000, 100);
+                grid.loadColumns(columns);
+                grid.loadData(data);
+            } else if (selectedValue === '3') {
+                const { columns, data } = generateData(100, 5000);
+                grid.loadColumns(columns);
+                grid.loadData(data);
+            }
+        });
+    </script>
+</html>

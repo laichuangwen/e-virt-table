@@ -95,6 +95,7 @@ export default defineConfig({
                             { text: '历史回退', link: '/zh/table/history' },
                             { text: '插槽（覆盖层）', link: '/zh/table/overlayer' },
                             { text: '自定义表头', link: '/zh/table/custom-header' },
+                            { text: '查找器', link: '/zh/table/finder-bar' },
                         ],
                     },
                     {
@@ -172,6 +173,7 @@ export default defineConfig({
                             { text: 'History', link: '/en/table/history' },
                             { text: 'Slot (Overlay)', link: '/en/table/overlayer' },
                             { text: 'Custom Header', link: '/en/table/custom-header' },
+                            { text: 'Finder Bar', link: '/en/table/finder-bar' },
                         ],
                     },
                     {
