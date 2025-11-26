@@ -6,6 +6,14 @@ Vx.x.x(TPL)
 -   Style changes
 -   Dependencies Changes
 -   
+V1.3.11
+### Bug Fixes
+
+- feat:多级表头已隐藏可点击父级显示
+- feat:添加表格查找器
+- docs:更新查找文档
+
+---  
 
 V1.3.10
 ### Bug Fixes
