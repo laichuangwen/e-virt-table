@@ -87,7 +87,7 @@ export class FinderBar {
                     });
                 }
             },
-            10,
+            5,
         );
         const { maxColIndex, maxRowIndex } = this.ctx;
         await this.batchRun(
@@ -106,7 +106,7 @@ export class FinderBar {
                     });
                 }
             },
-            10,
+            5,
         );
         this.hideLoading();
     }
