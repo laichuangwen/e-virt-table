@@ -135,7 +135,7 @@ type EVirtTableOptions = {
 | BODY_CELL_FORMATTER_METHOD | 自定义格式化 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — |
 | BODY_CELL_RULES_METHOD | 自定义校验规则 | ^[Function]`({row, column, rowIndex, colIndex,value})=>Rules\|viod` | — |
 | BODY_CELL_TYPE_METHOD | 自定义类型 | ^[Function]`({row, column, rowIndex, colIndex,value})=>Type\|viod` | — |
-| BODY_CELL_EDITOR_METHOD | 自定义编辑器类型 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — |
+| BODY_CELL_EDITOR_METHOD | 自定义编辑器类型 | ^[Function]`({row, column, rowIndex, colIndex,value})=>EditorOptions` | — |
 | BODY_CELL_RENDER_METHOD | 自定义单元格渲染 | ^[Function]`({row, column, rowIndex, colIndex,headIndex,visibleRows,rows})=>string\|viod` | — |
 | SPAN_METHOD | 自定义跨列/行渲染 | ^[Function]`({row, column, rowIndex, colIndex,value,visibleLeafColumns,headIndex,headPosition,visibleRows,rows})=>SpanType` | — |
 | SELECTABLE_METHOD | 自定义选择禁用 | ^[Function]`({row, rowIndex})=>boolean\|viod` | — |
@@ -295,6 +295,7 @@ type EVirtTableOptions = {
 | maxLineClampHeader | 表头最大溢出截断行数，默认`auto`根据内容撑开 | `auto,number` | auto |
 | autoRowHeight | 当前列行自适应高度 | boolean | false |
 | dragDisabled | 当前列禁用拖拽 | boolean | false |
+| selectorCellValueType | 选择器选择格子类型 | `SelectorCellValueType` | `value` |
 
 ## Row
 
@@ -445,5 +446,12 @@ type CustomHeader = {
     hideData?: Record<string, boolean>;
     resizableData?: Record<string, number>;
 };
+
+export type EditorOptions = {
+    type: string;
+    props: any;
+};
+
+type SelectorCellValueType = 'displayText' | 'value';
 
 ```

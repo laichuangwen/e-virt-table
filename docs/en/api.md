@@ -128,7 +128,7 @@ type EVirtTableOptions = {
 | BODY_CELL_FORMATTER_METHOD | Custom cell formatter | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|void` | — | — |
 | BODY_CELL_RULES_METHOD | Custom cell validation rules | ^[Function]`({row, column, rowIndex, colIndex,value})=>Rules\|void` | — | — |
 | BODY_CELL_TYPE_METHOD | Custom cell type | ^[Function]`({row, column, rowIndex, colIndex,value})=>Type\|void` | — | — |
-| BODY_CELL_EDITOR_METHOD | Custom cell editor type | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|void` | — | — |
+| BODY_CELL_EDITOR_METHOD | Custom cell editor type | ^[Function]`({row, column, rowIndex, colIndex,value})=>EditorOptions` | — | — |
 | BODY_CELL_RENDER_METHOD | Custom cell render method | ^[Function]`({row, column, rowIndex, colIndex,headIndex,visibleRows,rows})=>string\|void` | — | — |
 | SPAN_METHOD | Custom span method for column/row rendering | ^[Function]`({row, column, rowIndex, colIndex,value,visibleLeafColumns,headIndex,headPosition,visibleRows,rows})=>SpanType` | — | — |
 | SELECTABLE_METHOD | Custom selectable method | ^[Function]`({row, rowIndex})=>boolean\|void` | — | — |
@@ -293,6 +293,7 @@ type EVirtTableOptions = {
 | maxLineClampHeader | Maximum overflow truncation lines, default `auto` expands based on content | `auto,number` | auto |
 | autoRowHeight | Adaptive row height | boolean | false |
 | dragDisabled | Disable column drag for current column | boolean | false |
+| selectorCellValueType | Selector Cell Value Type | `SelectorCellValueType` | `value` |
 
 ## Row
 
@@ -445,4 +446,11 @@ type CustomHeader = {
     hideData?: Record<string, boolean>;
     resizableData?: Record<string, number>;
 };
+
+export type EditorOptions = {
+    type: string;
+    props: any;
+};
+
+type SelectorCellValueType = 'displayText' | 'value';
 ```
