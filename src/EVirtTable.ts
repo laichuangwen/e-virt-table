@@ -26,6 +26,7 @@ import ContextMenu from './ContextMenu';
 import { mergeColCell, mergeRowCell, getSpanArrByRow, getSpanObjByColumn } from './util';
 import './style.css';
 import Loading from './Loading';
+import { FinderBar } from './FinderBar';
 
 export default class EVirtTable {
     private options: EVirtTableOptions;
@@ -41,6 +42,7 @@ export default class EVirtTable {
     private overlayer: Overlayer;
     private contextMenu: ContextMenu;
     private loading: Loading;
+    private finderBar: FinderBar;
     private animationFrameId: number | undefined = undefined;
     private animationFrameId2: number | undefined = undefined;
     ctx: Context;
@@ -68,6 +70,7 @@ export default class EVirtTable {
         this.overlayer = new Overlayer(this.ctx);
         this.contextMenu = new ContextMenu(this.ctx);
         this.loading = new Loading(this.ctx);
+        this.finderBar = new FinderBar(this.ctx);
         this.ctx.on('draw', () => {
             this.draw();
         });
@@ -76,6 +79,7 @@ export default class EVirtTable {
         });
         this.draw();
     }
+
     private createContainer(
         containerElement: HTMLDivElement,
         _overlayerElement?: HTMLDivElement,
@@ -476,6 +480,7 @@ export default class EVirtTable {
         this.autofill.destroy();
         this.contextMenu.destroy();
         this.loading.destroy();
+        this.finderBar.destroy();
         this.ctx.destroy();
         this.ctx.containerElement.remove();
     }

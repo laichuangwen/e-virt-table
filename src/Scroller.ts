@@ -323,6 +323,9 @@ export default class Scroller {
         this.ctx.on('setScrollY', (scrollY: number) => {
             this.setScrollY(scrollY);
         });
+        this.ctx.on('scrollToIndex', (rowIndex: number, colIndex: number) => {
+            this.scrollToIndex(rowIndex, colIndex);
+        });
         this.ctx.on('cellHeaderMousedown', () => {
             this.mousedownHeader = true;
         });
@@ -415,18 +418,17 @@ export default class Scroller {
         const { header } = this.ctx;
         const cell = header.leafCellHeaders.find((cell) => cell.colIndex === colIndex);
         if (cell) {
-            // 移动到窗口中间/2
-            if (cell.x > header.visibleWidth / 2) {
-                this.setScrollX(cell.x - header.visibleWidth / 2);
-            }
+            this.setScrollX(cell.x - header.visibleWidth / 2);
         }
     }
     scrollToRowIndex(rowIndex: number) {
         const { body, database } = this.ctx;
         const { top } = database.getPositionForRowIndex(rowIndex);
-        if (top > body.visibleHeight) {
-            this.setScrollY(top - body.visibleHeight / 2);
-        }
+        this.setScrollY(top - body.visibleHeight / 2);
+    }
+    scrollToIndex(rowIndex: number, colIndex: number) {
+        this.scrollToRowIndex(rowIndex);
+        this.scrollToColIndex(colIndex);
     }
     scrollToRowKey(rowKey: string) {
         const { body, database } = this.ctx;

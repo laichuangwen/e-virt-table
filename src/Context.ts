@@ -10,6 +10,7 @@ import CellHeader from './CellHeader';
 import Row from './Row';
 import Cell from './Cell';
 import EventTable from './EventTable';
+import { FinderResult } from './FinderBar';
 export type ConfigType = Partial<typeof Config>;
 export type containerElementOptions = {
     containerElement: HTMLDivElement;
@@ -102,6 +103,7 @@ export default class Context {
     selectColsIng = false; // 选择列中
     selectRowsIng = false; // 选择行中
     dragHeaderIng = false; // 拖拽表头中
+    finding = false; // 查找中
     adjustPositioning = false; // 调整位置中
     contextMenuIng = false; // 右键菜单中
     editing = false; // 编辑中
@@ -176,6 +178,12 @@ export default class Context {
         enable: false,
         xArr: [-1, -1],
         yArr: [-1, -1],
+    };
+    finderBar: FinderResult={
+        text: '',
+        rowIndex: -1,
+        colIndex: -1,
+        type: 'body',
     };
     database: Database;
     history: History;

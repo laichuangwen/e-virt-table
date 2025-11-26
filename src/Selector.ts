@@ -114,6 +114,9 @@ export default class Selector {
             if (this.ctx.editing) {
                 return;
             }
+            if (this.ctx.finding) {
+                return;
+            }
             // CTRL+C／Command+C
             if ((e.ctrlKey && e.code === 'KeyV') || (e.metaKey && e.code === 'KeyV')) {
                 this.paste();

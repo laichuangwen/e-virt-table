@@ -146,6 +146,10 @@ export default class Config {
     CHECKBOX_KEY = '';
     /** 选择框颜色 */
     CHECKBOX_COLOR = 'rgb(82,146,247)';
+    /** 查找结果当前行颜色 */
+    FINDER_CELL_BG_COLOR = 'rgb(255,229,144)';
+    /** 启用查找 */
+    ENABLE_FINDER = true;
     /** 选择框大小 */
     CHECKBOX_SIZE = 20;
     /** 选择框禁用图标 */

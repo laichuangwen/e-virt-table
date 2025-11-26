@@ -59,6 +59,9 @@ export default class Editor {
             if (!this.ctx.focusCell) {
                 return;
             }
+            if (this.ctx.finding) {
+                return;
+            }
             if (e.code === 'Escape' && this.ctx.editing) {
                 this.cancel = true;
                 const { focusCell } = this.ctx;

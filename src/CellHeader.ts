@@ -142,6 +142,11 @@ export default class CellHeader extends BaseCell {
                 this.drawTextFont = font;
             }
         }
+        // 高亮查找结果
+        const {colKey, type } = this.ctx.finderBar;
+        if ( type === 'header' && colKey === this.key) {
+            bgColor = this.ctx.config.FINDER_CELL_BG_COLOR;
+        }
         this.drawCellBgColor = bgColor;
         this.drawTextColor = textColor;
     }

@@ -547,6 +547,8 @@ const eVirtTable = new EVirtTable(canvas, {
         ENABLE_COPY: true,
         ENABLE_PASTER: true,
         FOOTER_POSITION: 'bottom',
+        ENABLE_FINDER: true,
+        // FINDER_CELL_BG_COLOR: 'red',
         // ENABLE_SELECTOR_SINGLE: true,
         ENABLE_AUTOFILL_SPAN_COL: true,
         ENABLE_AUTOFILL_SPAN_ROW: true,

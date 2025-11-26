@@ -111,6 +111,7 @@ export default class Cell extends BaseCell {
         column: Column,
         row: any,
         cellType: CellType = 'body',
+        isUpdate = true, // 是否更新，虚拟的时候可能不需要更新，解决性能问题
     ) {
         super(ctx, x, y, width, height, cellType, column.fixed);
         this.visibleWidth = this.width;
@@ -148,7 +149,9 @@ export default class Cell extends BaseCell {
         this.formatter = column.formatter;
         this.formatterFooter = column.formatterFooter;
         this.maxLineClamp = column.maxLineClamp || 'auto';
-        this.update();
+        if (isUpdate) {
+            this.update();
+        }
     }
     setWidthHeight(width: number, height: number) {
         this.width = width;
@@ -493,6 +496,7 @@ export default class Cell extends BaseCell {
             HIGHLIGHT_HOVER_ROW_COLOR,
             STRIPE,
             STRIPE_COLOR,
+            FINDER_CELL_BG_COLOR,
         } = this.ctx.config;
         if (this.cellType === 'footer') {
             let bgColor = FOOTER_BG_COLOR;
@@ -596,6 +600,11 @@ export default class Cell extends BaseCell {
             if (font) {
                 this.drawTextFont = font;
             }
+        }
+        // 高亮查找结果
+        const { rowIndex, colIndex, type } = this.ctx.finderBar;
+        if (rowIndex === this.rowIndex && colIndex === this.colIndex && type === 'body') {
+            bgColor = FINDER_CELL_BG_COLOR;
         }
         this.drawCellBgColor = bgColor;
         this.drawTextColor = textColor;

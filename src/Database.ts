@@ -1504,6 +1504,7 @@ export default class Database {
         this.headerMap.set(key, cellHeader);
         return true;
     }
+    
     getReadonly(rowKey: string, key: string) {
         const { DISABLED } = this.ctx.config;
         // 禁用编辑
@@ -1805,13 +1806,13 @@ export default class Database {
         return this.validationErrorMap.get(_key) || [];
     }
     // 获取虚拟单元格,只针对可见的
-    getVirtualBodyCell(rowIndex: number, colIndex: number) {
+    getVirtualBodyCell(rowIndex: number, colIndex: number, isUpdate = true) {
         const column = this.getColumnByColIndex(colIndex);
         const row = this.getRowForRowIndex(rowIndex);
         if (!column || !row) {
             return;
         }
-        const cell = new Cell(this.ctx, rowIndex, colIndex, 0, 0, 0, 0, column, row.item, 'body');
+        const cell = new Cell(this.ctx, rowIndex, colIndex, 0, 0, 0, 0, column, row.item, 'body', isUpdate);
         return cell;
     }
     getVirtualBodyCellByKey(rowKey: string, key: string) {
