@@ -287,10 +287,11 @@ export default class Database {
                 for (const [key, value] of Object.entries(dataMap)) {
                     if (value !== undefined) obj[key] = value;
                 }
+                const allHide = children && children.every((item) => item.hide);// 所有子项都隐藏那父级也要隐藏
                 return {
                     ...column,
                     children,
-                    hide: typeof column.hide === 'function' ? column.hide(column) : column.hide,
+                    hide: allHide || (typeof column.hide === 'function' ? column.hide(column) : column.hide),
                     ...obj,
                 };
             });
@@ -1504,7 +1505,7 @@ export default class Database {
         this.headerMap.set(key, cellHeader);
         return true;
     }
-    
+
     getReadonly(rowKey: string, key: string) {
         const { DISABLED } = this.ctx.config;
         // 禁用编辑

@@ -144,7 +144,7 @@ let columns: Column[] = [
                             {
                                 title: '姓名113',
                                 key: 'emp_name113',
-                                hideDisabled: true,
+                                // hideDisabled: true,
                             },
                         ],
                     },
@@ -166,7 +166,7 @@ let columns: Column[] = [
                             {
                                 title: '姓名223',
                                 key: 'emp_name223',
-                                hideDisabled: true,
+                                // hideDisabled: true,
                             },
                         ],
                     },
@@ -256,7 +256,13 @@ let columns: Column[] = [
         hoverIconName: 'icon-date',
         sort: 2,
     },
-    { title: '工作地址', key: 'work_address' },
+    {
+        title: '工作地址',
+        key: 'work_address',
+        formatter: ({ value }) => {
+            return `工作11地址：${value}`;
+        },
+    },
     {
         title: '家庭地址',
         key: 'address',
@@ -280,7 +286,7 @@ let columns: Column[] = [
             });
             cellEl.style.minHeight = '36px';
             cellEl.style.opacity = '0.5';
-            cellEl.style.backgroundColor = 'cyan';
+            // cellEl.style.backgroundColor = 'cyan';
             cellEl.style.flex = 'none';
             cellEl.style.display = 'block';
             cellEl.style.padding = '8px';
