@@ -6,6 +6,14 @@ Vx.x.x(TPL)
 -   Style changes
 -   Dependencies Changes
 -   
+
+V1.3.12
+### Bug Fixes
+
+- fix:修复多级表头隐藏所有末级父级不隐藏导致选择器多一条选中线
+
+---  
+
 V1.3.12
 ### Bug Fixes
 

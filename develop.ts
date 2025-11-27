@@ -646,17 +646,17 @@ const eVirtTable = new EVirtTable(canvas, {
         //     };
         // },
         // 改变前需要篡改数据
-        BEFORE_VALUE_CHANGE_METHOD: (changeList) => {
-            let list: BeforeValueChangeItem[] = [
-                {
-                    rowKey: '1_0',
-                    key: 'emp_no',
-                    value: Math.random().toString(36).substring(2, 7),
-                },
-            ];
-            const data = [...changeList, ...list];
-            console.log('修改前数据', data);
-            return data;
+        // BEFORE_VALUE_CHANGE_METHOD: (changeList) => {
+            // let list: BeforeValueChangeItem[] = [
+            //     {
+            //         rowKey: '1_0',
+            //         key: 'emp_no',
+            //         value: Math.random().toString(36).substring(2, 7),
+            //     },
+            // ];
+            // const data = [...changeList, ...list];
+            // console.log('修改前数据', data);
+            // return data;
             // if(changeList.some((item) => item.key !== 'requiredQuantity')) {
             //     return changeList.map(item=>{
             //       item.row.emp_name = '张三111';
@@ -688,7 +688,7 @@ const eVirtTable = new EVirtTable(canvas, {
             //         resolve(ll);
             //     }, 1000);
             // });
-        },
+        // },
         // BEFORE_PASTE_DATA_METHOD: (changeList, xArr, yArr, texArr) => {
         //     console.log(yArr, texArr);
         //     const [minY, maxY] = yArr;
@@ -752,16 +752,15 @@ const eVirtTable = new EVirtTable(canvas, {
         //         }, 1000);
         //     });
         // },
-
-        BODY_CELL_STYLE_METHOD: (cell: any) => {
-            const { rowIndex, column, isHasChanged } = cell;
-            if (isHasChanged)
-                return {
-                    color: 'blue',
-                    backgroundColor: 'red',
-                };
-            return {};
-        },
+        // BODY_CELL_STYLE_METHOD: (cell: any) => {
+        //     const { rowIndex, column, isHasChanged } = cell;
+        //     if (isHasChanged)
+        //         return {
+        //             color: 'blue',
+        //             backgroundColor: 'red',
+        //         };
+        //     return {};
+        // },
         BODY_CELL_READONLY_METHOD: (params: any) => {
             const { rowIndex, column } = params;
             if (rowIndex == 15 && ['emp_name221', 'emp_name2'].includes(column.key)) {
