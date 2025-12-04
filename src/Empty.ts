@@ -18,12 +18,7 @@ export default class Tooltip {
             const top = headerHeight + (bodyHeight + footerHeight) / 2;
             const contentStyle = {
                 display: type === 'empty' ? 'block' : 'none',
-                position: 'absolute',
-                fontSize: '14px',
-                color: '#666',
-                left: '50%',
                 top: `${top}px`,
-                transform: 'translate(-50%, -50%)',
                 ...EMPTY_CUSTOM_STYLE,
             };
             Object.assign(this.emptyEl.style, contentStyle);

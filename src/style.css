@@ -15,7 +15,6 @@
     --evt-stripe-color: #fafafa;
     --evt-placeholder-color: #cdd0dc;
     --evt-header-bg-color: #f8faff;
-    --evt-body-bg-color: #fff;
     --evt-header-text-color: #1d2129;
     --evt-body-text-color: #4e5969;
     --evt-footer-text-color: #4e5969;
@@ -104,6 +103,7 @@
     left: 0px;
     top: 0px;
     box-sizing: border-box;
+    background-color: var(--evt-body-bg-color);
     border: none;
     outline: none;
     z-index: 10;
@@ -457,4 +457,13 @@
     height: 100%;
     color: #666;
     animation: rotate 1s linear infinite;
+}
+.e-virt-table-empty {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    color: #666;
+    z-index: 15;
 }
