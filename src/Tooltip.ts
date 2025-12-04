@@ -110,8 +110,14 @@ export default class Tooltip {
                 this.show(cell);
             }
         });
+        this.ctx.on('cellShowTooltip', (cell, message) => {
+            this.show(cell, message);
+        });
+        this.ctx.on('cellHideTooltip', () => {
+            this.hide();
+        });
     }
-    private show(cell: Cell) {
+    private show(cell: Cell, message?: string) {
         // 如果没有设置overflowTooltipShow=true，则不显示
         if (this.ctx.contextMenuIng) {
             return;
@@ -128,6 +134,9 @@ export default class Tooltip {
         // 如果有message，则显示message
         if (cell.message) {
             text = cell.message;
+        }
+        if (message) {
+            text = message;
         }
         const targetRect = this.ctx.containerElement.getBoundingClientRect();
         if (!targetRect) {

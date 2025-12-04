@@ -58,6 +58,8 @@ export default class Config {
     EMPTY_BODY_HEIGHT = 120;
     /** 自定义空样式 */
     EMPTY_CUSTOM_STYLE: Partial<CSSStyleDeclaration> = {};
+    /** 数字类型错误提示 */
+    NUMBER_ERROR_TIP = '只允许输入数字';
     /** 空数据文本 */
     EMPTY_TEXT = '暂无数据';
     /** 加载文本 */

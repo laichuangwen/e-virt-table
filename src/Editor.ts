@@ -229,6 +229,14 @@ export default class Editor {
         this.ctx.containerElement.appendChild(this.editorEl);
     }
     private autoSize() {
+        // 针对数字类型提示错误信息
+        const value = this.inputEl.value;
+        if (this.cellTarget && this.cellTarget.type === 'number' && value !== '') {
+            this.ctx.emit('cellHideTooltip');
+            if (!/^-?\d+(\.\d+)?$/.test(value)) {
+                this.ctx.emit('cellShowTooltip', this.cellTarget, this.ctx.config.NUMBER_ERROR_TIP);
+            }
+        }
         this.inputEl.style.height = 'auto'; // 重置高度
         let scrollHeight = this.inputEl.scrollHeight;
         let maxHeight = this.ctx.body.visibleHeight;
@@ -397,6 +405,7 @@ export default class Editor {
             return;
         }
         this.doneEditByInput();
+        this.ctx.emit('cellHideTooltip');
         this.ctx.emit('doneEdit', this.cellTarget);
         this.enable = false;
         this.ctx.editing = false;
