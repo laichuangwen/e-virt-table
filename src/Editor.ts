@@ -334,10 +334,6 @@ export default class Editor {
         if (!ENABLE_EDIT_CLICK_SELECTOR) {
             return;
         }
-        // 如果是调整边界位置，不进入编辑模式
-        if (this.ctx.adjustPositioning) {
-            return;
-        }
         const focusCell = this.ctx.focusCell;
         if (!focusCell) {
             return;
@@ -356,6 +352,7 @@ export default class Editor {
             return;
         }
         const { rowKey, key } = focusCell;
+        
         const readonly = this.ctx.database.getReadonly(rowKey, key);
         if (focusCell && !readonly) {
             this.enable = true;
