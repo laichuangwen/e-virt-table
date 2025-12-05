@@ -38,10 +38,6 @@ export default class EventTable {
 
         // 按下事件
         this.ctx.on('mousedown', (e) => {
-            // 左边点击
-            if (e.button !== 0) {
-                return;
-            }
             // 是否忙碌，进行其他操作
             if (this.isBusy(e)) {
                 return;
@@ -49,6 +45,19 @@ export default class EventTable {
             const { offsetY, offsetX } = this.ctx.getOffset(e);
             const y = offsetY;
             const x = offsetX;
+            // 判断是否在body外部
+            const {
+                body: { height, visibleHeight, visibleWidth, y: bodyY },
+            } = this.ctx;
+            const realityHeight = Math.min(height, visibleHeight);
+            const isInBody = x > 0 && x < visibleWidth && y > bodyY && y < bodyY + realityHeight;
+            if (!isInBody) {
+                this.ctx.emit('mousedownBodyOutside', e);
+            }
+            // 左边点击
+            if (e.button !== 0) {
+                return;
+            }
             this.handleHeaderEvent(x, y, this.ctx.header.renderCellHeaders, (cell: CellHeader) => {
                 this.ctx.focusCellHeader = cell;
                 this.ctx.focusCell = undefined;

@@ -37,12 +37,6 @@ export default class Editor {
                 this.doneEdit();
             }
         });
-        this.ctx.on('cellHeaderMousedown', () => {
-            if (this.enable) {
-                this.doneEdit();
-            }
-            this.cellTarget = null;
-        });
         this.ctx.on('hoverIconClick', (cell) => {
             if (this.ctx.disableHoverIconClick) {
                 return;
@@ -195,6 +189,12 @@ export default class Editor {
                     this.startEdit();
                 }
             }
+        });
+        this.ctx.on('mousedownBodyOutside', () => {
+            if (this.enable) {
+                this.doneEdit();
+            }
+            this.cellTarget = null;
         });
     }
     private isInSelectorRange(rowIndex: number, colIndex: number) {
@@ -352,7 +352,7 @@ export default class Editor {
             return;
         }
         const { rowKey, key } = focusCell;
-        
+
         const readonly = this.ctx.database.getReadonly(rowKey, key);
         if (focusCell && !readonly) {
             this.enable = true;
