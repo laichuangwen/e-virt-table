@@ -383,12 +383,12 @@ export default class Body {
         this.renderRows = rows;
         this.ctx.body.renderRows = rows;
     }
-    updateAutoHeight() {
+    updateAutoHeight(): boolean {
         const rows = this.ctx.body.renderRows;
         const hasAutoHeight = rows.some((row) => row.calculatedHeightCells.length > 0);
         // 如果没有计算格子，不更新
         if (!hasAutoHeight) {
-            return;
+            return false;
         }
         // 更新计算高度
         rows.forEach((row) => {
@@ -399,7 +399,7 @@ export default class Body {
             height: row.calculatedHeight,
             rowIndex: row.rowIndex,
         }));
-        this.ctx.database.setBatchCalculatedRowHeight(heights);
+        return this.ctx.database.setBatchCalculatedRowHeight(heights);
     }
     draw() {
         // 容器背景

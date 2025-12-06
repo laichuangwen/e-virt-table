@@ -928,11 +928,7 @@ export default class Cell extends BaseCell {
                 top = `${this.drawY - this.ctx.footer.y}px`;
             }
         }
-        // 防止闪烁
-        if (this.autoRowHeight && this.ctx.database.getOverlayerAutoHeight(this.rowIndex, this.colIndex) === 0) {
-            left = '-99999px';
-            top = '-99999px';
-        }
+
         return {
             position: 'absolute',
             overflow: 'hidden',

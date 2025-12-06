@@ -218,14 +218,14 @@ export default class Database {
         this.clearBufferData(); // 清除缓存数据
     }
     // 批量设置计算行高度
-    setBatchCalculatedRowHeight(rowIndexHeightList: { rowIndex: number; height: number }[]) {
+    setBatchCalculatedRowHeight(rowIndexHeightList: { rowIndex: number; height: number }[]): boolean {
         // 判断是否需要更新
-        const isNeedUpdate = rowIndexHeightList.every(({ height, rowIndex }) => {
+        const isNoNeedUpdate = rowIndexHeightList.every(({ height, rowIndex }) => {
             const position = this.getPositionForRowIndex(rowIndex);
             return position.calculatedHeight === height;
         });
-        if (isNeedUpdate) {
-            return;
+        if (isNoNeedUpdate) {
+            return false;
         }
         rowIndexHeightList.forEach(({ rowIndex, height }) => {
             const rowKey = this.rowIndexRowKeyMap.get(rowIndex);
@@ -244,7 +244,7 @@ export default class Database {
         });
         this.clearBufferData(); // 清除缓存数据
         this.getData(); // 重新获取数据
-        this.ctx.emit('draw');
+        return true;
     }
     /**
      * 清除最大行高记录

@@ -44,7 +44,6 @@ export default class EVirtTable {
     private loading: Loading;
     private finderBar: FinderBar;
     private animationFrameId: number | undefined = undefined;
-    private animationFrameId2: number | undefined = undefined;
     ctx: Context;
 
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
@@ -113,30 +112,30 @@ export default class EVirtTable {
             contextMenuElement,
         };
     }
+    private doDraw(ignoreOverlayer = false) {
+        this.header.update();
+        this.footer.update();
+        this.body.update();
+        this.ctx.paint.clear();
+        this.body.draw();
+        this.footer.draw();
+        this.header.draw();
+        this.scroller.draw();
+        // 忽略重绘覆盖层，解决按下事件时，重绘覆盖层导致事件无法触发，目前只在Selector中按下事件使用
+        if (!ignoreOverlayer) {
+            this.overlayer.draw();
+        }
+    }
     draw(ignoreOverlayer = false) {
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
         }
         this.animationFrameId = requestAnimationFrame(() => {
-            this.header.update();
-            this.footer.update();
-            this.body.update();
-            this.ctx.paint.clear();
-            this.body.draw();
-            this.footer.draw();
-            this.header.draw();
-            this.scroller.draw();
-            // 忽略重绘覆盖层，解决按下事件时，重绘覆盖层导致事件无法触发，目前只在Selector中按下事件使用
-            if (!ignoreOverlayer) {
-                this.overlayer.draw();
+            this.doDraw(ignoreOverlayer);
+            const needReDraw = this.body.updateAutoHeight();
+            if (needReDraw) {
+                this.doDraw(ignoreOverlayer);
             }
-            // 更新自动高度放在第二帧，避免影响绘制性能
-            if (this.animationFrameId2) {
-                cancelAnimationFrame(this.animationFrameId2);
-            }
-            this.animationFrameId2 = requestAnimationFrame(() => {
-                this.body.updateAutoHeight();
-            });
         });
     }
     loadConfig(_config: ConfigType) {
