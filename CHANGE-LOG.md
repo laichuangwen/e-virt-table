@@ -6,6 +6,11 @@ Vx.x.x(TPL)
 -   Style changes
 -   Dependencies Changes
 -   
+V1.3.15
+### Bug Fixes
+
+- fix:修复doneEdit后编辑器没有被遮住
+---  
 
 V1.3.14
 ### Bug Fixes

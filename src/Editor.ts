@@ -401,12 +401,19 @@ export default class Editor {
         if (!this.enable) {
             return;
         }
+        const {
+            header,
+            config: { CELL_HEIGHT },
+        } = this.ctx;
         this.doneEditByInput();
         this.ctx.emit('cellHideTooltip');
         this.ctx.emit('doneEdit', this.cellTarget);
         this.enable = false;
         this.ctx.editing = false;
         this.inputEl.style.display = 'inline-block';
+        this.editorEl.style.left = '0px';
+        this.editorEl.style.top = `${header.height}px`;
+        this.editorEl.style.maxHeight = `${CELL_HEIGHT}px`;
         this.editorEl.style.zIndex = '-1';
         setTimeout(() => {
             this.inputEl.focus({ preventScroll: true });
