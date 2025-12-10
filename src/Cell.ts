@@ -931,9 +931,6 @@ export default class Cell extends BaseCell {
         // 定位到居中
         if (this.autoRowHeight && this.render && this.verticalAlign === 'middle') {
             const renderHeight = this.ctx.database.getOverlayerAutoHeight(this.rowIndex, this.colIndex);
-            if (this.colIndex === 1) {
-                console.log('renderHeight', renderHeight, this.visibleHeight, this.key);
-            }
             if (renderHeight < this.visibleHeight && renderHeight > 0) {
                 const remainTop = (this.visibleHeight - renderHeight) / 2;
                 top = top + remainTop;
