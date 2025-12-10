@@ -7,7 +7,17 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -   
 
-V1.3.12
+V1.3.14
+### Bug Fixes
+
+- feat:数字类型编辑器添加提示
+- fix:解决空数据时编辑器还存在
+- fix:body数据量少时点击body空白位置，编辑器没有关闭
+- fix:优化自适应高度出现抖动或错位问题及覆盖层丢失问题
+- fix:覆盖层Cell偏移1px问题
+---  
+
+V1.3.13
 ### Bug Fixes
 
 - fix:修复多级表头隐藏所有末级父级不隐藏导致选择器多一条选中线
