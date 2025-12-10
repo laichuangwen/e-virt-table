@@ -914,26 +914,41 @@ export default class Cell extends BaseCell {
      * 获取样式
      */
     getOverlayerViewsStyle() {
-        let left = `${this.drawX - this.ctx.fixedLeftWidth}px`;
-        let top = `${this.drawY - this.ctx.body.y}px`;
+        let left = this.drawX - this.ctx.fixedLeftWidth;
+        let top = this.drawY - this.ctx.body.y;
         // 固定列
         if (this.fixed === 'left') {
-            left = `${this.drawX}px`;
+            left = this.drawX;
         } else if (this.fixed === 'right') {
-            left = `${this.drawX - (this.ctx.stageWidth - this.ctx.fixedRightWidth)}px`;
+            left = this.drawX - (this.ctx.stageWidth - this.ctx.fixedRightWidth);
         }
         // 合计
         if (this.cellType === 'footer') {
             if (this.ctx.config.FOOTER_FIXED) {
-                top = `${this.drawY - this.ctx.footer.y}px`;
+                top = this.drawY - this.ctx.footer.y;
             }
         }
-
+        // 定位到居中
+        if (this.autoRowHeight && this.render && this.verticalAlign === 'middle') {
+            const renderHeight = this.ctx.database.getOverlayerAutoHeight(this.rowIndex, this.colIndex);
+            if (this.colIndex === 1) {
+                console.log('renderHeight', renderHeight, this.visibleHeight, this.key);
+            }
+            if (renderHeight < this.visibleHeight && renderHeight > 0) {
+                const remainTop = (this.visibleHeight - renderHeight) / 2;
+                top = top + remainTop;
+            }
+        }
+        // 防止覆盖层叠加显示,直接隐藏后显示
+        if (this.autoRowHeight && this.ctx.database.getOverlayerAutoHeight(this.rowIndex, this.colIndex) === 0) {
+            left = -99999;
+            top = -99999;
+        }
         return {
             position: 'absolute',
             overflow: 'hidden',
-            left,
-            top,
+            left:`${Math.round(left - 1)}px`,
+            top:`${Math.round(top - 1)}px`,
             width: `${this.visibleWidth}px`,
             height: this.autoRowHeight ? `auto` : `${this.visibleHeight}px`,
             // height: `${this.visibleHeight}px`,

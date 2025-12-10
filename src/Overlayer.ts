@@ -27,23 +27,15 @@ export default class Overlayer {
                 // 当 DOM 发生变化时执行的回调
                 const elements = this.ctx.overlayerElement.querySelectorAll('[data-auto-height="true"]');
                 const map = new Map<string, number>();
-                elements.forEach((element) => {
+                elements.forEach((element: Element) => {
                     const rowIndex = Number(element.getAttribute('data-row-index'));
                     const colIndex = Number(element.getAttribute('data-col-index'));
-                    if (isNaN(rowIndex)) {
+                    if (isNaN(rowIndex) || isNaN(colIndex)) {
                         return;
                     }
-                    if (isNaN(colIndex)) {
-                        return;
-                    }
-                    if (!(element instanceof HTMLElement)) {
-                        return;
-                    }
-                    if (element.offsetWidth === 0) {
-                        return;
-                    }
+                    const rect = element.getBoundingClientRect();
                     const key = `${rowIndex}\u200b_${colIndex}`;
-                    map.set(key, Math.round(element.offsetHeight));
+                    map.set(key, Math.round(rect.height));
                 });
                 const overlayerAutoHeightMap = this.ctx.database.getOverlayerAutoHeightMap();
                 const isNeedUpdate = !this.arerMapsEqual(overlayerAutoHeightMap, map);
