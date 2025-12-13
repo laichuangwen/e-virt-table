@@ -444,9 +444,6 @@ export default class EVirtTable {
     clearSort() {
         this.ctx.database.clearSort();
     }
-    clearMaxRowHeight() {
-        this.ctx.database.clearMaxRowHeight();
-    }
     contextMenuHide() {
         this.contextMenu.hide();
     }

@@ -73,9 +73,20 @@ export default class Row {
     }
     updateCalculatedHeight() {
         const heights = this.calculatedHeightCells.map((cell) => {
-            return cell.getAutoHeight();
+            const calculatedHeight = cell.getAutoHeight();
+            const { key, height: curRowMaxHeight = -1 } = this.ctx.database.getMaxRowHeightItem(this.rowKey) || {};
+            // 设置最大值
+            if (calculatedHeight > curRowMaxHeight) {
+                this.ctx.database.setMaxRowHeightItem(this.rowKey, cell.key, calculatedHeight);
+            } else if (calculatedHeight !== 0 && cell.key === key && calculatedHeight < curRowMaxHeight) {
+                // 如果计算高度小于当前最大值，则设置为当前最大值
+                this.ctx.database.setMaxRowHeightItem(this.rowKey, cell.key, calculatedHeight);
+            }
+            return calculatedHeight;
         });
+        // 获取最高高度
         this.calculatedHeight = heights.length ? Math.max(...heights) : -1;
+        return this.calculatedHeight;
     }
     drawCenter() {
         this.noFixedCells.forEach((cell) => {

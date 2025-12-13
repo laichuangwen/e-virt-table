@@ -304,6 +304,10 @@ export type EditorOptions = {
     type: string;
     props: any;
 };
+export type RowMaxHeightData = {
+    key: string;
+    height: number;
+};
 export type ConfigType = Partial<Config>;
 export type FilterMethod = (rows: any[]) => any[];
 export type FormatterMethod = (params: CellParams) => string | void;
