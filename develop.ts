@@ -535,7 +535,6 @@ const eVirtTable = new EVirtTable(canvas, {
         // CHECKBOX_KEY: 'emp_name',
         ENABLE_DRAG_COLUMN: true,
         AUTO_ROW_HEIGHT: true,
-        REMEMBER_MAX_ROW_HEIGHT: true,
         ROW_KEY: 'id',
         CELL_HEIGHT: 36,
         SELECTOR_AREA_MIN_X: 1,
