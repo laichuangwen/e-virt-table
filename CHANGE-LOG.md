@@ -11,6 +11,7 @@ V1.3.16
 
 - fix:修复键盘NumpadEnter不生效
 - fix:优化自动行高逻辑去除记录高度属性默认内部动态算
+- feat:添加showColumns、fixedColumns方法
 ---  
 V1.3.15
 ### Bug Fixes

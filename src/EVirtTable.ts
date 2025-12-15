@@ -6,6 +6,7 @@ import {
     EventCallback,
     EVirtTableOptions,
     FilterMethod,
+    Fixed,
     Position,
     RowParams,
     ValidateField,
@@ -171,6 +172,16 @@ export default class EVirtTable {
     }
     getCustomHeader() {
         return this.header.getCustomHeader();
+    }
+    showColumns(keys: string[], show = true) {
+        this.ctx.database.setCustomHeaderHideData(keys, !show);
+        this.header.init();
+        this.ctx.emit('draw');
+    }
+    fixedColumns(keys: string[], fixed: Fixed | '') {
+        this.ctx.database.setCustomHeaderFixedData(keys, fixed);
+        this.header.init();
+        this.ctx.emit('draw');
     }
 
     setLoading(loading: boolean) {

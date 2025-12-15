@@ -646,47 +646,47 @@ const eVirtTable = new EVirtTable(canvas, {
         // },
         // 改变前需要篡改数据
         // BEFORE_VALUE_CHANGE_METHOD: (changeList) => {
-            // let list: BeforeValueChangeItem[] = [
-            //     {
-            //         rowKey: '1_0',
-            //         key: 'emp_no',
-            //         value: Math.random().toString(36).substring(2, 7),
-            //     },
-            // ];
-            // const data = [...changeList, ...list];
-            // console.log('修改前数据', data);
-            // return data;
-            // if(changeList.some((item) => item.key !== 'requiredQuantity')) {
-            //     return changeList.map(item=>{
-            //       item.row.emp_name = '张三111';
-            //     });
-            // }
-            // return new Promise((resolve) => {
-            //     setTimeout(() => {
-            //         const ll = changeList.map((item) => {
-            //             const { value, key, rowKey, oldValue } = item;
-            //             if (key === 'requiredQuantity') {
-            //                 // 清空的
-            //                 if ([null, '', undefined].includes(value)) {
-            //                     return item;
-            //                 }
-            //                 // 数字的
-            //                 if (!isNaN(value) && Number(value) < 1000000000) {
-            //                     return {
-            //                         ...item,
-            //                         value: Number(value),
-            //                     };
-            //                 }
-            //                 return {
-            //                     ...item,
-            //                     value: oldValue,
-            //                 };
-            //             }
-            //             return item;
-            //         });
-            //         resolve(ll);
-            //     }, 1000);
-            // });
+        // let list: BeforeValueChangeItem[] = [
+        //     {
+        //         rowKey: '1_0',
+        //         key: 'emp_no',
+        //         value: Math.random().toString(36).substring(2, 7),
+        //     },
+        // ];
+        // const data = [...changeList, ...list];
+        // console.log('修改前数据', data);
+        // return data;
+        // if(changeList.some((item) => item.key !== 'requiredQuantity')) {
+        //     return changeList.map(item=>{
+        //       item.row.emp_name = '张三111';
+        //     });
+        // }
+        // return new Promise((resolve) => {
+        //     setTimeout(() => {
+        //         const ll = changeList.map((item) => {
+        //             const { value, key, rowKey, oldValue } = item;
+        //             if (key === 'requiredQuantity') {
+        //                 // 清空的
+        //                 if ([null, '', undefined].includes(value)) {
+        //                     return item;
+        //                 }
+        //                 // 数字的
+        //                 if (!isNaN(value) && Number(value) < 1000000000) {
+        //                     return {
+        //                         ...item,
+        //                         value: Number(value),
+        //                     };
+        //                 }
+        //                 return {
+        //                     ...item,
+        //                     value: oldValue,
+        //                 };
+        //             }
+        //             return item;
+        //         });
+        //         resolve(ll);
+        //     }, 1000);
+        // });
         // },
         // BEFORE_PASTE_DATA_METHOD: (changeList, xArr, yArr, texArr) => {
         //     console.log(yArr, texArr);
@@ -1222,10 +1222,10 @@ document.getElementById('getChangedValues')?.addEventListener('click', () => {
 });
 
 document.getElementById('visible')?.addEventListener('click', () => {
-    eVirtTable.setCustomHeader({ hideData: {} });
+    eVirtTable.showColumns(['phone', 'sex'], true);
 });
 document.getElementById('hide')?.addEventListener('click', () => {
-    eVirtTable.setCustomHeader({ hideData: { phone: true } });
+    eVirtTable.showColumns(['phone', 'sex'], false);
 });
 
 const customHeader = localStorage.getItem('customHeader');
