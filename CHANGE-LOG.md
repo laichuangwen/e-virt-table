@@ -6,6 +6,12 @@ Vx.x.x(TPL)
 -   Style changes
 -   Dependencies Changes
 -   
+V1.3.16
+### Bug Fixes
+
+- fix:修复键盘NumpadEnter不生效
+- fix:优化自动行高逻辑去除记录高度属性默认内部动态算
+---  
 V1.3.15
 ### Bug Fixes
 
