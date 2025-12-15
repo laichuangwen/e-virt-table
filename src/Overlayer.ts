@@ -48,7 +48,12 @@ export default class Overlayer {
                 }
             }, 16.67),
         );
-        this.observer.observe(this.ctx.overlayerElement, { childList: true, subtree: true, attributes: true });
+        this.observer.observe(this.ctx.overlayerElement, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            characterData: true,
+        });
         // 自定义覆盖层时，不监听覆盖层变化
         if (this.ctx.overlayerElement.getAttribute('data-overlayer') === 'default') {
             this.ctx.on('overlayerChange', (container) => {

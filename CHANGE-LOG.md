@@ -6,6 +6,12 @@ Vx.x.x(TPL)
 -   Style changes
 -   Dependencies Changes
 -   
+
+V1.3.17
+### Bug Fixes
+
+- fix:修复MutationObserver只改文本不改结构高度不会重新算
+---  
 V1.3.16
 ### Bug Fixes
 
