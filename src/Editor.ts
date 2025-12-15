@@ -66,7 +66,7 @@ export default class Editor {
                 this.doneEdit();
                 return;
             }
-            if ((e.altKey || e.metaKey) && e.code === 'Enter' && this.ctx.editing && this.inputEl) {
+            if ((e.altKey || e.metaKey) && e.key === 'Enter' && this.ctx.editing && this.inputEl) {
                 e.preventDefault();
                 const cursorPos = this.inputEl.selectionStart; // 获取光标位置
                 const textBefore = this.inputEl.value.substring(0, cursorPos); // 光标前的文本
@@ -88,7 +88,7 @@ export default class Editor {
                 this.ctx.emit('setMoveFocus', 'RIGHT');
                 return;
             }
-            if (e.code === 'Enter' && this.ctx.editing) {
+            if (e.key === 'Enter' && this.ctx.editing) {
                 e.preventDefault();
                 this.doneEdit();
                 if (e.shiftKey) {
@@ -98,7 +98,7 @@ export default class Editor {
                 this.ctx.emit('setMoveFocus', 'BOTTOM');
                 return;
             }
-            if (e.code === 'Enter' && !this.ctx.editing) {
+            if (e.key === 'Enter' && !this.ctx.editing) {
                 e.preventDefault();
                 this.startEdit();
                 return;

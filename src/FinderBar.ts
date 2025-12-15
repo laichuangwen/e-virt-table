@@ -47,12 +47,12 @@ export class FinderBar {
                     this.hide();
                     return;
                 }
-                if (e.code === 'ArrowUp' || (e.shiftKey && e.code === 'Enter')) {
+                if (e.code === 'ArrowUp' || (e.shiftKey && e.key === 'Enter')) {
                     e.preventDefault();
                     this.navigatePrevious();
                     return;
                 }
-                if (e.code === 'ArrowDown' || e.code === 'Enter') {
+                if (e.code === 'ArrowDown' || e.key === 'Enter') {
                     e.preventDefault();
                     this.navigateNext();
                     return;
