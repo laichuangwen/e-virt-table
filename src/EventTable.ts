@@ -251,7 +251,7 @@ export default class EventTable {
     }
     private hoverIconClick(cell: Cell) {
         // 鼠标移动到图标上会变成pointer，所以这里判断是否是pointer就能判断出是图标点击的
-        if (cell.hoverIconName && this.ctx.isPointer) {
+        if (cell.hoverIconName && this.ctx.isPointer && !this.ctx.disableHoverIconClick) {
             this.ctx.emit('hoverIconClick', cell);
         }
     }

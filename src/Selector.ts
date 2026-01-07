@@ -78,7 +78,9 @@ export default class Selector {
             this.ctx.selectorMove = false;
             this.ctx.stopAdjustPosition();
             this.ctx.adjustPositioning = false;
-            this.ctx.disableHoverIconClick = false;
+            setTimeout(() => {
+                this.ctx.disableHoverIconClick = false;
+            }, 0);
         });
         this.ctx.on('cellHeaderHoverChange', (cell) => {
             if (this.ctx.mousedown) {
