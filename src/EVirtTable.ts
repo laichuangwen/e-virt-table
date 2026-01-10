@@ -348,6 +348,12 @@ export default class EVirtTable {
         }
     }
     getValidations() {
+        // 禁用不验证
+        if (this.ctx.config.DISABLED) {
+            return new Promise((resolve) => {
+                resolve([]);
+            });
+        }
         return new Promise(async (resolve, reject) => {
             const data = this.ctx.database.getAllRowsData();
             const leafCellHeaders = this.ctx.header.leafCellHeaders;
@@ -473,6 +479,9 @@ export default class EVirtTable {
     clearChangeData() {
         this.ctx.database.clearChangeData();
         this.ctx.emit('draw');
+    }
+    getReadonly(rowKey: string, key: string) {
+        return this.ctx.database.getReadonly(rowKey, key);
     }
 
     /**

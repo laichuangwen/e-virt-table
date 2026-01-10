@@ -1512,6 +1512,13 @@ export default class Database {
         return this.validationErrorMap.size !== 0;
     }
     getValidator(rowKey: string, key: string) {
+        // 只读不验证
+        const readonly = this.ctx.database.getReadonly(rowKey, key);
+        if (readonly) {
+            return new Promise((resolve) => {
+                resolve([]);
+            });
+        }
         return new Promise((resolve) => {
             const row = this.rowKeyMap.get(rowKey);
             const colHeader = this.headerMap.get(key);
