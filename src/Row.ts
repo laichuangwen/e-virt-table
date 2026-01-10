@@ -78,7 +78,7 @@ export default class Row {
             // 设置最大值
             if (calculatedHeight > curRowMaxHeight) {
                 this.ctx.database.setMaxRowHeightItem(this.rowKey, cell.key, calculatedHeight);
-            } else if (calculatedHeight !== 0 && cell.key === key && calculatedHeight < curRowMaxHeight) {
+            } else if (cell.key === key && calculatedHeight < curRowMaxHeight) {
                 // 如果计算高度小于当前最大值，则设置为当前最大值
                 this.ctx.database.setMaxRowHeightItem(this.rowKey, cell.key, calculatedHeight);
             }

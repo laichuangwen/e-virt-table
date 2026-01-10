@@ -941,17 +941,24 @@ export default class Cell extends BaseCell {
             left = -99999;
             top = -99999;
         }
+        let autoStyle = {};
+        if (this.rowspan === 0) {
+            autoStyle = {
+                display: 'none',
+            };
+        }
         return {
             position: 'absolute',
             overflow: 'hidden',
-            left:`${Math.round(left - 1)}px`,
-            top:`${Math.round(top - 1)}px`,
+            left: `${Math.round(left - 1)}px`,
+            top: `${Math.round(top - 1)}px`,
             width: `${this.visibleWidth}px`,
-            height: this.autoRowHeight ? `auto` : `${this.visibleHeight}px`,
+            height: this.autoRowHeight ? 'auto' : `${this.visibleHeight}px`,
             // height: `${this.visibleHeight}px`,
             // minHeight: `${this.visibleHeight}px`,
             pointerEvents: 'initial',
             userSelect: 'none',
+            ...autoStyle,
         };
     }
     drawContainer() {
