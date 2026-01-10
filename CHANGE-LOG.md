@@ -7,6 +7,13 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -   
 
+V1.3.18
+### Bug Fixes
+- feat:添加只读Cell不校验
+- fix:修复合并单元格时autoHeight计算行高错误及合并单元格编辑时高度只增不减
+- fix: 修复hoverIconClick框选选和填充时,鼠标在图标上会触发
+---  
+
 V1.3.17
 ### Bug Fixes
 
