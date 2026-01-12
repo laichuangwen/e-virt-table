@@ -642,7 +642,13 @@ export default class Database {
                 if (['', undefined, null].includes(_value)) {
                     value = null;
                 } else if (/^-?\d+(\.\d+)?$/.test(`${_value}`)) {
-                    value = Number(_value);
+                    // 精度处理
+                    if (cell.precision !== undefined && cell.precision >= 0) {
+                        const factor = 10 ** cell.precision;
+                        value = Math.round(Number(_value) * factor) / factor;
+                    } else {
+                        value = Number(_value);
+                    }
                 } else {
                     value = oldValue;
                     errList.push({

@@ -181,6 +181,7 @@ export interface Column {
     selectorCellValueType?: SelectorCellValueType;
     maxLineClamp?: LineClampType; // 行高超出多少行显示省略号
     maxLineClampHeader?: LineClampType; // 表头行高超出多少行显示省略号
+    precision?: number; // 精度
 }
 export type LineClampType = number | 'auto';
 export type HistoryAction = 'back' | 'forward' | 'none';
