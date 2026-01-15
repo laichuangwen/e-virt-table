@@ -183,7 +183,7 @@ export default class Autofill {
         if (this.ctx.config.ENABLE_MERGE_CELL_LINK && this.ctx.database.hasMergeCell(xArr, yArr) && !isOneValue) {
             const err: ErrorType = {
                 code: 'ERR_MERGED_CELLS_AUTOFILL',
-                message: 'Merged cells cannot span autofill data',
+                message: this.ctx.locale.getText('mergeCellNoFill'),
             };
             if (this.ctx.hasEvent('error')) {
                 this.ctx.emit('error', err);

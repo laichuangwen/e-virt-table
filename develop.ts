@@ -9,6 +9,8 @@ import {
     SelectableParams,
 } from './src/types';
 // import { mergeColCell, mergeRowCell } from './src/util';
+import enUS from './src/lang/en-US';
+import zhCN from './src/lang/zh-CN';
 
 const canvas = document.getElementById('e-virt-table') as HTMLDivElement;
 let columns: Column[] = [
@@ -391,6 +393,7 @@ let columns: Column[] = [
         align: 'left',
         hoverIconName: 'icon-edit',
         placeholder: '请输入',
+        precision: 2,
         // readonly: true,
         // rules: [
         //     {
@@ -565,10 +568,10 @@ const eVirtTable = new EVirtTable(canvas, {
         // SELECTOR_AREA_MIN_Y: 1,
         // SELECTOR_AREA_MAX_Y_OFFSET: 1,
         CONTEXT_MENU: [
-            { label: '复制', value: 'copy' },
-            { label: '剪切', value: 'cut' },
-            { label: '粘贴', value: 'paste' },
-            { label: '清空选中内容', value: 'clearSelected' },
+            { value: 'copy' },
+            { value: 'cut' },
+            { value: 'paste' },
+            { value: 'clearSelected' },
             {
                 label: '新增',
                 value: 'add',
@@ -1244,6 +1247,16 @@ eVirtTable.on('customHeaderChange', (customHeader) => {
 });
 document.getElementById('clearChangeData')?.addEventListener('click', () => {
     eVirtTable.clearChangeData();
+});
+document.getElementById('setLocaleZh')?.addEventListener('click', () => {
+    // 实例语言配置
+    EVirtTable.useLocale(zhCN);
+    eVirtTable.doLayout();
+});
+document.getElementById('setLocaleEn')?.addEventListener('click', () => {
+    // 全局默认语言配置
+    EVirtTable.useLocale(enUS);
+    eVirtTable.doLayout();
 });
 // 销毁
 function destroy() {

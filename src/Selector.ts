@@ -560,7 +560,7 @@ export default class Selector {
             } else {
                 const err: ErrorType = {
                     code: 'ERR_MERGED_CELLS_COPY',
-                    message: 'Merged cells cannot span copy data',
+                    message: this.ctx.locale.getText('mergeCellNoCopy'),
                 };
                 if (this.ctx.hasEvent('error')) {
                     this.ctx.emit('error', err);
@@ -687,7 +687,7 @@ export default class Selector {
                     ) {
                         const err: ErrorType = {
                             code: 'ERR_MERGED_CELLS_PASTE',
-                            message: 'Merged cells cannot span paste data',
+                            message: this.ctx.locale.getText('mergeCellNoPaste'),
                         };
                         if (this.ctx.hasEvent('error')) {
                             this.ctx.emit('error', err);

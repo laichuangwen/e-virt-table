@@ -34,7 +34,14 @@ export default class ContextMenu {
                 return;
             }
             const { ENABLE_CONTEXT_MENU, CUSTOM_BODY_CONTEXT_MENU, CONTEXT_MENU } = this.ctx.config;
-            const list = [...CONTEXT_MENU, ...CUSTOM_BODY_CONTEXT_MENU];
+            const contextMenu = CONTEXT_MENU.map((item) => {
+                const label = item.label || this.ctx.locale.getText(item.value);
+                return {
+                    ...item,
+                    label,
+                };
+            });
+            const list = [...contextMenu, ...CUSTOM_BODY_CONTEXT_MENU];
             if (!ENABLE_CONTEXT_MENU || list.length === 0) return;
             e.preventDefault();
             const { xArr, yArr } = this.ctx.selector;
@@ -84,7 +91,14 @@ export default class ContextMenu {
                 return;
             }
             const { HEADER_CONTEXT_MENU, CUSTOM_HEADER_CONTEXT_MENU, ENABLE_HEADER_CONTEXT_MENU } = this.ctx.config;
-            const list = [...HEADER_CONTEXT_MENU, ...CUSTOM_HEADER_CONTEXT_MENU];
+            const contextMenu = HEADER_CONTEXT_MENU.map((item) => {
+                const label = item.label || this.ctx.locale.getText(item.value);
+                return {
+                    ...item,
+                    label,
+                };
+            });
+            const list = [...contextMenu, ...CUSTOM_HEADER_CONTEXT_MENU];
             if (!ENABLE_HEADER_CONTEXT_MENU || list.length === 0) return;
             e.preventDefault();
             const { xArr } = this.ctx.selector;

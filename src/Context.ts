@@ -11,6 +11,7 @@ import Row from './Row';
 import Cell from './Cell';
 import EventTable from './EventTable';
 import { FinderResult } from './FinderBar';
+import Locale from './Locale';
 export type ConfigType = Partial<typeof Config>;
 export type containerElementOptions = {
     containerElement: HTMLDivElement;
@@ -76,6 +77,7 @@ export default class Context {
     private eventBus: EventBus;
     private eventBrowser: EventBrowser;
     private eventTable: EventTable;
+    locale: Locale = new Locale();
     containerElement: HTMLDivElement;
     stageElement: HTMLDivElement;
     canvasElement: HTMLCanvasElement;

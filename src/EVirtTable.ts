@@ -28,8 +28,9 @@ import { mergeColCell, mergeRowCell, getSpanArrByRow, getSpanObjByColumn } from 
 import './style.css';
 import Loading from './Loading';
 import { FinderBar } from './FinderBar';
-
+import { LangConfig } from './Locale';
 export default class EVirtTable {
+    static locale: LangConfig;
     private options: EVirtTableOptions;
     private scroller: Scroller;
     private header: Header;
@@ -46,7 +47,9 @@ export default class EVirtTable {
     private finderBar: FinderBar;
     private animationFrameId: number | undefined = undefined;
     ctx: Context;
-
+    static useLocale(langConfig: LangConfig) {
+        EVirtTable.locale = langConfig;
+    }
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
         this.options = options;
         const { overlayerElement, editorElement, emptyElement, contextMenuElement } = this.options;
@@ -122,6 +125,8 @@ export default class EVirtTable {
         this.footer.draw();
         this.header.draw();
         this.scroller.draw();
+        this.empty.draw();
+        this.loading.draw();
         // 忽略重绘覆盖层，解决按下事件时，重绘覆盖层导致事件无法触发，目前只在Selector中按下事件使用
         if (!ignoreOverlayer) {
             this.overlayer.draw();
@@ -482,6 +487,9 @@ export default class EVirtTable {
     }
     getReadonly(rowKey: string, key: string) {
         return this.ctx.database.getReadonly(rowKey, key);
+    }
+    useLocale(langConfig: LangConfig) {
+        this.ctx.locale.use(langConfig);
     }
 
     /**

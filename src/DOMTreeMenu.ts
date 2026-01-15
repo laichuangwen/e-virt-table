@@ -65,7 +65,7 @@ export class DOMTreeMenu {
         }
 
         const textSpan = this.createElement('span', 'e-virt-table-menu-item-text');
-        textSpan.textContent = item.label;
+        textSpan.textContent = item.label || '';
         contentContainer.appendChild(textSpan);
         menuItem.appendChild(contentContainer);
 

@@ -1,6 +1,5 @@
 import type Cell from './Cell';
 import type Context from './Context';
-
 export default class Editor {
     private editorEl!: HTMLDivElement;
     private inputEl!: HTMLTextAreaElement;
@@ -231,7 +230,8 @@ export default class Editor {
         if (this.cellTarget && this.cellTarget.type === 'number' && value !== '') {
             this.ctx.emit('cellHideTooltip');
             if (!/^-?\d+(\.\d+)?$/.test(value)) {
-                this.ctx.emit('cellShowTooltip', this.cellTarget, this.ctx.config.NUMBER_ERROR_TIP);
+                const numberErrorTip = this.ctx.locale.getText('numberErrorTip');
+                this.ctx.emit('cellShowTooltip', this.cellTarget, numberErrorTip);
             }
         }
         this.inputEl.style.height = 'auto'; // 重置高度

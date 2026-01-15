@@ -2,6 +2,7 @@ import type Cell from './Cell';
 import type CellHeader from './CellHeader';
 import type { Rule, Rules } from './Validator';
 import Config from './Config';
+// 变成可选类型
 export type OptionalizeExcept<T, K extends keyof T> = Partial<Omit<T, K>> & Required<Pick<T, K>>;
 export type EVirtTableOptions = {
     data: Record<string, any>[];
@@ -63,7 +64,7 @@ export type MenuItemEvent =
     | 'resetHeader'
     | 'visible';
 export type MenuItem = {
-    label: string;
+    label?: string;
     value: string | MenuItemEvent;
     event?: Function;
     icon?: string;

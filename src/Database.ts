@@ -673,7 +673,7 @@ export default class Database {
         if (errList.length) {
             const err: ErrorType = {
                 code: 'ERR_BATCH_SET_NUMBER_VALUE',
-                message: 'Assignment failed, not a numeric type',
+                message: this.ctx.locale.getText('invalidNumber'),
                 data: errList,
             };
             this.ctx.emit('error', err);
@@ -793,7 +793,7 @@ export default class Database {
                     value = oldValue;
                     const err: ErrorType = {
                         code: 'ERR_SET_NUMBER_VALUE',
-                        message: 'Assignment failed, not a numeric type',
+                        message: this.ctx.locale.getText('invalidNumber'),
                         data: [
                             {
                                 rowKey,

@@ -4,12 +4,12 @@ export default class Tooltip {
     private emptyEl: HTMLDivElement;
     constructor(ctx: Context) {
         this.ctx = ctx;
-        const { EMPTY_TEXT, EMPTY_CUSTOM_STYLE } = this.ctx.config;
+        const { EMPTY_CUSTOM_STYLE } = this.ctx.config;
         if (this.ctx.emptyElement) {
             this.emptyEl = this.ctx.emptyElement;
         } else {
             this.emptyEl = document.createElement('div');
-            this.emptyEl.innerText = EMPTY_TEXT;
+            this.emptyEl.innerText = this.getText();
         }
         this.emptyEl.className = 'e-virt-table-empty';
         this.emptyEl.style.display = 'none';
@@ -23,6 +23,15 @@ export default class Tooltip {
             };
             Object.assign(this.emptyEl.style, contentStyle);
         });
+    }
+    private getText() {
+        return this.ctx.config.EMPTY_TEXT || this.ctx.locale.getText('emptyText');
+    }
+    draw() {
+        if (this.ctx.emptyElement) {
+            return;
+        }
+        this.emptyEl.innerText = this.getText();
     }
     destroy() {
         this.emptyEl.remove();

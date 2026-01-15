@@ -58,12 +58,10 @@ export default class Config {
     EMPTY_BODY_HEIGHT = 120;
     /** 自定义空样式 */
     EMPTY_CUSTOM_STYLE: Partial<CSSStyleDeclaration> = {};
-    /** 数字类型错误提示 */
-    NUMBER_ERROR_TIP = '只允许输入数字';
     /** 空数据文本 */
-    EMPTY_TEXT = '暂无数据';
+    EMPTY_TEXT = '';
     /** 加载文本 */
-    LOADING_TEXT = '加载中...';
+    LOADING_TEXT = '';
     /** 最大高度，为 0 表示自适应高度根据 HEIGHT	 */
     MAX_HEIGHT = 1000;
     /** 区域边框圆角 */
@@ -309,23 +307,15 @@ export default class Config {
     /** 自定义提示样式 */
     TOOLTIP_CUSTOM_STYLE: Partial<CSSStyleDeclaration> = {};
     /** 自定义右键菜单 */
-    CONTEXT_MENU: MenuItem[] = [
-        { label: '复制', value: 'copy' },
-        { label: '剪切', value: 'cut' },
-        { label: '粘贴', value: 'paste' },
-        { label: '清空选中内容', value: 'clearSelected' },
-    ];
+    CONTEXT_MENU: MenuItem[] = [{ value: 'copy' }, { value: 'cut' }, { value: 'paste' }, { value: 'clearSelected' }];
     CUSTOM_BODY_CONTEXT_MENU: MenuItem[] = [];
     HEADER_CONTEXT_MENU: MenuItem[] = [
-        { label: '左固定', value: 'fixedLeft' },
-        { label: '右固定', value: 'fixedRight' },
-        { label: '取消固定', value: 'fixedNone' },
-        { label: '隐藏', value: 'hide' },
-        {
-            label: '显示',
-            value: 'visible',
-        },
-        { label: '恢复默认', value: 'resetHeader' },
+        { value: 'fixedLeft' },
+        { value: 'fixedRight' },
+        { value: 'fixedNone' },
+        { value: 'hide' },
+        { value: 'visible' },
+        { value: 'resetHeader' },
     ];
     CUSTOM_HEADER_CONTEXT_MENU: MenuItem[] = [];
     /** 格子多行文本行高,isAutoRowHeight才会生效 */
