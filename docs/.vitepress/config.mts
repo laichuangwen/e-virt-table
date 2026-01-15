@@ -23,7 +23,7 @@ export default defineConfig({
     locales: {
         zh: {
             label: '中文',
-            lang: 'zh',
+            lang: 'zh-CN',
             themeConfig: {
                 // https://vitepress.dev/reference/default-theme-config
                 search: {
@@ -120,7 +120,7 @@ export default defineConfig({
         },
         en: {
             label: 'English',
-            lang: 'en',
+            lang: 'en-US',
             themeConfig: {
                 // https://vitepress.dev/reference/default-theme-config
                 search: {

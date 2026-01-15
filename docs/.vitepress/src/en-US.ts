@@ -1,0 +1,21 @@
+export default {
+    numberErrorTip: 'Only numbers are allowed',
+    emptyText: 'No Data',
+    loadingText: 'Loading...',
+    copy: 'Copy',
+    cut: 'Cut',
+    paste: 'Paste',
+    clearSelected: 'Clear Selected',
+    fixedLeft: 'Fixed Left',
+    fixedRight: 'Fixed Right',
+    fixedNone: 'Unfixed',
+    hide: 'Hide',
+    visible: 'Visible',
+    resetHeader: 'Reset Default',
+    invalidNumber: 'Please enter a numeric value',
+    mergeCellNoFill: 'Merged cells cannot be filled',
+    mergeCellNoCopy: 'Merged cells cannot be copied',
+    mergeCellNoPaste: 'Merged cells cannot be pasted',
+    numberTruncated: 'The input number has been truncated to {precision} decimal places',
+};
+

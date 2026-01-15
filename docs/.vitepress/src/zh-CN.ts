@@ -1,0 +1,21 @@
+export default {
+    numberErrorTip: '只允许输入数字',
+    emptyText: '暂无数据',
+    loadingText: '加载中...',
+    copy: '复制',
+    cut: '剪切', 
+    paste: '粘贴',
+    clearSelected: '清空选中内容',
+    fixedLeft: '左固定',
+    fixedRight: '右固定',
+    fixedNone: '取消固定',
+    hide: '隐藏',
+    visible: '显示',
+    resetHeader: '恢复默认',
+    invalidNumber: '请输入数字类型',
+    mergeCellNoFill: '合并单元格不能填充',
+    mergeCellNoCopy: '合并单元格不能复制',
+    mergeCellNoPaste: '合并单元格不能粘贴',
+    numberTruncated: '输入的数字已截取至小数点后{precision}位',
+};
+

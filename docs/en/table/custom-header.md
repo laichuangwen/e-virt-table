@@ -62,12 +62,12 @@ type MenuItem = {
 };
 
 const HEADER_CONTEXT_MENU: MenuItem[] = [
-    { label: 'Fixed Left', value: 'fixedLeft' },
-    { label: 'Fixed Right', value: 'fixedRight' },
-    { label: 'Unfix', value: 'fixedNone' },
-    { label: 'Hide', value: 'hide' },
-    { label: 'Show', value: 'visible' },
-    { label: 'Reset Default', value: 'resetHeader' },
+    { value: 'fixedLeft' },
+    { value: 'fixedRight' },
+    { value: 'fixedNone' },
+    { value: 'hide' },
+    { value: 'visible' },
+    { value: 'resetHeader' },
 ];
 
 export type CustomHeader = {

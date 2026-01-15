@@ -322,10 +322,10 @@ type Rules = Rule[];
  
 ```ts
 CONTEXT_MENU: MenuItem[] = [
-        { label: 'Copy', value: 'copy' },
-        { label: 'Cut', value: 'cut' },
-        { label: 'Paste', value: 'paste' },
-        { label: 'Clear Selected', value: 'clearSelected' },
+        { value: 'copy' },
+        { value: 'cut' },
+        { value: 'paste' },
+        { value: 'clearSelected' },
 ];
 ```
 

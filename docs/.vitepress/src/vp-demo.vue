@@ -9,6 +9,14 @@ import IconTop from './icon-top.vue';
 import IconStart from './icon-start.vue';
 import { ElTooltip, ElIcon, ElCollapseTransition } from 'element-plus';
 import SourceCode from './vp-source-code.vue';
+import { useI18n } from '../theme/useI18n';
+import zhCN from './zh-CN';
+import enUS from './en-US';
+const { t, lang } = useI18n();
+const langConfig = {
+    'zh-CN': zhCN,
+    'en-US': enUS,
+};
 const [sourceVisible, toggleSourceVisible] = useToggle();
 
 const props = defineProps<{
@@ -40,7 +48,7 @@ const copyCode = async () => {
     try {
         await copy();
         ElMessage({
-            message: '复制成功！',
+            message: t('copySuccess'),
             type: 'success',
         });
     } catch (e: any) {}
@@ -86,9 +94,6 @@ const iframeRef = ref<HTMLIFrameElement | null>(null);
 let observer: MutationObserver | null = null;
 const isDark = ref(false);
 function shetTheme() {
-    if (!development) {
-        return;
-    }
     if (iframeRef.value) {
         const iframeDoc = iframeRef.value?.contentDocument;
         if (isDark.value) {
@@ -106,9 +111,20 @@ function shetTheme() {
         ready.value = true;
     }
 }
+type IframeWindow = Window & { EVirtTable?: any };
+function setLocale(lang: string) {
+    if (iframeRef.value) {
+        const iframeWindow = iframeRef.value?.contentWindow as IframeWindow | null;
+        if (iframeWindow && typeof iframeWindow.EVirtTable?.useLocale === 'function') {
+            const _lang = langConfig[lang as keyof typeof langConfig];
+            iframeWindow.EVirtTable.useLocale(_lang);
+        }
+    }
+}
 const ready = ref(false);
 const onIframeLoad = () => {
     shetTheme();
+    setLocale(lang.value);
 };
 onMounted(() => {
     isDark.value = document.documentElement.classList.contains('dark');
@@ -147,6 +163,7 @@ onUnmounted(() => {
                     v-else
                     ref="iframeRef"
                     :srcdoc="decodedRawSource"
+                    @load="onIframeLoad"
                     :style="{
                         width: props.width,
                         height: props.height,
@@ -154,22 +171,22 @@ onUnmounted(() => {
                 />
             </div>
             <div class="op-btns">
-                <ElTooltip content="全屏" :show-arrow="false">
+                <ElTooltip :content="t('fullScreen')" :show-arrow="false">
                     <ElIcon :size="16" class="op-btn" @click="enterFullscreen">
                         <icon-fullscreen></icon-fullscreen>
                     </ElIcon>
                 </ElTooltip>
-                <ElTooltip content="复制代码" :show-arrow="false">
+                <ElTooltip :content="t('copyCode')" :show-arrow="false">
                     <ElIcon :size="16" class="op-btn" @click="copyCode">
                         <icon-copy></icon-copy>
                     </ElIcon>
                 </ElTooltip>
-                <ElTooltip content="查看源代码" :show-arrow="false">
+                <ElTooltip :content="t('viewSource')" :show-arrow="false">
                     <ElIcon :size="16" class="op-btn" @click="toggleSourceVisible()">
                         <icon-code></icon-code>
                     </ElIcon>
                 </ElTooltip>
-                <ElTooltip content="在线运行" :show-arrow="false">
+                <ElTooltip :content="t('onlineRun')" :show-arrow="false">
                     <ElIcon :size="16" class="op-btn" @click="goCodepen()">
                         <icon-start></icon-start>
                     </ElIcon>
@@ -185,7 +202,7 @@ onUnmounted(() => {
                     <ElIcon :size="16">
                         <icon-top></icon-top>
                     </ElIcon>
-                    <span>隐藏源码</span>
+                    <span>{{ t('hideSource') }}</span>
                 </div>
             </Transition>
         </div>

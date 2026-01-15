@@ -100,12 +100,12 @@ const CONTEXT_MENU: MenuItem[] = [
 ];
 
 const HEADER_CONTEXT_MENU: MenuItem[] = [
-    { label: '左固定', value: 'fixedLeft' },
-    { label: '右固定', value: 'fixedRight' },
-    { label: '取消固定', value: 'fixedNone' },
-    { label: '隐藏', value: 'hide' },
-    { label: '显示', value: 'visible' },
-    { label: '恢复默认', value: 'resetHeader' },
+    { value: 'fixedLeft' },
+    { value: 'fixedRight' },
+    { value: 'fixedNone' },
+    { value: 'hide' },
+    { value: 'visible' },
+    { value: 'resetHeader' },
 ];
 
 ```

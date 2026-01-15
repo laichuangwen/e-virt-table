@@ -7,7 +7,8 @@ import { ElTooltip, ElIcon, ElMessage } from 'element-plus';
 import IconCopy from './icon-copy.vue';
 import IconTop from './icon-top.vue';
 const [sourceVisible, toggleSourceVisible] = useToggle();
-
+import { useI18n } from '../theme/useI18n';
+const { t } = useI18n();
 const props = defineProps<{
     title: string;
     source: string;
@@ -24,7 +25,8 @@ const copyCode = async () => {
     try {
         await copy();
         ElMessage({
-            message: '复制成功！',
+            message: t('copySuccess'),
+
             type: 'success',
         });
     } catch (e: any) {}
@@ -40,7 +42,7 @@ const copyCode = async () => {
                 </ElIcon>
                 <div>{{ _title }}</div>
             </div>
-            <ElTooltip content="复制代码" :show-arrow="false">
+            <ElTooltip :content="t('copyCode')" :show-arrow="false">
                 <ElIcon :size="16" class="op-btn" @click="copyCode">
                     <icon-copy></icon-copy>
                 </ElIcon>
@@ -53,7 +55,7 @@ const copyCode = async () => {
                     <ElIcon :size="16">
                         <icon-top></icon-top>
                     </ElIcon>
-                    <span>隐藏源码</span>
+                    <span>{{ t('hideSource') }}</span>
                 </div>
             </Transition>
         </div>
