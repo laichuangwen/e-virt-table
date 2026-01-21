@@ -13,7 +13,7 @@ import type {
     BeforeCellValueChangeMethod,
     SpanInfo,
     SelectionMap,
-    ErrorType,
+    ErrorResult,
     BeforeChangeItem,
     HistoryAction,
     BeforeValueChangeItem,
@@ -22,8 +22,9 @@ import type {
     CustomHeader,
     Fixed,
     RowMaxHeightData,
+    ErrorItem,
 } from './types';
-import { generateShortUUID, toLeaf, compareDates } from './util';
+import { generateShortUUID, toLeaf, compareDates, getNumberPrecision } from './util';
 import { HistoryItemData } from './History';
 import Cell from './Cell';
 export default class Database {
@@ -627,59 +628,99 @@ export default class Database {
     ) {
         let historyList: HistoryItemData[] = [];
         let _checkReadonly = checkReadonly;
-        const rowKeyList: Set<string> = new Set();
-        let errList: ChangeItem[] = [];
-        let changeList: BeforeValueChangeItem[] = _list.map((item) => {
+        // key 为字符串，value 为行数据
+        const rowList: Map<string, any> = new Map();
+        const errList: ErrorItem[] = [];
+        let changeList: BeforeValueChangeItem[] = [];
+        for (const item of _list) {
             const { rowKey, key } = item;
-            let _value = item.value;
-            let value = _value;
+            let value = item.value;
             const row = this.getRowDataItemForRowKey(rowKey);
             const oldValue = this.getItemValue(rowKey, key);
-            // 判断数字
             const cell = this.getVirtualBodyCellByKey(rowKey, key);
+            const _changeItem: BeforeValueChangeItem = {
+                ...item,
+                oldValue,
+                row,
+            };
             if (cell?.type === 'number') {
-                // 处理数字
-                if (['', undefined, null].includes(_value)) {
+                if (['', undefined, null].includes(value)) {
                     value = null;
-                } else if (/^-?\d+(\.\d+)?$/.test(`${_value}`)) {
-                    // 精度处理
-                    if (cell.precision !== undefined && cell.precision >= 0) {
+                } else if (/^-?\d+(\.\d+)?$/.test(String(value))) {
+                    // 正则获取小数点后的精度
+                    const precision = getNumberPrecision(value);
+                    if (typeof cell.precision === 'number' && cell.precision >= 0 && precision > cell.precision) {
                         const factor = 10 ** cell.precision;
-                        value = Math.round(Number(_value) * factor) / factor;
+                        value = Math.round(Number(value) * factor) / factor;
+                        const message = this.ctx.locale.getText('numberTruncated', { precision: cell.precision });
+                        errList.push({
+                            ..._changeItem,
+                            column: cell?.column,
+                            code: 'ERR_NUMBER_PRECISION',
+                            message,
+                        });
+                    } else if (typeof cell.min === 'number' && Number(value) < cell.min) {
+                        const message = this.ctx.locale.getText('numberMin', { min: cell.min });
+                        value = cell.min;
+                        errList.push({
+                            ..._changeItem,
+                            column: cell?.column,
+                            code: 'ERR_NUMBER_MIN',
+                            message,
+                        });
+                    } else if (typeof cell.max === 'number' && Number(value) > cell.max) {
+                        const message = this.ctx.locale.getText('numberMax', { max: cell.max });
+                        value = cell.max;
+                        errList.push({
+                            ..._changeItem,
+                            column: cell?.column,
+                            code: 'ERR_NUMBER_MAX',
+                            message,
+                        });
                     } else {
-                        value = Number(_value);
+                        value = Number(value);
                     }
                 } else {
                     value = oldValue;
                     errList.push({
-                        ...item,
-                        value,
-                        oldValue,
-                        row,
+                        ..._changeItem,
+                        column: cell?.column,
+                        code: 'ERR_INVALID_NUMBER',
+                        message: this.ctx.locale.getText('invalidNumber'),
                     });
                 }
+            } else if (
+                cell?.editorType === 'text' &&
+                typeof cell.maxlength === 'number' &&
+                String(value).length > cell.maxlength
+            ) {
+                value = String(value).slice(0, cell.maxlength);
+                const message = this.ctx.locale.getText('stringMaxlength', { maxlength: cell.maxlength });
+                errList.push({
+                    ..._changeItem,
+                    column: cell?.column,
+                    code: 'ERR_STRING_MAXLENGTH',
+                    message,
+                });
             }
-            return {
-                ...item,
-                value,
-                oldValue,
-                row,
-            };
-        });
-        // 过滤错误的
-        changeList = changeList.filter((item) => {
-            return !errList.some((err) => item.rowKey === err.rowKey && item.key === err.key);
-        });
+            // 过滤无效项和相同值项
+            if (value !== oldValue) {
+                changeList.push({
+                    ...item,
+                    value,
+                    oldValue,
+                    row,
+                });
+            }
+        }
         if (errList.length) {
-            const err: ErrorType = {
-                code: 'ERR_BATCH_SET_NUMBER_VALUE',
-                message: this.ctx.locale.getText('invalidNumber'),
+            const err: ErrorResult = {
+                code: 'ERR_BATCH_SET_ITEM_VALUE',
+                message: this.ctx.locale.getText('batchSetItemValueError'),
                 data: errList,
             };
             this.ctx.emit('error', err);
         }
-        // 过滤旧数据新数据相同的
-        changeList = changeList.filter((item) => item.oldValue !== item.value);
         if (!changeList.length) {
             return;
         }
@@ -690,10 +731,12 @@ export default class Database {
             changeList = values;
             _checkReadonly = false; // 允许编辑只读
         }
+        const promsieValidators: Promise<unknown>[] = [];
         changeList.forEach((data) => {
-            const { value, rowKey, key } = data;
+            promsieValidators.push(this.getValidator(data.rowKey, data.key));
+            const { value, rowKey, key, row } = data;
             const oldValue = this.getItemValue(rowKey, key);
-            rowKeyList.add(rowKey);
+            rowList.set(rowKey, row);
             // 不加历史，不重绘，不是编辑器，不检验只读
             this.setItemValue(rowKey, key, value, false, false, false, _checkReadonly);
             historyList.push({
@@ -703,17 +746,12 @@ export default class Database {
                 newValue: value,
             });
         });
-        // 触发change事件
-        let rows: any[] = [];
-        rowKeyList.forEach((rowKey) => {
-            rows.push(this.ctx.database.getRowDataItemForRowKey(rowKey));
-        });
-        const promsieValidators = changeList.map(({ rowKey, key }) => this.getValidator(rowKey, key));
-        Promise.all(promsieValidators).then(() => {
-            if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
-                this.ctx.emit('validateChangedData', this.getChangedData());
-            }
-        });
+        const rows = Array.from(rowList.values());
+        await Promise.all(promsieValidators);
+        // 没有校验错误，且有改变数据，则触发validateChangedData事件
+        if (this.validationErrorMap.size === 0 && this.changedDataMap.size > 0) {
+            this.ctx.emit('validateChangedData', this.getChangedData());
+        }
         const changeListValid = changeList.map((item) => {
             const errorTip = !!this.getValidationError(item.rowKey, item.key).length;
             return {
@@ -780,56 +818,25 @@ export default class Database {
         }
         const originalValue = this.originalDataMap.get(changeKey);
         const row = this.getRowDataItemForRowKey(rowKey);
+        const changeItem: BeforeChangeItem = {
+            rowKey,
+            key,
+            value,
+            oldValue,
+            row,
+        };
         // 是否是否是编辑器进来的
         if (isEditor) {
-            const cell = this.getVirtualBodyCellByKey(rowKey, key);
-            if (cell?.type === 'number') {
-                // 处理数字
-                if (['', undefined, null].includes(_value)) {
-                    value = null;
-                } else if (/^-?\d+(\.\d+)?$/.test(`${_value}`)) {
-                    value = Number(_value);
-                } else {
-                    value = oldValue;
-                    const err: ErrorType = {
-                        code: 'ERR_SET_NUMBER_VALUE',
-                        message: this.ctx.locale.getText('invalidNumber'),
-                        data: [
-                            {
-                                rowKey,
-                                key,
-                                value,
-                                oldValue,
-                                row,
-                            },
-                        ],
-                    };
-                    this.ctx.emit('error', err);
-                }
-            }
             if (value === oldValue) {
                 return {
                     oldValue,
                     newValue: oldValue,
                 };
             }
-            let changeList: BeforeChangeItem[] = [
-                {
-                    rowKey,
-                    key,
-                    value,
-                    oldValue,
-                    row,
-                },
-            ];
-            this.batchSetItemValue(changeList, history, false);
+            this.batchSetItemValue([changeItem], history, false);
             this.ctx.emit('editChange', {
-                rowKey,
-                key,
-                oldValue,
-                value,
+                ...changeItem,
                 originalValue,
-                row,
             });
         } else {
             this.changedDataMap.set(changeKey, value);
@@ -838,12 +845,8 @@ export default class Database {
         // 迭代改变值事件,有改变一次值就触发，包括批量的
         if (this.ctx.hasEvent('iterationChange')) {
             this.ctx.emit('iterationChange', {
-                rowKey,
-                key,
-                oldValue,
-                value,
-                originalValue: this.originalDataMap.get(changeKey),
-                row,
+                ...changeItem,
+                originalValue,
             });
         }
         // 重绘

@@ -100,6 +100,9 @@ export default class Cell extends BaseCell {
     overflowTooltipPlacement: OverflowTooltipPlacement = 'top';
     maxLineClamp: LineClampType = 'auto';
     precision?: number = undefined;
+    min?: number = undefined;
+    max?: number = undefined;
+    maxlength?: number = undefined;
 
     constructor(
         ctx: Context,
@@ -151,6 +154,9 @@ export default class Cell extends BaseCell {
         this.formatterFooter = column.formatterFooter;
         this.maxLineClamp = column.maxLineClamp || 'auto';
         this.precision = column.precision;
+        this.min = column.min;
+        this.max = column.max;
+        this.maxlength = column.maxlength;
         if (isUpdate) {
             this.update();
         }

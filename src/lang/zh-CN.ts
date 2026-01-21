@@ -3,7 +3,7 @@ export default {
     emptyText: '暂无数据',
     loadingText: '加载中...',
     copy: '复制',
-    cut: '剪切', 
+    cut: '剪切',
     paste: '粘贴',
     clearSelected: '清空选中内容',
     fixedLeft: '左固定',
@@ -17,5 +17,8 @@ export default {
     mergeCellNoCopy: '合并单元格不能复制',
     mergeCellNoPaste: '合并单元格不能粘贴',
     numberTruncated: '输入的数字已截取至小数点后{precision}位',
+    batchSetItemValueError: '批量赋值错误',
+    numberMin: '输入值小于{min}，已自动调整为{min}',
+    numberMax: '输入值大于{max}，已自动调整为{max}',
+    stringMaxlength: '输入值超过{maxlength}个字符，已自动截取',
 };
-

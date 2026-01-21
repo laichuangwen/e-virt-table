@@ -474,6 +474,10 @@ function compareDates(a: any, b: any): number {
 
     return aDate.getTime() - bDate.getTime();
 }
+function getNumberPrecision(value: unknown): number {
+    const match = String(value).match(/\.(\d+)/);
+    return match?.[1].length ?? 0;
+}
 
 export {
     debounce,
@@ -493,4 +497,5 @@ export {
     parseDate,
     compareDates,
     filterHiddenColumns,
+    getNumberPrecision,
 };

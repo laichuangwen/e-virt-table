@@ -379,7 +379,7 @@ let columns: Column[] = [
             },
             {
                 // required: false,
-                message: '请输入销售价',
+                message: '最多输入两位小数',
                 // 只能输入数字或小数点，且小数点后最多两位
                 pattern: /^(\d+(\.\d{1,2})?|\.?\d{1,2})$/,
             },
@@ -394,14 +394,16 @@ let columns: Column[] = [
         hoverIconName: 'icon-edit',
         placeholder: '请输入',
         precision: 2,
+        min: 0,
+        max: 100,
         // readonly: true,
-        // rules: [
-        //     {
-        //         required: true,
-        //         type: 'number',
-        //         message: '请输入销售价',
-        //     },
-        // ],
+        rules: [
+            {
+                required: true,
+                message: '最多输入两位小数',
+                pattern: /^(\d+(\.\d{1,2})?|\.?\d{1,2})$/,
+            },
+        ],
     },
     {
         title: '操作',
@@ -537,7 +539,7 @@ const eVirtTable = new EVirtTable(canvas, {
         // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
         ENABLE_DRAG_COLUMN: true,
-        AUTO_ROW_HEIGHT: true,
+        AUTO_ROW_HEIGHT: false,
         ROW_KEY: 'id',
         CELL_HEIGHT: 36,
         SELECTOR_AREA_MIN_X: 1,

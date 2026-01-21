@@ -7,7 +7,7 @@ export default class Locale {
     use(langConfig: LangConfig) {
         this.langConfig = langConfig;
     }
-    getText(key: string) {
+    getText(key: string, params?: Record<string, any>) {
         const config = { ...defaultLang };
         // 合并全局默认语言配置
         Object.assign(config, EVirtTable.locale, this.langConfig);
@@ -15,6 +15,6 @@ export default class Locale {
         if (!text) {
             return '';
         }
-        return text;
+        return text.replace(/{(\w+)}/g, (match, p1) => params?.[p1] || match);
     }
 }

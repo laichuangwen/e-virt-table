@@ -1,7 +1,7 @@
 import type Context from './Context';
 import type Cell from './Cell';
 import type CellHeader from './CellHeader';
-import { BeforePasteDataMethod, BeforeSetSelectorMethod, ChangeItem, ErrorType, BeforeCopyMethod } from './types';
+import { BeforePasteDataMethod, BeforeSetSelectorMethod, ChangeItem, ErrorResult, BeforeCopyMethod } from './types';
 import { throttle, decodeSpreadsheetStr, encodeToSpreadsheetStr } from './util';
 export default class Selector {
     private isCut = false;
@@ -558,7 +558,7 @@ export default class Selector {
                 xArr = [cell.colIndex, cell.colIndex];
                 yArr = [cell.rowIndex, cell.rowIndex];
             } else {
-                const err: ErrorType = {
+                const err: ErrorResult = {
                     code: 'ERR_MERGED_CELLS_COPY',
                     message: this.ctx.locale.getText('mergeCellNoCopy'),
                 };
@@ -685,7 +685,7 @@ export default class Selector {
                         this.ctx.database.hasMergeCell(_xArr, _yArr) &&
                         !isOneData
                     ) {
-                        const err: ErrorType = {
+                        const err: ErrorResult = {
                             code: 'ERR_MERGED_CELLS_PASTE',
                             message: this.ctx.locale.getText('mergeCellNoPaste'),
                         };

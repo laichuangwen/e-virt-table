@@ -17,5 +17,9 @@ export default {
     mergeCellNoCopy: 'Merged cells cannot be copied',
     mergeCellNoPaste: 'Merged cells cannot be pasted',
     numberTruncated: 'The input number has been truncated to {precision} decimal places',
+    batchSetItemValueError: 'Batch set item value error',
+    numberMin: 'The input value is less than {min}, automatically adjusted to {min}',
+    numberMax: 'The input value is greater than {max}, automatically adjusted to {max}',
+    stringMaxlength: 'The input value exceeds {maxlength} characters, automatically truncated',
 };
 

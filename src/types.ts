@@ -182,7 +182,10 @@ export interface Column {
     selectorCellValueType?: SelectorCellValueType;
     maxLineClamp?: LineClampType; // 行高超出多少行显示省略号
     maxLineClampHeader?: LineClampType; // 表头行高超出多少行显示省略号
-    precision?: number; // 精度
+    precision?: number; // 精度,数字类型有效
+    min?: number; // 最小值,数字类型有效
+    max?: number; // 最大值,数字类型有效
+    maxlength?: number; // 最大长度,字符串类型有效
 }
 export type LineClampType = number | 'auto';
 export type HistoryAction = 'back' | 'forward' | 'none';
@@ -275,10 +278,19 @@ export type SpanType = {
     mergeRow?: boolean;
     mergeCol?: boolean;
 };
-export type ErrorType = {
+export type ErrorItem = {
     code: string;
     message: string;
-    data?: any;
+    value: any;
+    key: string;
+    rowKey: string;
+    row?: any;
+    column?: Column;
+};
+export type ErrorResult = {
+    code: string;
+    message: string;
+    data?: ErrorItem[];
 };
 export type SpanParams = CellParams & {
     visibleLeafColumns: Column[];

@@ -1,6 +1,6 @@
 import type Context from './Context';
 import Cell from './Cell';
-import { BeforeSetAutofillMethod, ErrorType } from './types';
+import { BeforeSetAutofillMethod, ErrorResult } from './types';
 export default class Autofill {
     private ctx: Context;
     private maxColRowCell: Cell | undefined;
@@ -181,7 +181,7 @@ export default class Autofill {
         const isOneValue = xStep === 1 && yStep === 1;
         // 禁用跨越填充
         if (this.ctx.config.ENABLE_MERGE_CELL_LINK && this.ctx.database.hasMergeCell(xArr, yArr) && !isOneValue) {
-            const err: ErrorType = {
+            const err: ErrorResult = {
                 code: 'ERR_MERGED_CELLS_AUTOFILL',
                 message: this.ctx.locale.getText('mergeCellNoFill'),
             };
