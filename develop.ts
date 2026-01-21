@@ -194,6 +194,19 @@ let columns: Column[] = [
         //     return `合：${value}`;
         // },
         width: 100,
+        // renderHeader: (pEl, cell) => {
+        //     const cellEl = document.createElement('div');
+        //     cellEl.style.width = '100%';
+        //     cellEl.style.height = '100%';
+        //     cellEl.style.opacity = '0.5';
+        //     // cellEl.style.backgroundColor = 'cyan';
+        //     cellEl.style.display = 'flex';
+        //     cellEl.style.justifyContent = 'center';
+        //     cellEl.style.alignItems = 'center';
+        //     cellEl.style.userSelect = 'text';
+        //     cellEl.innerHTML = cell.text;
+        //     pEl.appendChild(cellEl);
+        // },
     },
     {
         title: '性别',
@@ -510,10 +523,8 @@ for (let i = 0; i < 0; i += 1) {
         align: 'right',
     });
 }
-const overlayerEl = document.getElementById('e-virt-table-overlayer') as HTMLDivElement;
 const editorEl = document.getElementById('e-virt-table-editor') as HTMLDivElement;
 const eVirtTable = new EVirtTable(canvas, {
-    overlayerElement: overlayerEl,
     editorElement: editorEl,
     columns,
     data,
@@ -862,37 +873,6 @@ eVirtTable.on('onPastedDataOverflow', (val: PastedDataOverflow) => {
         );
         eVirtTable.loadColumns(columns);
     }
-});
-eVirtTable.on('overlayerChange', (container) => {
-    if (!overlayerEl) {
-        return;
-    }
-    // 移除所有子元素
-    overlayerEl.replaceChildren();
-    Object.assign(overlayerEl.style, container.style);
-    container.views.forEach((typeView) => {
-        const typeDiv = document.createElement('div');
-        typeDiv.className = typeView.class;
-        Object.assign(typeDiv.style, typeView.style);
-        typeView.views.forEach((cellWrapView) => {
-            const cellWrap = document.createElement('div');
-            Object.assign(cellWrap.style, cellWrapView.style);
-            cellWrapView.cells.forEach((cell) => {
-                const cellEl = document.createElement('div');
-                Object.assign(cellEl.style, cell.style);
-                Object.keys(cell.domDataset).forEach((key) => {
-                    cellEl.setAttribute(key, cell.domDataset[key]);
-                });
-
-                if (typeof cell.render === 'function') {
-                    cell.render(cellEl, cell);
-                }
-                cellWrap.appendChild(cellEl);
-            });
-            typeDiv.appendChild(cellWrap);
-        });
-        overlayerEl.appendChild(typeDiv);
-    });
 });
 
 const dateEl = document.getElementById('e-virt-table-date') as HTMLInputElement;

@@ -562,11 +562,7 @@ export default class Selector {
                     code: 'ERR_MERGED_CELLS_COPY',
                     message: this.ctx.locale.getText('mergeCellNoCopy'),
                 };
-                if (this.ctx.hasEvent('error')) {
-                    this.ctx.emit('error', err);
-                } else {
-                    alert(err.message);
-                }
+                this.ctx.emit('error', err);
                 return;
             }
         }
@@ -688,12 +684,9 @@ export default class Selector {
                         const err: ErrorResult = {
                             code: 'ERR_MERGED_CELLS_PASTE',
                             message: this.ctx.locale.getText('mergeCellNoPaste'),
+                            data: [],
                         };
-                        if (this.ctx.hasEvent('error')) {
-                            this.ctx.emit('error', err);
-                        } else {
-                            alert(err.message);
-                        }
+                        this.ctx.emit('error', err);
                         return;
                     }
                     let changeList: ChangeItem[] = [];

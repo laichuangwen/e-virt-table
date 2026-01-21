@@ -184,12 +184,9 @@ export default class Autofill {
             const err: ErrorResult = {
                 code: 'ERR_MERGED_CELLS_AUTOFILL',
                 message: this.ctx.locale.getText('mergeCellNoFill'),
+                data: [],
             };
-            if (this.ctx.hasEvent('error')) {
-                this.ctx.emit('error', err);
-            } else {
-                alert(err.message);
-            }
+            this.ctx.emit('error', err);
             return;
         }
         let changeList = [];
