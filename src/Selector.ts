@@ -195,6 +195,9 @@ export default class Selector {
         if (this.ctx.dragHeaderIng) {
             return;
         }
+        if (this.ctx.dragRowIng) {
+            return;
+        }
         const { ENABLE_SELECTOR_SPAN_COL, ENABLE_SELECTOR_SPAN_ROW } = this.ctx.config;
         let _xArr = xArr;
         let _yArr = yArr;

@@ -1,8 +1,14 @@
+import Cell from './Cell';
 import type Context from './Context';
 import Row from './Row';
+import { TreeUtil, TreeUtilPosition } from './TreeUtil';
 import { Position } from './types';
 export default class Body {
     private resizeTarget: Row | null = null; //调整行大小的目标
+    private dragSource: Cell | null = null; //拖拽行的源
+    private dragTarget: Cell | null = null; //拖拽行的目标
+    private dragRowDiff = 0; //拖拽行的差值
+    private dragPosition: TreeUtilPosition = 'none'; //拖拽行的目标行索引
     private isMouseDown = false; // 是否按下
     private resizeDiff = 0; // 是否移动中
     private clientY = 0; // 鼠标按下时的y轴位置
@@ -24,6 +30,7 @@ export default class Body {
         this.ctx = ctx;
         this.init();
         this.initResizeRow();
+        this.initDragRow();
     }
     private init() {
         const {
@@ -259,6 +266,116 @@ export default class Body {
             }
         });
     }
+    private isDragRowValid() {
+        if (!this.ctx.config.ENABLE_DRAG_ROW) {
+            return false;
+        }
+        if (!this.dragSource) {
+            return false;
+        }
+        if (!this.dragTarget) {
+            return false;
+        }
+        if (!this.ctx.dragRowIng) {
+            return false;
+        }
+        if (this.ctx.stageElement.style.cursor === 'not-allowed') {
+            return false;
+        }
+        return true;
+    }
+    private initDragRow() {
+        this.ctx.on('dragRowMouseDown', (cell) => {
+            if (!this.ctx.config.ENABLE_DRAG_ROW) {
+                return;
+            }
+            this.dragSource = cell;
+            // 收起行
+            this.ctx.database.expandItem(cell.rowKey, false);
+            this.ctx.dragRowIng = true;
+            this.dragRowDiff = this.ctx.mouseY - cell.drawY;
+            this.ctx.stageElement.style.cursor = 'grabbing';
+            this.ctx.clearSelector();
+            this.ctx.emit('draw');
+        });
+        this.ctx.on('mouseup', async () => {
+            if (this.isDragRowValid()) {
+                try {
+                    const dragSource = this.dragSource as Cell;
+                    const dragTarget = this.dragTarget as Cell;
+                    const params = {
+                        source: dragSource,
+                        target: dragTarget,
+                        position: this.dragPosition,
+                    };
+                    let isDragRow = true;
+                    const { BEFORE_DRAG_ROW_METHOD } = this.ctx.config;
+                    // 判断是不是函数
+                    if (typeof BEFORE_DRAG_ROW_METHOD === 'function') {
+                        // 判断的是不是Promise
+                        isDragRow = await BEFORE_DRAG_ROW_METHOD(params);
+                    }
+                    if (isDragRow) {
+                        this.ctx.emit('dragRowChange', params);
+                        const originalData = this.ctx.database.getOriginalData();
+                        const { TREE_CHILDREN_KEY, ROW_KEY } = this.ctx.config;
+                        const treeUtil = new TreeUtil(originalData, {
+                            key: ROW_KEY,
+                            childrenKey: TREE_CHILDREN_KEY,
+                        });
+                        treeUtil.treeMove(dragSource.rowKey, dragTarget.rowKey, this.dragPosition);
+                        this.ctx.database.setData(treeUtil.getTree());
+                    }
+
+                } catch { }
+            }
+            this.ctx.dragRowIng = false;
+            this.dragSource = null;
+            this.dragTarget = null;
+            this.dragPosition = 'after';
+            this.dragRowDiff = 0;
+            this.ctx.stageElement.style.cursor = 'default';
+            this.ctx.emit('draw');
+        });
+        this.ctx.on('mousemove', (e) => {
+            if (!this.isDragRowValid()) {
+                return;
+            }
+            const { offsetY } = this.ctx.getOffset(e);
+            const { drawY } = this.dragTarget as Cell;
+            if (drawY < offsetY || drawY > offsetY) {
+                this.ctx.startAdjustPosition(e);
+            } else {
+                this.ctx.stopAdjustPosition();
+            }
+        });
+        this.ctx.on('cellMouseenter', (cell) => {
+            this.dragTarget = cell;
+            if (!this.isDragRowValid()) {
+                return;
+            }
+            const { ENABLE_DRAG_ROW_CROSS_LEVEL } = this.ctx.config;
+            const dragSource = this.dragSource as Cell;
+            const dragTarget = this.dragTarget as Cell;
+            // 不启用跨级拖拽时，判断是否在同一级
+            if (!ENABLE_DRAG_ROW_CROSS_LEVEL && dragSource.parentRowKey !== dragTarget.parentRowKey) {
+                this.ctx.stageElement.style.cursor = 'not-allowed';
+                return;
+            }
+            this.ctx.stageElement.style.cursor = 'grabbing';
+            this.dragTarget = cell;
+            const { drawY, visibleHeight } = cell;
+            const scopeHeight = ENABLE_DRAG_ROW_CROSS_LEVEL ? visibleHeight / 3 : visibleHeight / 2;
+            if (this.ctx.mouseY <= drawY + scopeHeight) {
+                this.dragPosition = 'before';
+            } else if (this.ctx.mouseY > drawY + visibleHeight - scopeHeight) {
+                this.dragPosition = 'after';
+            } else {
+                this.dragPosition = 'inside';
+            }
+            this.ctx.emit('draw');
+        });
+    }
     private resizeRow(row: Row, diff: number) {
         const { rowIndex, height, rowKey, data } = row;
         this.ctx.database.setRowHeight(rowIndex, height + diff);
@@ -287,6 +404,47 @@ export default class Body {
             this.ctx.paint.drawLine(poins, {
                 borderColor: RESIZE_ROW_LINE_COLOR,
                 borderWidth: 1,
+            });
+        }
+    }
+    // 拖拽提示线绘制
+    drawDragRowTip() {
+        if (this.ctx.dragRowIng && this.dragTarget && this.dragSource) {
+            const {
+                stageWidth,
+                config: { DRAG_ROW_TIP_LINE_COLOR, DRAG_TIP_BG_COLOR },
+            } = this.ctx;
+            const rh = this.dragSource.visibleHeight;
+            // 提示背景
+            this.ctx.paint.drawRect(0, this.ctx.mouseY - this.dragRowDiff, this.visibleWidth, rh, {
+                fillColor: DRAG_TIP_BG_COLOR,
+                borderWidth: 0,
+                borderColor: 'transparent',
+            });
+            const dragTargetDrawY = this.dragTarget.drawY;
+            const dragTargetHeight = this.dragTarget.height;
+            // 默认上方
+            let y = dragTargetDrawY;
+            if (['before', 'after'].includes(this.dragPosition)) {
+                if (this.dragPosition === 'after') {
+                    y = dragTargetDrawY + dragTargetHeight;
+                }
+                const poins = [0, y - 0.5, stageWidth, y - 0.5];
+                this.ctx.paint.drawLine(poins, {
+                    borderColor: DRAG_ROW_TIP_LINE_COLOR,
+                    borderWidth: 1.2,
+                });
+            }
+            // 中间位置
+            if (['inside'].includes(this.dragPosition)) {
+                y = dragTargetDrawY + dragTargetHeight / 2;
+            }
+            // 倒三角形
+            const trianglePoins = [0, y - 4, 6, y, 0, y + 4, 0, y - 4];
+            this.ctx.paint.drawLine(trianglePoins, {
+                borderColor: DRAG_ROW_TIP_LINE_COLOR,
+                borderWidth: 1.2,
+                fillColor: DRAG_ROW_TIP_LINE_COLOR,
             });
         }
     }

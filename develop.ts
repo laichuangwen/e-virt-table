@@ -2,6 +2,7 @@ import EVirtTable from './src/EVirtTable';
 import {
     BeforeChangeItem,
     BeforeCopyParams,
+    BeforeDragRowParams,
     BeforeSetSelectorParams,
     BeforeValueChangeItem,
     Column,
@@ -22,13 +23,27 @@ let columns: Column[] = [
     //   width: 50,
     // },
     {
+        title: '工号',
+        key: 'emp_no',
+        align: 'left',
+        // operation: true,
+        readonly: false,
+        width: 120,
+        type: 'tree',
+        dragRow: true,
+        fixed: 'left',
+        // hide: () => 3 > 2,
+    },
+    {
         key: 'selection',
-        type: 'selection',
+        type: 'index-selection',
         fixed: 'left',
         title: '',
-        align: 'center',
-        maxWidth: 60,
+        align: 'left',
+        minWidth: 50,
         operation: true,
+        dragRow: true,
+        dragDisabled: true,
         widthFillDisable: true,
     },
     {
@@ -45,17 +60,6 @@ let columns: Column[] = [
     //   width: 100,
     //   fixed: "left",
     // },
-    {
-        title: '工号',
-        key: 'emp_no',
-        align: 'left',
-        // operation: true,
-        readonly: false,
-        width: 120,
-        type: 'tree',
-        fixed: 'right',
-        // hide: () => 3 > 2,
-    },
     {
         title: '姓名',
         key: 'emp_name',
@@ -185,7 +189,7 @@ let columns: Column[] = [
         key: 'phone',
         maxLineClamp: 'auto',
         sortBy: 'string',
-        align: 'left',
+        align: 'center',
         verticalAlign: 'bottom',
         // fixed: 'right',
         // readonly: false,
@@ -229,6 +233,9 @@ let columns: Column[] = [
             cellEl.style.width = '100%';
             cellEl.style.height = '100%';
             cellEl.style.opacity = '0.5';
+            cellEl.style.lineHeight = '1.2';
+            cellEl.style.color = 'red';
+            cellEl.style.fontSize = '12px';
             // cellEl.style.backgroundColor = 'cyan';
             cellEl.style.display = 'flex';
             cellEl.style.justifyContent = 'center';
@@ -384,6 +391,7 @@ let columns: Column[] = [
         fixed: 'right',
         required: true,
         align: 'right',
+        // verticalAlign: 'top',
         // type: 'number',
         rules: [
             {
@@ -425,10 +433,10 @@ let columns: Column[] = [
     },
 ];
 let data: any[] = [];
-for (let i = 0; i < 5000; i += 1) {
+for (let i = 0; i < 2000; i += 1) {
     data.push({
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
-        id: `1_${i}`,
+        id: `${i}`,
         // _readonly: true,
         emp_name: `张三${i % 5 ? 1 : 0}`,
         emp_name11: `张三${i % 5 ? 1 : 0}`,
@@ -446,8 +454,8 @@ for (let i = 0; i < 5000; i += 1) {
             i === 1
                 ? `海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地${i}号`
                 : i === 4
-                ? '海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地'
-                : `海淀区北京路${i}号`,
+                    ? '海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地海淀区北京路海淀区北京路十分地'
+                    : `海淀区北京路${i}号`,
         work_type: `兼职${i}`,
         work_status: `在职${i}`,
         household_city: `深圳${i}`,
@@ -512,7 +520,6 @@ for (let i = 0; i < 5000; i += 1) {
                 ],
             },
         ],
-        _hasChildren: true,
     });
 }
 for (let i = 0; i < 0; i += 1) {
@@ -550,6 +557,7 @@ const eVirtTable = new EVirtTable(canvas, {
         // HEIGHT: 500,
         // CHECKBOX_KEY: 'emp_name',
         ENABLE_DRAG_COLUMN: true,
+        ENABLE_DRAG_ROW: true,
         AUTO_ROW_HEIGHT: false,
         ROW_KEY: 'id',
         CELL_HEIGHT: 36,
@@ -785,7 +793,7 @@ const eVirtTable = new EVirtTable(canvas, {
         ENABLE_HEADER_CONTEXT_MENU: true,
         ENABLE_CONTEXT_MENU: true,
         SPAN_METHOD: (params) => {
-            const { mergeColCell, mergeRowCell } = eVirtTable.getUtils();
+            const { mergeColCell, mergeRowCell, getSpanObjByColumn } = eVirtTable.getUtils();
             const { colIndex, column, row, visibleLeafColumns, visibleRows } = params;
             if (
                 [
@@ -818,19 +826,37 @@ const eVirtTable = new EVirtTable(canvas, {
             //     return mergeRowCell(params, 'emp_name');
             // }
             // // 合并动态列单元格
-            // if (colIndex > 4) {
-            //   const spanObj = getSpanObjByColumn(row, visibleLeafColumns);
-            //   if (spanObj[column.key] === 0) {
-            //     return {
-            //       rowspan: 0,
-            //       colspan: 0,
-            //     };
-            //   }
-            //   return {
-            //     rowspan: 1,
-            //     colspan: spanObj[column.key],
-            //   };
-            // }
+            if (colIndex > 4) {
+                const spanObj = getSpanObjByColumn(row, visibleLeafColumns);
+                if (spanObj[column.key] === 0) {
+                    return {
+                        rowspan: 0,
+                        colspan: 0,
+                    };
+                }
+                return {
+                    rowspan: 1,
+                    colspan: spanObj[column.key],
+                };
+            }
+        },
+        BEFORE_DRAG_ROW_METHOD: async (params: BeforeDragRowParams) => {
+            const { source, target, position } = params;
+            if (target.parentRowKey === '1') {
+                console.log('不能调整到1级');
+                return false;
+            } 
+            return true;
+            // return new Promise<boolean>((resolve) => {
+            //     setTimeout(() => {
+            //         if (target.parentRowKey === '1') {
+            //             console.log('不能调整到1级');
+            //             resolve(false);
+            //         } else {
+            //             resolve(true);
+            //         }
+            //     }, 1000);
+            // });
         },
     },
 });
@@ -1239,6 +1265,10 @@ document.getElementById('setLocaleEn')?.addEventListener('click', () => {
     // 全局默认语言配置
     EVirtTable.useLocale(enUS);
     eVirtTable.doLayout();
+});
+eVirtTable.on('dragRowChange', (data) => {
+    const { callback, source, target, position } = data;
+    console.log('dragRowChange', data);
 });
 // 销毁
 function destroy() {

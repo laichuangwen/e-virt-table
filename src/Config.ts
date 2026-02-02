@@ -4,6 +4,7 @@ import {
     BeforeAutofillDataMethod,
     BeforeCellValueChangeMethod,
     BeforeCopyMethod,
+    BeforeDragRowMethod,
     BeforePasteDataMethod,
     BeforeSetAutofillMethod,
     BeforeSetSelectorMethod,
@@ -319,11 +320,23 @@ export default class Config {
     ];
     CUSTOM_HEADER_CONTEXT_MENU: MenuItem[] = [];
     /** 格子多行文本行高,isAutoRowHeight才会生效 */
-    CELL_LINE_HEIGHT = 1.3;
+    CELL_LINE_HEIGHT = 1.2;
     /** 全局自动行高 */
     AUTO_ROW_HEIGHT = false;
     /** 启用拖拽表头 */
     ENABLE_DRAG_COLUMN = false;
+    /** 启用拖拽行 */
+    ENABLE_DRAG_ROW = false;
+    /** 启用拖拽行跨级,针对tree数据结构 */
+    ENABLE_DRAG_ROW_CROSS_LEVEL = false;
+    /** 拖拽提示线颜色 */
+    DRAG_ROW_TIP_LINE_COLOR = 'rgb(82,146,247)';
+    /** 拖拽行图标 */
+    DRAG_ROW_ICON_SVG = '';
+    /** 拖拽行图标大小 */
+    DRAG_ROW_ICON_SIZE = 18;
+    /** 拖拽行图标颜色 */
+    DRAG_ROW_ICON_COLOR = '#bec4c7';
     /** header 格子样式 */
     HEADER_CELL_STYLE_METHOD?: CellHeaderStyleMethod;
     /** body 格子样式 */
@@ -362,6 +375,7 @@ export default class Config {
     BEFORE_SET_AUTOFILL_METHOD?: BeforeSetAutofillMethod;
     /** 数据复制前回调 */
     BEFORE_COPY_METHOD?: BeforeCopyMethod;
+    BEFORE_DRAG_ROW_METHOD?: BeforeDragRowMethod;
     constructor(config: Partial<Config>) {
         this._config = config;
         this.updateCssVar();

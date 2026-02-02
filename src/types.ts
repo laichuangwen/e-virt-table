@@ -2,6 +2,7 @@ import type Cell from './Cell';
 import type CellHeader from './CellHeader';
 import type { Rule, Rules } from './Validator';
 import Config from './Config';
+import { TreeUtilPosition } from './TreeUtil';
 // 变成可选类型
 export type OptionalizeExcept<T, K extends keyof T> = Partial<Omit<T, K>> & Required<Pick<T, K>>;
 export type EVirtTableOptions = {
@@ -176,6 +177,7 @@ export interface Column {
     column?: Column;
     rules?: Rules | Rule;
     options?: any;
+    dragRow?: boolean;
     dragDisabled?: boolean;
     hideDisabled?: boolean;
     fixedDisabled?: boolean;
@@ -322,6 +324,11 @@ export type RowMaxHeightData = {
     key: string;
     height: number;
 };
+export type BeforeDragRowParams = {
+    source: Cell;
+    target: Cell;
+    position: TreeUtilPosition;
+};
 export type ConfigType = Partial<Config>;
 export type FilterMethod = (rows: any[]) => any[];
 export type FormatterMethod = (params: CellParams) => string | void;
@@ -354,3 +361,4 @@ export type BeforeAutofillDataMethod = (
 export type BeforeSetSelectorMethod = (params: BeforeSetSelectorParams) => BeforeSetSelectorParams | undefined;
 export type BeforeSetAutofillMethod = (params: BeforeSetAutofillParams) => BeforeSetAutofillParams | undefined;
 export type BeforeCopyMethod = (params: BeforeCopyParams) => BeforeCopyParams | undefined;
+export type BeforeDragRowMethod = (params: BeforeDragRowParams) =>  boolean | Promise<boolean>;

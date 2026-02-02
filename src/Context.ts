@@ -105,6 +105,7 @@ export default class Context {
     selectColsIng = false; // 选择列中
     selectRowsIng = false; // 选择行中
     dragHeaderIng = false; // 拖拽表头中
+    dragRowIng = false; // 拖拽行中
     finding = false; // 查找中
     adjustPositioning = false; // 调整位置中
     contextMenuIng = false; // 右键菜单中

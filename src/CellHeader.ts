@@ -271,6 +271,11 @@ export default class CellHeader extends BaseCell {
             } else if (this.verticalAlign === 'bottom') {
                 iconY = this.drawY + this.height - CHECKBOX_SIZE - CELL_PADDING / 2;
             }
+            if(this.column.dragRow){
+                iconX += this.ctx.config.DRAG_ROW_ICON_SIZE;
+                this.drawTextX += this.ctx.config.DRAG_ROW_ICON_SIZE;
+                this.drawTextWidth -= this.ctx.config.DRAG_ROW_ICON_SIZE;
+            }
 
             let checkboxImage: HTMLImageElement | undefined = this.ctx.icons.get('checkbox-uncheck');
             let checkboxName = 'checkbox-uncheck';

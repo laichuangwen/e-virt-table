@@ -124,6 +124,7 @@ export default class EVirtTable {
         this.body.draw();
         this.footer.draw();
         this.header.draw();
+        this.body.drawDragRowTip();
         this.scroller.draw();
         this.empty.draw();
         this.loading.draw();

@@ -67,6 +67,7 @@ export default class EventTable {
                 this.ctx.setFocusCell(cell);
                 this.ctx.focusCellHeader = undefined;
                 this.ctx.emit('cellMousedown', cell, e);
+                this.dragRowMouseDown(cell, e);
             });
         });
         // 按上事件
@@ -183,7 +184,7 @@ export default class EventTable {
                 return;
             }
             this.ctx.isPointer = false;
-            if (this.ctx.stageElement.style.cursor === 'pointer') {
+            if (!this.ctx.mousedown && this.ctx.stageElement.style.cursor !== 'default') {
                 this.ctx.stageElement.style.cursor = 'default';
             }
             const y = this.ctx.getOffset(e).offsetY;
@@ -393,6 +394,26 @@ export default class EventTable {
         }
         this.ctx.database.setSortState(cellHeader.key, newDirection);
     }
+    private dragRowMouseDown(cell: Cell, e: MouseEvent) {
+         // 判断是否点击tree图标
+         const { offsetY, offsetX } = this.ctx.getOffset(e);
+         const clickY = offsetY;
+         const clickX = offsetX;
+ 
+         if (
+             !this.isInsideElement(
+                 clickX,
+                 clickY,
+                 cell.drawDragImageX,
+                 cell.drawDragImageY,
+                 cell.drawDragImageWidth,
+                 cell.drawDragImageHeight,
+             )
+         ) {
+             return;
+         }
+         this.ctx.emit('dragRowMouseDown', cell);
+    }
     /**
      * 图标进入和离开事件，包括选中，展开，提示图标等
      * @param cell
@@ -489,6 +510,22 @@ export default class EventTable {
                 )
             ) {
                 this.ctx.stageElement.style.cursor = 'pointer';
+                this.ctx.isPointer = true;
+                return;
+            }
+             // drag图
+             if (
+                cell.drawDragImageSource &&
+                this.isInsideElement(
+                    x,
+                    y,
+                    cell.drawDragImageX,
+                    cell.drawDragImageY,
+                    cell.drawDragImageWidth,
+                    cell.drawDragImageHeight,
+                )
+            ) {
+                this.ctx.stageElement.style.cursor = 'grab';
                 this.ctx.isPointer = true;
                 return;
             }

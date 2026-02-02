@@ -250,6 +250,7 @@ export class Paint {
         }
         const fontSize = parseInt(font.match(/\d+/)?.[0] || '12');
         const lineHeight = fontSize * (options.lineHeight || 1.2); // 默认行高为字体大小的1.2倍
+        const textOffsetY = fontSize * 0.14; // 经验值 6%~12%
         const availableWidth = width - padding * 2 - offsetLeft - offsetRight;
         let textEllipsis = false;
         // 计算总行数,向上取整round
@@ -287,10 +288,9 @@ export class Paint {
         } else if (align === 'right') {
             startX = x + width - padding - offsetRight;
         }
-        // 绘制每一行用for循环
         for (let i = 0; i < lines.length; i++) {
             const lineText = lines[i];
-            const lineY = startY + i * lineHeight;
+            const lineY = startY + i * lineHeight + textOffsetY;
             this.ctx.textBaseline = 'top';
             // 如果设置了lineClamp，则只绘制lineClamp行
             if (i === totalTextLine - 1) {

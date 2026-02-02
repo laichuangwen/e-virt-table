@@ -87,7 +87,7 @@ export default class Database {
         const _columns = this.getColumns();
         const leafColumns = toLeaf(_columns);
         this.ctx.hasSelection = leafColumns.some((item) => item.type === 'selection');
-        this.ctx.hasTree = leafColumns.some((item) => item.type === 'tree');
+        this.ctx.hasTree = leafColumns.some((item) => item.type?.includes('tree'));
         if (isClear) {
             this.originalDataMap.clear();
             this.changedDataMap.clear();
@@ -296,6 +296,9 @@ export default class Database {
         this.data = data;
         this.init();
     }
+    getOriginalData() {
+        return this.data;
+    }
     /**
      * 统一转化数据，给画body使用，包括过滤树状等，统一入口
      * @returns
@@ -313,7 +316,7 @@ export default class Database {
         this.sumHeight = 0;
         this.positions = [];
         const recursiveData = (data: any[]) => {
-            data.forEach((item) => {
+            data?.forEach((item) => {
                 list.push(item);
                 const rowKey = this.itemRowKeyMap.get(item);
                 const { expand, hasChildren, height, calculatedHeight } = this.rowKeyMap.get(rowKey);

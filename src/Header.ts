@@ -274,7 +274,7 @@ export default class Header {
                     childrenKey: 'children', // 子节点数组字段
                 });
                 const position = this.dragTarget.colIndex > this.dragingCell.colIndex ? 'before' : 'after';
-                tree.treeMove(this.dragTarget.column, this.dragingCell.column, position);
+                tree.treeMove(this.dragTarget.column.key, this.dragingCell.column.key, position);
                 const columnsTree = tree.getTree();
                 const sortData = genSortObj(columnsTree);
                 this.ctx.database.setCustomHeader({ sortData });
