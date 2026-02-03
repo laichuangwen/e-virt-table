@@ -1,3 +1,4 @@
+import CellImage from './CellImage';
 import Context from './Context';
 import { CellType, Fixed } from './types';
 
@@ -7,8 +8,13 @@ export default class BaseCell {
     y = 0;
     width = 0;
     height = 0;
+    visibleWidth = 0;
+    visibleHeight = 0;
     fixed?: Fixed;
     cellType: CellType;
+    drawX = 0;
+    drawY = 0;
+    cellImages: Map<string, CellImage> = new Map();
     constructor(ctx: Context, x: number, y: number, width: number, height: number, cellType: CellType, fixed?: Fixed) {
         this.ctx = ctx;
         this.x = x;
@@ -61,23 +67,33 @@ export default class BaseCell {
     getLeftFixedX() {
         return this.x - this.ctx.scrollX;
     }
+    isInside(x: number, y: number) {
+        return x >= this.drawX && x <= this.drawX + this.width && y >= this.drawY && y <= this.drawY + this.height;
+    }
     /**
-     * RightFixed时相对StageX
-     * @returns
+     * 判断是否在可见区域,合并单元格用
+     * @param x 
+     * @param y 
+     * @returns 
      */
-    getRightFixedX() {
-        // const { SCROLLER_TRACK_SIZE } = this.grid.config;
-        // if (!this.grid.header) {
-        //   return 0;
-        // }
-        // return (
-        //   this.grid.header.width -
-        //   this.x -
-        //   this.grid.layer.x() -
-        //   (this.grid.header.width - this.x) +
-        //   this.grid.stage.width() -
-        //   SCROLLER_TRACK_SIZE -
-        //   (this.grid.header.width - this.x)
-        // );
+    isInsideVisible(x: number, y: number) {
+        return x >= this.drawX && x <= this.drawX + this.visibleWidth && y >= this.drawY && y <= this.drawY + this.visibleHeight && this.isInside(x, y);
+    }
+    setImage(key: string, image: CellImage) {
+        this.cellImages.set(key, image);
+    }
+    getImages() {
+        return this.cellImages;
+    }
+    getImage(key: string) {
+        return this.cellImages.get(key);
+    }
+    isImageInside(key: string, e: MouseEvent) {
+        const { offsetX, offsetY } = this.ctx.getOffset(e);
+        const image = this.getImage(key);
+        if (image) {
+            return image.isInside(offsetX, offsetY);
+        }
+        return false;
     }
 }

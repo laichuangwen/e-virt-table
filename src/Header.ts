@@ -44,6 +44,8 @@ export default class Header {
             }, 100),
         );
         this.init();
+        this.initSelection();
+        this.initSort();
         // 初始化调整列大小ENABLE_RESIZE_COLUMN
         this.initResizeColumn();
         this.initDragColumn();
@@ -115,6 +117,37 @@ export default class Header {
         this.ctx.header.allCellHeaders = this.allCellHeaders;
         this.ctx.header.visibleWidth = this.visibleWidth;
         this.ctx.header.visibleHeight = this.visibleHeight;
+    }
+    private initSort() {
+        this.ctx.on('cellHeaderClick', (cellHeader, e) => {
+            if (!cellHeader.isImageInside('sort', e)) {
+                return;
+            }
+            const currentState = this.ctx.database.getSortState(cellHeader.key);
+            let newDirection: 'asc' | 'desc' | 'none';
+            // 按照 不排序->升序->降序->不排序 的顺序循环
+            if (currentState.direction === 'none') {
+                newDirection = 'asc';
+            } else if (currentState.direction === 'asc') {
+                newDirection = 'desc';
+            } else {
+                newDirection = 'none';
+            }
+            this.ctx.database.setSortState(cellHeader.key, newDirection);
+        });
+    }
+    private initSelection() {
+        this.ctx.on('cellHeaderClick', (cellHeader, e) => {
+            if (!cellHeader.isImageInside('selection', e)) {
+                return;
+            }
+            const image = cellHeader.getImage('selection');
+            if (['checkbox-uncheck', 'checkbox-indeterminate'].includes(image.name)) {
+                this.ctx.database.toggleAllSelection();
+            } else if (image.name === 'checkbox-check') {
+                this.ctx.database.clearSelection(true);
+            }
+        });
     }
     // 调整表头的宽度
     private initResizeColumn() {
@@ -230,6 +263,9 @@ export default class Header {
     }
     private initDragColumn() {
         this.ctx.on('cellHeaderMousedown', (cellHeader) => {
+            if (this.ctx.stageElement.style.cursor !== 'default') {
+                return;
+            }
             if (!this.ctx.config.ENABLE_DRAG_COLUMN) {
                 return;
             }
@@ -287,13 +323,15 @@ export default class Header {
                 this.ctx.emit('columnDragChange', data);
             }
             if (this.ctx.dragHeaderIng && this.dragTarget) {
+                if (this.ctx.stageElement.style.cursor === 'grabbing') {
+                    this.ctx.stageElement.style.cursor = 'default';
+                }
                 this.ctx.dragHeaderIng = false;
                 this.dragTarget = null;
                 this.dragingCell = undefined;
                 this.dragCellDiff = 0;
                 this.ctx.clearSelector();
                 this.ctx.focusCellHeader = undefined;
-                this.ctx.stageElement.style.cursor = 'default';
                 this.ctx.emit('draw');
             }
         });

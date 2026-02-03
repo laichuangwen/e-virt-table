@@ -4,6 +4,7 @@ import type { Align, CellHeaderStyleMethod, Column, Fixed, LineClampType, Render
 import BaseCell from './BaseCell';
 import { Rule, Rules } from './Validator';
 import { TextInfo } from './Paint';
+import CellImage from './CellImage';
 export default class CellHeader extends BaseCell {
     align: Align;
     hideHeaderSelection = false;
@@ -44,6 +45,10 @@ export default class CellHeader extends BaseCell {
     visibleHeight = 0;
     maxLineClampHeader: LineClampType = 'auto';
     domDataset: any = {};
+    textOffsetRight = 0; // 文本偏移右
+    textOffsetLeft = 0; // 文本偏移左
+    // 文本信息
+    textInfo: TextInfo | undefined = undefined
     drawTextX = 0;
     drawTextY = 0;
     drawTextWidth = 0;
@@ -51,19 +56,6 @@ export default class CellHeader extends BaseCell {
     drawCellBgColor = '';
     drawTextColor = '';
     drawTextFont = '';
-    drawSelectionImageX = 0;
-    drawSelectionImageY = 0;
-    drawSelectionImageWidth = 0;
-    drawSelectionImageHeight = 0;
-    drawSelectionImageName = '';
-    drawSelectionImageSource?: HTMLImageElement;
-    // 排序相关
-    drawSortImageX = 0;
-    drawSortImageY = 0;
-    drawSortImageWidth = 0;
-    drawSortImageHeight = 0;
-    drawSortImageName = '';
-    drawSortImageSource?: HTMLImageElement;
     constructor(ctx: Context, colIndex: number, x: number, y: number, width: number, height: number, column: Column) {
         super(ctx, x, y, width, height, 'header', column.fixed);
         this.ctx = ctx;
@@ -143,18 +135,28 @@ export default class CellHeader extends BaseCell {
             }
         }
         // 高亮查找结果
-        const {colKey, type } = this.ctx.finderBar;
-        if ( type === 'header' && colKey === this.key) {
+        const { colKey, type } = this.ctx.finderBar;
+        if (type === 'header' && colKey === this.key) {
             bgColor = this.ctx.config.FINDER_CELL_BG_COLOR;
         }
         this.drawCellBgColor = bgColor;
         this.drawTextColor = textColor;
     }
+    private updateOffset() {
+        if (this.column.sortBy) {
+            this.textOffsetRight = 16;
+        }
+        if (this.required) {
+            this.textOffsetLeft = 12;
+        }
+    }
     update() {
         this.updateContainer();
+        this.updateOffset();
         this.displayText = this.getText();
         this.drawX = this.getDrawX();
         this.drawY = this.getDrawY();
+        this.updateSelection();
         this.drawTextX = this.drawX;
         this.drawTextY = this.drawY;
         this.drawTextWidth = this.width;
@@ -163,10 +165,18 @@ export default class CellHeader extends BaseCell {
     }
     draw() {
         this.drawEdge();
-        this.drawSelection();
         this.drawText();
         this.drawBg();
-        this.drawSortIcon();
+        this.updateSortIcon();
+        this.drawImages();
+        this.drawRequired();
+    }
+    drawImages() {
+        this.getImages().forEach((image) => {
+            if (image.visible && image.source) {
+                this.ctx.paint.drawImage(image.source, image.x, image.y, image.width, image.height);
+            }
+        });
     }
     private drawEdge() {
         const {
@@ -183,7 +193,7 @@ export default class CellHeader extends BaseCell {
     private drawText() {
         const {
             paint,
-            config: { HEADER_FONT, CELL_PADDING, REQUIRED_COLOR },
+            config: { HEADER_FONT, CELL_PADDING },
         } = this.ctx;
         const cacheTextKey = `${this.displayText}_${this.drawTextWidth}_${this.drawTextFont}`;
         this.ellipsis = paint.drawText(
@@ -199,27 +209,31 @@ export default class CellHeader extends BaseCell {
                 align: this.align,
                 verticalAlign: this.verticalAlign,
                 maxLineClamp: this.maxLineClampHeader,
-                offsetRight: this.column.sortBy ? 16 : 0, // 排序图标占位
-                offsetLeft: this.required ? 12 : 0, // 必填星号占位
+                offsetRight: this.textOffsetRight, // 右边占位
+                offsetLeft: this.textOffsetLeft, // 左边占位
                 cacheTextKey,
                 textCallback: (textInfo: TextInfo) => {
-                    // 排序图标位置,需要跟随文字变化
-                    if (this.column.sortBy) {
-                        this.drawSortImageX = textInfo.right + 4;
-                        this.drawSortImageY = textInfo.top + (textInfo.height - 16) / 2;
-                    }
-                    if (this.required) {
-                        paint.drawText('*', textInfo.left - 18, textInfo.top + (textInfo.height - 12) / 2, 24, 24, {
-                            color: REQUIRED_COLOR,
-                            font: '18px Arial',
-                            align: 'center',
-                            verticalAlign: 'middle',
-                            padding: 0,
-                        });
-                    }
+                    this.textInfo = textInfo;
                 },
             },
         );
+    }
+    private drawRequired() {
+        if (!this.required) {
+            return;
+        }
+        if (!this.textInfo) {
+            return;
+        }
+        const { left, top, height } = this.textInfo;
+        const { paint, config: { REQUIRED_COLOR } } = this.ctx;
+        paint.drawText('*', left - 18, top + (height - 12) / 2, 24, 24, {
+            color: REQUIRED_COLOR,
+            font: '18px Arial',
+            align: 'center',
+            verticalAlign: 'middle',
+            padding: 0,
+        });
     }
     private drawBg() {
         if (this.ctx.dragHeaderIng) {
@@ -247,11 +261,7 @@ export default class CellHeader extends BaseCell {
             });
         }
     }
-    private drawSelection() {
-        if (this.hideHeaderSelection) {
-            return;
-        }
-
+    private updateSelection() {
         // 选中框类型
         if (['index-selection', 'selection', 'selection-tree', 'tree-selection'].includes(this.type)) {
             const { indeterminate, check, selectable } = this.ctx.database.getCheckedState();
@@ -271,7 +281,7 @@ export default class CellHeader extends BaseCell {
             } else if (this.verticalAlign === 'bottom') {
                 iconY = this.drawY + this.height - CHECKBOX_SIZE - CELL_PADDING / 2;
             }
-            if(this.column.dragRow){
+            if (this.column.dragRow) {
                 iconX += this.ctx.config.DRAG_ROW_ICON_SIZE;
                 this.drawTextX += this.ctx.config.DRAG_ROW_ICON_SIZE;
                 this.drawTextWidth -= this.ctx.config.DRAG_ROW_ICON_SIZE;
@@ -295,30 +305,19 @@ export default class CellHeader extends BaseCell {
                 checkboxImage = this.ctx.icons.get('checkbox-disabled');
                 checkboxName = 'checkbox-disabled';
             }
-            if (checkboxImage) {
-                this.drawSelectionImageX = iconX;
-                this.drawSelectionImageY = iconY;
-                this.drawSelectionImageWidth = CHECKBOX_SIZE;
-                this.drawSelectionImageHeight = CHECKBOX_SIZE;
-                this.drawSelectionImageName = checkboxName;
-                this.drawSelectionImageSource = checkboxImage;
-                this.ctx.paint.drawImage(
-                    this.drawSelectionImageSource,
-                    this.drawSelectionImageX,
-                    this.drawSelectionImageY,
-                    this.drawSelectionImageWidth,
-                    this.drawSelectionImageHeight,
-                );
-            }
-
-            // 不再需要保存文本位置信息，直接在 draw 方法中计算
+            const selectionImage = new CellImage(checkboxName, iconX, iconY, CHECKBOX_SIZE, CHECKBOX_SIZE, checkboxImage);
+            selectionImage.setVisible(!this.hideHeaderSelection);
+            this.setImage('selection', selectionImage);
         }
     }
-    private drawSortIcon() {
+    private updateSortIcon() {
         // 如果没有sortBy配置且不是后端排序，不显示排序图标
-        if (!this.column.sortBy) {
+        if (!this.column.sortBy || !this.textInfo) {
             return;
         }
+        const { right, top, height } = this.textInfo;
+        const x = right + 4;
+        const y = top + (height - 16) / 2;
         const iconSize = 16;
         let iconName = this.sortIconName;
         // 前端排序
@@ -329,22 +328,8 @@ export default class CellHeader extends BaseCell {
             iconName = this.sortDescIconName;
         }
         const icon = this.ctx.icons.get(iconName);
-        if (!icon) {
-            return;
-        }
-        this.drawSortImageWidth = iconSize;
-        this.drawSortImageHeight = iconSize;
-        this.drawSortImageName = iconName;
-        this.drawSortImageSource = icon;
-
-        // 绘制图标
-        this.ctx.paint.drawImage(
-            this.drawSortImageSource,
-            this.drawSortImageX,
-            this.drawSortImageY,
-            this.drawSortImageWidth,
-            this.drawSortImageHeight,
-        );
+        const sortImage = new CellImage(iconName, x, y, iconSize, iconSize, icon);
+        this.setImage('sort', sortImage);
     }
 
     getText() {

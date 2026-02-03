@@ -2,7 +2,7 @@ import Cell from './Cell';
 import type Context from './Context';
 import Row from './Row';
 import { TreeUtil, TreeUtilPosition } from './TreeUtil';
-import { Position } from './types';
+import { ExpandLazyMethod, Position } from './types';
 export default class Body {
     private resizeTarget: Row | null = null; //调整行大小的目标
     private dragSource: Cell | null = null; //拖拽行的源
@@ -29,6 +29,8 @@ export default class Body {
     constructor(ctx: Context) {
         this.ctx = ctx;
         this.init();
+        this.initTree();
+        this.initSelection();
         this.initResizeRow();
         this.initDragRow();
     }
@@ -139,6 +141,56 @@ export default class Body {
         const _cssHeight = Math.round((canvasElement.height / dpr) * 10000) / 10000;
         this.ctx.canvasElement.setAttribute('style', `height:${_cssHeight}px;width:${_cssWidth}px;`);
         this.ctx.paint.scale(dpr);
+    }
+    private initTree() {
+        this.ctx.on('cellClick', (cell, e) => {
+            if (!cell.isImageInside('tree', e)) {
+                return;
+            }
+            const row = this.ctx.database.getRowForRowKey(cell.rowKey);
+            const { expand = false, expandLazy = false } = row || {};
+            const { EXPAND_LAZY, EXPAND_LAZY_METHOD } = this.ctx.config;
+            // 懒加载且有懒加载方法，不是展开的不是已经加载过的
+            if (EXPAND_LAZY && EXPAND_LAZY_METHOD && !expand && !expandLazy) {
+                if (typeof EXPAND_LAZY_METHOD === 'function') {
+                    this.ctx.database.expandLoading(cell.rowKey, true);
+                    const expandLazyMethod: ExpandLazyMethod = EXPAND_LAZY_METHOD;
+                    expandLazyMethod({
+                        row: cell.row,
+                        rowIndex: cell.rowIndex,
+                        colIndex: cell.colIndex,
+                        column: cell.column,
+                        value: cell.getValue(),
+                    })
+                        .then((res: any) => {
+                            this.ctx.database.setExpandChildren(cell.rowKey, res);
+                            this.ctx.database.expandLoading(cell.rowKey, false);
+                            this.ctx.emit('expandChange', this.ctx.database.getExpandRowKeys());
+                        })
+                        .catch((err: any) => {
+                            this.ctx.database.expandLoading(cell.rowKey, false);
+                            console.error(err);
+                        });
+                }
+                // 懒加载
+            } else {
+                const isExpand = this.ctx.database.getIsExpand(cell.rowKey);
+                this.ctx.database.expandItem(cell.rowKey, !isExpand);
+                this.ctx.emit('expandChange', this.ctx.database.getExpandRowKeys());
+            }
+        });
+    }
+    private initSelection() {
+        this.ctx.on('cellClick', (cell, e) => {
+            if (!cell.isImageInside('selection', e)) {
+                return;
+            }
+            const selectable = this.ctx.database.getRowSelectable(cell.rowKey);
+            if (!selectable) {
+                return;
+            }
+            this.ctx.database.toggleRowSelection(cell.rowKey, cell.type);
+        });
     }
     // 调整行的高度
     private initResizeRow() {
@@ -285,8 +337,11 @@ export default class Body {
         return true;
     }
     private initDragRow() {
-        this.ctx.on('dragRowMouseDown', (cell) => {
+        this.ctx.on('cellMousedown', (cell, e) => {
             if (!this.ctx.config.ENABLE_DRAG_ROW) {
+                return;
+            }
+            if (!cell.isImageInside('drag', e)) {
                 return;
             }
             this.dragSource = cell;
@@ -296,6 +351,7 @@ export default class Body {
             this.dragRowDiff = this.ctx.mouseY - cell.drawY;
             this.ctx.stageElement.style.cursor = 'grabbing';
             this.ctx.clearSelector();
+            this.ctx.emit('dragRowMouseDown', cell);
             this.ctx.emit('draw');
         });
         this.ctx.on('mouseup', async () => {
@@ -334,7 +390,6 @@ export default class Body {
             this.dragTarget = null;
             this.dragPosition = 'after';
             this.dragRowDiff = 0;
-            this.ctx.stageElement.style.cursor = 'default';
             this.ctx.emit('draw');
         });
         this.ctx.on('mousemove', (e) => {

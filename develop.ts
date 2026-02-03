@@ -818,34 +818,37 @@ const eVirtTable = new EVirtTable(canvas, {
                 // 合并行单元格
                 return mergeRowCell(params, 'emp_name', ['emp_name', 'phone']);
             }
-            // if (['emp_name221', 'emp_name222', 'emp_name2'].includes(column.key)) {
+            // if (['emp_name221', 'emp_name222'].includes(column.key)) {
             //     return mergeColCell(params, ['emp_name221', 'emp_name222']);
+            // }
+            // if (['emp_name111', 'emp_name112', 'emp_name113'].includes(column.key)) {
+            //     return mergeColCell(params, ['emp_name111', 'emp_name112', 'emp_name113']);
             // }
             // if (column.key === 'selection') {
             //     // 合并行单元格
             //     return mergeRowCell(params, 'emp_name');
             // }
             // // 合并动态列单元格
-            if (colIndex > 4) {
-                const spanObj = getSpanObjByColumn(row, visibleLeafColumns);
-                if (spanObj[column.key] === 0) {
-                    return {
-                        rowspan: 0,
-                        colspan: 0,
-                    };
-                }
-                return {
-                    rowspan: 1,
-                    colspan: spanObj[column.key],
-                };
-            }
+            // if (colIndex > 4) {
+            //     const spanObj = getSpanObjByColumn(row, visibleLeafColumns);
+            //     if (spanObj[column.key] === 0) {
+            //         return {
+            //             rowspan: 0,
+            //             colspan: 0,
+            //         };
+            //     }
+            //     return {
+            //         rowspan: 1,
+            //         colspan: spanObj[column.key],
+            //     };
+            // }
         },
         BEFORE_DRAG_ROW_METHOD: async (params: BeforeDragRowParams) => {
             const { source, target, position } = params;
             if (target.parentRowKey === '1') {
                 console.log('不能调整到1级');
                 return false;
-            } 
+            }
             return true;
             // return new Promise<boolean>((resolve) => {
             //     setTimeout(() => {
