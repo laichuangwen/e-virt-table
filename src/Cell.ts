@@ -696,8 +696,8 @@ export default class Cell extends BaseCell {
             return;
         }
         const selectionImage = new CellImage(checkboxName, iconX, iconY, CHECKBOX_SIZE, CHECKBOX_SIZE, checkboxImage);
-        const isIndexSelection = type === 'index-selection' && ((this.ctx.hoverCell && this.ctx.hoverCell.rowIndex === rowIndex) || (['checkbox-disabled', 'checkbox-check'].includes(checkboxName)));
-        if (!isIndexSelection) {
+        const isIndexSelection = type === 'index-selection' && !((this.ctx.hoverCell && this.ctx.hoverCell.rowIndex === rowIndex) || (['checkbox-disabled', 'checkbox-check'].includes(checkboxName)));
+        if (isIndexSelection) {
             selectionImage.setVisible(false);
         }
         this.setImage('selection', selectionImage);
