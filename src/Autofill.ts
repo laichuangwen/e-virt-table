@@ -186,7 +186,11 @@ export default class Autofill {
                 message: this.ctx.locale.getText('mergeCellNoFill'),
                 data: [],
             };
-            this.ctx.emit('error', err);
+            if (this.ctx.hasEvent('error')) {
+                this.ctx.emit('error', err);
+            } else {
+                console.error(err.message);
+            }
             return;
         }
         let changeList = [];
@@ -268,5 +272,5 @@ export default class Autofill {
             this.setAutofill(xArr, yArr);
         }
     }
-    destroy() {}
+    destroy() { }
 }

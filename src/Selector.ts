@@ -559,7 +559,11 @@ export default class Selector {
                     code: 'ERR_MERGED_CELLS_COPY',
                     message: this.ctx.locale.getText('mergeCellNoCopy'),
                 };
-                this.ctx.emit('error', err);
+                if (this.ctx.hasEvent('error')) {
+                    this.ctx.emit('error', err);
+                } else {
+                    console.error(err.message);
+                }
                 return;
             }
         }
@@ -683,7 +687,11 @@ export default class Selector {
                             message: this.ctx.locale.getText('mergeCellNoPaste'),
                             data: [],
                         };
-                        this.ctx.emit('error', err);
+                        if (this.ctx.hasEvent('error')) {
+                            this.ctx.emit('error', err);
+                        } else {
+                           console.error(err.message);
+                        }
                         return;
                     }
                     let changeList: ChangeItem[] = [];
@@ -917,5 +925,5 @@ export default class Selector {
             this.ctx.setScroll(_scrollX, _scrollY);
         }
     }
-    destroy() {}
+    destroy() { }
 }
