@@ -227,7 +227,7 @@ export default class Editor {
         this.ctx.containerElement.appendChild(this.editorEl);
     }
     private autoSize() {
-        if(!this.ctx.editing) {
+        if (!this.ctx.editing) {
             return;
         }
         // 针对数字类型提示错误信息
@@ -419,8 +419,8 @@ export default class Editor {
         if (!cell) {
             return;
         }
-        this.editorEl.style.left = `${cell.drawX - 1}px`;
-        this.editorEl.style.top = `${cell.drawY - 1}px`;
+        this.editorEl.style.left = `${cell.drawX}px`;
+        this.editorEl.style.top = `${cell.drawY}px`;
         this.editorEl.style.maxHeight = `${cell.visibleHeight}px`;
         this.editorEl.style.zIndex = '-1';
     }
