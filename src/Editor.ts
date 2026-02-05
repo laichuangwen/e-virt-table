@@ -28,6 +28,7 @@ export default class Editor {
         });
         this.ctx.on('moveFocus', (cell) => {
             this.cellTarget = cell;
+            this.resetEditorStyle();
             const { xArr, yArr } = this.ctx.selector;
             this.selectorArrStr = JSON.stringify(xArr) + JSON.stringify(yArr);
         });
@@ -174,6 +175,7 @@ export default class Editor {
             this.selectorArrStr = selectorArrStr;
             this.doneEdit();
             this.cellTarget = cell;
+            this.resetEditorStyle();
             // 单击单元格进入编辑模式
             if (this.ctx.config.ENABLE_EDIT_SINGLE_CLICK) {
                 // 启用合并单元格关联&&只有合并单元格时才进入编辑模式
@@ -226,6 +228,9 @@ export default class Editor {
         this.ctx.containerElement.appendChild(this.editorEl);
     }
     private autoSize() {
+        if(!this.ctx.editing) {
+            return;
+        }
         // 针对数字类型提示错误信息
         const value = this.inputEl.value;
         if (this.cellTarget && this.cellTarget.type === 'number' && value !== '') {
@@ -398,24 +403,26 @@ export default class Editor {
         if (!this.enable) {
             return;
         }
-        const {
-            header,
-            config: { CELL_HEIGHT },
-        } = this.ctx;
         this.doneEditByInput();
         this.ctx.emit('cellHideTooltip');
         this.ctx.emit('doneEdit', this.cellTarget);
         this.enable = false;
         this.ctx.editing = false;
-        this.inputEl.style.display = 'inline-block';
-        this.editorEl.style.left = '0px';
-        this.editorEl.style.top = `${header.height}px`;
-        this.editorEl.style.maxHeight = `${CELL_HEIGHT}px`;
-        this.editorEl.style.zIndex = '-1';
+        this.resetEditorStyle();
         setTimeout(() => {
             this.inputEl.focus({ preventScroll: true });
         }, 0);
         this.ctx.emit('draw');
+    }
+    private resetEditorStyle() {
+        const cell = this.cellTarget;
+        if (!cell) {
+            return;
+        }
+        this.editorEl.style.left = `${cell.drawX - 1}px`;
+        this.editorEl.style.top = `${cell.drawY - 1}px`;
+        this.editorEl.style.maxHeight = `${cell.visibleHeight}px`;
+        this.editorEl.style.zIndex = '-1';
     }
     clearEditor() {
         this.doneEdit();
