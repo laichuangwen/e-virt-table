@@ -93,7 +93,6 @@ export default class Context {
     domSelectionStr = '';
     isMouseoverTargetContainer = false;
     mousedown = false;
-    isPointer = false;
     isEmpty = false; // 是否空数据
     rowResizing = false; // 行调整大小中
     columnResizing = false; // 列调整大小中
@@ -182,7 +181,7 @@ export default class Context {
         xArr: [-1, -1],
         yArr: [-1, -1],
     };
-    finderBar: FinderResult={
+    finderBar: FinderResult = {
         text: '',
         rowIndex: -1,
         colIndex: -1,

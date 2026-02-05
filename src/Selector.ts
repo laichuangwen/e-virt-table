@@ -53,9 +53,6 @@ export default class Selector {
             if (this.ctx.stageElement.style.cursor === 'pointer') {
                 return;
             }
-            if (this.ctx.isPointer) {
-                return;
-            }
             // 如果是填充返回
             if (this.ctx.stageElement.style.cursor === 'crosshair') {
                 return;
@@ -95,9 +92,6 @@ export default class Selector {
         this.ctx.on('cellHeaderMousedown', (cell, e) => {
             // 如果是选中就不处理，比如chexkbox
             if (this.ctx.stageElement.style.cursor === 'pointer') {
-                return;
-            }
-            if (this.ctx.isPointer) {
                 return;
             }
             // 解决dom文档选中问题

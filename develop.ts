@@ -46,14 +46,15 @@ let columns: Column[] = [
     //     // dragDisabled: true,
     //     widthFillDisable: true,
     // },
-    {
-        key: 'id',
-        width: 100,
-        title: 'ID',
-        fixed: 'left',
-        minWidth: 80,
-        maxWidth: 200,
-    },
+    // {
+    //     key: 'id',
+    //     width: 100,
+    //     title: 'ID',
+    //     fixed: 'left',
+    //     // dragRow: true,
+    //     minWidth: 80,
+    //     maxWidth: 200,
+    // },
     // {
     //   key: "selection",
     //   type: "index-selection",
@@ -66,24 +67,25 @@ let columns: Column[] = [
         width: 100,
         fixed: 'left',
         align: 'left',
-
+        // dragRow: true,
+        // type: 'selection',
         hoverIconName: 'icon-edit',
         placeholder: '请输入',
         // maxLineClamp: 3,
         // editorType: 'none',
         verticalAlign: 'middle',
         // hide: true,
-        render: (pEl, cell) => {
-            const cellEl = document.createElement('div');
-            cellEl.addEventListener('click', () => {
-                console.log('点击了姓名');
-            });
-            cellEl.style.opacity = '0.5';
-            cellEl.style.backgroundColor = 'cyan';
+        // render: (pEl, cell) => {
+        //     const cellEl = document.createElement('div');
+        //     cellEl.addEventListener('click', () => {
+        //         console.log('点击了姓名');
+        //     });
+        //     cellEl.style.opacity = '0.5';
+        //     cellEl.style.backgroundColor = 'cyan';
 
-            cellEl.innerHTML = cell.text;
-            pEl.appendChild(cellEl);
-        },
+        //     cellEl.innerHTML = cell.text;
+        //     pEl.appendChild(cellEl);
+        // },
         // render: "emp_name",
     },
     // {

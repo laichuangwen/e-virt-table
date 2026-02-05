@@ -252,6 +252,9 @@ export class Paint {
         const lineHeight = fontSize * (options.lineHeight || 1.2); // 默认行高为字体大小的1.2倍
         const textOffsetY = fontSize * 0.14; // 经验值 6%~12%
         const availableWidth = width - padding * 2 - offsetLeft - offsetRight;
+        if(availableWidth <= padding) {
+            return true;
+        }
         let textEllipsis = false;
         // 计算总行数,向上取整round
         const maxTextLine = Math.round((height - 2 * padding) / lineHeight);

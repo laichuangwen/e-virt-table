@@ -145,7 +145,7 @@ export default class Editor {
         // 重绘可能会导致cellClick事件不能触发，调整用按下cellMouseup按下延时赋值cellTarget
         this.ctx.on('cellMouseup', (cell: Cell) => {
             // 如果是选择器，不进入编辑模式
-            if (this.ctx.isPointer) {
+            if (this.ctx.stageElement.style.cursor === 'pointer') {
                 return;
             }
             // 不在区域内

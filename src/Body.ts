@@ -144,6 +144,9 @@ export default class Body {
     }
     private initTree() {
         this.ctx.on('cellClick', (cell, e) => {
+            if (this.ctx.stageElement.style.cursor !== 'pointer') {
+                return;
+            }
             if (!cell.isImageInside('tree', e)) {
                 return;
             }
@@ -182,6 +185,9 @@ export default class Body {
     }
     private initSelection() {
         this.ctx.on('cellClick', (cell, e) => {
+            if (this.ctx.stageElement.style.cursor !== 'pointer') {
+                return;
+            }
             if (!cell.isImageInside('selection', e)) {
                 return;
             }
@@ -318,24 +324,6 @@ export default class Body {
             }
         });
     }
-    private isDragRowValid() {
-        if (!this.ctx.config.ENABLE_DRAG_ROW) {
-            return false;
-        }
-        if (!this.dragSource) {
-            return false;
-        }
-        if (!this.dragTarget) {
-            return false;
-        }
-        if (!this.ctx.dragRowIng) {
-            return false;
-        }
-        if (this.ctx.stageElement.style.cursor === 'not-allowed') {
-            return false;
-        }
-        return true;
-    }
     private initDragRow() {
         this.ctx.on('cellMousedown', (cell, e) => {
             if (!this.ctx.config.ENABLE_DRAG_ROW) {
@@ -355,35 +343,38 @@ export default class Body {
             this.ctx.emit('draw');
         });
         this.ctx.on('mouseup', async () => {
-            if (this.isDragRowValid()) {
-                try {
-                    const dragSource = this.dragSource as Cell;
-                    const dragTarget = this.dragTarget as Cell;
-                    const params = {
-                        source: dragSource,
-                        target: dragTarget,
-                        position: this.dragPosition,
-                    };
-                    let isDragRow = true;
-                    const { BEFORE_DRAG_ROW_METHOD } = this.ctx.config;
-                    // 判断是不是函数
-                    if (typeof BEFORE_DRAG_ROW_METHOD === 'function') {
-                        // 判断的是不是Promise
-                        isDragRow = await BEFORE_DRAG_ROW_METHOD(params);
-                    }
-                    if (isDragRow) {
-                        this.ctx.emit('dragRowChange', params);
-                        const originalData = this.ctx.database.getOriginalData();
-                        const { TREE_CHILDREN_KEY, ROW_KEY } = this.ctx.config;
-                        const treeUtil = new TreeUtil(originalData, {
-                            key: ROW_KEY,
-                            childrenKey: TREE_CHILDREN_KEY,
-                        });
-                        treeUtil.treeMove(dragSource.rowKey, dragTarget.rowKey, this.dragPosition);
-                        this.ctx.database.setData(treeUtil.getTree());
-                    }
-
-                } catch { }
+            if (!this.ctx.dragRowIng) {
+                return;
+            }
+            if (this.dragSource && this.dragTarget && this.ctx.stageElement.style.cursor !== 'not-allowed') {
+                const dragSource = this.dragSource;
+                const dragTarget = this.dragTarget;
+                const params = {
+                    source: dragSource,
+                    target: dragTarget,
+                    position: this.dragPosition,
+                };
+                this.ctx.emit('dragRowChange', params);
+                let isDragRow = true;
+                const { BEFORE_DRAG_ROW_METHOD } = this.ctx.config;
+                // 判断是不是函数
+                if (typeof BEFORE_DRAG_ROW_METHOD === 'function') {
+                    // 判断的是不是Promise
+                    isDragRow = await BEFORE_DRAG_ROW_METHOD(params);
+                }
+                if (isDragRow && !this.ctx.config.ENABLE_DRAG_ROW_CUSTOM) {
+                    const originalData = this.ctx.database.getOriginalData();
+                    const { TREE_CHILDREN_KEY, ROW_KEY } = this.ctx.config;
+                    const treeUtil = new TreeUtil(originalData, {
+                        key: ROW_KEY,
+                        childrenKey: TREE_CHILDREN_KEY,
+                    });
+                    treeUtil.treeMove(dragSource.rowKey, dragTarget.rowKey, this.dragPosition);
+                    this.ctx.emit('loadData', treeUtil.getTree());
+                }
+            }
+            if (!this.dragTarget) {
+                this.ctx.stageElement.style.cursor = 'grab';
             }
             this.ctx.dragRowIng = false;
             this.dragSource = null;
@@ -393,7 +384,7 @@ export default class Body {
             this.ctx.emit('draw');
         });
         this.ctx.on('mousemove', (e) => {
-            if (!this.isDragRowValid()) {
+            if (!this.ctx.dragRowIng) {
                 return;
             }
             const { offsetY } = this.ctx.getOffset(e);
@@ -405,15 +396,15 @@ export default class Body {
             }
         });
         this.ctx.on('cellMouseenter', (cell) => {
-            this.dragTarget = cell;
-            if (!this.isDragRowValid()) {
+            if (!this.ctx.dragRowIng) {
                 return;
             }
+            this.dragTarget = cell;
             const { ENABLE_DRAG_ROW_CROSS_LEVEL } = this.ctx.config;
-            const dragSource = this.dragSource as Cell;
-            const dragTarget = this.dragTarget as Cell;
+            const dragSource = this.dragSource;
+            const dragTarget = this.dragTarget;
             // 不启用跨级拖拽时，判断是否在同一级
-            if (!ENABLE_DRAG_ROW_CROSS_LEVEL && dragSource.parentRowKey !== dragTarget.parentRowKey) {
+            if (!ENABLE_DRAG_ROW_CROSS_LEVEL && dragSource && dragTarget && dragSource.parentRowKey !== dragTarget.parentRowKey) {
                 this.ctx.stageElement.style.cursor = 'not-allowed';
                 return;
             }
@@ -428,6 +419,12 @@ export default class Body {
             } else {
                 this.dragPosition = 'inside';
             }
+            const params = {
+                dragSource: this.dragSource,
+                dragTarget: this.dragTarget,
+                dragPosition: this.dragPosition,
+            };
+            this.ctx.emit('dragRowMove', params);
             this.ctx.emit('draw');
         });
     }

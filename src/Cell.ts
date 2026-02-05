@@ -163,14 +163,14 @@ export default class Cell extends BaseCell {
     update() {
         this.drawX = this.getDrawX();
         this.drawY = this.getDrawY();
+        this.updateSpan();
         this.updateDragImage();
         const dragImage = this.getImage('drag');
         const drawDragImageWidth = dragImage ? dragImage.width : 0;
         this.drawTextX = this.drawX + drawDragImageWidth;
         this.drawTextY = this.drawY;
         this.isHasChanged = this.ctx.database.isHasChangedData(this.rowKey, this.key);
-        this.updateSpan();
-        this.drawTextWidth = this.visibleWidth;
+        this.drawTextWidth = this.visibleWidth - drawDragImageWidth;
         this.drawTextHeight = this.visibleHeight;
         this.updateStyle();
         this.updateType();
@@ -408,6 +408,9 @@ export default class Cell extends BaseCell {
             const dragImageX = this.drawX + CELL_PADDING / 2;
             const dragImageY = this.drawY + (this.visibleHeight - DRAG_ROW_ICON_SIZE) / 2;
             const dragImage = new CellImage('drag', dragImageX, dragImageY, DRAG_ROW_ICON_SIZE, DRAG_ROW_ICON_SIZE, this.ctx.icons.get('drag'));
+            if (this.rowspan === 0) {
+                dragImage.setVisible(false);
+            }
             this.setImage('drag', dragImage);
         }
     }
@@ -696,9 +699,23 @@ export default class Cell extends BaseCell {
             return;
         }
         const selectionImage = new CellImage(checkboxName, iconX, iconY, CHECKBOX_SIZE, CHECKBOX_SIZE, checkboxImage);
-        const isIndexSelection = type === 'index-selection' && !((this.ctx.hoverCell && this.ctx.hoverCell.rowIndex === rowIndex) || (['checkbox-disabled', 'checkbox-check'].includes(checkboxName)));
-        if (isIndexSelection) {
-            selectionImage.setVisible(false);
+        if (type === 'index-selection') {
+            let minY = this.rowIndex;
+            let maxY = this.rowIndex;
+            if (this.rowspan === 0) {
+                selectionImage.setVisible(false);
+            } else if (this.rowspan === 1 && !(this.ctx.hoverCell && this.ctx.hoverCell.rowIndex === rowIndex)) {
+                selectionImage.setVisible(false);
+            } else {
+                const hoverCell = this.ctx.hoverCell;
+                const spanInfo = this.getSpanInfo();
+                const { yArr } = spanInfo;
+                minY = yArr[0];
+                maxY = yArr[1];
+                if (!(hoverCell && hoverCell.rowIndex >= minY && hoverCell.rowIndex <= maxY)) {
+                    selectionImage.setVisible(false);
+                }
+            }
         }
         this.setImage('selection', selectionImage);
     }

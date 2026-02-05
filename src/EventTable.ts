@@ -59,7 +59,7 @@ export default class EventTable {
                 this.ctx.setFocusCell(cell);
                 this.ctx.focusCellHeader = undefined;
                 this.ctx.emit('cellMousedown', cell, e);
-            });
+            }, true);
         });
         // 按上事件
         this.ctx.on('mouseup', (e) => {
@@ -75,11 +75,9 @@ export default class EventTable {
             const y = offsetY;
             const x = offsetX;
             this.handleHeaderEvent(x, y, this.ctx.header.renderCellHeaders, (cell: CellHeader) => {
-                this.ctx.focusCellHeader = cell;
                 this.ctx.emit('cellHeaderMouseup', cell, e);
             });
             this.handleBodyEvent(x, y, this.ctx.body.renderRows, (cell: Cell) => {
-                this.ctx.setFocusCell(cell);
                 this.ctx.emit('cellMouseup', cell, e);
             });
         });
@@ -161,7 +159,6 @@ export default class EventTable {
             if (this.isBusy(e)) {
                 return;
             }
-            this.ctx.isPointer = false;
             if (!this.ctx.mousedown && this.ctx.stageElement.style.cursor !== 'default') {
                 this.ctx.stageElement.style.cursor = 'default';
             }
@@ -199,7 +196,7 @@ export default class EventTable {
             );
             // 正常
             this.handleBodyEvent(x, y, this.ctx.body.renderRows, (cell: Cell) => {
-                this.imageEnterAndLeave(cell, e);
+                // this.imageEnterAndLeave(cell, e);
                 this.ctx.emit('cellMouseenter', cell, e);
                 // 移出事件
                 if (this.ctx.hoverCell && this.ctx.hoverCell !== cell) {
@@ -231,6 +228,9 @@ export default class EventTable {
      * @param e
      */
     private imageEnterAndLeave(cell: Cell | CellHeader, e: MouseEvent) {
+        if (this.ctx.dragRowIng || this.ctx.dragHeaderIng || this.ctx.selectColsIng || this.ctx.selectRowsIng || this.ctx.selectorMove || this.ctx.autofillMove) {
+            return;
+        }
         const { offsetY, offsetX } = this.ctx.getOffset(e);
         const y = offsetY;
         const x = offsetX;
@@ -241,7 +241,6 @@ export default class EventTable {
                 } else {
                     this.ctx.stageElement.style.cursor = 'pointer';
                 }
-                this.ctx.isPointer = true;
             }
         });
     }

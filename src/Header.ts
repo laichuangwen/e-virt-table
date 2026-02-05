@@ -138,6 +138,9 @@ export default class Header {
     }
     private initSelection() {
         this.ctx.on('cellHeaderClick', (cellHeader, e) => {
+            if (this.ctx.stageElement.style.cursor !== 'pointer') {
+                return;
+            }
             if (!cellHeader.isImageInside('selection', e)) {
                 return;
             }

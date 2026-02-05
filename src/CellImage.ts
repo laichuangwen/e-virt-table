@@ -31,6 +31,9 @@ export default class CellImage {
         mouseX: number,
         mouseY: number
     ) {
+        if (!this.visible) {
+            return false;
+        }
         if (this.source && mouseX > this.x && mouseX < this.x + this.width && mouseY > this.y && mouseY < this.y + this.height) {
             return true;
         }

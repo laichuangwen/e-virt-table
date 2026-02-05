@@ -329,6 +329,8 @@ export default class Config {
     ENABLE_DRAG_ROW = false;
     /** 启用拖拽行跨级,针对tree数据结构 */
     ENABLE_DRAG_ROW_CROSS_LEVEL = false;
+    /** 启用拖拽行自定义 */
+    ENABLE_DRAG_ROW_CUSTOM = false;
     /** 拖拽提示线颜色 */
     DRAG_ROW_TIP_LINE_COLOR = 'rgb(82,146,247)';
     /** 拖拽行图标 */

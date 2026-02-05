@@ -74,6 +74,9 @@ export default class EVirtTable {
         this.contextMenu = new ContextMenu(this.ctx);
         this.loading = new Loading(this.ctx);
         this.finderBar = new FinderBar(this.ctx);
+        this.ctx.on('loadData', (data) => {
+            this.loadData(data);
+        });
         this.ctx.on('draw', () => {
             this.draw();
         });
