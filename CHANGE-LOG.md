@@ -7,6 +7,11 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -   
 
+V1.3.19
+### Bug Fixes
+- fix:修复表格选中格子不在当前屏幕后，粘贴会乱滚动
+---  
+
 V1.3.18
 ### Bug Fixes
 - feat:添加只读Cell不校验
