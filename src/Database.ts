@@ -139,7 +139,7 @@ export default class Database {
                 item.children = item[TREE_CHILDREN_KEY];
             }
             const _rowKey = item[ROW_KEY]; // 行唯一标识,否则就rowKey
-            const rowKey = _rowKey !== undefined && _rowKey !== null ? `${_rowKey}` : generateShortUUID();
+            const rowKey = _rowKey !== undefined && _rowKey !== null ? _rowKey : generateShortUUID();
             this.itemRowKeyMap.set(item, rowKey);
             const height = item._height || CELL_HEIGHT;
             const readonly = item._readonly;
