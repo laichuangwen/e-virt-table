@@ -700,21 +700,22 @@ export default class Cell extends BaseCell {
         }
         const selectionImage = new CellImage(checkboxName, iconX, iconY, CHECKBOX_SIZE, CHECKBOX_SIZE, checkboxImage);
         if (type === 'index-selection') {
+            selectionImage.setVisible(false);
+            if (
+                (this.ctx.hoverCell && this.ctx.hoverCell.rowIndex === rowIndex) ||
+                ['checkbox-disabled', 'checkbox-check'].includes(checkboxName)
+            ) {
+                selectionImage.setVisible(true);
+            }
             let minY = this.rowIndex;
             let maxY = this.rowIndex;
-            if (this.rowspan === 0) {
-                selectionImage.setVisible(false);
-            } else if (this.rowspan === 1 && !(this.ctx.hoverCell && this.ctx.hoverCell.rowIndex === rowIndex)) {
-                selectionImage.setVisible(false);
-            } else {
-                const hoverCell = this.ctx.hoverCell;
-                const spanInfo = this.getSpanInfo();
-                const { yArr } = spanInfo;
-                minY = yArr[0];
-                maxY = yArr[1];
-                if (!(hoverCell && hoverCell.rowIndex >= minY && hoverCell.rowIndex <= maxY)) {
-                    selectionImage.setVisible(false);
-                }
+            const hoverCell = this.ctx.hoverCell;
+            const spanInfo = this.getSpanInfo();
+            const { yArr } = spanInfo;
+            minY = yArr[0];
+            maxY = yArr[1];
+            if (hoverCell && hoverCell.rowIndex >= minY && hoverCell.rowIndex <= maxY) {
+                selectionImage.setVisible(true);
             }
         }
         this.setImage('selection', selectionImage);
