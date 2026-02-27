@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table Row Drag - BEFORE_DRAG_ROW_METHOD</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        // Tree data: each node needs unique id, children in children array
+        let data = [
+            {
+                id: 1,
+                name: 'R&D',
+                date: '2016-05-03',
+                state: 'California',
+                city: 'Los Angeles',
+                children: [
+                    { id: 11, name: 'Frontend', date: '2016-05-04', state: 'California', city: 'Los Angeles' },
+                    { id: 12, name: 'Backend', date: '2016-05-01', state: 'California', city: 'Los Angeles' },
+                    {
+                        id: 13,
+                        name: 'Architecture',
+                        date: '2016-05-08',
+                        state: 'California',
+                        city: 'Los Angeles',
+                        children: [
+                            { id: 131, name: 'Infra', date: '2016-05-06', state: 'California', city: 'Los Angeles' },
+                            {
+                                id: 132,
+                                name: 'Middleware',
+                                date: '2016-05-07',
+                                state: 'California',
+                                city: 'Los Angeles',
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                id: 2,
+                name: 'Product',
+                date: '2016-05-02',
+                state: 'Texas',
+                city: 'Houston',
+                children: [
+                    { id: 21, name: 'Team A', date: '2016-05-04', state: 'Texas', city: 'Houston' },
+                    { id: 22, name: 'Team B', date: '2016-05-01', state: 'Texas', city: 'Houston' },
+                ],
+            },
+            {
+                id: 3,
+                name: 'Design',
+                date: '2016-05-04',
+                state: 'Florida',
+                city: 'Miami',
+            },
+        ];
+
+        let columns = [
+            {
+                type: 'tree',
+                title: 'Department / Group',
+                key: 'name',
+                dragRow: true,
+                width: 200,
+                readonly: true,
+            },
+            { title: 'Date', key: 'date', readonly: true, width: 110 },
+            { title: 'State', key: 'state', readonly: true },
+            { title: 'City', key: 'city', readonly: true },
+        ];
+
+        const target = document.getElementById('e-virt-table');
+        const crossLevelCheck = document.getElementById('cross-level-check');
+
+        const allowDragCheck = document.getElementById('allow-drag-check');
+        const onlyCaliforniaCheck = document.getElementById('only-california-check');
+
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                ROW_KEY: 'id',
+                ENABLE_DRAG_ROW: true,
+                ENABLE_DRAG_ROW_CROSS_LEVEL: false,
+                TREE_LINE: true,
+                DEFAULT_EXPAND_ALL: true,
+                // 返回 false 可阻止本次拖拽生效，不更新数据
+                BEFORE_DRAG_ROW_METHOD: async (params) => {
+                    const { source: { rowKey } } = params;
+                    const value = grid.getCellValue(rowKey, 'state');
+                    if (value === 'California') {
+                        alert('You cannot drag the row from California');
+                        return false;
+                    }
+                    return true;
+                },
+            },
+        });
+        grid.on('dragRowChange', ({ source, target, position }) => {
+            const srcName = source?.row?.item?.name ?? source?.rowKey;
+            const tgtName = target?.row?.item?.name ?? target?.rowKey;
+            const posText = { before: 'before', after: 'after', inside: 'inside (as child)' }[position] || position;
+            console.log('Drag: "' + srcName + '" -> "' + tgtName + '" (' + posText + ')', { source, target, position });
+        });
+    </script>
+</html>
