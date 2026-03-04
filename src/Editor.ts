@@ -41,9 +41,6 @@ export default class Editor {
         this.ctx.on('hoverIconClick', (cell) => {
             this.editCell(cell.rowIndex, cell.colIndex);
         });
-        this.ctx.on('cellMousedown', () => {
-            this.inputEl.focus({ preventScroll: true });
-        });
         this.ctx.on('keydown', (e) => {
             if (!this.ctx.isTarget(e)) {
                 return;
@@ -53,6 +50,13 @@ export default class Editor {
             }
             if (this.ctx.finding) {
                 return;
+            }
+            // 如果是多选不能输入任何字符, 如果输入框聚焦，则进入编辑模式
+            const { focusCell } = this.ctx;
+            const isVisible = focusCell.isVerticalVisible() && focusCell.isHorizontalVisible();
+            if (!isVisible) {
+                // 滚动到焦点单元格
+                this.ctx.emit('scrollToIndex', focusCell.rowIndex, focusCell.colIndex);
             }
             if (e.code === 'Escape' && this.ctx.editing) {
                 this.cancel = true;
@@ -142,6 +146,13 @@ export default class Editor {
             if (functionKeys.includes(key)) {
                 return;
             }
+            const isFocus = document.activeElement === this.inputEl;
+            if (!this.ctx.selectOnlyOne || !isFocus) {
+                e.preventDefault();
+                // 终止输入事件
+                this.inputEl.blur();
+                return;
+            }
             this.startEdit(true);
         });
         // 重绘可能会导致cellClick事件不能触发，调整用按下cellMouseup按下延时赋值cellTarget
@@ -175,6 +186,10 @@ export default class Editor {
             this.selectorArrStr = selectorArrStr;
             this.doneEdit();
             this.cellTarget = cell;
+            // 只有文本类型才能聚焦
+            if (this.ctx.selectOnlyOne) {
+                this.inputEl.focus({ preventScroll: true });
+            }
             this.resetEditorStyle();
             // 单击单元格进入编辑模式
             if (this.ctx.config.ENABLE_EDIT_SINGLE_CLICK) {
@@ -190,10 +205,7 @@ export default class Editor {
             }
         });
         this.ctx.on('mousedownBodyOutside', () => {
-            if (this.enable) {
-                this.doneEdit();
-            }
-            this.cellTarget = null;
+            this.clearEditor();
         });
     }
     private isInSelectorRange(rowIndex: number, colIndex: number) {
@@ -289,24 +301,27 @@ export default class Editor {
         this.editorEl.style.display = 'inline-block';
         this.editorEl.style.zIndex = '100';
         this.editorEl.style.left = `${this.drawX - 1}px`;
-        this.editorEl.style.top = `${this.drawY - 1}px`;
+        this.editorEl.style.top = `${this.drawY}px`;
         this.editorEl.style.bottom = `auto`;
+        this.editorEl.style.maxWidth = 'none';
         this.editorEl.style.maxHeight = `${maxHeight}px`;
-        if (editorType === 'text') {
+        if (['text'].includes(editorType)) {
+            this.inputEl.style.opacity = '1';
+            this.inputEl.style.position = 'relative';
             this.inputEl.style.display = 'inline-block';
             this.inputEl.style.minWidth = `${width - 1}px`;
             this.inputEl.style.minHeight = `${height - 1}px`;
             this.inputEl.style.maxHeight = `${maxHeight}px`;
-            this.inputEl.style.width = `${width - 1}px`;
+            this.inputEl.style.width = `${width}px`;
             this.inputEl.style.height = `auto`;
             this.inputEl.style.padding = `${CELL_PADDING}px`;
             this.inputEl.value = ''; // 清空
             if (value !== null) {
                 this.inputEl.value = value;
-                this.inputEl.focus({ preventScroll: true });
             }
         } else {
-            this.inputEl.style.display = 'none';
+            this.inputEl.style.opacity = '0';
+            this.inputEl.style.position = 'absolute';
         }
 
         if (this.inputEl.scrollHeight > height || this.drawY < header.height) {
@@ -409,6 +424,7 @@ export default class Editor {
         this.enable = false;
         this.ctx.editing = false;
         this.resetEditorStyle();
+        // 聚焦输入框,防止非文本类型无法聚焦
         setTimeout(() => {
             this.inputEl.focus({ preventScroll: true });
         }, 0);
@@ -421,7 +437,8 @@ export default class Editor {
         }
         this.editorEl.style.left = `${cell.drawX}px`;
         this.editorEl.style.top = `${cell.drawY}px`;
-        this.editorEl.style.maxHeight = `${cell.visibleHeight}px`;
+        this.editorEl.style.maxWidth = `1px`;
+        this.editorEl.style.maxHeight = `1px`;
         this.editorEl.style.zIndex = '-1';
     }
     clearEditor() {
@@ -430,6 +447,7 @@ export default class Editor {
         this.selectorArrStr = '';
         this.ctx.clearSelector();
         this.ctx.focusCell = undefined;
+        this.inputEl.blur();
         this.ctx.emit('draw');
     }
     destroy() {
