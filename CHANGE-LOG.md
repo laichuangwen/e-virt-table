@@ -7,6 +7,12 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -   
 
+V1.3.21
+### Bug Fixes
+- fix:化编辑器聚焦逻辑
+- fix:更新编辑器的样式
+---  
+
 V1.3.19
 ### Bug Fixes
 - fix:修复表格选中格子不在当前屏幕后，粘贴会乱滚动
