@@ -298,7 +298,6 @@ export default class Editor {
             height = maxHeight;
         }
         // 显示编辑器
-        this.editorEl.style.display = 'inline-block';
         this.editorEl.style.zIndex = '100';
         this.editorEl.style.left = `${this.drawX - 1}px`;
         this.editorEl.style.top = `${this.drawY}px`;
@@ -308,7 +307,6 @@ export default class Editor {
         if (['text'].includes(editorType)) {
             this.inputEl.style.opacity = '1';
             this.inputEl.style.position = 'relative';
-            this.inputEl.style.display = 'inline-block';
             this.inputEl.style.minWidth = `${width - 1}px`;
             this.inputEl.style.minHeight = `${height - 1}px`;
             this.inputEl.style.maxHeight = `${maxHeight}px`;
@@ -321,7 +319,11 @@ export default class Editor {
             }
         } else {
             this.inputEl.style.opacity = '0';
+            this.inputEl.style.width = '1px';
+            this.inputEl.style.height = '1px';
             this.inputEl.style.position = 'absolute';
+            this.inputEl.style.left = '0px';
+            this.inputEl.style.top = '0px';
         }
 
         if (this.inputEl.scrollHeight > height || this.drawY < header.height) {
