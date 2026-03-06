@@ -155,17 +155,23 @@ export default class Editor {
             this.startEdit(true);
         });
         // 重绘可能会导致cellClick事件不能触发，调整用按下cellMouseup按下延时赋值cellTarget
-        this.ctx.on('cellMouseup', (cell: Cell) => {
+        this.ctx.on('cellClick', (cell: Cell) => {
             // 如果是选择器，不进入编辑模式
             if (this.ctx.stageElement.style.cursor === 'pointer') {
                 return;
             }
+            console.log('cellClick', document.activeElement);
             // 不在区域内
             if (!this.isInSelectorRange(cell.rowIndex, cell.colIndex)) {
                 return;
             }
             const { xArr, yArr } = this.ctx.selector;
             const selectorArrStr = JSON.stringify(xArr) + JSON.stringify(yArr);
+            // 只有文本类型才能聚焦
+            if (this.ctx.selectOnlyOne) {
+                console.log('focus');
+                this.inputEl.focus({ preventScroll: true });
+            }
             if (this.selectorArrStr === selectorArrStr && this.cellTarget) {
                 // 启用合并单元格关联&&只有合并单元格时才进入编辑模式
                 if (this.ctx.config.ENABLE_MERGE_CELL_LINK && this.ctx.onlyMergeCell) {
@@ -185,10 +191,6 @@ export default class Editor {
             this.selectorArrStr = selectorArrStr;
             this.doneEdit();
             this.cellTarget = cell;
-            // 只有文本类型才能聚焦
-            if (this.ctx.selectOnlyOne) {
-                this.inputEl.focus({ preventScroll: true });
-            }
             this.resetEditorStyle();
             // 单击单元格进入编辑模式
             if (this.ctx.config.ENABLE_EDIT_SINGLE_CLICK) {
@@ -204,7 +206,7 @@ export default class Editor {
             }
         });
         this.ctx.on('mousedownBodyOutside', () => {
-            this.clearEditor();
+            // this.clearEditor();
         });
     }
     private isInSelectorRange(rowIndex: number, colIndex: number) {

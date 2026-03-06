@@ -188,6 +188,7 @@ export interface Column {
     min?: number; // 最小值,数字类型有效
     max?: number; // 最大值,数字类型有效
     maxlength?: number; // 最大长度,字符串类型有效
+    mixedRender?: boolean; // 混合渲染,dom和canvas一起渲染
 }
 export type LineClampType = number | 'auto';
 export type HistoryAction = 'back' | 'forward' | 'none';

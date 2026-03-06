@@ -85,6 +85,7 @@ export default class Cell extends BaseCell {
     min?: number = undefined;
     max?: number = undefined;
     maxlength?: number = undefined;
+    mixedRender?: boolean = false;
 
     constructor(
         ctx: Context,
@@ -139,6 +140,7 @@ export default class Cell extends BaseCell {
         this.min = column.min;
         this.max = column.max;
         this.maxlength = column.maxlength;
+        this.mixedRender = column.mixedRender || false;
         const rowItem = this.ctx.database.getRowForRowKey(this.rowKey);
         if (this.cellType === 'body' && rowItem) {
             this.parentRowKey = rowItem.parentRowKey;
@@ -848,8 +850,8 @@ export default class Cell extends BaseCell {
             if (this.rowspan === 0 || this.colspan === 0) {
                 return '';
             }
-            // 插槽不显示文本
-            if (this.render) {
+            // dom和canvas一起渲染
+            if (this.render && !this.mixedRender) {
                 return '';
             }
             const selectionImage = this.getImage('selection');

@@ -218,6 +218,7 @@ let columns: Column[] = [
         title: '性别',
         key: 'sex',
         // readonly: false,
+        mixedRender: true,
         // render: "sex",
         // rules: [
         //     {
@@ -247,21 +248,24 @@ let columns: Column[] = [
             pEl.appendChild(cellEl);
         },
         render: (pEl, cell) => {
+            // 右上角一个标
             const cellEl = document.createElement('div');
-            cellEl.style.width = '100%';
-            cellEl.style.opacity = '0.5';
-            cellEl.style.backgroundColor = 'cyan';
-            cellEl.style.display = 'block';
-            // cellEl.style.justifyContent = 'center';
-            // cellEl.style.alignItems = 'center';
-            cellEl.style.whiteSpace = 'pre-line';
-            cellEl.style.userSelect = 'text';
-            cellEl.innerHTML = cell.text;
-            cellEl.className = 'evt-body-cell-auto-height';
-            cellEl.dataset.rowIndex = cell.rowIndex;
-            cellEl.dataset.visibleWidth = cell.visibleWidth;
-            cellEl.dataset.visibleHeight = cell.visibleHeight;
+            cellEl.style.position = 'absolute';
+            cellEl.style.top = '0';
+            cellEl.style.right = '0';
+            cellEl.style.width = '20px';
+            cellEl.style.height = '20px';
+            cellEl.style.backgroundColor = 'red';
+            cellEl.style.borderRadius = '50%';
+            cellEl.style.display = 'flex';
+            cellEl.style.justifyContent = 'center';
+            cellEl.innerHTML = '★';
             pEl.appendChild(cellEl);
+            // 添加事件，组织冒泡
+            cellEl.addEventListener('click', (e: MouseEvent) => {
+                e.stopPropagation();
+                console.log('点击了性别');
+            });
         },
     },
     {

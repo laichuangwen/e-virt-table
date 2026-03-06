@@ -48,8 +48,7 @@ h:400px
 
 通过配置 `BEFORE_DRAG_ROW_METHOD` 在拖拽结束前拦截：返回 `false` 时本次拖拽不生效，数据不更新。可用于全局开关（如权限）、或按行数据条件限制（如仅允许某 state 的行被拖动）。
 
-::: demo
-
+::: demo State 为California 禁用移动
 row-drag/method
 h:480px
 :::
