@@ -31,6 +31,7 @@ export default class Editor {
             this.resetEditorStyle();
             const { xArr, yArr } = this.ctx.selector;
             this.selectorArrStr = JSON.stringify(xArr) + JSON.stringify(yArr);
+            this.focusInput();
         });
         // 滚动时，结束编辑
         this.ctx.on('onScroll', () => {
@@ -156,7 +157,7 @@ export default class Editor {
             this.startEdit(true);
         });
         // 重绘可能会导致cellClick事件不能触发，调整用按下cellMouseup按下延时赋值cellTarget
-        this.ctx.on('cellMouseup', (cell: Cell) => {
+        this.ctx.on('cellClick', (cell: Cell) => {
             // 如果是选择器，不进入编辑模式
             if (this.ctx.isPointer) {
                 return;
@@ -167,6 +168,8 @@ export default class Editor {
             }
             const { xArr, yArr } = this.ctx.selector;
             const selectorArrStr = JSON.stringify(xArr) + JSON.stringify(yArr);
+            // 只有文本类型才能聚焦
+            this.focusInput();
             if (this.selectorArrStr === selectorArrStr && this.cellTarget) {
                 // 启用合并单元格关联&&只有合并单元格时才进入编辑模式
                 if (this.ctx.config.ENABLE_MERGE_CELL_LINK && this.ctx.onlyMergeCell) {
@@ -186,10 +189,6 @@ export default class Editor {
             this.selectorArrStr = selectorArrStr;
             this.doneEdit();
             this.cellTarget = cell;
-            // 只有文本类型才能聚焦
-            if (this.ctx.selectOnlyOne) {
-                this.inputEl.focus({ preventScroll: true });
-            }
             this.resetEditorStyle();
             // 单击单元格进入编辑模式
             if (this.ctx.config.ENABLE_EDIT_SINGLE_CLICK) {
@@ -203,9 +202,6 @@ export default class Editor {
                     this.startEdit();
                 }
             }
-        });
-        this.ctx.on('mousedownBodyOutside', () => {
-            this.clearEditor();
         });
     }
     private isInSelectorRange(rowIndex: number, colIndex: number) {
@@ -346,6 +342,11 @@ export default class Editor {
             }
         }
     }
+    private focusInput() {
+        if (this.ctx.selectOnlyOne && document.activeElement !== this.inputEl) {
+            this.inputEl.focus({ preventScroll: true });
+        }
+    }
     startEdit(ignoreValue = false) {
         this.cancel = false;
         // 如果不启用点击选择器编辑
@@ -428,7 +429,7 @@ export default class Editor {
         this.resetEditorStyle();
         // 聚焦输入框,防止非文本类型无法聚焦
         setTimeout(() => {
-            this.inputEl.focus({ preventScroll: true });
+            this.focusInput();
         }, 0);
         this.ctx.emit('draw');
     }

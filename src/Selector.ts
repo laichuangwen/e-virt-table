@@ -45,6 +45,9 @@ export default class Selector {
             }
             this.mouseenter();
         });
+        this.ctx.on('cellClick', () => { 
+            this.adjustBoundaryPosition();
+        });
         this.ctx.on('cellMousedown', (cell, e) => {
             if (!this.ctx.isTarget(e)) {
                 return;
@@ -77,7 +80,6 @@ export default class Selector {
         this.ctx.on('mouseup', () => {
             this.ctx.selectorMove = false;
             this.ctx.stopAdjustPosition();
-            this.ctx.adjustPositioning = false;
             setTimeout(() => {
                 this.ctx.disableHoverIconClick = false;
             }, 0);
@@ -185,6 +187,7 @@ export default class Selector {
         this.ctx.on('setSelectorCell', (cell: Cell) => {
             this.ctx.setFocusCell(cell);
             this.click();
+            this.adjustBoundaryPosition();
         });
         //解耦：外部调用选择单元格
         this.ctx.on('selectCols', (cell: CellHeader) => {
@@ -518,7 +521,6 @@ export default class Selector {
             const xArr = [focusCell.colIndex, focusCell.colIndex];
             const yArr = [focusCell.rowIndex, focusCell.rowIndex];
             this.setSelector(xArr, yArr);
-            this.adjustBoundaryPosition();
         }
     }
 
@@ -920,12 +922,9 @@ export default class Selector {
             _scrollY = Math.floor(scrollY + diffBottom);
         }
         // >1是因为上面为了可移动加1，所以这里要大于2(保险一点)
-        if (Math.abs(scrollX - _scrollX) > 2 || Math.abs(scrollY - _scrollY) > 2) {
-            this.ctx.adjustPositioning = true;
-            // fix:处理移动后编辑器，需要再点击一次,编辑器那边有监听
-            this.ctx.emit('adjustBoundaryPosition', focusCell);
+        if (Math.abs(scrollX - _scrollX) > 2.5 || Math.abs(scrollY - _scrollY) > 2.5) {
             this.ctx.setScroll(_scrollX, _scrollY);
         }
     }
-    destroy() {}
+    destroy() { }
 }

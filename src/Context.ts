@@ -104,7 +104,6 @@ export default class Context {
     selectRowsIng = false; // 选择行中
     dragHeaderIng = false; // 拖拽表头中
     finding = false; // 查找中
-    adjustPositioning = false; // 调整位置中
     contextMenuIng = false; // 右键菜单中
     editing = false; // 编辑中
     loading = false; // 加载中
