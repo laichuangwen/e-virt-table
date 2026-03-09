@@ -7,6 +7,11 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -   
 
+V1.3.22
+### Bug Fixes
+- fix:修复多选隐藏表头
+- fix:优化编辑器体验性问题
+---  
 V1.3.21
 ### Bug Fixes
 - fix:化编辑器聚焦逻辑
