@@ -148,10 +148,8 @@ export default class Editor {
                 return;
             }
             const isFocus = document.activeElement === this.inputEl;
-            if (!this.ctx.selectOnlyOne || !isFocus) {
+            if (!isFocus) {
                 e.preventDefault();
-                // 终止输入事件
-                this.inputEl.blur();
                 return;
             }
             this.startEdit(true);
@@ -343,7 +341,7 @@ export default class Editor {
         }
     }
     private focusInput() {
-        if (this.ctx.selectOnlyOne && document.activeElement !== this.inputEl) {
+        if (document.activeElement !== this.inputEl) {
             this.inputEl.focus({ preventScroll: true });
         }
     }

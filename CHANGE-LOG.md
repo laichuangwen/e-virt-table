@@ -7,6 +7,11 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -   
 
+V1.3.23
+### Bug Fixes
+- fix:解决合并单元格编辑问题
+---  
+
 V1.3.22
 ### Bug Fixes
 - fix:修复多选隐藏表头
