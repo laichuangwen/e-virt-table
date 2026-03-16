@@ -21,7 +21,7 @@ export default class Selector {
             'mousemove',
             throttle((e) => {
                 // focus为fixed的不处理
-                if (this.ctx.focusCell?.fixed || this.ctx.focusCellHeader?.fixed) {
+                if (this.ctx.focusCellHeader?.fixed) {
                     return;
                 }
                 if (!this.ctx.dragHeaderIng && this.ctx.selectorMove) {
