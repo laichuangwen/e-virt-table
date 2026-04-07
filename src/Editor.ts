@@ -148,7 +148,7 @@ export default class Editor {
                 return;
             }
             const isFocus = document.activeElement === this.inputEl;
-            if (!isFocus) {
+            if (!isFocus && focusCell.editorType === 'text') {
                 e.preventDefault();
                 return;
             }
@@ -311,6 +311,9 @@ export default class Editor {
             if (value !== null) {
                 this.inputEl.value = value;
             }
+            if (this.inputEl.scrollHeight > height || this.drawY < header.height) {
+                this.autoSize();
+            }
         } else {
             this.inputEl.style.opacity = '0';
             this.inputEl.style.width = '1px';
@@ -318,10 +321,6 @@ export default class Editor {
             this.inputEl.style.position = 'absolute';
             this.inputEl.style.left = '0px';
             this.inputEl.style.top = '0px';
-        }
-
-        if (this.inputEl.scrollHeight > height || this.drawY < header.height) {
-            this.autoSize();
         }
     }
     private doneEditByInput() {
