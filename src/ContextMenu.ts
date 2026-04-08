@@ -27,14 +27,17 @@ export default class ContextMenu {
         this.ctx.on('outsideMousedown', () => {
             this.hide();
         });
-        this.ctx.on('cellContextMenuClick', (cell: Cell, e: MouseEvent) => {
+        this.ctx.on('cellContextMenuClick', async (cell: Cell, e: MouseEvent) => {
             if (this.isCustom) {
                 this.contextMenuEl.style.display = 'block';
                 this.positionMenu(e);
                 return;
             }
-            const { ENABLE_CONTEXT_MENU, CUSTOM_BODY_CONTEXT_MENU, CONTEXT_MENU } = this.ctx.config;
-            const list = [...CONTEXT_MENU, ...CUSTOM_BODY_CONTEXT_MENU];
+            const { ENABLE_CONTEXT_MENU, CUSTOM_BODY_CONTEXT_MENU, CONTEXT_MENU, BEFORE_BODY_CONTEXT_MENU_METHOD } = this.ctx.config;
+            let list = [...CONTEXT_MENU, ...CUSTOM_BODY_CONTEXT_MENU];
+            if (BEFORE_BODY_CONTEXT_MENU_METHOD) {
+                list = await BEFORE_BODY_CONTEXT_MENU_METHOD({ list, cell, hide: this.hide.bind(this) });
+            }
             if (!ENABLE_CONTEXT_MENU || list.length === 0) return;
             e.preventDefault();
             const { xArr, yArr } = this.ctx.selector;
@@ -65,26 +68,36 @@ export default class ContextMenu {
                     } else if (value === 'clearSelected') {
                         this.ctx.emit('contextMenuClearSelected');
                         this.hide();
+                    } else {
+                        if (_itemData.event) {
+                            _itemData.event(e, {
+                                hide: this.hide.bind(this),
+                                cell,
+                            });
+                        }
                     }
                 },
             });
             this.currentDOMTreeMenu.positionMenu(e);
         });
-        this.ctx.on('cellHeaderContextMenuClick', (cell: CellHeader, e: MouseEvent) => {
+        this.ctx.on('cellHeaderContextMenuClick', async (cell: CellHeader, e: MouseEvent) => {
             if (this.isCustom) {
                 this.contextMenuEl.style.display = 'block';
                 this.positionMenu(e);
                 return;
             }
             // 判断是否在范围内
-            const { SELECTOR_AREA_MIN_X, SELECTOR_AREA_MAX_X, SELECTOR_AREA_MAX_X_OFFSET } = this.ctx.config;
+            const { SELECTOR_AREA_MIN_X, SELECTOR_AREA_MAX_X, SELECTOR_AREA_MAX_X_OFFSET, BEFORE_HEADER_CONTEXT_MENU_METHOD } = this.ctx.config;
             const areaMinX = SELECTOR_AREA_MIN_X;
             const areaMaxX = SELECTOR_AREA_MAX_X || this.ctx.maxColIndex - SELECTOR_AREA_MAX_X_OFFSET;
             if (cell.colIndex < areaMinX || cell.colIndex > areaMaxX) {
                 return;
             }
             const { HEADER_CONTEXT_MENU, CUSTOM_HEADER_CONTEXT_MENU, ENABLE_HEADER_CONTEXT_MENU } = this.ctx.config;
-            const list = [...HEADER_CONTEXT_MENU, ...CUSTOM_HEADER_CONTEXT_MENU];
+            let list = [...HEADER_CONTEXT_MENU, ...CUSTOM_HEADER_CONTEXT_MENU];
+            if (BEFORE_HEADER_CONTEXT_MENU_METHOD) {
+                list = await BEFORE_HEADER_CONTEXT_MENU_METHOD({ list, cell, hide: this.hide.bind(this) });
+            }
             if (!ENABLE_HEADER_CONTEXT_MENU || list.length === 0) return;
             e.preventDefault();
             const { xArr } = this.ctx.selector;
@@ -160,6 +173,13 @@ export default class ContextMenu {
                     } else if (value === 'resetHeader') {
                         this.ctx.database.resetCustomHeader();
                         this.hide();
+                    } else {
+                        if (_itemData.event) {
+                            _itemData.event(e, {
+                                hide: this.hide.bind(this),
+                                cell,
+                            });
+                        }
                     }
                 },
             });

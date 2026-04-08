@@ -308,6 +308,11 @@ export type RowMaxHeightData = {
     key: string;
     height: number;
 };
+export type ContextMenuItemParams = {
+    list: MenuItem[];
+    cell: CellHeader | Cell;
+    hide: () => void;
+};
 export type ConfigType = Partial<Config>;
 export type FilterMethod = (rows: any[]) => any[];
 export type FormatterMethod = (params: CellParams) => string | void;
@@ -336,7 +341,8 @@ export type BeforeAutofillDataMethod = (
     xArr: number[],
     yArr: number[],
 ) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
-
 export type BeforeSetSelectorMethod = (params: BeforeSetSelectorParams) => BeforeSetSelectorParams | undefined;
 export type BeforeSetAutofillMethod = (params: BeforeSetAutofillParams) => BeforeSetAutofillParams | undefined;
 export type BeforeCopyMethod = (params: BeforeCopyParams) => BeforeCopyParams | undefined;
+export type BeforeHeaderContextMenuMethod = (params: ContextMenuItemParams) => MenuItem[] | Promise<MenuItem[]>;
+export type BeforeBodyContextMenuMethod = (params: ContextMenuItemParams) => MenuItem[] | Promise<MenuItem[]>;
