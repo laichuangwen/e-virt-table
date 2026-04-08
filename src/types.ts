@@ -128,7 +128,7 @@ export type SortDirection = 'asc' | 'desc' | 'none';
 export type SortStateMapItem = { direction: SortDirection; timestamp: number };
 export type SortStateMap = Map<string, SortStateMapItem>;
 export type SortByType = 'number' | 'string' | 'date' | 'api' | ((a: any, b: any) => number);
-
+export type RenderType =  'default' | 'both';
 export interface Column {
     key: string;
     title: string;
@@ -162,6 +162,9 @@ export interface Column {
     render?: Function | string;
     renderFooter?: Function | string;
     renderHeader?: Function | string;
+    renderType?: RenderType;
+    renderHeaderType?: RenderType;
+    renderFooterType?: RenderType;
     formatter?: FormatterMethod;
     formatterFooter?: FormatterMethod;
     autoRowHeight?: boolean;
