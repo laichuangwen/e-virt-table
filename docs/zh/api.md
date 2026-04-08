@@ -271,8 +271,11 @@ type EVirtTableOptions = {
 | hideHeaderSelection | 表头Selection是否隐藏 | boolean | false |
 | fixed | 是否固定列 | `"left"`, `"right"` | — |
 | render | 自定义渲染方法 | string\|Function | — |
+| renderType | 配置both就是dom和canvas共存显示 | `RenderType`（`default`、`both`） | `default` |
 | renderFooter | 自定义渲染底部方法 | string\|Function | — |
+| renderFooterType | 配置both就是dom和canvas共存显示 | `RenderType`（`default`、`both`） | `default` |
 | renderHeader | 自定义渲染头部方法 | string\|Function | — |
+| renderHeaderType | 配置both就是dom和canvas共存显示 | `RenderType`（`default`、`both`） | `default` |
 | formatter | 格式化方法 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — |
 | formatterFooter | 格式化底部方法 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — |
 | readonly | 是否只读 | boolean | false |
