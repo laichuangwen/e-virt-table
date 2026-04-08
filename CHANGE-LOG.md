@@ -7,6 +7,13 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -   
 
+V1.3.24
+### Bug Fixes
+- fix:修复编辑器不是文本输入类型定位错误及不可输入筛选
+- feat: 为header和body添加可自定义的右键菜单支持
+- feat:添加canvas渲染和dom共存配置
+---  
+
 V1.3.23
 ### Bug Fixes
 - fix:解决合并单元格编辑问题
