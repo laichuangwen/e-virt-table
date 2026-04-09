@@ -7,6 +7,12 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -   
 
+V1.3.25
+### Bug Fixes
+- fix:解决聚焦后按shift左右滚动不了
+- chore: update vite to version 6.4.2
+---  
+
 V1.3.24
 ### Bug Fixes
 - fix:修复编辑器不是文本输入类型定位错误及不可输入筛选
