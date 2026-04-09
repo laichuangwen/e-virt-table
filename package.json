@@ -51,7 +51,7 @@
     "devDependencies": {
         "fs-extra": "^11.3.1",
         "typescript": "^5.5.3",
-        "vite": "^5.4.1",
+        "vite": "^6.4.2",
         "vite-plugin-css-injected-by-js": "^3.5.2"
     },
     "dependencies": {
