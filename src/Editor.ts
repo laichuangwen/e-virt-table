@@ -54,11 +54,6 @@ export default class Editor {
             }
             // 如果是多选不能输入任何字符, 如果输入框聚焦，则进入编辑模式
             const { focusCell } = this.ctx;
-            const isVisible = focusCell.isVerticalVisible() && focusCell.isHorizontalVisible();
-            if (!isVisible) {
-                // 滚动到焦点单元格
-                this.ctx.emit('scrollToIndex', focusCell.rowIndex, focusCell.colIndex);
-            }
             if (e.code === 'Escape' && this.ctx.editing) {
                 this.cancel = true;
                 const { focusCell } = this.ctx;
@@ -118,6 +113,7 @@ export default class Editor {
             // 检测功能键（比如 F1, Escape,Tab 等）
             const functionKeys = [
                 'Enter',
+                'CapsLock',
                 'Escape',
                 'Tab',
                 'Backspace',
@@ -355,39 +351,27 @@ export default class Editor {
         if (!focusCell) {
             return;
         }
-
-        // 如果是index或者index-selection,selection类型的单元格，不允许编辑
-        if (['index', 'index-selection', 'selection'].includes(focusCell.type)) {
-            return;
-        }
-        if (this.enable) {
-            return;
-        }
         // 可视区可见
         const isVisible = focusCell.isVerticalVisible() && focusCell.isHorizontalVisible();
         if (!isVisible) {
-            return;
+            // 滚动到焦点单元格
+            this.ctx.emit('scrollToIndex', focusCell.rowIndex, focusCell.colIndex);
         }
-        const { rowKey, key } = focusCell;
-
-        const readonly = this.ctx.database.getReadonly(rowKey, key);
-        if (focusCell && !readonly) {
-            this.enable = true;
-            this.ctx.editing = true;
-            this.cellTarget = focusCell;
-            this.startEditByInput(this.cellTarget, ignoreValue);
-            this.ctx.emit('startEdit', this.cellTarget);
-            // 触发绘制，刷新
-            this.ctx.emit('draw');
-        }
+        this.editCell(focusCell.rowIndex, focusCell.colIndex, ignoreValue);
     }
-    editCell(rowIndex: number, colIndex: number) {
+    editCell(rowIndex: number, colIndex: number, ignoreValue = false) {
+        // 直接从renderRows中获取cell，防止focusCell不是最新的
         const row = this.ctx.body.renderRows.find((row) => row.rowIndex === rowIndex);
         if (!row) {
             return;
         }
         const cell = row.cells.find((cell: Cell) => cell.colIndex === colIndex);
         if (!cell) {
+            return;
+        }
+        // 可视区可见
+        const isVisible = cell.isVerticalVisible() && cell.isHorizontalVisible();
+        if (!isVisible) {
             return;
         }
         this.ctx.emit('setSelectorCell', cell);
@@ -408,7 +392,7 @@ export default class Editor {
             this.enable = true;
             this.ctx.editing = true;
             this.cellTarget = focusCell;
-            this.startEditByInput(this.cellTarget);
+            this.startEditByInput(this.cellTarget, ignoreValue);
             this.ctx.emit('startEdit', this.cellTarget);
             // 触发绘制，刷新
             this.ctx.emit('draw');
