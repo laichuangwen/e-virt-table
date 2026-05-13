@@ -7,6 +7,11 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -   
 
+V1.3.26
+### Bug Fixes
+- fix: 查找器查不到最后一行数据
+---  
+
 V1.3.25
 ### Bug Fixes
 - fix:解决聚焦后按shift左右滚动不了
