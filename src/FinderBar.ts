@@ -85,8 +85,8 @@ export class FinderBar {
                 }
             }
             const { maxColIndex, maxRowIndex } = this.ctx;
-            for (let i = 0; i < maxRowIndex; i++) {
-                for (let j = 0; j < maxColIndex; j++) {
+            for (let i = 0; i <= maxRowIndex; i++) {
+                for (let j = 0; j <= maxColIndex; j++) {
                     const cell = this.ctx.database.getVirtualBodyCell(i, j, false);
                     const text = cell?.getText();
                     if (['string', 'number'].includes(typeof text)) {
