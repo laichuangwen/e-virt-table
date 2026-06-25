@@ -87,6 +87,9 @@ export default class Selector {
             }
         });
         this.ctx.on('cellHoverChange', (cell) => {
+            if (this.ctx.textSelecting) {
+                return;
+            }
             if (this.ctx.mousedown) {
                 this.selectCols(cell);
             }
@@ -545,8 +548,8 @@ export default class Selector {
         if (!this.ctx.config.ENABLE_COPY) {
             return;
         }
-        // dom选中时会阻止复制
-        if (this.ctx.domSelectionStr) {
+        // dom选中或文字选中时会阻止复制
+        if (this.ctx.domSelectionStr || this.ctx.textSelectionStr) {
             return;
         }
         let { value, xArr, yArr } = this.ctx.getSelectedData();

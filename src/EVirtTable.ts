@@ -29,6 +29,7 @@ import './style.css';
 import Loading from './Loading';
 import { FinderBar } from './FinderBar';
 import { LangConfig } from './Locale';
+import TextSelector from './TextSelector';
 export default class EVirtTable {
     static locale: LangConfig;
     private options: EVirtTableOptions;
@@ -45,6 +46,7 @@ export default class EVirtTable {
     private contextMenu: ContextMenu;
     private loading: Loading;
     private finderBar: FinderBar;
+    private textSelector: TextSelector;
     private animationFrameId: number | undefined = undefined;
     ctx: Context;
     static useLocale(langConfig: LangConfig) {
@@ -77,6 +79,7 @@ export default class EVirtTable {
         this.ctx.on('loadData', (data) => {
             this.loadData(data);
         });
+        this.textSelector = new TextSelector(this.ctx);
         this.ctx.on('draw', () => {
             this.draw();
         });
@@ -124,7 +127,9 @@ export default class EVirtTable {
         this.footer.update();
         this.body.update();
         this.ctx.paint.clear();
+        this.textSelector.clearLayouts();
         this.body.draw();
+        this.textSelector.draw();
         this.footer.draw();
         this.header.draw();
         this.body.drawDragRowTip();
@@ -509,6 +514,7 @@ export default class EVirtTable {
         this.contextMenu.destroy();
         this.loading.destroy();
         this.finderBar.destroy();
+        this.textSelector.destroy();
         this.ctx.destroy();
         this.ctx.containerElement.remove();
     }

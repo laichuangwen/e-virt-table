@@ -91,6 +91,8 @@ export default class Context {
     paint: Paint;
     icons: Icons;
     domSelectionStr = '';
+    textSelectionStr = '';
+    textSelecting = false;
     isMouseoverTargetContainer = false;
     mousedown = false;
     isEmpty = false; // 是否空数据

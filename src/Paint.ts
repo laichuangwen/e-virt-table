@@ -1,4 +1,5 @@
 import { Align, LineClampType, VerticalAlign } from './types';
+import type { TextGlyph, TextLayout, TextLayoutLine, TextLineItem, TextLineSegment } from './TextSelector';
 
 export type LineOptions = {
     lineCap?: CanvasLineCap;
@@ -34,6 +35,7 @@ export type DrawTextOptions = {
     offsetLeft?: number;
     offsetRight?: number;
     textCallback?: (textInfo: TextInfo) => void;
+    layoutCallback?: (layout: TextLayout) => void;
     cacheTextKey?: string;
 };
 export type TextInfo = {
@@ -243,100 +245,285 @@ export class Paint {
         } = options;
         this.ctx.font = font;
         this.ctx.fillStyle = color;
-        this.ctx.textAlign = align;
         if (['', null, undefined].includes(text)) {
             this.ctx.restore();
             return false;
         }
         const fontSize = parseInt(font.match(/\d+/)?.[0] || '12');
-        const lineHeight = fontSize * (options.lineHeight || 1.2); // 默认行高为字体大小的1.2倍
-        const textOffsetY = fontSize * 0.14; // 经验值 6%~12%
-        const availableWidth = width - padding * 2 - offsetLeft - offsetRight;
-        if(availableWidth <= padding) {
-            return true;
+        const lineHeight = fontSize * (options.lineHeight || 1.2);
+        const layout = this.buildTextLayout(text, x, y, width, height, {
+            font,
+            color,
+            align,
+            padding,
+            verticalAlign,
+            maxLineClamp,
+            autoRowHeight,
+            lineHeight,
+            offsetLeft,
+            offsetRight,
+        });
+        this.ctx.textBaseline = 'top';
+        this.ctx.textAlign = 'left';
+        layout.lines.forEach((line) => {
+            this.ctx.fillText(line.text, line.drawX, line.drawY);
+        });
+        if (options.textCallback && layout.lines.length) {
+            const maxLineWidth = layout.lines.reduce((max, line) => Math.max(max, line.width), 0);
+            const textMaxWidth = Math.round(maxLineWidth);
+            let left = layout.lines[0]?.drawX ?? x + padding + offsetLeft;
+            let right = left + textMaxWidth;
+            if (align === 'center') {
+                left = x + width / 2 - textMaxWidth / 2;
+                right = x + width / 2 + textMaxWidth / 2;
+            } else if (align === 'right') {
+                left = x + width - padding - offsetRight - textMaxWidth;
+                right = x + width - padding - offsetRight;
+            }
+            const textInfo = {
+                x: layout.lines[0]?.drawX ?? left,
+                y: layout.contentY,
+                width: textMaxWidth,
+                height: layout.lines.length * lineHeight,
+                left,
+                right,
+                top: layout.contentY,
+                bottom: layout.contentY + layout.lines.length * lineHeight,
+            };
+            options.textCallback(textInfo);
         }
-        let textEllipsis = false;
-        // 计算总行数,向上取整round
-        const maxTextLine = Math.round((height - 2 * padding) / lineHeight);
-        // 将文本按可用宽度分割成行,如果为1直接就不计算了,直接绘制
-        let lines = this.wrapText(text, availableWidth, options.cacheTextKey);
+        if (options.layoutCallback) {
+            options.layoutCallback(layout);
+        }
+        this.ctx.restore();
+        return layout.ellipsis;
+    }
+
+    private buildTextLayout(
+        text: string,
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        options: {
+            font: string;
+            color: string;
+            align: Align;
+            padding: number;
+            verticalAlign: VerticalAlign;
+            maxLineClamp: LineClampType;
+            autoRowHeight: boolean;
+            lineHeight: number;
+            offsetLeft: number;
+            offsetRight: number;
+        },
+    ): TextLayout {
+        const {
+            font,
+            color,
+            align,
+            padding,
+            verticalAlign,
+            maxLineClamp,
+            autoRowHeight,
+            lineHeight,
+            offsetLeft,
+            offsetRight,
+        } = options;
+        this.ctx.save();
+        this.ctx.font = font;
+        const availableWidth = width - padding * 2 - offsetLeft - offsetRight;
+        const contentWidth = availableWidth;
+        const contentHeight = height - padding * 2;
+        const chars = Array.from(text);
+        let lines = this.wrapTextToLines(text, availableWidth);
+        const maxTextLine = Math.round(contentHeight / lineHeight);
         let totalTextLine = Math.min(lines.length, Math.max(maxTextLine, 1));
         if (maxLineClamp === 'auto' && autoRowHeight) {
             totalTextLine = lines.length;
         } else if (typeof maxLineClamp === 'number' && maxLineClamp < totalTextLine && maxLineClamp !== 1) {
             totalTextLine = maxLineClamp;
         } else {
-            // 处理边界问题
             if (maxLineClamp === 1) {
-                lines = [text];
+                lines = [{ items: chars.map((char, i) => ({ char, sourceIndex: i })), text, caretIndex: 0, lineIndex: 0, drawX: 0, drawY: 0, width: 0, segments: [] }];
                 totalTextLine = 1;
             }
             if (maxLineClamp === 'auto' && maxTextLine === 1) {
-                lines = [text];
+                lines = [{ items: chars.map((char, i) => ({ char, sourceIndex: i })), text, caretIndex: 0, lineIndex: 0, drawX: 0, drawY: 0, width: 0, segments: [] }];
                 totalTextLine = 1;
             }
         }
-        // 计算起始Y位置
-        let startY = y + padding;
-        const totalTextHeight = Math.round(totalTextLine * lineHeight);
+        let ellipsis = false;
+        const visibleLines = lines.slice(0, totalTextLine);
+        if (lines.length > totalTextLine) {
+            ellipsis = true;
+            const remainingLines = lines.slice(totalTextLine - 1);
+            const ellipsisLine = this.buildEllipsisLine(remainingLines, width, padding);
+            ellipsisLine.lineIndex = totalTextLine - 1;
+            visibleLines[totalTextLine - 1] = ellipsisLine;
+        } else if (totalTextLine > 0) {
+            const lastLineIndex = totalTextLine - 1;
+            const remainingLines = lines.slice(lastLineIndex);
+            const remainingText = remainingLines.map((line) => line.text).join('');
+            const { ellipsis: widthEllipsis } = this.handleEllipsis(remainingText, width, padding, font);
+            if (widthEllipsis) {
+                ellipsis = true;
+                const ellipsisLine = this.buildEllipsisLine(remainingLines, width, padding);
+                ellipsisLine.lineIndex = lastLineIndex;
+                visibleLines[lastLineIndex] = ellipsisLine;
+            }
+        }
+        const totalTextHeight = visibleLines.length * lineHeight;
+        let contentY = y + padding;
         if (verticalAlign === 'middle') {
-            startY = y + (height - totalTextHeight) / 2;
+            contentY = y + (height - totalTextHeight) / 2;
         } else if (verticalAlign === 'bottom') {
-            startY = y + height - totalTextHeight - padding;
+            contentY = y + height - totalTextHeight - padding;
         }
-        // 计算起始X位置
-        let startX = x + padding + offsetLeft;
-        if (align === 'center') {
-            startX = x + width / 2;
-        } else if (align === 'right') {
-            startX = x + width - padding - offsetRight;
+        const glyphs: TextGlyph[] = [];
+        visibleLines.forEach((line, index) => {
+            line.lineIndex = index;
+            const segments = this.buildLineSegments(line);
+            const lineWidth = segments.reduce((sum, segment) => sum + segment.width, 0);
+            let lineX = x + padding + offsetLeft;
+            if (align === 'center') {
+                lineX = x + (width - lineWidth) / 2;
+            } else if (align === 'right') {
+                lineX = x + width - padding - offsetRight - lineWidth;
+            }
+            const lineY = contentY + index * lineHeight;
+            line.drawX = lineX;
+            line.drawY = lineY;
+            line.width = lineWidth;
+            line.segments = segments;
+            segments.forEach((segment) => {
+                if (segment.sourceIndex < 0) {
+                    return;
+                }
+                glyphs.push({
+                    char: segment.char,
+                    index: segment.sourceIndex,
+                    line: index,
+                    x: lineX + segment.x,
+                    y: lineY,
+                    width: segment.width,
+                    height: lineHeight,
+                });
+            });
+        });
+        this.ctx.restore();
+        return {
+            text,
+            chars,
+            glyphs,
+            lines: visibleLines,
+            box: { x, y, width, height },
+            contentBox: { x: x + padding + offsetLeft, y: y + padding, width: contentWidth, height: contentHeight },
+            contentY,
+            lineHeight,
+            font,
+            color,
+            align,
+            ellipsis,
+        };
+    }
+
+    private wrapTextToLines(text: string, maxWidth: number): TextLayoutLine[] {
+        if (!text) {
+            return [{ items: [], text: '', caretIndex: 0, lineIndex: 0, drawX: 0, drawY: 0, width: 0, segments: [] }];
         }
-        for (let i = 0; i < lines.length; i++) {
-            const lineText = lines[i];
-            const lineY = startY + i * lineHeight + textOffsetY;
-            this.ctx.textBaseline = 'top';
-            // 如果设置了lineClamp，则只绘制lineClamp行
-            if (i === totalTextLine - 1) {
-                //截取剩余lines，组合成字符串处理省略号
-                const remainingLines = lines.slice(i);
-                const remainingText = remainingLines.join('');
-                const { _text, ellipsis } = this.handleEllipsis(remainingText, width, padding, font);
-                this.ctx.fillText(_text, startX, lineY);
-                textEllipsis = ellipsis;
+        const chars = Array.from(text);
+        const lines: TextLayoutLine[] = [];
+        let currentItems: TextLineItem[] = [];
+        let currentWidth = 0;
+        let lineCaretIndex = 0;
+
+        const flushLine = (nextCaretIndex: number) => {
+            const lineText = currentItems.map((item) => item.char).join('');
+            lines.push({
+                items: currentItems,
+                text: lineText,
+                caretIndex: lineCaretIndex,
+                lineIndex: lines.length,
+                drawX: 0,
+                drawY: 0,
+                width: 0,
+                segments: [],
+            });
+            currentItems = [];
+            currentWidth = 0;
+            lineCaretIndex = nextCaretIndex;
+        };
+
+        for (let i = 0; i < chars.length; i++) {
+            const char = chars[i];
+            if (char === '\n') {
+                flushLine(i + 1);
+                continue;
+            }
+            const charWidth = this.ctx.measureText(char).width;
+            if (currentWidth + charWidth > maxWidth && currentItems.length > 0) {
+                flushLine(currentItems[currentItems.length - 1].sourceIndex + 1);
+                currentItems.push({ char, sourceIndex: i });
+                currentWidth = charWidth;
+                continue;
+            }
+            currentItems.push({ char, sourceIndex: i });
+            currentWidth += charWidth;
+        }
+        if (currentItems.length > 0 || lines.length === 0) {
+            flushLine(chars.length);
+        }
+        return lines;
+    }
+
+    private buildEllipsisLine(remainingLines: TextLayoutLine[], width: number, padding: number): TextLayoutLine {
+        const remainingItems = remainingLines.flatMap((line) => line.items);
+        const remainingText = remainingItems.map((item) => item.char).join('');
+        const { _text, ellipsis } = this.handleEllipsis(remainingText, width, padding, this.ctx.font);
+        const contentText = ellipsis ? _text.slice(0, -3) : _text;
+        const items: TextLineItem[] = [];
+        for (let i = 0; i < contentText.length; i++) {
+            const item = remainingItems[i];
+            if (!item) {
                 break;
             }
-            this.ctx.fillText(lineText, startX, lineY);
+            items.push({ char: item.char, sourceIndex: item.sourceIndex });
         }
-        // 文字信息回调，用于画跟随图标的
-        if (options.textCallback && lines.length) {
-            // 取最长行
-            const maxLineWidth = lines.reduce((max, line) => {
-                return Math.max(max, this.ctx.measureText(line).width);
-            }, 0);
-            const textMaxWidth = Math.round(maxLineWidth);
-            let left = startX;
-            let right = startX + textMaxWidth;
-            if (align === 'center') {
-                left = startX - textMaxWidth / 2;
-                right = startX + textMaxWidth / 2;
-            } else if (align === 'right') {
-                left = startX - textMaxWidth;
-                right = startX;
-            }
-            const textInfo = {
-                x: startX,
-                y: startY,
-                width: textMaxWidth,
-                height: totalTextHeight,
-                left,
-                right,
-                top: startY,
-                bottom: startY + totalTextHeight,
-            };
-            options.textCallback(textInfo);
+        if (ellipsis) {
+            items.push(
+                { char: '.', sourceIndex: -1, ellipsis: true },
+                { char: '.', sourceIndex: -1, ellipsis: true },
+                { char: '.', sourceIndex: -1, ellipsis: true },
+            );
         }
-        this.ctx.restore();
-        return textEllipsis;
+        return {
+            items,
+            text: _text,
+            caretIndex: remainingLines[0]?.caretIndex ?? 0,
+            lineIndex: 0,
+            drawX: 0,
+            drawY: 0,
+            width: 0,
+            segments: [],
+        };
+    }
+
+    private buildLineSegments(line: TextLayoutLine): TextLineSegment[] {
+        const segments: TextLineSegment[] = [];
+        let offsetX = 0;
+        line.items.forEach((item, itemIndex) => {
+            const segmentWidth = this.ctx.measureText(item.char).width;
+            segments.push({
+                char: item.char,
+                itemIndex,
+                sourceIndex: item.sourceIndex,
+                x: offsetX,
+                width: segmentWidth,
+            });
+            offsetX += segmentWidth;
+        });
+        return segments;
     }
 
     /**
