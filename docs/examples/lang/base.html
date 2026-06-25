@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+        <style>
+            .toolbar {
+                margin-bottom: 12px;
+            }
+            .toolbar button {
+                margin-right: 8px;
+            }
+            .toolbar button.active {
+                color: #fff;
+                background-color: #5292f7;
+                border-color: #5292f7;
+            }
+        </style>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div class="toolbar">
+            <button id="locale-zh" class="active">中文</button>
+            <button id="locale-en">English</button>
+            <button id="toggle-empty">切换空数据</button>
+        </div>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        const zhCN = {
+            numberErrorTip: '只允许输入数字',
+            emptyText: '暂无数据',
+            loadingText: '加载中...',
+            copy: '复制',
+            cut: '剪切',
+            paste: '粘贴',
+            clearSelected: '清空选中内容',
+            fixedLeft: '左固定',
+            fixedRight: '右固定',
+            fixedNone: '取消固定',
+            hide: '隐藏',
+            visible: '显示',
+            resetHeader: '恢复默认',
+            invalidNumber: '请输入数字类型',
+            mergeCellNoFill: '合并单元格不能填充',
+            mergeCellNoCopy: '合并单元格不能复制',
+            mergeCellNoPaste: '合并单元格不能粘贴',
+            numberTruncated: '输入的数字已截取至小数点后{precision}位',
+            batchSetItemValueError: '批量赋值错误',
+            numberMin: '输入值小于{min}，已自动调整为{min}',
+            numberMax: '输入值大于{max}，已自动调整为{max}',
+            stringMaxlength: '输入值超过{maxlength}个字符，已自动截取',
+        };
+        const enUS = {
+            numberErrorTip: 'Only numbers are allowed',
+            emptyText: 'No Data',
+            loadingText: 'Loading...',
+            copy: 'Copy',
+            cut: 'Cut',
+            paste: 'Paste',
+            clearSelected: 'Clear Selected',
+            fixedLeft: 'Fixed Left',
+            fixedRight: 'Fixed Right',
+            fixedNone: 'Unfixed',
+            hide: 'Hide',
+            visible: 'Visible',
+            resetHeader: 'Reset Default',
+            invalidNumber: 'Please enter a numeric value',
+            mergeCellNoFill: 'Merged cells cannot be filled',
+            mergeCellNoCopy: 'Merged cells cannot be copied',
+            mergeCellNoPaste: 'Merged cells cannot be pasted',
+            numberTruncated: 'The input number has been truncated to {precision} decimal places',
+            batchSetItemValueError: 'Batch set item value error',
+            numberMin: 'The input value is less than {min}, automatically adjusted to {min}',
+            numberMax: 'The input value is greater than {max}, automatically adjusted to {max}',
+            stringMaxlength: 'The input value exceeds {maxlength} characters, automatically truncated',
+        };
+
+        const data = [
+            {
+                date: '2016-05-03',
+                name: 'Tom',
+                age: 28,
+                city: 'Los Angeles',
+            },
+            {
+                date: '2016-05-02',
+                name: 'Jerry',
+                age: 32,
+                city: 'San Francisco',
+            },
+            {
+                date: '2016-05-04',
+                name: 'Alice',
+                age: 24,
+                city: 'Seattle',
+            },
+        ];
+        const columns = [
+            {
+                type: 'index',
+                key: 'index',
+                width: 50,
+            },
+            {
+                title: 'Date',
+                key: 'date',
+            },
+            {
+                title: 'Name',
+                key: 'name',
+            },
+            {
+                title: 'Age',
+                key: 'age',
+                type: 'number',
+            },
+            {
+                title: 'City',
+                key: 'city',
+            },
+        ];
+
+        const target = document.getElementById('e-virt-table');
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                HEIGHT: 280,
+                ENABLE_SELECTOR: true,
+                ENABLE_CONTEXT_MENU: true,
+                ENABLE_HEADER_CONTEXT_MENU: true,
+            },
+        });
+
+        let isEmpty = false;
+        let currentLocale = 'zh-CN';
+
+        function setLocale(locale) {
+            currentLocale = locale;
+            const langConfig = locale === 'zh-CN' ? zhCN : enUS;
+            grid.useLocale(langConfig);
+            grid.doLayout();
+            document.getElementById('locale-zh').classList.toggle('active', locale === 'zh-CN');
+            document.getElementById('locale-en').classList.toggle('active', locale === 'en-US');
+        }
+
+        document.getElementById('locale-zh').addEventListener('click', () => {
+            setLocale('zh-CN');
+        });
+        document.getElementById('locale-en').addEventListener('click', () => {
+            setLocale('en-US');
+        });
+        document.getElementById('toggle-empty').addEventListener('click', () => {
+            if (isEmpty) {
+                grid.loadData(data);
+                isEmpty = false;
+            } else {
+                grid.loadData([]);
+                isEmpty = true;
+            }
+        });
+    </script>
+</html>
