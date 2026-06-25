@@ -260,6 +260,8 @@ export default class Config {
     ENABLE_CONTEXT_MENU = false;
     /** 启用表头右键菜单 */
     ENABLE_HEADER_CONTEXT_MENU = false;
+    /** 启用文字选中复制 */
+    ENABLE_TEXT_SELECTION = true;
     /** 启用复制 */
     ENABLE_COPY = true;
     /** 启用粘贴 */

@@ -28,6 +28,7 @@ import { mergeColCell, mergeRowCell, getSpanArrByRow, getSpanObjByColumn } from 
 import './style.css';
 import Loading from './Loading';
 import { FinderBar } from './FinderBar';
+import TextSelector from './TextSelector';
 
 export default class EVirtTable {
     private options: EVirtTableOptions;
@@ -44,6 +45,7 @@ export default class EVirtTable {
     private contextMenu: ContextMenu;
     private loading: Loading;
     private finderBar: FinderBar;
+    private textSelector: TextSelector;
     private animationFrameId: number | undefined = undefined;
     ctx: Context;
 
@@ -71,6 +73,7 @@ export default class EVirtTable {
         this.contextMenu = new ContextMenu(this.ctx);
         this.loading = new Loading(this.ctx);
         this.finderBar = new FinderBar(this.ctx);
+        this.textSelector = new TextSelector(this.ctx);
         this.ctx.on('draw', () => {
             this.draw();
         });
@@ -118,7 +121,9 @@ export default class EVirtTable {
         this.footer.update();
         this.body.update();
         this.ctx.paint.clear();
+        this.textSelector.clearLayouts();
         this.body.draw();
+        this.textSelector.draw();
         this.footer.draw();
         this.header.draw();
         this.scroller.draw();
@@ -497,6 +502,7 @@ export default class EVirtTable {
         this.contextMenu.destroy();
         this.loading.destroy();
         this.finderBar.destroy();
+        this.textSelector.destroy();
         this.ctx.destroy();
         this.ctx.containerElement.remove();
     }

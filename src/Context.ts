@@ -89,6 +89,8 @@ export default class Context {
     paint: Paint;
     icons: Icons;
     domSelectionStr = '';
+    textSelectionStr = '';
+    textSelecting = false;
     isMouseoverTargetContainer = false;
     mousedown = false;
     isPointer = false;

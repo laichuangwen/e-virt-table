@@ -97,6 +97,9 @@ export default class Editor {
                 return;
             }
             if (e.key === 'Enter' && !this.ctx.editing) {
+                if (this.isTextSelectionActive()) {
+                    return;
+                }
                 e.preventDefault();
                 this.startEdit();
                 return;
@@ -148,12 +151,19 @@ export default class Editor {
                 e.preventDefault();
                 return;
             }
+            if (this.isTextSelectionActive()) {
+                return;
+            }
             this.startEdit(true);
         });
         // 重绘可能会导致cellClick事件不能触发，调整用按下cellMouseup按下延时赋值cellTarget
         this.ctx.on('cellClick', (cell: Cell) => {
             // 如果是选择器，不进入编辑模式
             if (this.ctx.isPointer) {
+                return;
+            }
+            // 文字选中时不进入编辑模式
+            if (this.isTextSelectionActive()) {
                 return;
             }
             // 不在区域内
@@ -197,6 +207,12 @@ export default class Editor {
                 }
             }
         });
+    }
+    private isTextSelectionActive() {
+        return (
+            this.ctx.config.ENABLE_TEXT_SELECTION &&
+            (this.ctx.textSelecting || !!this.ctx.textSelectionStr)
+        );
     }
     private isInSelectorRange(rowIndex: number, colIndex: number) {
         const { xArr, yArr } = this.ctx.selector;
@@ -341,6 +357,9 @@ export default class Editor {
         }
     }
     startEdit(ignoreValue = false) {
+        if (this.isTextSelectionActive()) {
+            return;
+        }
         this.cancel = false;
         // 如果不启用点击选择器编辑
         const { ENABLE_EDIT_CLICK_SELECTOR } = this.ctx.config;

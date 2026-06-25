@@ -1092,6 +1092,9 @@ export default class Cell extends BaseCell {
                 lineHeight: CELL_LINE_HEIGHT,
                 maxLineClamp: this.maxLineClamp,
                 cacheTextKey,
+                layoutCallback: (layout) => {
+                    this.ctx.emit('registerTextLayout', `${this.rowIndex}-${this.colIndex}`, layout);
+                },
             },
         );
         return this.ellipsis;
