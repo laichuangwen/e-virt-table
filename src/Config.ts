@@ -2,9 +2,11 @@ import { IconType } from './Icons';
 import {
     Align,
     BeforeAutofillDataMethod,
+    BeforeBodyContextMenuMethod,
     BeforeCellValueChangeMethod,
     BeforeCopyMethod,
     BeforeDragRowMethod,
+    BeforeHeaderContextMenuMethod,
     BeforePasteDataMethod,
     BeforeSetAutofillMethod,
     BeforeSetSelectorMethod,
@@ -375,6 +377,10 @@ export default class Config {
     BEFORE_SET_SELECTOR_METHOD?: BeforeSetSelectorMethod;
     /** 设置填充器前回调 */
     BEFORE_SET_AUTOFILL_METHOD?: BeforeSetAutofillMethod;
+    /** 自定义表头右键菜单 */
+    BEFORE_HEADER_CONTEXT_MENU_METHOD?: BeforeHeaderContextMenuMethod;
+    /** 自定义BODY右键菜单 */
+    BEFORE_BODY_CONTEXT_MENU_METHOD?: BeforeBodyContextMenuMethod;
     /** 数据复制前回调 */
     BEFORE_COPY_METHOD?: BeforeCopyMethod;
     BEFORE_DRAG_ROW_METHOD?: BeforeDragRowMethod;

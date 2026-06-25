@@ -7,6 +7,34 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -   
 
+V1.3.26
+### Bug Fixes
+- fix: 查找器查不到最后一行数据
+---  
+
+V1.3.25
+### Bug Fixes
+- fix:解决聚焦后按shift左右滚动不了
+- chore: update vite to version 6.4.2
+---  
+
+V1.3.24
+### Bug Fixes
+- fix:修复编辑器不是文本输入类型定位错误及不可输入筛选
+- feat: 为header和body添加可自定义的右键菜单支持
+- feat:添加canvas渲染和dom共存配置
+---  
+
+V1.3.23
+### Bug Fixes
+- fix:解决合并单元格编辑问题
+---  
+
+V1.3.22
+### Bug Fixes
+- fix:修复多选隐藏表头
+- fix:优化编辑器体验性问题
+---  
 V1.3.21
 ### Bug Fixes
 - fix:化编辑器聚焦逻辑

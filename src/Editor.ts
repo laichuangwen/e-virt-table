@@ -30,6 +30,7 @@ export default class Editor {
             this.resetEditorStyle();
             const { xArr, yArr } = this.ctx.selector;
             this.selectorArrStr = JSON.stringify(xArr) + JSON.stringify(yArr);
+            this.focusInput();
         });
         // 滚动时，结束编辑
         this.ctx.on('onScroll', () => {
@@ -52,11 +53,6 @@ export default class Editor {
             }
             // 如果是多选不能输入任何字符, 如果输入框聚焦，则进入编辑模式
             const { focusCell } = this.ctx;
-            const isVisible = focusCell.isVerticalVisible() && focusCell.isHorizontalVisible();
-            if (!isVisible) {
-                // 滚动到焦点单元格
-                this.ctx.emit('scrollToIndex', focusCell.rowIndex, focusCell.colIndex);
-            }
             if (e.code === 'Escape' && this.ctx.editing) {
                 this.cancel = true;
                 const { focusCell } = this.ctx;
@@ -116,6 +112,7 @@ export default class Editor {
             // 检测功能键（比如 F1, Escape,Tab 等）
             const functionKeys = [
                 'Enter',
+                'CapsLock',
                 'Escape',
                 'Tab',
                 'Backspace',
@@ -146,10 +143,8 @@ export default class Editor {
                 return;
             }
             const isFocus = document.activeElement === this.inputEl;
-            if (!this.ctx.selectOnlyOne || !isFocus) {
+            if (!isFocus && focusCell.editorType === 'text') {
                 e.preventDefault();
-                // 终止输入事件
-                this.inputEl.blur();
                 return;
             }
             this.startEdit(true);
@@ -167,11 +162,7 @@ export default class Editor {
             }
             const { xArr, yArr } = this.ctx.selector;
             const selectorArrStr = JSON.stringify(xArr) + JSON.stringify(yArr);
-            // 只有文本类型才能聚焦
-            if (this.ctx.selectOnlyOne) {
-                console.log('focus');
-                this.inputEl.focus({ preventScroll: true });
-            }
+            this.focusInput();
             if (this.selectorArrStr === selectorArrStr && this.cellTarget) {
                 // 启用合并单元格关联&&只有合并单元格时才进入编辑模式
                 if (this.ctx.config.ENABLE_MERGE_CELL_LINK && this.ctx.onlyMergeCell) {
@@ -204,9 +195,6 @@ export default class Editor {
                     this.startEdit();
                 }
             }
-        });
-        this.ctx.on('mousedownBodyOutside', () => {
-            // this.clearEditor();
         });
     }
     private isInSelectorRange(rowIndex: number, colIndex: number) {
@@ -319,6 +307,9 @@ export default class Editor {
             if (value !== null) {
                 this.inputEl.value = value;
             }
+            if (this.inputEl.scrollHeight > height || this.drawY < header.height) {
+                this.autoSize();
+            }
         } else {
             this.inputEl.style.opacity = '0';
             this.inputEl.style.width = '1px';
@@ -326,10 +317,6 @@ export default class Editor {
             this.inputEl.style.position = 'absolute';
             this.inputEl.style.left = '0px';
             this.inputEl.style.top = '0px';
-        }
-
-        if (this.inputEl.scrollHeight > height || this.drawY < header.height) {
-            this.autoSize();
         }
     }
     private doneEditByInput() {
@@ -348,6 +335,11 @@ export default class Editor {
             }
         }
     }
+    private focusInput() {
+        if (document.activeElement !== this.inputEl) {
+            this.inputEl.focus({ preventScroll: true });
+        }
+    }
     startEdit(ignoreValue = false) {
         this.cancel = false;
         // 如果不启用点击选择器编辑
@@ -359,39 +351,27 @@ export default class Editor {
         if (!focusCell) {
             return;
         }
-
-        // 如果是index或者index-selection,selection类型的单元格，不允许编辑
-        if (['index', 'index-selection', 'selection'].includes(focusCell.type)) {
-            return;
-        }
-        if (this.enable) {
-            return;
-        }
         // 可视区可见
         const isVisible = focusCell.isVerticalVisible() && focusCell.isHorizontalVisible();
         if (!isVisible) {
-            return;
+            // 滚动到焦点单元格
+            this.ctx.emit('scrollToIndex', focusCell.rowIndex, focusCell.colIndex);
         }
-        const { rowKey, key } = focusCell;
-
-        const readonly = this.ctx.database.getReadonly(rowKey, key);
-        if (focusCell && !readonly) {
-            this.enable = true;
-            this.ctx.editing = true;
-            this.cellTarget = focusCell;
-            this.startEditByInput(this.cellTarget, ignoreValue);
-            this.ctx.emit('startEdit', this.cellTarget);
-            // 触发绘制，刷新
-            this.ctx.emit('draw');
-        }
+        this.editCell(focusCell.rowIndex, focusCell.colIndex, ignoreValue);
     }
-    editCell(rowIndex: number, colIndex: number) {
+    editCell(rowIndex: number, colIndex: number, ignoreValue = false) {
+        // 直接从renderRows中获取cell，防止focusCell不是最新的
         const row = this.ctx.body.renderRows.find((row) => row.rowIndex === rowIndex);
         if (!row) {
             return;
         }
         const cell = row.cells.find((cell: Cell) => cell.colIndex === colIndex);
         if (!cell) {
+            return;
+        }
+        // 可视区可见
+        const isVisible = cell.isVerticalVisible() && cell.isHorizontalVisible();
+        if (!isVisible) {
             return;
         }
         this.ctx.emit('setSelectorCell', cell);
@@ -412,7 +392,7 @@ export default class Editor {
             this.enable = true;
             this.ctx.editing = true;
             this.cellTarget = focusCell;
-            this.startEditByInput(this.cellTarget);
+            this.startEditByInput(this.cellTarget, ignoreValue);
             this.ctx.emit('startEdit', this.cellTarget);
             // 触发绘制，刷新
             this.ctx.emit('draw');
@@ -430,7 +410,7 @@ export default class Editor {
         this.resetEditorStyle();
         // 聚焦输入框,防止非文本类型无法聚焦
         setTimeout(() => {
-            this.inputEl.focus({ preventScroll: true });
+            this.focusInput();
         }, 0);
         this.ctx.emit('draw');
     }

@@ -269,9 +269,6 @@ export class DOMTreeMenu {
         const itemData = this.findMenuItem(menuValue || '');
 
         if (itemData) {
-            if (itemData.event) {
-                itemData.event(e, this.hide.bind(this));
-            }
             if (this.onClick) {
                 this.onClick(itemData, menuValue || '');
             }
@@ -316,12 +313,6 @@ export class DOMTreeMenu {
                 }
             });
         });
-    }
-
-    private hide(): void {
-        // 隐藏菜单
-        this.cleanupAllSubmenus(this.container);
-        this.container.style.display = 'none';
     }
 
     public destroy(): void {

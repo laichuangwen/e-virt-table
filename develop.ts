@@ -26,6 +26,7 @@ let columns: Column[] = [
         title: '工号',
         key: 'emp_no',
         align: 'left',
+        type: 'tree',
         // operation: true,
         readonly: false,
         width: 120,

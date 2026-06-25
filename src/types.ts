@@ -130,7 +130,7 @@ export type SortDirection = 'asc' | 'desc' | 'none';
 export type SortStateMapItem = { direction: SortDirection; timestamp: number };
 export type SortStateMap = Map<string, SortStateMapItem>;
 export type SortByType = 'number' | 'string' | 'date' | 'api' | ((a: any, b: any) => number);
-
+export type RenderType =  'default' | 'both';
 export interface Column {
     key: string;
     title: string;
@@ -164,6 +164,9 @@ export interface Column {
     render?: Function | string;
     renderFooter?: Function | string;
     renderHeader?: Function | string;
+    renderType?: RenderType;
+    renderHeaderType?: RenderType;
+    renderFooterType?: RenderType;
     formatter?: FormatterMethod;
     formatterFooter?: FormatterMethod;
     autoRowHeight?: boolean;
@@ -330,6 +333,11 @@ export type BeforeDragRowParams = {
     target: Cell;
     position: TreeUtilPosition;
 };
+export type ContextMenuItemParams = {
+    list: MenuItem[];
+    cell: CellHeader | Cell;
+    hide: () => void;
+};
 export type ConfigType = Partial<Config>;
 export type FilterMethod = (rows: any[]) => any[];
 export type FormatterMethod = (params: CellParams) => string | void;
@@ -358,8 +366,9 @@ export type BeforeAutofillDataMethod = (
     xArr: number[],
     yArr: number[],
 ) => BeforeChangeItem[] | Promise<BeforeChangeItem[]>;
-
 export type BeforeSetSelectorMethod = (params: BeforeSetSelectorParams) => BeforeSetSelectorParams | undefined;
 export type BeforeSetAutofillMethod = (params: BeforeSetAutofillParams) => BeforeSetAutofillParams | undefined;
 export type BeforeCopyMethod = (params: BeforeCopyParams) => BeforeCopyParams | undefined;
-export type BeforeDragRowMethod = (params: BeforeDragRowParams) =>  boolean | Promise<boolean>;
+export type BeforeDragRowMethod = (params: BeforeDragRowParams) => boolean | Promise<boolean>;
+export type BeforeHeaderContextMenuMethod = (params: ContextMenuItemParams) => MenuItem[] | Promise<MenuItem[]>;
+export type BeforeBodyContextMenuMethod = (params: ContextMenuItemParams) => MenuItem[] | Promise<MenuItem[]>;

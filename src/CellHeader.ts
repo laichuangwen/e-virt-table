@@ -1,6 +1,6 @@
 import type Context from './Context';
 import { generateShortUUID } from './util';
-import type { Align, CellHeaderStyleMethod, Column, Fixed, LineClampType, Render, Type, VerticalAlign } from './types';
+import type { Align, CellHeaderStyleMethod, Column, Fixed, LineClampType, Render, RenderType, Type, VerticalAlign } from './types';
 import BaseCell from './BaseCell';
 import { Rule, Rules } from './Validator';
 import { TextInfo } from './Paint';
@@ -56,6 +56,20 @@ export default class CellHeader extends BaseCell {
     drawCellBgColor = '';
     drawTextColor = '';
     drawTextFont = '';
+    drawSelectionImageX = 0;
+    drawSelectionImageY = 0;
+    drawSelectionImageWidth = 0;
+    drawSelectionImageHeight = 0;
+    drawSelectionImageName = '';
+    drawSelectionImageSource?: HTMLImageElement;
+    // 排序相关
+    drawSortImageX = 0;
+    drawSortImageY = 0;
+    drawSortImageWidth = 0;
+    drawSortImageHeight = 0;
+    drawSortImageName = '';
+    drawSortImageSource?: HTMLImageElement;
+    renderHeaderType: RenderType = 'default';
     constructor(ctx: Context, colIndex: number, x: number, y: number, width: number, height: number, column: Column) {
         super(ctx, x, y, width, height, 'header', column.fixed);
         this.ctx = ctx;
@@ -95,6 +109,7 @@ export default class CellHeader extends BaseCell {
         this.hasChildren = (column.children && column.children.length > 0) || false; // 是否有子
         this.render = column.renderHeader;
         this.maxLineClampHeader = column.maxLineClampHeader || 'auto';
+        this.renderHeaderType = column.renderHeaderType || 'default';
     }
     /**
      * 是否可见，覆盖基类方法，表头是跟y滚动条没有关系的所以不需要加滚动参数
@@ -333,7 +348,7 @@ export default class CellHeader extends BaseCell {
     }
 
     getText() {
-        if (this.render) {
+        if (this.render && this.renderHeaderType === 'default') {
             return '';
         }
         if (['', null, undefined].includes(this.text)) {

@@ -251,50 +251,58 @@ type EVirtTableOptions = {
 | clearChangeData         | 清空改变值                         | —                                                         |
 
 ## Column
-| 参数                      | 说明                                         | 类型                                                                                                                            | 默认值  |
-| ------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| key ^(required)           | 列的唯一标识                                 | string                                                                                                                          | —       |
-| title ^(required)         | 列的标题                                     | string                                                                                                                          | —       |
-| type                      | 列的类型                                     | ^[string]`index, selection, index-selection,tree,number`                                                                        | —       |
-| operation                 | 指定列为操作列                               | boolean                                                                                                                         | false   |
-| editorType                | 指定列编辑器类型                             | string                                                                                                                          | text    |
-| widthFillDisable          | 指定当前列不可填充宽度                       | boolean                                                                                                                         | false   |
-| hide                      | 指定列隐藏                                   | boolean                                                                                                                         | false   |
-| sort                      | 指定列排序                                   | number                                                                                                                          | 0       |
-| width                     | 列的宽度                                     | number                                                                                                                          | 100     |
-| minWidth                  | 列的最小宽度                                 | number                                                                                                                          | —       |
-| maxWidth                  | 列的最大宽度                                 | number                                                                                                                          | —       |
-| headerAlign               | 表头水平对齐方式                             | `"left"`, `"center"`, `"right"`                                                                                                 | left    |
-| headerVerticalAlign       | 表头垂直对齐方式                             | `"top"`, `"middle"`, `"bottom"`                                                                                                 | middle  |
-| align                     | 水平对齐方式                                 | `"left"`, `"center"`, `"right"`                                                                                                 | left    |
-| verticalAlign             | 垂直对齐方式                                 | `"top"`, `"middle"`, `"bottom"`                                                                                                 | middle  |
-| hideHeaderSelection       | 表头Selection是否隐藏                        | boolean                                                                                                                         | false   |
-| fixed                     | 是否固定列                                   | `"left"`, `"right"`                                                                                                             | —       |
-| render                    | 自定义渲染方法                               | string\|Function                                                                                                                | —       |
-| renderFooter              | 自定义渲染底部方法                           | string\|Function                                                                                                                | —       |
-| renderHeader              | 自定义渲染头部方法                           | string\|Function                                                                                                                | —       |
-| formatter                 | 格式化方法                                   | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod`                                                            | —       |
-| formatterFooter           | 格式化底部方法                               | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod`                                                            | —       |
-| readonly                  | 是否只读                                     | boolean                                                                                                                         | false   |
-| children                  | 子列                                         | Column[]                                                                                                                        | —       |
-| column                    | 当前列对象                                   | Column                                                                                                                          | —       |
-| hoverIconName             | 悬浮图标名字，可ICONS配置                    | string                                                                                                                          | —       |
-| placeholder               | 占位符文本                                   | string                                                                                                                          | —       |
-| autoRowHeight             | 格子自适应行高                               | boolean                                                                                                                         | false   |
-| overflowTooltipHeaderShow | 表头是否显示溢出提示                         | boolean                                                                                                                         | true    |
-| overflowTooltipShow       | 是否显示溢出提示                             | boolean                                                                                                                         | true    |
-| overflowTooltipMaxWidth   | 溢出提示的宽度                               | number                                                                                                                          | 500     |
-| overflowTooltipPlacement  | 溢出提示的位置                               | ^[string]`top, top-start, top-end, right, right-start, right-end, left, left-start, left-end, bottom, bottom-start, bottom-end` | —       |
-| sortBy                    | 排序类型                                     | `'number'`, `'string'`, `'date'`, `(a: rowData, b: rowData) => number`                                                          | —       |
-| sortIconName              | 默认排序图标                                 | `string`                                                                                                                        | —       |
-| sortAscIconName           | 升序排序图标                                 | `string`                                                                                                                        | —       |
-| sortDescIconName          | 降序排序图标                                 | `string`                                                                                                                        | —       |
-| rules                     | 校验规则                                     | Rules                                                                                                                           | —       |
-| maxLineClamp              | 最大溢出截断行数，默认`auto`根据内容撑开     | `auto,number`                                                                                                                   | auto    |
-| maxLineClampHeader        | 表头最大溢出截断行数，默认`auto`根据内容撑开 | `auto,number`                                                                                                                   | auto    |
-| autoRowHeight             | 当前列行自适应高度                           | boolean                                                                                                                         | false   |
-| dragDisabled              | 当前列禁用拖拽                               | boolean                                                                                                                         | false   |
-| selectorCellValueType     | 选择器选择格子类型                           | `SelectorCellValueType`                                                                                                         | `value` |
+| 参数 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| key ^(required)| 列的唯一标识 | string | — |
+| title ^(required)| 列的标题 | string | — |
+| type| 列的类型 | ^[string]`index, selection, index-selection,tree,number` | — |
+| operation | 指定列为操作列 | boolean | false |
+| editorType | 指定列编辑器类型 | string | text |
+| widthFillDisable | 指定当前列不可填充宽度 | boolean | false |
+| hide | 指定列隐藏 | boolean | false |
+| sort | 指定列排序 | number | 0 |
+| width | 列的宽度 | number | 100 |
+| minWidth | 列的最小宽度 | number | —|
+| maxWidth | 列的最大宽度 | number | —|
+| headerAlign | 表头水平对齐方式 | `"left"`, `"center"`, `"right"` | left |
+| headerVerticalAlign | 表头垂直对齐方式 | `"top"`, `"middle"`, `"bottom"` | middle |
+| align | 水平对齐方式 | `"left"`, `"center"`, `"right"` | left |
+| verticalAlign | 垂直对齐方式 | `"top"`, `"middle"`, `"bottom"` | middle |
+| hideHeaderSelection | 表头Selection是否隐藏 | boolean | false |
+| fixed | 是否固定列 | `"left"`, `"right"` | — |
+| render | 自定义渲染方法 | string\|Function | — |
+| renderType | 配置both就是dom和canvas共存显示 | `RenderType`（`default`、`both`） | `default` |
+| renderFooter | 自定义渲染底部方法 | string\|Function | — |
+| renderFooterType | 配置both就是dom和canvas共存显示 | `RenderType`（`default`、`both`） | `default` |
+| renderHeader | 自定义渲染头部方法 | string\|Function | — |
+| renderHeaderType | 配置both就是dom和canvas共存显示 | `RenderType`（`default`、`both`） | `default` |
+| formatter | 格式化方法 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — |
+| formatterFooter | 格式化底部方法 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — |
+| readonly | 是否只读 | boolean | false |
+| children | 子列 | Column[] | — |
+| column | 当前列对象 | Column | — |
+| hoverIconName | 悬浮图标名字，可ICONS配置 | string | — |
+| placeholder | 占位符文本 | string | — |
+| autoRowHeight | 格子自适应行高 | boolean | false |
+| overflowTooltipHeaderShow | 表头是否显示溢出提示 | boolean | true |
+| overflowTooltipShow | 是否显示溢出提示 | boolean | true |
+| overflowTooltipMaxWidth | 溢出提示的宽度 | number | 500 |
+| overflowTooltipPlacement | 溢出提示的位置|  ^[string]`top, top-start, top-end, right, right-start, right-end, left, left-start, left-end, bottom, bottom-start, bottom-end` | — |
+| sortBy | 排序类型 | `'number'`, `'string'`, `'date'`, `(a: rowData, b: rowData) => number` | — |
+| sortIconName | 默认排序图标 | `string` | — |
+| sortAscIconName | 升序排序图标 | `string` | — |
+| sortDescIconName | 降序排序图标 | `string` | — |
+| rules | 校验规则 | Rules | — |
+| maxLineClamp | 最大溢出截断行数，默认`auto`根据内容撑开 | `auto,number` | auto |
+| maxLineClampHeader | 表头最大溢出截断行数，默认`auto`根据内容撑开 | `auto,number` | auto |
+| dragRow | 在该列显示拖拽手柄，用于触发行拖拽 | boolean | false |
+| dragDisabled | 当前列禁用拖拽 | boolean | false |
+| selectorCellValueType | 选择器选择格子类型 | `SelectorCellValueType` | `value` |
+| precision | 数字精度 | number | — |
+| min | 数字最小值 | number | — |
+| max | 数字最大值 | number | — |
+| maxlength | 字符串最大长度 | number | — |
+| mixedRender | 混合渲染，dom和canvas一起渲染 | boolean | false |
 
 ## Row
 

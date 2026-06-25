@@ -269,8 +269,11 @@ type EVirtTableOptions = {
 | hideHeaderSelection | Hide selection in header | boolean | false |
 | fixed | Fix the column position | string | `"left"`, `"right"` | — |
 | render | Custom render method | string\|Function | — | — |
+| renderType | "both" enables the simultaneous display of both DOM and Canvas | `RenderType` | `default`, `both` | `default` |
 | renderFooter | Custom footer render method | string\|Function | — | — |
+| renderFooterType | "both" enables the simultaneous display of both DOM and Canvas | `RenderType` | `default`, `both` | `default` |
 | renderHeader | Custom header render method | string\|Function | — | — |
+| renderHeaderType | "both" enables the simultaneous display of both DOM and Canvas | `RenderType` | `default`, `both` | `default` |
 | formatter | Formatter method | ^[Function]`({row, column, rowIndex, colIndex, value})=>string\|void` | — | — |
 | formatterFooter | Footer formatter method | ^[Function]`({row, column, rowIndex, colIndex, value})=>string\|void` | — | — |
 | readonly | Read-only column | boolean | — | false |

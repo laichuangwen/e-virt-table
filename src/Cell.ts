@@ -17,6 +17,7 @@ import type {
     SpanInfo,
     SelectorCellValueType,
     LineClampType,
+    RenderType,
 } from './types';
 import Context from './Context';
 import BaseCell from './BaseCell';
@@ -86,7 +87,8 @@ export default class Cell extends BaseCell {
     max?: number = undefined;
     maxlength?: number = undefined;
     mixedRender?: boolean = false;
-
+    renderType: RenderType = 'default';
+    renderFooterType: RenderType = 'default';
     constructor(
         ctx: Context,
         rowIndex: number,
@@ -141,6 +143,8 @@ export default class Cell extends BaseCell {
         this.max = column.max;
         this.maxlength = column.maxlength;
         this.mixedRender = column.mixedRender || false;
+        this.renderType = column.renderType || 'default';
+        this.renderFooterType = column.renderFooterType || 'default';
         const rowItem = this.ctx.database.getRowForRowKey(this.rowKey);
         if (this.cellType === 'body' && rowItem) {
             this.parentRowKey = rowItem.parentRowKey;
@@ -837,7 +841,7 @@ export default class Cell extends BaseCell {
     getDisplayText() {
         if (this.cellType === 'footer') {
             // 插槽不显示文本
-            if (this.renderFooter) {
+            if (this.renderFooter && this.renderFooterType === 'default') {
                 return '';
             }
             if (this.text === null || this.text === undefined) {
@@ -850,8 +854,8 @@ export default class Cell extends BaseCell {
             if (this.rowspan === 0 || this.colspan === 0) {
                 return '';
             }
-            // dom和canvas一起渲染
-            if (this.render && !this.mixedRender) {
+            // 自定义渲染为 default 且非混合渲染时不显示 canvas 文本
+            if (this.render && this.renderType === 'default' && !this.mixedRender) {
                 return '';
             }
             const selectionImage = this.getImage('selection');
@@ -962,7 +966,7 @@ export default class Cell extends BaseCell {
             left: `${Math.round(left - 1)}px`,
             top: `${Math.round(top - 1)}px`,
             width: `${this.visibleWidth}px`,
-            height: this.autoRowHeight ? 'auto' : `${this.visibleHeight}px`,
+            height: this.autoRowHeight && this.renderType === 'default' ? 'auto' : `${this.visibleHeight}px`,
             // height: `${this.visibleHeight}px`,
             // minHeight: `${this.visibleHeight}px`,
             pointerEvents: 'initial',
