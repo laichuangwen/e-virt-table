@@ -5,7 +5,17 @@ Vx.x.x(TPL)
 -   Performance Improvements
 -   Style changes
 -   Dependencies Changes
--   
+-  
+
+
+V1.4.0
+### Bug Fixes
+- refactor: 抽离SVG图标方便拓展
+- feat:添加文本选择
+- feat:添加行拖拽
+- feat:支持语言切换
+- feat:数字类型支持精度
+---  
 
 V1.3.26
 ### Bug Fixes
