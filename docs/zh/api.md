@@ -97,6 +97,7 @@ type EVirtTableOptions = {
 | ENABLE_SELECTOR_ALL_COLS | 启用选择器-批量选中行 | boolean | true |
 | ENABLE_MERGE_CELL_LINK | 启用合并格子数据关联 | boolean | false |
 | ENABLE_AUTOFILL | 启用填充 | boolean | true |
+| ENABLE_TEXT_SELECTION | 启用 body 单元格内文字选中与复制；在单元格内拖拽选中文本后，可使用 `Ctrl/Cmd+C` 复制选中内容。有文字选中时优先复制文字，不会触发区域单元格复制；编辑或查找模式下不可用 | boolean | true |
 | ENABLE_COPY | 启用复制 | boolean | true |
 | ENABLE_PASTER | 启用粘贴 | boolean | true |
 | ENABLE_RESIZE_ROW | 启用调整行高 | boolean | true |
