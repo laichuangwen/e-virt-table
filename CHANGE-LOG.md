@@ -10,6 +10,12 @@ Vx.x.x(TPL)
 
 V1.4.0
 ### Bug Fixes
+- fix:修复不聚焦单元格就复制不了选中的文字
+- feat:添加表头和合计也可以复制文本
+
+---  
+V1.4.0
+### Bug Fixes
 - refactor: 抽离SVG图标方便拓展
 - feat:添加文本选择
 - feat:添加行拖拽

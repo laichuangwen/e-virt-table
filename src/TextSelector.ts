@@ -115,9 +115,6 @@ export default class TextSelector {
             this.syncSelection();
         });
         this.ctx.on('mousemove', (e) => {
-            if (this.ctx.dragHeaderIng) {
-                return;
-            }
             if (!this.canSelect || !this.dragging) {
                 return;
             }
