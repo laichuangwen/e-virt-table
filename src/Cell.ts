@@ -1102,7 +1102,11 @@ export default class Cell extends BaseCell {
                 maxLineClamp: this.maxLineClamp,
                 cacheTextKey,
                 layoutCallback: (layout) => {
-                    this.ctx.emit('registerTextLayout', `${this.rowIndex}-${this.colIndex}`, layout);
+                    this.ctx.emit(
+                        'registerTextLayout',
+                        `${this.cellType}-${this.rowIndex}-${this.colIndex}`,
+                        layout,
+                    );
                 },
             },
         );

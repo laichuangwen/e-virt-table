@@ -1,6 +1,5 @@
 import type { Align } from './types';
 import type Context from './Context';
-import type Cell from './Cell';
 
 export type TextSelectionRange = {
     start: number;
@@ -65,53 +64,65 @@ export default class TextSelector {
         this.init();
     }
 
+    /** 是否允许进行文字选择（开启配置且不在编辑/查找状态） */
+    private get canSelect() {
+        return this.ctx.config.ENABLE_TEXT_SELECTION && !this.ctx.editing && !this.ctx.finding;
+    }
+
+    /**
+     * 在所有已注册的文字 layout（body/header/footer）中命中鼠标位置，返回命中的单元格 key 与字符索引。
+     * 由于固定列/表头会后绘制并覆盖普通单元格，这里取最后一个命中的 layout 作为最顶层结果。
+     */
+    private hitTestLayouts(e: MouseEvent): { cellKey: string; index: number } | null {
+        const { offsetX, offsetY } = this.ctx.getOffset(e);
+        let hit: { cellKey: string; index: number } | null = null;
+        for (const [cellKey, layout] of this.layouts) {
+            const index = this.hitTestText(layout, offsetX, offsetY);
+            if (index !== null) {
+                hit = { cellKey, index };
+            }
+        }
+        return hit;
+    }
+
+    /** 同步选中文本并触发重绘 */
+    private syncSelection() {
+        this.ctx.textSelectionStr = this.getSelectedText();
+        this.ctx.emit('drawView');
+    }
+
     private init() {
         this.ctx.on('registerTextLayout', (cellKey: string, layout: TextLayout) => {
             this.registerLayout(cellKey, layout);
         });
         this.ctx.on('mousedown', (e) => {
-            if (!this.ctx.config.ENABLE_TEXT_SELECTION) {
+            if (!this.canSelect || !this.ctx.isTarget(e)) {
                 return;
             }
-            if (!this.ctx.isTarget(e)) {
-                return;
+            if (!this.ctx.containerElement.contains(document.activeElement)) {
+                this.ctx.containerElement.focus({ preventScroll: true });
             }
-            if (this.ctx.editing || this.ctx.finding) {
-                return;
-            }
-            const cell = this.ctx.focusCell;
-            if (!cell || cell.cellType !== 'body') {
+            const hit = this.hitTestLayouts(e);
+            if (!hit) {
                 this.clearSelection();
                 return;
             }
-            const layout = this.getCellLayout(cell);
-            if (!layout) {
-                this.clearSelection();
-                return;
-            }
-            const { offsetX, offsetY } = this.ctx.getOffset(e);
-            const index = this.hitTestText(layout, offsetX, offsetY);
-            if (index === null) {
-                this.clearSelection();
-                return;
-            }
-            this.activeCellKey = this.getCellKey(cell);
-            this.selectionStart = index;
-            this.selectionEnd = index;
+            this.activeCellKey = hit.cellKey;
+            this.selectionStart = hit.index;
+            this.selectionEnd = hit.index;
             this.dragging = true;
             this.ctx.textSelecting = true;
-            this.ctx.textSelectionStr = this.getSelectedText();
-            this.ctx.emit('drawView');
+            this.syncSelection();
         });
         this.ctx.on('mousemove', (e) => {
-            if (!this.ctx.config.ENABLE_TEXT_SELECTION || !this.dragging) {
+            if (this.ctx.dragHeaderIng) {
                 return;
             }
-            const cell = this.ctx.focusCell;
-            if (!cell) {
+            if (!this.canSelect || !this.dragging) {
                 return;
             }
-            const layout = this.getCellLayout(cell);
+            // 拖拽选区限制在起始单元格内
+            const layout = this.layouts.get(this.activeCellKey);
             if (!layout) {
                 return;
             }
@@ -121,8 +132,7 @@ export default class TextSelector {
                 return;
             }
             this.selectionEnd = index;
-            this.ctx.textSelectionStr = this.getSelectedText();
-            this.ctx.emit('drawView');
+            this.syncSelection();
         });
         this.ctx.on('mouseup', () => {
             this.dragging = false;
@@ -133,22 +143,16 @@ export default class TextSelector {
             }
         });
         this.ctx.on('keydown', (e) => {
-            if (!this.ctx.config.ENABLE_TEXT_SELECTION) {
+            console.log('keydown');
+            if (!this.canSelect || !((e.ctrlKey || e.metaKey) && e.code === 'KeyC')) {
                 return;
             }
-            if (this.ctx.editing || this.ctx.finding) {
+            const text = this.getSelectedText();
+            if (!text) {
                 return;
             }
-            if ((e.ctrlKey && e.code === 'KeyC') || (e.metaKey && e.code === 'KeyC')) {
-                const text = this.getSelectedText();
-                if (!text) {
-                    return;
-                }
-                e.preventDefault();
-                if (navigator.clipboard) {
-                    navigator.clipboard.writeText(text).catch((error) => console.error('Copy Failure:', error));
-                }
-            }
+            e.preventDefault();
+            navigator.clipboard?.writeText(text).catch((error) => console.error('Copy Failure:', error));
         });
         this.ctx.on('outsideMousedown', () => {
             this.clearSelection();
@@ -209,14 +213,6 @@ export default class TextSelector {
         this.drawTextSelection(layout, range);
     }
 
-    private getCanvasCtx(): CanvasRenderingContext2D {
-        const ctx = this.ctx.canvasElement.getContext('2d');
-        if (!ctx) {
-            throw new Error('canvas context not found');
-        }
-        return ctx;
-    }
-
     /**
      * 绘制文字选中高亮
      */
@@ -230,53 +226,36 @@ export default class TextSelector {
             return;
         }
         const byLine = new Map<number, TextGlyph[]>();
-        layout.glyphs.forEach((glyph) => {
-            if (glyph.index < 0 || glyph.index < range.start || glyph.index >= range.end) {
-                return;
+        for (const glyph of layout.glyphs) {
+            if (glyph.index < range.start || glyph.index >= range.end) {
+                continue;
             }
-            if (!byLine.has(glyph.line)) {
-                byLine.set(glyph.line, []);
+            const lineGlyphs = byLine.get(glyph.line);
+            if (lineGlyphs) {
+                lineGlyphs.push(glyph);
+            } else {
+                byLine.set(glyph.line, [glyph]);
             }
-            byLine.get(glyph.line)!.push(glyph);
-        });
-        const ctx = this.getCanvasCtx();
+        }
+        if (!byLine.size) {
+            return;
+        }
+        const ctx = this.ctx.paint.getCtx();
         ctx.save();
-        ctx.fillStyle = selectionBgColor;
-        byLine.forEach((lineGlyphs) => {
-            const first = lineGlyphs[0];
-            const last = lineGlyphs[lineGlyphs.length - 1];
-            ctx.fillRect(first.x, first.y, last.x + last.width - first.x, first.height);
-        });
         ctx.font = layout.font;
         ctx.textBaseline = 'top';
         ctx.textAlign = 'left';
-        ctx.fillStyle = selectedColor;
-        layout.lines.forEach((line) => {
-            const selectedItems = line.items.filter(
-                (item) => item.sourceIndex >= 0 && item.sourceIndex >= range.start && item.sourceIndex < range.end,
-            );
-            if (!selectedItems.length) {
-                return;
+        byLine.forEach((lineGlyphs) => {
+            const first = lineGlyphs[0];
+            const last = lineGlyphs[lineGlyphs.length - 1];
+            ctx.fillStyle = selectionBgColor;
+            ctx.fillRect(first.x, first.y, last.x + last.width - first.x, first.height);
+            ctx.fillStyle = selectedColor;
+            for (const glyph of lineGlyphs) {
+                ctx.fillText(glyph.char, glyph.x, glyph.y);
             }
-            const firstSelected = selectedItems[0];
-            const colIndex = line.items.indexOf(firstSelected);
-            const selectedText = selectedItems.map((item) => item.char).join('');
-            const prefix = line.items
-                .slice(0, colIndex)
-                .map((item) => item.char)
-                .join('');
-            const drawX = line.drawX + ctx.measureText(prefix).width;
-            ctx.fillText(selectedText, drawX, line.drawY);
         });
         ctx.restore();
-    }
-
-    private getCellKey(cell: Cell) {
-        return `${cell.rowIndex}-${cell.colIndex}`;
-    }
-
-    private getCellLayout(cell: Cell) {
-        return this.layouts.get(this.getCellKey(cell));
     }
 
     private getSelectionRange(): TextSelectionRange | null {

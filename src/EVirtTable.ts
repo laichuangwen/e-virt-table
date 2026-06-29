@@ -129,9 +129,10 @@ export default class EVirtTable {
         this.ctx.paint.clear();
         this.textSelector.clearLayouts();
         this.body.draw();
-        this.textSelector.draw();
         this.footer.draw();
         this.header.draw();
+        // 在 body/footer/header 之后绘制，保证文字选中高亮覆盖在三类单元格之上
+        this.textSelector.draw();
         this.body.drawDragRowTip();
         this.scroller.draw();
         this.empty.draw();

@@ -230,6 +230,9 @@ export default class CellHeader extends BaseCell {
                 textCallback: (textInfo: TextInfo) => {
                     this.textInfo = textInfo;
                 },
+                layoutCallback: (layout) => {
+                    this.ctx.emit('registerTextLayout', `${this.cellType}-${this.colIndex}-${this.level}`, layout);
+                },
             },
         );
     }

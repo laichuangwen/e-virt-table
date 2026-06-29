@@ -56,6 +56,9 @@ export class Paint {
         if (!ctx) throw new Error('canvas context not found');
         this.ctx = ctx;
     }
+    getCtx() {
+        return this.ctx;
+    }
     clearTextCache() {
         this.textCacheMap.clear();
     }

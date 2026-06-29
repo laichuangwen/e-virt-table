@@ -82,6 +82,9 @@ export default class Selector {
             }, 0);
         });
         this.ctx.on('cellHeaderHoverChange', (cell) => {
+            if (this.ctx.textSelecting) {
+                return;
+            }
             if (this.ctx.mousedown) {
                 this.selectCols(cell);
             }

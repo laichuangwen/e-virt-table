@@ -96,7 +96,7 @@ type EVirtTableOptions = {
 | ENABLE_MERGE_CELL_LINK | Enable merge cell data association | boolean | — | false |
 | ENABLE_AUTOFILL | Enable autofill | boolean | — | true |
 | ENABLE_CONTEXT_MENU | Enable context menu | boolean | — | false |
-| ENABLE_TEXT_SELECTION | Enable in-cell text selection and copy in body cells. Drag to select text within a cell, then use `Ctrl/Cmd+C` to copy the selection. When text is selected, cell-range copy is skipped; unavailable while editing or searching | boolean | — | true |
+| ENABLE_TEXT_SELECTION | Enable in-cell text selection and copy for header, body and footer cells. Drag to select text within a cell, then use `Ctrl/Cmd+C` to copy the selection. When text is selected, cell-range copy is skipped; unavailable while editing or searching | boolean | — | true |
 | ENABLE_COPY | Enable copy | boolean | — | true |
 | ENABLE_PASTER | Enable paste | boolean | — | true |
 | ENABLE_RESIZE_ROW | Enable row height adjustment | boolean | — | true |
