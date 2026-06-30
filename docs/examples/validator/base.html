@@ -105,9 +105,9 @@
                 rules: {
                     validator(rule, value, callback) {
                         if (!value) {
-                            callback('请输入');
+                            callback('Please enter');
                         } else if (value.length > 20) {
-                            callback('字段长度必须小于20个字符哦！');
+                            callback('Field length must be less than 20 characters!');
                         } else {
                             callback();
                         }
@@ -124,12 +124,12 @@
                 rules: [
                     {
                         required: true,
-                        message: '请输入',
+                        message: 'Please enter',
                     },
                     {
                         required: true,
                         type: 'email',
-                        message: '请输入正确的邮箱',
+                        message: 'Please enter a valid email',
                     },
                 ],
             },
@@ -139,7 +139,7 @@
             data,
             columns,
             config: {
-                RESIZE_COLUMN_MIN_WIDTH: 100, // 调整最小列宽
+                RESIZE_COLUMN_MIN_WIDTH: 100, // Minimum column resize width
                 ENABLE_SELECTOR: true,
                 ENABLE_AUTOFILL: true,
                 ENABLE_HISTORY: true,
@@ -148,7 +148,7 @@
         grid.on('validateChangedData', (changeData) => {
             console.log('validateChangedData', changeData);
         });
-        // 不滚动到错误点
+        // Do not scroll to error point
         document.getElementById('verify-btn').addEventListener('click', () => {
             console.log('2222');
 
@@ -168,12 +168,12 @@
                 {
                     key: 'address',
                     rowIndex: 0,
-                    message: '设置Address错误1',
+                    message: 'Set Address error 1',
                 },
                 {
                     key: 'address',
                     rowIndex: 3,
-                    message: '设置Address错误3',
+                    message: 'Set Address error 3',
                 },
             ];
             grid.setValidations(errors);

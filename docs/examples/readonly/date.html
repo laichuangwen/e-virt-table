@@ -114,7 +114,7 @@
         });
         grid.on('startEdit', (cell) => {
             const { width, height, editorType } = cell;
-            // 内部已经处理了文本类型的编辑
+            // Text type editing is handled internally
             if (editorType === 'text') {
                 return;
             }
@@ -131,7 +131,7 @@
             }
         });
         grid.on('doneEdit', (cell) => {
-            // 内部已经处理了文本类型的编辑
+            // Text type editing is handled internally
             if (cell.editorType === 'text') {
                 return;
             }
@@ -140,7 +140,7 @@
             }
         });
         dateEl.addEventListener('change', function (event) {
-            // 获取 input 元素的新值
+            // Get the new value of the input element
             const newValue = event.target.value;
             const rowKey = dateEl.getAttribute('data-row-key');
             const key = dateEl.getAttribute('data-key');

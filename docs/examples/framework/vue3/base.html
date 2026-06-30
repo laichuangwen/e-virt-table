@@ -3,19 +3,19 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>e-virt-table vue3示例</title>
-        <!-- 引入 Vue -->
+        <title>e-virt-table Vue3 Example</title>
+        <!-- Import Vue -->
         <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
         <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
     </head>
     <body>
         <div id="app">
-            <!-- 表格容器 -->
+            <!-- Table container -->
             <div ref="eVirtTableRef"></div>
         </div>
 
         <script>
-            // 使用 Vue 创建应用
+            // Create app with Vue
             const app = Vue.createApp({
                 setup() {
                     const eVirtTableRef = Vue.ref(null);
@@ -24,7 +24,7 @@
                     };
                 },
                 mounted() {
-                    // 创建 e-virt-table 实例
+                    // Create e-virt-table instance
                     const columns = [
                         { title: 'Name', key: 'name' },
                         { title: 'Age', key: 'age' },

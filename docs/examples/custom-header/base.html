@@ -225,7 +225,7 @@
         }
         grid.on('customHeaderChange', (customHeader) => {
             console.log('customHeaderChange', customHeader);
-            // 如果customHeader为空，则删除localStorage
+            // Delete localStorage if customHeader is empty
             if (Object.keys(customHeader).length === 0) {
                 localStorage.removeItem('customHeader');
             } else {

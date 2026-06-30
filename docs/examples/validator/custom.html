@@ -106,7 +106,7 @@
                 rules: [
                     {
                         type: 'number',
-                        message: 'Zip必须为数字',
+                        message: 'Zip must be a number',
                     },
                 ],
             },
@@ -116,12 +116,12 @@
                 rules: [
                     {
                         required: true,
-                        message: '请输入',
+                        message: 'Please enter',
                     },
                     {
                         required: true,
                         type: 'email',
-                        message: '请输入正确的邮箱Address',
+                        message: 'Please enter a valid email address',
                     },
                 ],
             },
@@ -131,17 +131,17 @@
             data,
             columns,
             config: {
-                RESIZE_COLUMN_MIN_WIDTH: 100, // 调整最小列宽
+                RESIZE_COLUMN_MIN_WIDTH: 100, // Minimum column resize width
                 ENABLE_SELECTOR: true,
                 ENABLE_AUTOFILL: true,
                 ENABLE_HISTORY: true,
                 BODY_CELL_RULES_METHOD: ({ rowIndex, column }) => {
-                    // email的rowIndex= 0,1不校验不必填
+                    // Skip validation for email when rowIndex is 0 or 1
                     if (column.key === 'email' && [0, 1].includes(rowIndex)) {
                         return [
                             {
                                 required: false,
-                                message: '请输入',
+                                message: 'Please enter',
                             },
                         ];
                     }

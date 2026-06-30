@@ -164,15 +164,15 @@
                         return mergeRowCell(params, 'state');
                     }
                     if (column.key === 'city') {
-                        // 第三个参数为关联key,内部会根据这个key进行合并进行数据对比
+                        // Third param is relation key; internal merge compares data by this key
                         return mergeRowCell(params, 'city', ['state', 'city']);
                     }
                     if (column.key === 'address') {
-                        // 第三个参数为关联key,内部会根据这个key进行合并进行数据对比
+                        // Third param is relation key; internal merge compares data by this key
                         return mergeRowCell(params, 'address', ['state', 'city', 'address']);
                     }
                     if (column.key === 'date') {
-                        // 第三个参数为关联key,内部会根据这个key进行合并进行数据对比
+                        // Third param is relation key; internal merge compares data by this key
                         return mergeRowCell(params, 'date', ['state', 'city', 'address', 'date']);
                     }
                     if (['zip', 'zip1'].includes(column.key)) {

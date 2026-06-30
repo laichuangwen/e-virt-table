@@ -129,7 +129,7 @@
             },
         });
 
-        // 如果是自定义表头不建用
+        // Not recommended for custom headers
         grid.on('customHeaderChange', (data) => {
             console.log('customHeaderChange', data);
             localStorage.setItem('customHeader', JSON.stringify(data));

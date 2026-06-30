@@ -104,8 +104,8 @@
                 ENABLE_SELECTOR: true,
                 BEFORE_VALUE_CHANGE_METHOD: (changeList) => {
                     console.log(changeList);
-                    // 返回一个Promise类型，那么会等待Promise resolve之后再更新数据
-                    // 只有当所有的数据都是 age 字段的时候，才会触发Promise类型
+                    // Return a Promise; data updates after Promise resolves
+                    // Promise type is triggered only when all changes are on the age field
                     if (changeList.every((data) => data.key === 'age')) {
                         return new Promise((resolve) => {
                             setTimeout(() => {
@@ -118,7 +118,7 @@
                             }, 3000);
                         });
                     } else {
-                        // 否则直接返回数据
+                        // Otherwise return data directly
                         return changeList.map((data) => ({
                             ...data,
                             value: `${data.value}Sync`,

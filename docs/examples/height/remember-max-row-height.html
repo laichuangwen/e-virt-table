@@ -27,33 +27,33 @@
                     fixed: 'left',
                 },
                 {
-                    title: '姓名Name',
+                    title: 'Name',
                     key: 'name',
                     width: 220,
                     fixed: 'left',
                 },
                 {
-                    title: '日期Date',
+                    title: 'Date',
                     key: 'date',
                     width: 120,
                 },
                 {
-                    title: '城市City',
+                    title: 'City',
                     key: 'city',
                     width: 220,
                 },
                 {
-                    title: '州State',
+                    title: 'State',
                     key: 'state',
                     width: 220,
                 },
                 {
-                    title: '邮编Zip',
+                    title: 'Zip',
                     key: 'zip',
                     width: 200,
                 },
                 {
-                    title: '长文本1LongText1',
+                    title: 'Long Text 1',
                     key: 'longText1',
                     width: 200,
                     autoRowHeight: true,
@@ -71,12 +71,12 @@
                     },
                 },
                 {
-                    title: '地址Address',
+                    title: 'Address',
                     key: 'address',
                     width: 200,
                 },
                 {
-                    title: '长文本2LongText2',
+                    title: 'Long Text 2',
                     key: 'longText2',
                     width: 200,
                     autoRowHeight: true,
@@ -95,10 +95,10 @@
                 },
             ];
 
-            // 添加更多列以便横向滚动
+            // Add more columns for horizontal scrolling
             for (let i = 0; i < 30; i++) {
                 columns.push({
-                    title: `列${i + 1}Col${i + 1}`,
+                    title: `Col ${i + 1}`,
                     key: `col_${i}`,
                     width: 100,
                 });
@@ -106,28 +106,28 @@
 
             let data = [];
             const longTexts = [
-                '这是一段很长很长的文本内容，用于测试自动行高功能。当内容很长时，单元格会自动换行并撑高行高。This is a very long text content for testing auto row height.',
-                '短文本Short',
-                '这是一段中等长度的文本内容，用于演示不同长度的文本对行高的影响。Medium length text for demonstration.',
-                '超级超级超级超级超级超级超级长的文本内容，这段文本会让单元格变得非常高，用于测试记录最大行高的功能是否正常工作。Super super super long text content.',
-                '普通文本Normal text',
+                'This is a very long text content for testing auto row height. When content is long, cells wrap automatically and increase row height.',
+                'Short text',
+                'Medium length text for demonstration of how different text lengths affect row height.',
+                'Super super super long text content that makes the cell very tall, used to test max row height recording.',
+                'Normal text',
             ];
 
             for (let i = 0; i < 1000; i++) {
                 const rowData = {
                     id: `row_${i}`,
-                    name: `张三${i + 1}Tom${i + 1}`,
+                    name: `Tom${i + 1}`,
                     date: '2016-05-02',
-                    city: '洛杉矶Los Angeles',
-                    state: '加州California',
+                    city: 'Los Angeles',
+                    state: 'California',
                     zip: 'CA 90036',
                     longText1: longTexts[i % longTexts.length],
-                    address: `海淀区北京路${189 + i}号No. ${189 + i}, Grove St`,
+                    address: `No. ${189 + i}, Grove St, Haidian, Beijing`,
                     longText2: longTexts[(i + 2) % longTexts.length],
                 };
-                // 添加额外列数据
+                // Add extra column data
                 for (let j = 0; j < 30; j++) {
-                    rowData[`col_${j}`] = `数据data_${i + 1}_${j + 1}`;
+                    rowData[`col_${j}`] = `data_${i + 1}_${j + 1}`;
                 }
                 data.push(rowData);
             }
@@ -152,7 +152,7 @@
             overlayerElement: overlayerEl,
         });
 
-        // 覆盖层渲染
+        // Overlay rendering
         grid.on('overlayerChange', (container) => {
             if (!overlayerEl) {
                 return;

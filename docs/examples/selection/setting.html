@@ -130,15 +130,15 @@
             grid.setSelectionByRows([data[1], data[3]], true);
         }
 
-        // 按钮点击事件
+        // Button click handler
         document.getElementById('selection-rows-btn').addEventListener('click', setSelectionByRows);
         function clearSelection() {
             grid.clearSelection();
         }
-        // 按钮点击事件
+        // Button click handler
         document.getElementById('clear-selection-btn').addEventListener('click', clearSelection);
 
-        // 按钮点击事件
+        // Button click handler
         document.getElementById('toggle-selection-btn').addEventListener('click', function () {
             grid.toggleRowSelection(data[1]);
         });

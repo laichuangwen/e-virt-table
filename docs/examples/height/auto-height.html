@@ -107,7 +107,7 @@
             if (!overlayerEl) {
                 return;
             }
-            // 移除所有子元素
+            // Remove all child elements
             overlayerEl.replaceChildren();
             Object.assign(overlayerEl.style, container.style);
             container.views.forEach((typeView) => {
@@ -120,7 +120,7 @@
                     cellWrapView.cells.forEach((cell) => {
                         const cellEl = document.createElement('div');
                         Object.assign(cellEl.style, cell.style);
-                        //注意dom自适应行号需要设置domDataset
+                        // Note: set domDataset for DOM auto row index adaptation
                         Object.keys(cell.domDataset).forEach((key) => {
                             cellEl.setAttribute(key, cell.domDataset[key]);
                         });

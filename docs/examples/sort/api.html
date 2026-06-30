@@ -3,100 +3,100 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>e-virt-table - 服务端排序</title>
+        <title>e-virt-table - Server-side Sort</title>
     </head>
     <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
     <body>
         <div id="e-virt-table"></div>
     </body>
     <script>
-        // 模拟服务端数据
+        // Mock server-side data
         let serverData = [
             {
                 id: 1,
-                name: '张三',
+                name: 'Tom',
                 age: 25,
                 salary: 50000,
-                department: '技术部',
+                department: 'Engineering',
                 joinDate: '2023-01-15',
                 score: 85.5,
-                status: '在职',
+                status: 'Active',
             },
             {
                 id: 2,
-                name: '李四',
+                name: 'Jerry',
                 age: 30,
                 salary: 65000,
-                department: '市场部',
+                department: 'Marketing',
                 joinDate: '2022-08-20',
                 score: 92.3,
-                status: '在职',
+                status: 'Active',
             },
             {
                 id: 3,
-                name: '王五',
+                name: 'Alice',
                 age: 28,
                 salary: 55000,
-                department: '技术部',
+                department: 'Engineering',
                 joinDate: '2023-03-10',
                 score: 78.9,
-                status: '离职',
+                status: 'Inactive',
             },
             {
                 id: 4,
-                name: '赵六',
+                name: 'Bob',
                 age: 35,
                 salary: 75000,
-                department: '销售部',
+                department: 'Sales',
                 joinDate: '2021-12-05',
                 score: 88.7,
-                status: '在职',
+                status: 'Active',
             },
             {
                 id: 5,
-                name: '钱七',
+                name: 'Charlie',
                 age: 27,
                 salary: 48000,
-                department: '人事部',
+                department: 'HR',
                 joinDate: '2023-06-18',
                 score: 95.2,
-                status: '在职',
+                status: 'Active',
             },
             {
                 id: 6,
-                name: '孙八',
+                name: 'David',
                 age: 32,
                 salary: 70000,
-                department: '技术部',
+                department: 'Engineering',
                 joinDate: '2022-11-12',
                 score: 82.1,
-                status: '在职',
+                status: 'Active',
             },
             {
                 id: 7,
-                name: '周九',
+                name: 'Eve',
                 age: 29,
                 salary: 58000,
-                department: '市场部',
+                department: 'Marketing',
                 joinDate: '2023-02-28',
                 score: 90.5,
-                status: '离职',
+                status: 'Inactive',
             },
             {
                 id: 8,
-                name: '吴十',
+                name: 'Frank',
                 age: 33,
                 salary: 72000,
-                department: '销售部',
+                department: 'Sales',
                 joinDate: '2022-05-15',
                 score: 87.3,
-                status: '在职',
+                status: 'Active',
             },
         ];
 
         let columns = [
             {
-                title: '编号',
+                title: 'ID',
                 key: 'id',
                 width: 80,
                 align: 'center',
@@ -104,7 +104,7 @@
                 readonly: true,
             },
             {
-                title: '姓名',
+                title: 'Name',
                 key: 'name',
                 width: 120,
                 align: 'left',
@@ -112,7 +112,7 @@
                 readonly: true,
             },
             {
-                title: '年龄',
+                title: 'Age',
                 key: 'age',
                 width: 80,
                 align: 'center',
@@ -120,7 +120,7 @@
                 readonly: true,
             },
             {
-                title: '薪资',
+                title: 'Salary',
                 key: 'salary',
                 width: 100,
                 align: 'right',
@@ -131,7 +131,7 @@
                 },
             },
             {
-                title: '部门',
+                title: 'Department',
                 key: 'department',
                 width: 120,
                 align: 'left',
@@ -139,7 +139,7 @@
                 readonly: true,
             },
             {
-                title: '入职日期',
+                title: 'Hire Date',
                 key: 'joinDate',
                 width: 120,
                 align: 'center',
@@ -147,25 +147,25 @@
                 readonly: true,
             },
             {
-                title: '评分',
+                title: 'Score',
                 key: 'score',
                 width: 100,
                 align: 'center',
                 sortBy: 'api',
                 readonly: true,
                 formatter: ({ value }) => {
-                    return `${value.toFixed(1)}分`;
+                    return `${value.toFixed(1)} pts`;
                 },
             },
             {
-                title: '状态',
+                title: 'Status',
                 key: 'status',
                 width: 100,
                 align: 'center',
                 sortBy: 'api',
                 readonly: true,
                 formatter: ({ value }) => {
-                    return value === '在职' ? '✅ 在职' : '❌ 离职';
+                    return value === 'Active' ? '✅ Active' : '❌ Inactive';
                 },
             },
         ];
@@ -185,31 +185,31 @@
             },
         });
 
-        // 模拟服务端排序接口
+        // Mock server-side sort API
         function mockServerSort(sortData) {
             return new Promise((resolve) => {
                 setTimeout(() => {
                     let sortedData = [...serverData];
 
-                    // 根据排序条件对数据进行排序
+                    // Sort data by sort conditions
                     sortData.forEach(({ field, direction }) => {
                         sortedData.sort((a, b) => {
                             let aValue = a[field];
                             let bValue = b[field];
 
-                            // 根据字段类型进行排序
+                            // Sort by field type
                             if (field === 'age' || field === 'salary' || field === 'score' || field === 'id') {
-                                // 数字排序
+                                // Numeric sort
                                 aValue = Number(aValue) || 0;
                                 bValue = Number(bValue) || 0;
                                 return direction === 'asc' ? aValue - bValue : bValue - aValue;
                             } else if (field === 'joinDate') {
-                                // 日期排序
+                                // Date sort
                                 aValue = new Date(aValue).getTime();
                                 bValue = new Date(bValue).getTime();
                                 return direction === 'asc' ? aValue - bValue : bValue - aValue;
                             } else {
-                                // 字符串排序
+                                // String sort
                                 aValue = String(aValue || '');
                                 bValue = String(bValue || '');
                                 return direction === 'asc'
@@ -220,32 +220,32 @@
                     });
 
                     resolve(sortedData);
-                }, 500); // 模拟网络延迟
+                }, 500); // Simulate network latency
             });
         }
 
-        // 监听排序查询事件
+        // Listen for sort query event
         eVirtTable.on('sortChange', async (sortMap) => {
-            console.log('排序查询参数Map:', sortMap);
+            console.log('Sort query params Map:', sortMap);
             const sortData = Array.from(sortMap.entries()).map(([key, value]) => ({
                 field: key,
                 direction: value.direction,
             }));
-            console.log('排序查询参数Array:', sortData);
+            console.log('Sort query params Array:', sortData);
             try {
-                // 调用服务端排序接口
+                // Call server-side sort API
                 const sortedData = await mockServerSort(sortData);
-                // 更新表格数据
+                // Update table data
                 eVirtTable.loadData(sortedData);
-                console.log('排序完成，数据已更新');
+                console.log('Sort complete, data updated');
             } catch (error) {
-                console.error('排序失败:', error);
+                console.error('Sort failed:', error);
             }
         });
 
-        // 监听选择变化
+        // Listen for selection change
         eVirtTable.on('selectionChange', (rowkeys) => {
-            console.log('选中的行:', rowkeys);
+            console.log('Selected rows:', rowkeys);
         });
     </script>
 </html>

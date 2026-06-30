@@ -89,7 +89,7 @@
                 ENABLE_DRAG_ROW_CROSS_LEVEL: false,
                 TREE_LINE: true,
                 DEFAULT_EXPAND_ALL: true,
-                // 返回 false 可阻止本次拖拽生效，不更新数据
+                // Return false to prevent drag from taking effect and skip data update
                 BEFORE_DRAG_ROW_METHOD: async (params) => {
                     const { source: { rowKey } } = params;
                     const value = grid.getCellValue(rowKey, 'state');

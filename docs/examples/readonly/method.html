@@ -101,7 +101,7 @@
             columns,
             config: {
                 ENABLE_SELECTOR: true,
-                // 方法可控制只读
+                // Method can control readonly state
                 BODY_CELL_READONLY_METHOD: function (params) {
                     const { rowIndex, column, row } = params;
                     if (column.key === 'date' || column.key === 'name') {

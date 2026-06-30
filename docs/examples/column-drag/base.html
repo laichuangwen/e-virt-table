@@ -128,7 +128,7 @@
                 ENABLE_DRAG_COLUMN: true,
             },
         });
-        // 如果是自定义表头不建用
+        // Not recommended for custom headers
         grid.on('columnDragChange', (data) => {
             console.log('columnDragChange', data);
         });

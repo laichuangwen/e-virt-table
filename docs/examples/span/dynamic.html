@@ -102,7 +102,7 @@
                 zip: 'CA 90036',
             },
         ];
-        // 合并50行数据,看虚拟滚动错位
+        // Merge 50 rows to test virtual scroll alignment
         for (let i = 0; i < 10; i++) {
             data.push({
                 id: `${10 + i}`,
@@ -141,7 +141,7 @@
             },
         ];
         const target = document.getElementById('e-virt-table');
-        // 获取合并单元格的spanArr,针对行数据相同key合并
+        // Get spanArr for merged cells; merge rows with same key
         const getSpanArrByRow = function (list, key) {
             let contactDot = 0;
             const spanArr = [];
@@ -184,7 +184,7 @@
             return spanObj;
         };
         const mergeRowCell = function (data, key) {
-            // 合并单元格
+            // Merge cells
             const { visibleRows, rowIndex, headIndex } = data;
             const spanArr = getSpanArrByRow(visibleRows, key);
             if (spanArr[rowIndex - headIndex] === 0) {
@@ -209,7 +209,7 @@
                 SPAN_METHOD: (params) => {
                     const { colIndex, rowIndex, column, row, visibleLeafColumns } = params;
                     if (column.key === 'date') {
-                        // 合并行单元格
+                        // Merge row cells
                         return mergeRowCell(params, 'date');
                     }
                     if (colIndex > 1) {

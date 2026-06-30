@@ -110,13 +110,13 @@
             config: {
                 ENABLE_SELECTOR: true,
                 ENABLE_AUTOFILL: true,
-                // 方法可控制编辑器类型
+                // Method can control editor type
                 BODY_CELL_EDITOR_METHOD: function (params) {
                     const { rowIndex, column, row } = params;
                     if (column.key === 'date' && rowIndex === 1) {
                         return {
                             type: 'text',
-                            props: {}, // 传递给编辑器的editorProps属性
+                            props: {}, // Props passed to editor editorProps
                         };
                     }
                 },
@@ -132,7 +132,7 @@
         });
         grid.on('startEdit', (cell) => {
             const { width, height, editorType } = cell;
-            // 内部已经处理了文本类型的编辑
+            // Text type editing is handled internally
             if (editorType === 'text') {
                 return;
             }
@@ -153,7 +153,7 @@
             }
         });
         grid.on('doneEdit', (cell) => {
-            // 内部已经处理了文本类型的编辑
+            // Text type editing is handled internally
             if (cell.editorType === 'text') {
                 return;
             }
@@ -166,7 +166,7 @@
             }
         });
         dateEl.addEventListener('change', function (event) {
-            // 获取 input 元素的新值
+            // Get the new value of the input element
             const newValue = event.target.value;
             const rowKey = dateEl.getAttribute('data-row-key');
             const key = dateEl.getAttribute('data-key');

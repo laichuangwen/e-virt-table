@@ -112,10 +112,10 @@
                     let [minX, maxX] = xArr;
                     let [minY, maxY] = yArr;
                     if (minX < 1 || maxX > columns.length - 3 || minY < 1 || maxY > data.length - 2) {
-                        console.error('只能选择Name、State、City列');
+                        console.error('Only Name, State, City columns can be selected');
                         return;
                     }
-                    // 只能选择一列
+                    // Only one column can be selected
                     if (focusCell) {
                         return {
                             ...scope,
