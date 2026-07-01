@@ -80,6 +80,9 @@ type EVirtTableOptions = {
 | FOOTER_BG_COLOR | Footer background color | string | — | #fafafa |
 | FOOTER_FIXED | Fixed footer | boolean | — | true |
 | CELL_FOOTER_HEIGHT | Row height of the table footer | number | — | 36 |
+| MIN_ZOOM | Minimum content zoom ratio | number | — | 0.5 |
+| MAX_ZOOM | Maximum content zoom ratio | number | — | 2 |
+| ENABLE_ZOOM_WHEEL | Enable Ctrl + wheel content zoom | boolean | — | true |
 | FOOTER_DATA | Table footer data | ^[array]`any[]` | — | [] |
 | ENABLE_SELECTOR | Enable selector | boolean | — | true |
 | ENABLE_SELECTOR_SINGLE | Enable single selector | boolean | — | false |
@@ -182,6 +185,7 @@ type EVirtTableOptions = {
 | dblclick | Callback for double click | — |
 | contextMenu | Callback for context menu | — |
 | resize | Callback for resize | — |
+| zoomChange | Content zoom ratio changed | zoom |
 | mousedown | Callback for mouse down | — |
 | mousemove | Callback for mouse move | — |
 | keydown | Callback for key down | — |
@@ -220,6 +224,8 @@ type EVirtTableOptions = {
 | scrollTo               | Scroll to position            | ^`(x, y)`                                                 |
 | scrollXTo              | Scroll to X position          | x                                                         |
 | scrollYTo              | Scroll to Y position          | y                                                         |
+| setZoom                | Set content zoom ratio        | zoom                                                      |
+| getZoom                | Get current content zoom ratio| —                                                         |
 | scrollToColkey         | Scroll to column key position | colKey                                                    |
 | scrollToRowkey         | Scroll to row key position    | rowKey                                                    |
 | scrollToColIndex       | Scroll to column index position| colIndex                                                  |

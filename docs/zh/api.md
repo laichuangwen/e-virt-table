@@ -82,6 +82,9 @@ type EVirtTableOptions = {
 | FOOTER_FIXED | 合计底部固定 | boolean | true |
 | FOOTER_POSITION | 合计底部位置 | `top`、`bottom` | `bottom` |
 | CELL_FOOTER_HEIGHT | 表格 footer 部分的行高 | number | 36 |
+| MIN_ZOOM | 内容缩放最小比例 | number | 0.5 |
+| MAX_ZOOM | 内容缩放最大比例 | number | 2 |
+| ENABLE_ZOOM_WHEEL | 启用 Ctrl + 滚轮内容缩放 | boolean | true |
 | FOOTER_DATA | 表格 footer 数据 | ^[array]`any[]` | [] |
 | ENABLE_SELECTOR | 启用选择器 | boolean | true |
 | ENABLE_SELECTOR_SINGLE | 启用选择器-选择器单选 | boolean | false |
@@ -189,6 +192,7 @@ type EVirtTableOptions = {
 | dblclick                  | dblclick回调                                                             | —                                                 |
 | contextMenu               | contextMenu回调                                                          | —                                                 |
 | resize                    | resize回调                                                               | —                                                 |
+| zoomChange                | 内容缩放比例改变回调                                                     | zoom                                              |
 | mousedown                 | mousedown回调                                                            | —                                                 |
 | mousemove                 | mousemove回调                                                            | —                                                 |
 | keydown                   | keydown回调                                                              | —                                                 |
@@ -228,6 +232,8 @@ type EVirtTableOptions = {
 | scrollTo                | 滚动位置                           | ^`(x,y)`                                                  |
 | scrollXTo               | 滚动位置                           | x                                                         |
 | scrollYTo               | 滚动位置                           | y                                                         |
+| setZoom                 | 设置内容缩放比例                   | zoom                                                      |
+| getZoom                 | 获取当前内容缩放比例               | —                                                         |
 | scrollToColkey          | 滚动位置                           | colKey                                                    |
 | scrollToRowkey          | 滚动位置                           | rowKey                                                    |
 | scrollToRowkey          | 滚动位置                           | rowKey                                                    |
