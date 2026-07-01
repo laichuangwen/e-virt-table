@@ -63,6 +63,7 @@ export default class EVirtTable {
             contextMenuElement,
         );
         this.ctx = new Context(containerElement, this.options);
+        this.textSelector = new TextSelector(this.ctx);
         this.header = new Header(this.ctx);
         this.footer = new Footer(this.ctx);
         this.body = new Body(this.ctx);
@@ -79,7 +80,6 @@ export default class EVirtTable {
         this.ctx.on('loadData', (data) => {
             this.loadData(data);
         });
-        this.textSelector = new TextSelector(this.ctx);
         this.ctx.on('draw', () => {
             this.draw();
         });

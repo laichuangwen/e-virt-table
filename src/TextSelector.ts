@@ -1,5 +1,6 @@
 import type { Align } from './types';
 import type Context from './Context';
+import type CellHeader from './CellHeader';
 
 export type TextSelectionRange = {
     start: number;
@@ -51,31 +52,140 @@ export type TextLayout = {
     ellipsis: boolean;
 };
 
+type TextHit = { cellKey: string; index: number };
+type PendingSelect = { cellKey: string; index: number; startX: number; startY: number };
+
 export default class TextSelector {
+    private static readonly DRAG_THRESHOLD = 4;
     private ctx: Context;
     private layouts = new Map<string, TextLayout>();
     private activeCellKey = '';
     private selectionStart: number | null = null;
     private selectionEnd: number | null = null;
-    private dragging = false;
+    private pending: PendingSelect | null = null;
 
     constructor(ctx: Context) {
         this.ctx = ctx;
-        this.init();
+        this.ctx.on('registerTextLayout', (key, layout) => this.layouts.set(key, layout));
+        this.ctx.on('mousedown', (e) => this.onMouseDown(e));
+        this.ctx.on('mousemove', (e) => this.onMouseMove(e));
+        this.ctx.on('mouseup', () => this.onMouseUp());
+        this.ctx.on('cellHeaderHoverChange', (cell) => this.yieldToColumnDrag(cell));
+        this.ctx.on('cellHoverChange', () => this.yieldToColumnDrag());
+        this.ctx.on('keydown', (e) => this.onCopyKeydown(e));
+        this.ctx.on('outsideMousedown', () => this.resetSelection());
     }
 
-    /** 是否允许进行文字选择（开启配置且不在编辑/查找状态） */
     private get canSelect() {
         return this.ctx.config.ENABLE_TEXT_SELECTION && !this.ctx.editing && !this.ctx.finding;
     }
 
-    /**
-     * 在所有已注册的文字 layout（body/header/footer）中命中鼠标位置，返回命中的单元格 key 与字符索引。
-     * 由于固定列/表头会后绘制并覆盖普通单元格，这里取最后一个命中的 layout 作为最顶层结果。
-     */
-    private hitTestLayouts(e: MouseEvent): { cellKey: string; index: number } | null {
+    /** 跨表头列或从表头拖入 body 时，让位给列/区域选择 */
+    private yieldToColumnDrag(target?: CellHeader) {
+        const anchor = this.ctx.focusCellHeader;
+        if (!this.ctx.textSelecting || !anchor) {
+            return;
+        }
+        if (target) {
+            const min = anchor.colIndex;
+            const max = anchor.colIndex + anchor.colspan - 1;
+            const tMin = target.colIndex;
+            const tMax = target.colIndex + target.colspan - 1;
+            if (tMin >= min && tMax <= max) {
+                return;
+            }
+        }
+        this.resetSelection();
+    }
+
+    private onMouseDown(e: MouseEvent) {
+        if (!this.canSelect || !this.ctx.isTarget(e)) {
+            return;
+        }
+        if (!this.ctx.containerElement.contains(document.activeElement)) {
+            this.ctx.containerElement.focus({ preventScroll: true });
+        }
+        const hit = this.hitTest(e);
+        if (!hit) {
+            this.resetSelection();
+            return;
+        }
         const { offsetX, offsetY } = this.ctx.getOffset(e);
-        let hit: { cellKey: string; index: number } | null = null;
+        this.pending = { cellKey: hit.cellKey, index: hit.index, startX: offsetX, startY: offsetY };
+    }
+
+    private onMouseMove(e: MouseEvent) {
+        if (!this.canSelect) {
+            return;
+        }
+        if (!this.ctx.textSelecting) {
+            this.tryStartDrag(e);
+        }
+        if (!this.ctx.textSelecting) {
+            return;
+        }
+        const layout = this.layouts.get(this.activeCellKey);
+        if (!layout) {
+            return;
+        }
+        const { offsetX, offsetY } = this.ctx.getOffset(e);
+        const index = this.hitTestText(layout, offsetX, offsetY);
+        if (index !== null) {
+            this.selectionEnd = index;
+            this.updateSelection();
+        }
+    }
+
+    private tryStartDrag(e: MouseEvent) {
+        if (!this.pending || !this.ctx.mousedown) {
+            return;
+        }
+        const { offsetX, offsetY } = this.ctx.getOffset(e);
+        const dx = Math.abs(offsetX - this.pending.startX);
+        const dy = Math.abs(offsetY - this.pending.startY);
+        if (dx < TextSelector.DRAG_THRESHOLD && dy < TextSelector.DRAG_THRESHOLD) {
+            return;
+        }
+        const hit = this.hitTest(e);
+        if (!hit || hit.cellKey !== this.pending.cellKey) {
+            this.pending = null;
+            return;
+        }
+        this.activeCellKey = this.pending.cellKey;
+        this.selectionStart = this.pending.index;
+        this.selectionEnd = hit.index;
+        this.pending = null;
+        this.ctx.textSelecting = true;
+        this.updateSelection();
+    }
+
+    private onMouseUp() {
+        this.pending = null;
+        this.ctx.textSelecting = false;
+        this.ctx.textSelectionStr = this.getSelectedText();
+        if (this.ctx.textSelectionStr) {
+            this.ctx.emit('drawView');
+        }
+    }
+
+    private onCopyKeydown(e: KeyboardEvent) {
+        if (!this.canSelect || !((e.ctrlKey || e.metaKey) && e.code === 'KeyC')) {
+            return;
+        }
+        const text = this.getSelectedText();
+        if (!text) {
+            return;
+        }
+        e.preventDefault();
+        navigator.clipboard?.writeText(text).catch((error) => console.error('Copy Failure:', error));
+    }
+
+    /**
+     * 命中最顶层文字（固定列/表头后绘制会覆盖普通单元格，取最后一个命中）。
+     */
+    private hitTest(e: MouseEvent): TextHit | null {
+        const { offsetX, offsetY } = this.ctx.getOffset(e);
+        let hit: TextHit | null = null;
         for (const [cellKey, layout] of this.layouts) {
             const index = this.hitTestText(layout, offsetX, offsetY);
             if (index !== null) {
@@ -85,109 +195,43 @@ export default class TextSelector {
         return hit;
     }
 
-    /** 同步选中文本并触发重绘 */
-    private syncSelection() {
+    private updateSelection() {
         this.ctx.textSelectionStr = this.getSelectedText();
         this.ctx.emit('drawView');
     }
 
-    private init() {
-        this.ctx.on('registerTextLayout', (cellKey: string, layout: TextLayout) => {
-            this.registerLayout(cellKey, layout);
-        });
-        this.ctx.on('mousedown', (e) => {
-            if (!this.canSelect || !this.ctx.isTarget(e)) {
-                return;
-            }
-            if (!this.ctx.containerElement.contains(document.activeElement)) {
-                this.ctx.containerElement.focus({ preventScroll: true });
-            }
-            const hit = this.hitTestLayouts(e);
-            if (!hit) {
-                this.clearSelection();
-                return;
-            }
-            this.activeCellKey = hit.cellKey;
-            this.selectionStart = hit.index;
-            this.selectionEnd = hit.index;
-            this.dragging = true;
-            this.ctx.textSelecting = true;
-            this.syncSelection();
-        });
-        this.ctx.on('mousemove', (e) => {
-            if (!this.canSelect || !this.dragging) {
-                return;
-            }
-            // 拖拽选区限制在起始单元格内
-            const layout = this.layouts.get(this.activeCellKey);
-            if (!layout) {
-                return;
-            }
-            const { offsetX, offsetY } = this.ctx.getOffset(e);
-            const index = this.hitTestText(layout, offsetX, offsetY);
-            if (index === null) {
-                return;
-            }
-            this.selectionEnd = index;
-            this.syncSelection();
-        });
-        this.ctx.on('mouseup', () => {
-            this.dragging = false;
-            this.ctx.textSelecting = false;
-            this.ctx.textSelectionStr = this.getSelectedText();
-            if (this.ctx.textSelectionStr) {
-                this.ctx.emit('drawView');
-            }
-        });
-        this.ctx.on('keydown', (e) => {
-            if (!this.canSelect || !((e.ctrlKey || e.metaKey) && e.code === 'KeyC')) {
-                return;
-            }
-            const text = this.getSelectedText();
-            if (!text) {
-                return;
-            }
-            e.preventDefault();
-            navigator.clipboard?.writeText(text).catch((error) => console.error('Copy Failure:', error));
-        });
-        this.ctx.on('outsideMousedown', () => {
-            this.clearSelection();
-        });
-    }
-
-    /**
-     * 命中测试，返回字符索引
-     */
     private hitTestText(layout: TextLayout, mouseX: number, mouseY: number): number | null {
-        const { contentBox, lines, glyphs, contentY, lineHeight } = layout;
-        if (
-            mouseX < contentBox.x ||
-            mouseX > contentBox.x + contentBox.width ||
-            mouseY < contentBox.y ||
-            mouseY > contentBox.y + contentBox.height
-        ) {
+        const { glyphs, contentY, lineHeight, lines } = layout;
+        if (!glyphs.length) {
             return null;
         }
-        const relativeY = mouseY - contentY;
-        const lineIndex = Math.max(0, Math.min(Math.floor(relativeY / lineHeight), lines.length - 1));
-        const line = lines[lineIndex];
-        const lineGlyphs = glyphs.filter((glyph) => glyph.line === lineIndex);
-        if (!lineGlyphs.length) {
-            return line.caretIndex;
+        const lineIndex = Math.floor((mouseY - contentY) / lineHeight);
+        if (lineIndex < 0 || lineIndex >= lines.length) {
+            return null;
         }
-        if (mouseX <= lineGlyphs[0].x) {
-            return lineGlyphs[0].index;
+        const lineGlyphs = glyphs.filter((g) => g.line === lineIndex);
+        if (!lineGlyphs.length) {
+            return null;
+        }
+        const pad = 2;
+        const lineTop = contentY + lineIndex * lineHeight;
+        if (mouseY < lineTop - pad || mouseY >= lineTop + lineHeight + pad) {
+            return null;
+        }
+        const first = lineGlyphs[0];
+        const last = lineGlyphs[lineGlyphs.length - 1];
+        if (mouseX < first.x - pad || mouseX > last.x + last.width + pad) {
+            return null;
+        }
+        if (mouseX <= first.x) {
+            return first.index;
         }
         for (const glyph of lineGlyphs) {
             if (mouseX < glyph.x + glyph.width / 2) {
                 return glyph.index;
             }
         }
-        return lineGlyphs[lineGlyphs.length - 1].index + 1;
-    }
-
-    registerLayout(cellKey: string, layout: TextLayout) {
-        this.layouts.set(cellKey, layout);
+        return last.index + 1;
     }
 
     clearLayouts() {
@@ -199,25 +243,18 @@ export default class TextSelector {
             return;
         }
         const range = this.getSelectionRange();
-        if (!range) {
-            return;
+        const layout = range && this.layouts.get(this.activeCellKey);
+        if (layout) {
+            this.drawTextSelection(layout, range);
         }
-        const layout = this.layouts.get(this.activeCellKey);
-        if (!layout) {
-            return;
-        }
-        this.drawTextSelection(layout, range);
     }
 
-    /**
-     * 绘制文字选中高亮
-     */
     private drawTextSelection(
         layout: TextLayout,
         range: TextSelectionRange,
         selectedColor = '#fff',
         selectionBgColor = '#3b82f6',
-    ): void {
+    ) {
         if (range.start >= range.end) {
             return;
         }
@@ -226,12 +263,9 @@ export default class TextSelector {
             if (glyph.index < range.start || glyph.index >= range.end) {
                 continue;
             }
-            const lineGlyphs = byLine.get(glyph.line);
-            if (lineGlyphs) {
-                lineGlyphs.push(glyph);
-            } else {
-                byLine.set(glyph.line, [glyph]);
-            }
+            const list = byLine.get(glyph.line) ?? [];
+            list.push(glyph);
+            byLine.set(glyph.line, list);
         }
         if (!byLine.size) {
             return;
@@ -245,7 +279,7 @@ export default class TextSelector {
             const first = lineGlyphs[0];
             const last = lineGlyphs[lineGlyphs.length - 1];
             ctx.fillStyle = selectionBgColor;
-            ctx.fillRect(first.x, first.y-1, last.x + last.width - first.x, first.height);
+            ctx.fillRect(first.x, first.y - 1, last.x + last.width - first.x, first.height);
             ctx.fillStyle = selectedColor;
             for (const glyph of lineGlyphs) {
                 ctx.fillText(glyph.char, glyph.x, glyph.y);
@@ -266,26 +300,25 @@ export default class TextSelector {
 
     private getSelectedText() {
         const range = this.getSelectionRange();
-        if (!range || range.start >= range.end) {
-            return '';
-        }
-        const layout = this.layouts.get(this.activeCellKey);
-        if (!layout) {
+        const layout = range && this.layouts.get(this.activeCellKey);
+        if (!layout || range.start >= range.end) {
             return '';
         }
         return layout.chars.slice(range.start, range.end).join('');
     }
 
-    private clearSelection() {
+    private resetSelection() {
         this.activeCellKey = '';
         this.selectionStart = null;
         this.selectionEnd = null;
-        this.dragging = false;
+        this.pending = null;
+        this.ctx.textSelecting = false;
         this.ctx.textSelectionStr = '';
+        this.ctx.emit('drawView');
     }
 
     destroy() {
         this.layouts.clear();
-        this.clearSelection();
+        this.resetSelection();
     }
 }
