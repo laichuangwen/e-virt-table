@@ -91,7 +91,7 @@ export default class Context {
     stageHeight = 0; // 逻辑可视高度(物理高度/zoom)
     stagePhysicalWidth = 0;
     stagePhysicalHeight = 0;
-    zoomScale = new ZoomScale();
+    zoomScale: ZoomScale;
     get zoom() {
         return this.zoomScale.value;
     }
@@ -227,6 +227,7 @@ export default class Context {
         this.database = new Database(this, options);
         this.history = new History(this);
         this.icons = new Icons(this);
+        this.zoomScale = new ZoomScale();
     }
     setConfig(config: Config) {
         this.config = new Config(config);
@@ -419,6 +420,7 @@ export default class Context {
             return;
         }
         this.emit('zoomChange', this.zoomScale.value);
+        this.emit('resetHeader');
     }
     getZoom(): number {
         return this.zoomScale.value;

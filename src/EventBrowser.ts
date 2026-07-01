@@ -93,12 +93,20 @@ export default class EventBrowser {
             return;
         }
         // 拖拽表头中不处理
-        if(this.ctx.dragHeaderIng){
+        if (this.ctx.dragHeaderIng) {
             return;
         }
         this.ctx.emit('keydown', e);
     }
     private handleWheel(e: Event) {
+        const _e = e as WheelEvent;
+        const { ENABLE_ZOOM_WHEEL } = this.ctx.config;
+        if (ENABLE_ZOOM_WHEEL && (_e.ctrlKey || _e.metaKey)) {
+            e.preventDefault();
+            const delta = _e.deltaY > 0 ? -0.1 : 0.1;
+            this.ctx.setZoom(this.ctx.getZoom() + delta);
+            return;
+        }
         this.ctx.emit('wheel', e);
     }
     private handleTouchstart(e: Event) {

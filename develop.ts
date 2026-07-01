@@ -1289,30 +1289,18 @@ const updateZoomLabel = () => {
         label.textContent = `${Math.round(eVirtTable.getZoom() * 100)}%`;
     }
 };
+eVirtTable.on('zoomChange', updateZoomLabel);
+updateZoomLabel();
 document.getElementById('zoomIn')?.addEventListener('click', () => {
     eVirtTable.setZoom(eVirtTable.getZoom() + ZOOM_STEP);
-    updateZoomLabel();
 });
 document.getElementById('zoomOut')?.addEventListener('click', () => {
     eVirtTable.setZoom(eVirtTable.getZoom() - ZOOM_STEP);
-    updateZoomLabel();
 });
 document.getElementById('zoomReset')?.addEventListener('click', () => {
     eVirtTable.setZoom(1);
-    updateZoomLabel();
 });
-// Ctrl + 滚轮缩放
-canvas.addEventListener(
-    'wheel',
-    (e) => {
-        if (!e.ctrlKey) return;
-        e.preventDefault();
-        const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
-        eVirtTable.setZoom(eVirtTable.getZoom() + delta);
-        updateZoomLabel();
-    },
-    { passive: false },
-);
+// Ctrl + 滚轮缩放由 ENABLE_ZOOM_WHEEL 配置控制，默认开启
 
 // 销毁
 function destroy() {

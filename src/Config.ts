@@ -129,6 +129,8 @@ export default class Config {
     MIN_ZOOM = 0.5;
     /** 内容缩放最大比例 */
     MAX_ZOOM = 2;
+    /** 启用 Ctrl + 滚轮内容缩放 */
+    ENABLE_ZOOM_WHEEL = true;
     /** 滚动条轨道尺寸 */
     SCROLLER_TRACK_SIZE = 14;
     /** 滚动条滑块尺寸 */
