@@ -140,7 +140,6 @@ export default class TextSelector {
             }
         });
         this.ctx.on('keydown', (e) => {
-            console.log('keydown');
             if (!this.canSelect || !((e.ctrlKey || e.metaKey) && e.code === 'KeyC')) {
                 return;
             }
