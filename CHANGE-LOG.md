@@ -7,7 +7,12 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -  
 
-
+V1.4.2
+### Bug Fixes
+- fix:修复拓展表头选中文字导致不能多选表头
+- fix: 调整文本选择器的选区矩形位置，使视觉上更对齐
+- feat:添加表格缩放功能
+  
 V1.4.1
 ### Bug Fixes
 - fix:修复不聚焦单元格就复制不了选中的文字
