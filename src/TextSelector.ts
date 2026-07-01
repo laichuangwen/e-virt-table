@@ -246,7 +246,7 @@ export default class TextSelector {
             const first = lineGlyphs[0];
             const last = lineGlyphs[lineGlyphs.length - 1];
             ctx.fillStyle = selectionBgColor;
-            ctx.fillRect(first.x, first.y, last.x + last.width - first.x, first.height);
+            ctx.fillRect(first.x, first.y-1, last.x + last.width - first.x, first.height);
             ctx.fillStyle = selectedColor;
             for (const glyph of lineGlyphs) {
                 ctx.fillText(glyph.char, glyph.x, glyph.y);
