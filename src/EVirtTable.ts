@@ -126,6 +126,10 @@ export default class EVirtTable {
         this.header.update();
         this.footer.update();
         this.body.update();
+        // body.update 里会根据 footer 高度重新计算 stageHeight，
+        // 固定底部 footer 的位置依赖 stageHeight，需在 body 之后再定位一次，
+        // 否则缩放等单次重绘场景下 footer 会停留在上一帧位置
+        this.footer.update();
         this.ctx.paint.clear();
         this.textSelector.clearLayouts();
         this.body.draw();
@@ -247,6 +251,19 @@ export default class EVirtTable {
     }
     doLayout() {
         this.ctx.emit('draw');
+    }
+    /**
+     * 设置内容缩放比例(容器大小不变,内容变大/变小,基于原生分辨率重绘不失清晰度)
+     * @param zoom 缩放比例,范围 MIN_ZOOM ~ MAX_ZOOM
+     */
+    setZoom(zoom: number) {
+        this.ctx.setZoom(zoom);
+        // 重新计算舞台逻辑/物理尺寸后重绘
+        this.header.init();
+        this.ctx.emit('draw');
+    }
+    getZoom() {
+        return this.ctx.getZoom();
     }
     getChangedData() {
         return this.ctx.database.getChangedData();

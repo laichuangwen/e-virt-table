@@ -70,8 +70,8 @@ export default class EventBrowser {
     private handleMousemove(e: Event) {
         const _e = e as MouseEvent;
         const rect = this.ctx.containerElement.getBoundingClientRect();
-        const x = _e.clientX - rect.left;
-        const y = _e.clientY - rect.top;
+        const x = this.ctx.zoomScale.toLogical(_e.clientX - rect.left);
+        const y = this.ctx.zoomScale.toLogical(_e.clientY - rect.top);
         this.ctx.mouseX = x;
         this.ctx.mouseY = y;
         this.ctx.emit('mousemove', e);

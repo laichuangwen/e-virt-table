@@ -151,21 +151,18 @@ export default class Tooltip {
         this.contentEl.style.wordBreak = 'break-all';
         this.contentEl.style.lineHeight = '1.5';
         this.contentEl.innerText = text;
-        const cellX = cell.drawX + targetRect.x;
-        const cellY = cell.drawY + targetRect.y;
-        // 这个是相对于视口的位置
+        const viewportRect = this.ctx.zoomScale.getViewportRect(
+            {
+                x: cell.drawX,
+                y: cell.drawY,
+                width: cell.visibleWidth,
+                height: cell.visibleHeight,
+            },
+            targetRect,
+        );
         const virtualEl = {
             getBoundingClientRect() {
-                return {
-                    width: cell.visibleWidth,
-                    height: cell.visibleHeight,
-                    x: cellX,
-                    y: cellY,
-                    left: cellX,
-                    right: cellX + cell.visibleWidth,
-                    top: cellY,
-                    bottom: cellY + cell.visibleHeight,
-                };
+                return viewportRect;
             },
         };
 

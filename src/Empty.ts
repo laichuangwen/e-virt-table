@@ -18,7 +18,7 @@ export default class Tooltip {
             const top = headerHeight + (bodyHeight + footerHeight) / 2;
             const contentStyle = {
                 display: type === 'empty' ? 'block' : 'none',
-                top: `${top}px`,
+                top: this.ctx.toVisualPx(top),
                 ...EMPTY_CUSTOM_STYLE,
             };
             Object.assign(this.emptyEl.style, contentStyle);

@@ -86,16 +86,15 @@ export default class Header {
         this.render(spanColumns, 0);
         this.ctx.database.updateColIndexKeyMap(this.leafCellHeaders);
         const containerElement = this.ctx.containerElement.getBoundingClientRect();
-        // 如果有可调整列，宽度等于容器宽度
-        if (this.resizeNum > 0) {
-            this.ctx.stageWidth = Math.floor(containerElement.width);
-        } else {
-            this.ctx.stageWidth = Math.min(
-                Math.floor(this.width + SCROLLER_TRACK_SIZE),
-                Math.floor(containerElement.width),
-            );
-        }
-        this.ctx.stageElement.style.width = this.ctx.stageWidth + 'px';
+        const { stageWidth, stagePhysicalWidth } = this.ctx.zoomScale.resolveStageWidth({
+            containerPhysicalWidth: containerElement.width,
+            contentWidth: this.width,
+            scrollerTrackSize: SCROLLER_TRACK_SIZE,
+            fillContainer: this.resizeNum > 0,
+        });
+        this.ctx.stageWidth = stageWidth;
+        this.ctx.stagePhysicalWidth = stagePhysicalWidth;
+        this.ctx.stageElement.style.width = `${stagePhysicalWidth}px`;
         this.visibleWidth = this.ctx.stageWidth - SCROLLER_TRACK_SIZE;
 
         // 如果表头宽度小于可视宽度，平均分配
@@ -220,8 +219,9 @@ export default class Header {
                 if (this.isMouseDown) {
                     return;
                 }
-                // 鼠标在表头上,边界处理
-                if (e.offsetX < 0 || e.offsetX > this.visibleWidth) {
+                // 鼠标在表头上,边界处理(offsetX 为物理像素,转成逻辑坐标再与逻辑宽度比较)
+                const { offsetX: logicalOffsetX } = this.ctx.getOffset(e);
+                if (logicalOffsetX < 0 || logicalOffsetX > this.visibleWidth) {
                     if (this.ctx.stageElement.style.cursor === 'col-resize') {
                         this.ctx.stageElement.style.cursor = 'default';
                     }

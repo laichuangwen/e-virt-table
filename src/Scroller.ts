@@ -37,8 +37,9 @@ class Scrollbar {
     }
     onTouchmove(e: TouchEvent) {
         const { clientY, clientX } = e.touches[0];
-        const deltaY = clientY - this.clientY; // 计算滑动距离
-        const deltaX = clientX - this.clientX; // 计算滑动距离
+        // 物理滑动距离换算为逻辑距离
+        const deltaY = this.ctx.zoomScale.toLogical(clientY - this.clientY);
+        const deltaX = this.ctx.zoomScale.toLogical(clientX - this.clientX);
         let scroll = 0;
         if (this.type === 'vertical') {
             scroll = Math.max(0, Math.min(this.dragStart - deltaY, this.distance));
@@ -75,7 +76,10 @@ class Scrollbar {
             return true;
         }
 
-        const { offsetX, offsetY, clientX, clientY } = e;
+        const { clientX, clientY } = e;
+        // 滚动条按逻辑坐标绘制,鼠标 offset 是物理像素,需换算
+        const offsetX = this.ctx.zoomScale.toLogical(e.offsetX);
+        const offsetY = this.ctx.zoomScale.toLogical(e.offsetY);
         if (clientX == this.clientX && clientY == this.clientY) return;
         if (this.isOnScrollbar(offsetX, offsetY)) {
             this.clientX = clientX;
@@ -109,7 +113,9 @@ class Scrollbar {
     }
 
     onMouseMove(e: MouseEvent) {
-        const { offsetX, offsetY, clientX, clientY, buttons } = e;
+        const { clientX, clientY, buttons } = e;
+        const offsetX = this.ctx.zoomScale.toLogical(e.offsetX);
+        const offsetY = this.ctx.zoomScale.toLogical(e.offsetY);
         // 没有鼠标按下时不处理，要重置抬起事件
         // 悬浮提示
         if (this.isOnScrollbar(offsetX, offsetY) && e.target === this.ctx.canvasElement) {
@@ -128,6 +134,8 @@ class Scrollbar {
         } else {
             offset = clientY - this.clientY;
         }
+        // 物理位移换算为逻辑位移
+        offset = this.ctx.zoomScale.toLogical(offset);
         if (this.isDragging && offset !== 0) {
             // scroll= 开始滚动条位置+（鼠标移动的距离/可见区域的长度）*滚动条的长度
             let scroll = 0;
