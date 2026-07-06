@@ -55,6 +55,7 @@
         "vite-plugin-css-injected-by-js": "^3.5.2"
     },
     "dependencies": {
-        "@floating-ui/dom": "^1.6.11"
+        "@floating-ui/dom": "^1.6.11",
+        "lit-html": "^3.3.3"
     }
 }

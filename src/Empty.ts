@@ -1,38 +1,57 @@
 import Context from './Context';
-export default class Tooltip {
+import { html, render } from 'lit-html';
+import { toStyleStr } from './util';
+
+export default class Empty {
     private ctx: Context;
     private emptyEl: HTMLDivElement;
+    private visible = false;
+    private top = '0px';
+
     constructor(ctx: Context) {
         this.ctx = ctx;
-        const { EMPTY_CUSTOM_STYLE } = this.ctx.config;
         if (this.ctx.emptyElement) {
             this.emptyEl = this.ctx.emptyElement;
         } else {
             this.emptyEl = document.createElement('div');
-            this.emptyEl.innerText = this.getText();
+            this.ctx.containerElement.appendChild(this.emptyEl);
         }
         this.emptyEl.className = 'e-virt-table-empty';
-        this.emptyEl.style.display = 'none';
-        this.ctx.containerElement.appendChild(this.emptyEl);
         this.ctx.on('emptyChange', ({ type, headerHeight, bodyHeight, footerHeight }) => {
             const top = headerHeight + (bodyHeight + footerHeight) / 2;
-            const contentStyle = {
-                display: type === 'empty' ? 'block' : 'none',
-                top: this.ctx.toVisualPx(top),
-                ...EMPTY_CUSTOM_STYLE,
-            };
-            Object.assign(this.emptyEl.style, contentStyle);
+            this.visible = type === 'empty';
+            this.top = this.ctx.toVisualPx(top);
+            this.renderEmpty();
         });
+        this.renderEmpty();
     }
+
     private getText() {
         return this.ctx.config.EMPTY_TEXT || this.ctx.locale.getText('emptyText');
     }
-    draw() {
+
+    private renderEmpty() {
         if (this.ctx.emptyElement) {
             return;
         }
-        this.emptyEl.innerText = this.getText();
+        const { EMPTY_CUSTOM_STYLE } = this.ctx.config;
+        const style = toStyleStr({
+            display: this.visible ? 'block' : 'none',
+            top: this.top,
+            ...(EMPTY_CUSTOM_STYLE as Record<string, string | number>),
+        });
+        render(
+            html`<div style="${style}">
+                ${this.getText()}
+            </div>`,
+            this.emptyEl,
+        );
     }
+
+    draw() {
+        this.renderEmpty();
+    }
+
     destroy() {
         this.emptyEl.remove();
     }

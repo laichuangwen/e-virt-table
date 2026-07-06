@@ -2,7 +2,8 @@ import type Cell from './Cell';
 import type CellHeader from './CellHeader';
 import type Context from './Context';
 import type { OverlayerContainer, OverlayerView, OverlayerWrapper } from './types';
-import { throttle } from './util';
+import { throttle, toStyleStr } from './util';
+import { html, render } from 'lit-html';
 export default class Overlayer {
     ctx: Context;
     observer?: MutationObserver;
@@ -57,30 +58,51 @@ export default class Overlayer {
         // 自定义覆盖层时，不监听覆盖层变化
         if (this.ctx.overlayerElement.getAttribute('data-overlayer') === 'default') {
             this.ctx.on('overlayerChange', (container) => {
-                const overlayerEl = this.ctx.overlayerElement;
-                // 移除所有子元素
-                overlayerEl.replaceChildren();
-                Object.assign(overlayerEl.style, container.style);
-                container.views.forEach((typeView: OverlayerWrapper) => {
-                    const typeDiv = document.createElement('div');
-                    typeDiv.className = typeView.class;
-                    this.ctx.zoomScale.assignScaledStyle(typeDiv, typeView.style);
-                    typeView.views.forEach((cellWrapView) => {
-                        const cellWrap = document.createElement('div');
-                        this.ctx.zoomScale.assignScaledStyle(cellWrap, cellWrapView.style);
-                        cellWrapView.cells.forEach((cell) => {
-                            const cellEl = this.ctx.zoomScale.createOverlayerCellElement(
-                                cell,
-                                this.ctx.config.CSS_PREFIX,
-                            );
-                            cellWrap.appendChild(cellEl);
-                        });
-                        typeDiv.appendChild(cellWrap);
-                    });
-                    overlayerEl.appendChild(typeDiv);
-                });
+                this.renderOverlayer(container);
             });
         }
+    }
+
+    private renderOverlayer(container: OverlayerContainer) {
+        const overlayerEl = this.ctx.overlayerElement;
+        const cssPrefix = this.ctx.config.CSS_PREFIX;
+        const zoom = this.ctx.zoomScale;
+        const containerStyle = (container as OverlayerContainer & { style?: Record<string, string> }).style;
+        if (containerStyle) {
+            Object.assign(overlayerEl.style, containerStyle);
+        }
+        render(
+            html`${container.views.map((typeView: OverlayerWrapper) => {
+                const typeStyle = zoom.scaleStyle(typeView.style);
+                return html`<div class=${typeView.class} style="${toStyleStr(typeStyle)}">
+                    ${typeView.views.map((cellWrapView) => {
+                        const wrapStyle = zoom.scaleStyle(cellWrapView.style);
+                        return html`<div style="${toStyleStr(wrapStyle)}">
+                            ${cellWrapView.cells.map((cell) => zoom.overlayerCellTemplate(cell, cssPrefix))}
+                        </div>`;
+                    })}
+                </div>`;
+            })}`,
+            overlayerEl,
+        );
+        this.mountCellRenders(container, cssPrefix);
+    }
+
+    private mountCellRenders(container: OverlayerContainer, cssPrefix: string) {
+        const zoom = this.ctx.zoomScale;
+        container.views.forEach((wrapper) => {
+            wrapper.views.forEach((view) => {
+                view.cells.forEach((cell) => {
+                    const key = zoom.getOverlayerCellKey(cell);
+                    const cellEl = this.ctx.overlayerElement.querySelector(
+                        `[data-overlayer-cell="${key}"]`,
+                    ) as HTMLDivElement;
+                    if (cellEl) {
+                        zoom.mountOverlayerCellRender(cellEl, cell, cssPrefix);
+                    }
+                });
+            });
+        });
     }
     draw() {
         const overlayer = this.getContainer();

@@ -1,8 +1,10 @@
 import Context from './Context';
-export default class Tooltip {
+import { html, render } from 'lit-html';
+
+export default class Loading {
     private ctx: Context;
     private loadingEl: HTMLDivElement;
-    private textEl: HTMLParagraphElement = document.createElement('p');
+
     constructor(ctx: Context) {
         this.ctx = ctx;
 
@@ -10,39 +12,51 @@ export default class Tooltip {
             this.loadingEl = this.ctx.loadingElement;
         } else {
             this.loadingEl = document.createElement('div');
-            const loadingSpinner = document.createElement('div');
-            loadingSpinner.className = 'e-virt-table-loading-spinner';
-            const loadingSvg = this.ctx.icons.getSvg('loading');
-            if (loadingSvg) {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(loadingSvg.svg, 'image/svg+xml');
-                const svgEl = doc.documentElement;
-                loadingSpinner.appendChild(svgEl);
-            }
-            this.textEl.className = 'e-virt-table-loading-text';
-            this.textEl.innerText = this.getText();
-            loadingSpinner.appendChild(this.textEl);
-            this.loadingEl.appendChild(loadingSpinner);
+            this.ctx.containerElement.appendChild(this.loadingEl);
         }
         this.loadingEl.className = 'e-virt-table-loading';
         this.loadingEl.style.display = 'none';
-        this.ctx.containerElement.appendChild(this.loadingEl);
+        this.renderLoading();
     }
+
     private getText() {
         return this.ctx.config.LOADING_TEXT || this.ctx.locale.getText('loadingText');
     }
-    show() {
-        this.loadingEl.style.display = 'flex';
+
+    private getLoadingSvg() {
+        const loadingSvg = this.ctx.icons.getSvg('loading');
+        return loadingSvg?.svg || '';
     }
-    hide() {
-        this.loadingEl.style.display = 'none';
-    }
-    draw() {
+
+    private renderLoading() {
         if (this.ctx.loadingElement) {
             return;
         }
-        this.textEl.innerText = this.getText();
+        render(
+            html`<div class="e-virt-table-loading-spinner">
+                <span class="e-virt-table-loading-icon"></span>
+                <p class="e-virt-table-loading-text">${this.getText()}</p>
+            </div>`,
+            this.loadingEl,
+        );
+        const spinnerEl = this.loadingEl.querySelector('.e-virt-table-loading-icon') as HTMLSpanElement;
+        if (spinnerEl) {
+            spinnerEl.innerHTML = this.getLoadingSvg();
+        }
     }
+
+    show() {
+        this.loadingEl.style.display = 'flex';
+    }
+
+    hide() {
+        this.loadingEl.style.display = 'none';
+    }
+
+    draw() {
+        this.renderLoading();
+    }
+
     destroy() {
         this.loadingEl.remove();
     }

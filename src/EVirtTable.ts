@@ -30,6 +30,7 @@ import Loading from './Loading';
 import { FinderBar } from './FinderBar';
 import { LangConfig } from './Locale';
 import TextSelector from './TextSelector';
+import { html, render } from 'lit-html';
 export default class EVirtTable {
     static locale: LangConfig;
     private options: EVirtTableOptions;
@@ -97,29 +98,34 @@ export default class EVirtTable {
         _contextMenuElement?: HTMLDivElement,
     ) {
         containerElement.className = 'e-virt-table-container';
-        const stageElement = document.createElement('div');
-        const canvasElement = document.createElement('canvas');
-        const overlayerElement = _overlayerElement || document.createElement('div');
-        stageElement.className = 'e-virt-table-stage';
         containerElement.tabIndex = 0;
-        canvasElement.className = 'e-virt-table-canvas';
+
+        const overlayerElement = _overlayerElement || document.createElement('div');
         overlayerElement.className = 'e-virt-table-overlayer';
         overlayerElement.setAttribute('data-overlayer', _overlayerElement ? 'custom' : 'default');
+
         const editorElement = _editorElement || document.createElement('div');
         editorElement.className = 'e-virt-table-editor';
-        const emptyElement = _emptyElement;
-        const contextMenuElement = _contextMenuElement;
-        stageElement.appendChild(canvasElement);
-        stageElement.appendChild(overlayerElement);
-        containerElement.appendChild(stageElement);
+
+        render(
+            html`<div class="e-virt-table-stage">
+                <canvas class="e-virt-table-canvas"></canvas>
+                ${overlayerElement}
+            </div>`,
+            containerElement,
+        );
+
+        const stageElement = containerElement.querySelector('.e-virt-table-stage') as HTMLDivElement;
+        const canvasElement = containerElement.querySelector('.e-virt-table-canvas') as HTMLCanvasElement;
+
         return {
             containerElement,
             stageElement,
             canvasElement,
             overlayerElement,
             editorElement,
-            emptyElement,
-            contextMenuElement,
+            emptyElement: _emptyElement,
+            contextMenuElement: _contextMenuElement,
         };
     }
     private doDraw(ignoreOverlayer = false) {

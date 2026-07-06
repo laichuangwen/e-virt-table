@@ -18,6 +18,7 @@ export default class ContextMenu {
             this.isCustom = true;
         } else {
             this.contextMenuEl = document.createElement('div');
+            this.contextMenuEl.className = 'e-virt-table-main-menu';
             this.isCustom = false;
         }
         this.ctx.containerElement.appendChild(this.contextMenuEl);

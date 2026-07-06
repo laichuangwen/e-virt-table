@@ -27,4 +27,4 @@ pnpm install e-virt-table
 
 ## TIP
 
-This component is still under testing, use at your own risk. If you find any bugs or issues, please report them at GitHub for us to fix. Also there were some APIs which are not mentioned in this documentation, some of them were not fully developed yet, which is why they are not mentioned here.
+If you find any bugs or issues, please report them at GitHub for us to fix. Also there were some APIs which are not mentioned in this documentation, some of them were not fully developed yet, which is why they are not mentioned here.

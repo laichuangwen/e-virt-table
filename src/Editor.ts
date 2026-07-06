@@ -1,5 +1,6 @@
 import type Cell from './Cell';
 import type Context from './Context';
+import { html, render } from 'lit-html';
 export default class Editor {
     private editorEl!: HTMLDivElement;
     private inputEl!: HTMLTextAreaElement;
@@ -221,16 +222,18 @@ export default class Editor {
         return true;
     }
     private initTextEditor() {
-        // 初始化文本编辑器
-        this.inputEl = document.createElement('textarea');
-        this.inputEl.id = 'e-virt-table-editor-textarea';
-        this.inputEl.setAttribute('rows', '1');
-        this.inputEl.setAttribute('tabindex', '-1');
-        // 监听输入事件，自动调整高度
-        this.inputEl.addEventListener('input', this.autoSize.bind(this));
         this.editorEl = this.ctx.editorElement;
-        this.inputEl.className = 'e-virt-table-editor-textarea';
-        this.editorEl.appendChild(this.inputEl);
+        render(
+            html`<textarea
+                id="e-virt-table-editor-textarea"
+                class="e-virt-table-editor-textarea"
+                rows="1"
+                tabindex="-1"
+                @input=${this.autoSize.bind(this)}
+            ></textarea>`,
+            this.editorEl,
+        );
+        this.inputEl = this.editorEl.querySelector('#e-virt-table-editor-textarea') as HTMLTextAreaElement;
         this.ctx.containerElement.appendChild(this.editorEl);
     }
     private autoSize() {

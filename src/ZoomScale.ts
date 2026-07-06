@@ -1,5 +1,7 @@
 import type Cell from './Cell';
 import type CellHeader from './CellHeader';
+import { html, render } from 'lit-html';
+import { toStyleStr } from './util';
 
 const PX_VALUE_RE = /^-?\d*\.?\d+px$/;
 
@@ -133,19 +135,28 @@ export default class ZoomScale {
 
     /** overlayer 单元格：外层物理定位 + 内层 zoom 缩放自定义 render */
     createOverlayerCellElement(cell: Cell | CellHeader, cssPrefix: string): HTMLDivElement {
-        const cellEl = document.createElement('div');
-        this.assignScaledStyle(cellEl, cell.style);
-        Object.keys(cell.domDataset || {}).forEach((key) => {
-            cellEl.setAttribute(key, cell.domDataset[key]);
-        });
+        const mount = document.createElement('div');
+        render(this.overlayerCellTemplate(cell, cssPrefix), mount);
+        const cellEl = mount.firstElementChild as HTMLDivElement;
+        this.mountOverlayerCellRender(cellEl, cell, cssPrefix);
+        cellEl.remove();
+        return cellEl;
+    }
+
+    overlayerCellTemplate(cell: Cell | CellHeader, cssPrefix: string) {
+        const scaledStyle = this.scaleStyle(cell.style);
+        const cellKey = this.getOverlayerCellKey(cell);
 
         if (typeof cell.render !== 'function') {
-            return cellEl;
+            return html`<div style="${toStyleStr(scaledStyle)}" data-overlayer-cell=${cellKey}></div>`;
         }
 
         if (this.isDefault) {
-            cell.render(cellEl, cell);
-            return cellEl;
+            return html`<div
+                style="${toStyleStr(scaledStyle)}"
+                data-overlayer-cell=${cellKey}
+                data-render-target="self"
+            ></div>`;
         }
 
         const logicalWidth = 'visibleWidth' in cell ? (cell as Cell).visibleWidth : (cell as CellHeader).width;
@@ -156,23 +167,50 @@ export default class ZoomScale {
             'renderType' in cell &&
             cell.renderType === 'default';
 
-        const contentEl = document.createElement('div');
-        contentEl.className = `${cssPrefix}-overlayer-cell-content`;
-        contentEl.style.width = `${logicalWidth}px`;
-        contentEl.style.boxSizing = 'border-box';
-        if (isAutoHeight) {
-            contentEl.style.height = 'auto';
-            contentEl.style.minHeight = `${logicalHeight}px`;
-            cellEl.style.height = 'auto';
-        } else {
-            contentEl.style.height = `${logicalHeight}px`;
-            cellEl.style.height = this.toPx(logicalHeight);
-        }
-        contentEl.style.zoom = String(this.value);
-        cellEl.style.width = this.toPx(logicalWidth);
+        const cellStyle = { ...scaledStyle };
+        const contentStyle: Record<string, string | number> = {
+            width: `${logicalWidth}px`,
+            boxSizing: 'border-box',
+            zoom: String(this.value),
+        };
 
-        cellEl.appendChild(contentEl);
-        cell.render(contentEl, cell);
-        return cellEl;
+        if (isAutoHeight) {
+            contentStyle.height = 'auto';
+            contentStyle.minHeight = `${logicalHeight}px`;
+            cellStyle.height = 'auto';
+        } else {
+            contentStyle.height = `${logicalHeight}px`;
+            cellStyle.height = this.toPx(logicalHeight);
+        }
+        cellStyle.width = this.toPx(logicalWidth);
+
+        return html`<div style="${toStyleStr(cellStyle)}" data-overlayer-cell=${cellKey}>
+            <div
+                class="${cssPrefix}-overlayer-cell-content"
+                style="${toStyleStr(contentStyle)}"
+                data-render-target="content"
+            ></div>
+        </div>`;
+    }
+
+    getOverlayerCellKey(cell: Cell | CellHeader): string {
+        const rowIndex = 'rowIndex' in cell ? cell.rowIndex : 0;
+        return `${cell.key}_${rowIndex}_${cell.colIndex}`;
+    }
+
+    mountOverlayerCellRender(cellEl: HTMLDivElement, cell: Cell | CellHeader, cssPrefix: string) {
+        Object.keys(cell.domDataset || {}).forEach((key) => {
+            cellEl.setAttribute(key, cell.domDataset[key]);
+        });
+        if (typeof cell.render !== 'function') {
+            return;
+        }
+        const renderTarget = cellEl.dataset.renderTarget;
+        if (renderTarget === 'content') {
+            const contentEl = cellEl.querySelector(`.${cssPrefix}-overlayer-cell-content`) as HTMLDivElement;
+            cell.render(contentEl, cell);
+            return;
+        }
+        cell.render(cellEl, cell);
     }
 }

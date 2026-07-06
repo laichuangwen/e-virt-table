@@ -1,5 +1,6 @@
 import Context from './Context';
 import { expandSvg, svgLoading } from './Icons';
+import { html, render } from 'lit-html';
 
 export interface FinderResult {
     type: 'header' | 'body';
@@ -13,11 +14,13 @@ export class FinderBar {
     private ctx: Context;
     private container: HTMLElement;
     private input!: HTMLInputElement;
-    private prevBtn!: HTMLElement;
-    private nextBtn!: HTMLElement;
-    private closeBtn!: HTMLElement;
-    private countEl!: HTMLElement;
-    private loadingEl!: HTMLElement;
+    private prevBtn!: HTMLButtonElement;
+    private nextBtn!: HTMLButtonElement;
+    private closeBtn!: HTMLButtonElement;
+    private countEl!: HTMLSpanElement;
+    private loadingEl!: HTMLDivElement;
+    private inputWrapper!: HTMLDivElement;
+    private barEl!: HTMLDivElement;
     private isVisible = false;
     private searchResults: FinderResult[] = [];
     private currentIndex = -1;
@@ -26,8 +29,9 @@ export class FinderBar {
 
     constructor(ctx: Context) {
         this.ctx = ctx;
-        this.container = this.createContainer();
+        this.container = document.createElement('div');
         this.ctx.containerElement.appendChild(this.container);
+        this.render();
         this.bindEvents();
         this.ctx.on('keydown', (e: KeyboardEvent) => {
             if (!this.ctx.config.ENABLE_FINDER) {
@@ -63,6 +67,77 @@ export class FinderBar {
             this.hide();
         });
         this.ctx.on('outsideMousedown', () => {
+            this.hide();
+        });
+    }
+
+    private render(): void {
+        render(
+            html`
+                <div class="e-virt-table-finder-bar">
+                    <div class="e-virt-table-finder-bar-input-wrapper">
+                        <input type="text" class="e-virt-table-finder-bar-input" placeholder="" />
+                        <div class="e-virt-table-finder-bar-loading"></div>
+                    </div>
+                    <span class="e-virt-table-finder-bar-count"></span>
+                    <div class="e-virt-table-finder-bar-nav">
+                        <button class="e-virt-table-finder-bar-nav-btn prev-btn"></button>
+                        <button class="e-virt-table-finder-bar-nav-btn next-btn"></button>
+                    </div>
+                    <button class="e-virt-table-finder-bar-nav-btn close-btn">×</button>
+                </div>
+            `,
+            this.container,
+        );
+        this.barEl = this.container.querySelector('.e-virt-table-finder-bar') as HTMLDivElement;
+        this.inputWrapper = this.container.querySelector('.e-virt-table-finder-bar-input-wrapper') as HTMLDivElement;
+        this.input = this.container.querySelector('.e-virt-table-finder-bar-input') as HTMLInputElement;
+        this.loadingEl = this.container.querySelector('.e-virt-table-finder-bar-loading') as HTMLDivElement;
+        this.countEl = this.container.querySelector('.e-virt-table-finder-bar-count') as HTMLSpanElement;
+        this.prevBtn = this.container.querySelector('.prev-btn') as HTMLButtonElement;
+        this.nextBtn = this.container.querySelector('.next-btn') as HTMLButtonElement;
+        this.closeBtn = this.container.querySelector('.close-btn') as HTMLButtonElement;
+        this.loadingEl.innerHTML = svgLoading;
+        this.prevBtn.innerHTML = expandSvg;
+        this.nextBtn.innerHTML = expandSvg;
+        this.updateView();
+    }
+
+    private getCountText(): string {
+        if (this.searchResults.length === 0) {
+            if (this.input.value.trim()) {
+                return '0/0';
+            }
+            return '';
+        }
+        return `${this.currentIndex + 1}/${this.searchResults.length}`;
+    }
+
+    private updateView(): void {
+        this.barEl.classList.toggle('show', this.isVisible);
+        this.inputWrapper.classList.toggle('loading', this.loadingEl.classList.contains('show'));
+        this.countEl.textContent = this.getCountText();
+        this.countEl.classList.toggle('no-results', this.searchResults.length === 0 && !!this.input.value.trim());
+    }
+
+    private bindEvents(): void {
+        this.input.addEventListener('input', () => {
+            if (!this.isComposing) this.performSearch();
+        });
+        this.input.addEventListener('compositionstart', () => {
+            this.isComposing = true;
+        });
+        this.input.addEventListener('compositionend', () => {
+            this.isComposing = false;
+            this.performSearch();
+        });
+        this.prevBtn.addEventListener('click', () => {
+            this.navigatePrevious();
+        });
+        this.nextBtn.addEventListener('click', () => {
+            this.navigateNext();
+        });
+        this.closeBtn.addEventListener('click', () => {
             this.hide();
         });
     }
@@ -103,83 +178,6 @@ export class FinderBar {
         }, 0);
     }
 
-    private createContainer(): HTMLElement {
-        const container = document.createElement('div');
-        container.className = 'e-virt-table-finder-bar';
-        // 创建输入框容器
-        const inputWrapper = document.createElement('div');
-        inputWrapper.className = 'e-virt-table-finder-bar-input-wrapper';
-        // 创建输入框
-        this.input = document.createElement('input');
-        this.input.type = 'text';
-        this.input.className = 'e-virt-table-finder-bar-input';
-        this.input.placeholder = '';
-        inputWrapper.appendChild(this.input);
-
-        // 创建 loading 指示器（放在输入框容器内）
-        this.loadingEl = document.createElement('div');
-        this.loadingEl.className = 'e-virt-table-finder-bar-loading';
-        const loadingSvg = svgLoading;
-        this.loadingEl.innerHTML = loadingSvg;
-        inputWrapper.appendChild(this.loadingEl);
-        // 创建计数文本
-        this.countEl = document.createElement('span');
-        this.countEl.className = 'e-virt-table-finder-bar-count';
-        // 创建导航按钮容器
-        const navContainer = document.createElement('div');
-        navContainer.className = 'e-virt-table-finder-bar-nav';
-        // 创建上一个按钮（向上箭头）
-        this.prevBtn = document.createElement('button');
-        this.prevBtn.className = 'e-virt-table-finder-bar-nav-btn prev-btn';
-        this.prevBtn.innerHTML = expandSvg;
-        // 创建下一个按钮（向下箭头）
-        this.nextBtn = document.createElement('button');
-        this.nextBtn.className = 'e-virt-table-finder-bar-nav-btn next-btn';
-        this.nextBtn.innerHTML = expandSvg;
-        navContainer.appendChild(this.prevBtn);
-        navContainer.appendChild(this.nextBtn);
-
-        // 创建关闭按钮
-        this.closeBtn = document.createElement('button');
-        this.closeBtn.className = 'e-virt-table-finder-bar-nav-btn close-btn';
-        this.closeBtn.innerHTML = '×';
-
-        container.appendChild(inputWrapper);
-        container.appendChild(this.countEl);
-        container.appendChild(navContainer);
-        container.appendChild(this.closeBtn);
-
-        return container;
-    }
-
-    private bindEvents(): void {
-        // 输入框输入事件
-        this.input.addEventListener('input', () => {
-            if (!this.isComposing) this.performSearch();
-        });
-        this.input.addEventListener('compositionstart', () => {
-            this.isComposing = true;
-        });
-
-        this.input.addEventListener('compositionend', () => {
-            this.isComposing = false;
-            this.performSearch();
-        });
-        // 导航按钮事件
-        this.prevBtn.addEventListener('click', () => {
-            this.navigatePrevious();
-        });
-
-        this.nextBtn.addEventListener('click', () => {
-            this.navigateNext();
-        });
-
-        // 关闭按钮事件
-        this.closeBtn.addEventListener('click', () => {
-            this.hide();
-        });
-    }
-
     private performSearch(): void {
         const searchText = this.input.value.trim();
         this.searchResults = [];
@@ -187,26 +185,23 @@ export class FinderBar {
 
         if (!searchText) {
             this.cearFinderBar();
-            this.updateCount();
+            this.updateView();
             return;
         }
 
         this.showLoading();
         setTimeout(() => {
-            // 支持大小写搜索
             this.searchResults = this.searchData.filter((item) =>
                 item.text.toLowerCase().includes(searchText.toLowerCase()),
             );
-            // 如果找到结果，定位到第一个
             if (this.searchResults.length > 0) {
                 this.currentIndex = 0;
                 this.scrollToCurrentResult();
             } else {
-                // 清空
                 this.cearFinderBar();
             }
-            this.updateCount();
             this.hideLoading();
+            this.updateView();
         }, 0);
     }
 
@@ -225,7 +220,7 @@ export class FinderBar {
 
         this.currentIndex = (this.currentIndex + 1) % this.searchResults.length;
         this.scrollToCurrentResult();
-        this.updateCount();
+        this.updateView();
     }
 
     private navigatePrevious(): void {
@@ -233,46 +228,30 @@ export class FinderBar {
 
         this.currentIndex = this.currentIndex <= 0 ? this.searchResults.length - 1 : this.currentIndex - 1;
         this.scrollToCurrentResult();
-        this.updateCount();
-    }
-
-    private updateCount(): void {
-        if (this.searchResults.length === 0) {
-            if (this.input.value.trim()) {
-                this.countEl.textContent = '0/0';
-                this.countEl.classList.add('no-results');
-            } else {
-                this.countEl.textContent = '';
-                this.countEl.classList.remove('no-results');
-            }
-        } else {
-            const current = this.currentIndex + 1;
-            const total = this.searchResults.length;
-            this.countEl.textContent = `${current}/${total}`;
-            this.countEl.classList.remove('no-results');
-        }
+        this.updateView();
     }
 
     public show(): void {
         if (this.isVisible) return;
         this.isVisible = true;
         this.ctx.finding = true;
-        this.container.classList.add('show');
+        this.updateView();
         this.input.focus();
         this.initSearchData();
     }
 
     private showLoading(): void {
         this.loadingEl.classList.add('show');
-        this.loadingEl.parentElement?.classList.add('loading');
         this.input.readOnly = true;
+        this.updateView();
     }
 
     private hideLoading(): void {
         this.loadingEl.classList.remove('show');
-        this.loadingEl.parentElement?.classList.remove('loading');
         this.input.readOnly = false;
+        this.updateView();
     }
+
     private cearFinderBar(): void {
         this.ctx.finderBar = {
             rowIndex: -1,
@@ -287,20 +266,20 @@ export class FinderBar {
         if (!this.isVisible) return;
 
         this.isVisible = false;
-        this.container.classList.remove('show');
         this.ctx.finding = false;
         this.input.value = '';
         this.searchResults = [];
         this.searchData = [];
         this.currentIndex = -1;
-        this.hideLoading();
+        this.loadingEl.classList.remove('show');
+        this.input.readOnly = false;
         this.ctx.finderBar = {
             rowIndex: -1,
             colIndex: -1,
             text: '',
             type: 'header',
         };
-        this.updateCount();
+        this.updateView();
         this.ctx.emit('draw');
     }
 

@@ -1,50 +1,65 @@
 import Cell from './Cell';
 import Context from './Context';
 import { computePosition, offset, arrow, flip, shift } from '@floating-ui/dom';
+import { html, render } from 'lit-html';
+import { toStyleStr } from './util';
+
 export default class Tooltip {
     private ctx: Context;
     private enable = false;
-    private contentEl: HTMLDivElement;
     private floatingEl: HTMLDivElement;
-    private arrowEl: HTMLDivElement;
+    private contentText = '';
+    private contentStyle: Record<string, string> = {};
+    private floatingStyle: Record<string, string | number> = { display: 'none' };
+    private arrowStyle: Record<string, string | number> = {};
+
     constructor(ctx: Context) {
         this.ctx = ctx;
-        const { TOOLTIP_BG_COLOR, TOOLTIP_TEXT_COLOR, TOOLTIP_ZINDEX, TOOLTIP_CUSTOM_STYLE, CSS_PREFIX } =
-            this.ctx.config;
-        this.contentEl = document.createElement('div');
-        this.arrowEl = document.createElement('div');
         this.floatingEl = document.createElement('div');
-        this.floatingEl.className = `${CSS_PREFIX}-tooltip`;
-        this.contentEl.className = `${CSS_PREFIX}-tooltip-content`;
-        this.arrowEl.className = `${CSS_PREFIX}-tooltip-arrow`;
-        const floatingStyle = {
-            display: 'none',
-            position: 'absolute',
-            background: TOOLTIP_BG_COLOR,
-            color: TOOLTIP_TEXT_COLOR,
-            boxSizing: 'border-box',
-            zIndex: TOOLTIP_ZINDEX,
-            padding: '8px',
-            borderRadius: `4px`,
-            fontSize: `12px`,
-            ...TOOLTIP_CUSTOM_STYLE,
-        };
-        const arrowStyle = {
-            position: 'absolute',
-            width: '10px',
-            height: '10px',
-            background: floatingStyle.background,
-            backgroundColor: floatingStyle.backgroundColor,
-            transform: 'rotate(45deg)',
-            zIndex: floatingStyle.zIndex,
-        };
-        Object.assign(this.arrowEl.style, arrowStyle);
-        Object.assign(this.floatingEl.style, floatingStyle);
-        this.floatingEl.appendChild(this.contentEl);
-        this.floatingEl.appendChild(this.arrowEl);
         this.ctx.containerElement.appendChild(this.floatingEl);
+        this.renderTooltip();
         this.init();
     }
+
+    private getBaseStyles() {
+        const { TOOLTIP_BG_COLOR, TOOLTIP_TEXT_COLOR, TOOLTIP_ZINDEX, CSS_PREFIX } = this.ctx.config;
+        return {
+            prefix: CSS_PREFIX,
+            floating: {
+                position: 'absolute',
+                background: TOOLTIP_BG_COLOR,
+                color: TOOLTIP_TEXT_COLOR,
+                boxSizing: 'border-box',
+                zIndex: TOOLTIP_ZINDEX,
+                padding: '8px',
+                borderRadius: '4px',
+                fontSize: '12px',
+            },
+            arrow: {
+                position: 'absolute',
+                width: '10px',
+                height: '10px',
+                background: TOOLTIP_BG_COLOR,
+                transform: 'rotate(45deg)',
+                zIndex: TOOLTIP_ZINDEX,
+            },
+        };
+    }
+
+    private renderTooltip() {
+        const { prefix, floating, arrow } = this.getBaseStyles();
+        const customFloatingStyle = this.ctx.config.TOOLTIP_CUSTOM_STYLE as Record<string, string | number>;
+        render(
+            html`<div class="${prefix}-tooltip" style="${toStyleStr({ ...floating, ...customFloatingStyle, ...this.floatingStyle })}">
+                <div class="${prefix}-tooltip-content" style="${toStyleStr(this.contentStyle)}">
+                    ${this.contentText}
+                </div>
+                <div class="${prefix}-tooltip-arrow" style="${toStyleStr({ ...arrow, ...this.arrowStyle })}"></div>
+            </div>`,
+            this.floatingEl,
+        );
+    }
+
     private init() {
         this.floatingEl.addEventListener('mouseleave', () => {
             this.hide();
@@ -66,7 +81,6 @@ export default class Tooltip {
             if (contains) {
                 return;
             }
-            // 有移除或者有错误message时显示
             if (cell.ellipsis || cell.message) {
                 this.show(cell);
             }
@@ -117,21 +131,19 @@ export default class Tooltip {
             this.hide();
         });
     }
+
     private show(cell: Cell, message?: string) {
-        // 如果没有设置overflowTooltipShow=true，则不显示
         if (this.ctx.contextMenuIng) {
             return;
         }
         if (!cell.overflowTooltipShow) {
             return;
         }
-        // 如果是鼠标按下状态，则不显示
         if (this.ctx.mousedown) {
             return;
         }
-        this.floatingEl.style.display = 'block';
+        this.floatingStyle = { ...this.floatingStyle, display: 'block' };
         let text = cell.getText();
-        // 如果有message，则显示message
         if (cell.message) {
             text = cell.message;
         }
@@ -143,14 +155,17 @@ export default class Tooltip {
             return;
         }
         this.enable = true;
-        // 设置最大宽度
-        this.contentEl.style.maxWidth = `${cell.overflowTooltipMaxWidth || 500}px`;
-        this.contentEl.style.minWidth = '100px';
-        this.contentEl.style.width = '100%';
-        this.contentEl.style.display = 'inline-block';
-        this.contentEl.style.wordBreak = 'break-all';
-        this.contentEl.style.lineHeight = '1.5';
-        this.contentEl.innerText = text;
+        this.contentText = text;
+        this.contentStyle = {
+            maxWidth: `${cell.overflowTooltipMaxWidth || 500}px`,
+            minWidth: '100px',
+            width: '100%',
+            display: 'inline-block',
+            wordBreak: 'break-all',
+            lineHeight: '1.5',
+        };
+        this.renderTooltip();
+
         const viewportRect = this.ctx.zoomScale.getViewportRect(
             {
                 x: cell.drawX,
@@ -165,60 +180,64 @@ export default class Tooltip {
                 return viewportRect;
             },
         };
+        const arrowEl = this.floatingEl.querySelector(`.${this.ctx.config.CSS_PREFIX}-tooltip-arrow`) as HTMLElement;
 
-        computePosition(virtualEl, this.floatingEl, {
+        computePosition(virtualEl, this.floatingEl.firstElementChild as HTMLElement, {
             placement: cell.overflowTooltipPlacement,
-            middleware: [shift(), flip(), offset(6), arrow({ element: this.arrowEl })],
+            middleware: [shift(), flip(), offset(6), arrow({ element: arrowEl })],
         }).then((val) => {
             const { x, y, placement, middlewareData } = val;
-            Object.assign(this.floatingEl.style, {
+            this.floatingStyle = {
+                ...this.floatingStyle,
                 top: `${y}px`,
                 left: `${x}px`,
-            });
+            };
             if (middlewareData.arrow) {
-                const arrow = middlewareData.arrow;
+                const arrowData = middlewareData.arrow;
                 if (['left', 'left-start', 'left-end'].includes(placement)) {
-                    Object.assign(this.arrowEl.style, {
-                        top: `${arrow.y}px`,
+                    this.arrowStyle = {
+                        top: `${arrowData.y}px`,
                         bottom: '',
                         left: '',
-                        right: `-5px`,
-                    });
+                        right: '-5px',
+                    };
                 } else if (['right', 'right-start', 'right-end'].includes(placement)) {
-                    Object.assign(this.arrowEl.style, {
-                        top: `${arrow.y}px`,
+                    this.arrowStyle = {
+                        top: `${arrowData.y}px`,
                         bottom: '',
-                        left: `-5px`,
+                        left: '-5px',
                         right: '',
-                    });
+                    };
                 } else if (['bottom', 'bottom-start', 'bottom-end'].includes(placement)) {
-                    Object.assign(this.arrowEl.style, {
-                        top: `-5px`,
+                    this.arrowStyle = {
+                        top: '-5px',
                         bottom: '',
-                        left: `${arrow.x}px`,
+                        left: `${arrowData.x}px`,
                         right: '',
-                    });
+                    };
                 } else if (['top', 'top-start', 'top-end'].includes(placement)) {
-                    Object.assign(this.arrowEl.style, {
+                    this.arrowStyle = {
                         top: '',
-                        bottom: `-5px`,
-                        left: `${arrow.x}px`,
+                        bottom: '-5px',
+                        left: `${arrowData.x}px`,
                         right: '',
-                    });
+                    };
                 }
             }
+            this.renderTooltip();
         });
     }
+
     hide() {
         if (!this.enable) {
             return;
         }
         this.enable = false;
-        this.floatingEl.style.display = 'none';
+        this.floatingStyle = { ...this.floatingStyle, display: 'none' };
+        this.renderTooltip();
     }
+
     destroy() {
-        this.contentEl.remove();
-        this.arrowEl.remove();
         this.floatingEl.remove();
     }
 }

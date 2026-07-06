@@ -479,6 +479,16 @@ function getNumberPrecision(value: unknown): number {
     return match?.[1].length ?? 0;
 }
 
+function toStyleStr(style: Record<string, string | number | undefined | null>): string {
+    return Object.entries(style)
+        .filter(([, value]) => value != null && value !== '')
+        .map(([key, value]) => {
+            const cssKey = key.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`);
+            return `${cssKey}:${value}`;
+        })
+        .join(';');
+}
+
 export {
     debounce,
     throttle,
@@ -498,4 +508,5 @@ export {
     compareDates,
     filterHiddenColumns,
     getNumberPrecision,
+    toStyleStr,
 };
