@@ -1,4 +1,5 @@
 import { IconType } from './Icons';
+import type { BorderConfigValue } from './BorderStyle';
 import {
     Align,
     BeforeAutofillDataMethod,
@@ -46,7 +47,7 @@ export default class Config {
     /** 单元格字体 */
     BODY_FONT = '12px normal Arial';
     /** 边框 */
-    BORDER = true;
+    BORDER: BorderConfigValue = true;
     /** 斑马纹 */
     STRIPE = false;
     /** 斑马纹颜色 */
