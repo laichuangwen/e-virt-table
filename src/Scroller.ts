@@ -1,5 +1,7 @@
 import Context from './Context';
+import { getLayoutScrollerTrackSize, getOverlayScrollerTrackSize, isInnerScrollbarMode } from './ScrollbarMode';
 export type ScrollbarType = 'horizontal' | 'vertical';
+type Rect = { x: number; y: number; width: number; height: number };
 
 class Scrollbar {
     private ctx: Context;
@@ -19,6 +21,11 @@ class Scrollbar {
     private clientX = 0;
     private clientY = 0;
     private dragStart = 0; // 拖拽开始的位置
+    private innerVisible = false;
+    private innerCollapsed = false;
+    private innerShowTimer = 0;
+    private collapseButton: Rect = { x: 0, y: 0, width: 0, height: 0 };
+    private expandButton: Rect = { x: 0, y: 0, width: 0, height: 0 };
     isDragging = false;
     scroll = 0;
 
@@ -81,6 +88,28 @@ class Scrollbar {
         const offsetX = this.ctx.zoomScale.toLogical(e.offsetX);
         const offsetY = this.ctx.zoomScale.toLogical(e.offsetY);
         if (clientX == this.clientX && clientY == this.clientY) return;
+        if (this.isInnerMode()) {
+            if (this.isOnExpandButton(offsetX, offsetY)) {
+                this.innerCollapsed = false;
+                this.innerVisible = true;
+                this.ctx.stageElement.style.cursor = 'default';
+                this.ctx.emit('draw');
+                e.preventDefault();
+                return;
+            }
+            if (this.isOnCollapseButton(offsetX, offsetY)) {
+                this.innerCollapsed = true;
+                this.innerVisible = false;
+                this.isFocus = false;
+                this.ctx.stageElement.style.cursor = 'default';
+                this.ctx.emit('draw');
+                e.preventDefault();
+                return;
+            }
+            if (!this.canInteractWithScrollbar()) {
+                return;
+            }
+        }
         if (this.isOnScrollbar(offsetX, offsetY)) {
             this.clientX = clientX;
             this.clientY = clientY;
@@ -116,10 +145,18 @@ class Scrollbar {
         const { clientX, clientY, buttons } = e;
         const offsetX = this.ctx.zoomScale.toLogical(e.offsetX);
         const offsetY = this.ctx.zoomScale.toLogical(e.offsetY);
+        if (this.isInnerMode()) {
+            this.startInnerShowTimer();
+        }
         // 没有鼠标按下时不处理，要重置抬起事件
         // 悬浮提示
-        if (this.isOnScrollbar(offsetX, offsetY) && e.target === this.ctx.canvasElement) {
+        const isInnerControl =
+            this.isInnerMode() && (this.isOnCollapseButton(offsetX, offsetY) || this.isOnExpandButton(offsetX, offsetY));
+        const isScrollbarHover =
+            this.canInteractWithScrollbar() && (this.isOnScrollbar(offsetX, offsetY) || this.isOnTrack(offsetX, offsetY));
+        if ((isScrollbarHover || isInnerControl) && e.target === this.ctx.canvasElement) {
             this.isFocus = true;
+            this.ctx.stageElement.style.cursor = 'pointer';
         } else {
             this.isFocus = false;
         }
@@ -178,6 +215,66 @@ class Scrollbar {
     private isOnTrack(x: number, y: number): boolean {
         return this.isPointInElement(x, y, this.trackX, this.trackY, this.trackWidth, this.trackHeight);
     }
+    private isOnCollapseButton(x: number, y: number): boolean {
+        if (!this.isInnerMode() || this.innerCollapsed || !this.innerVisible) {
+            return false;
+        }
+        return this.isPointInElement(
+            x,
+            y,
+            this.collapseButton.x,
+            this.collapseButton.y,
+            this.collapseButton.width,
+            this.collapseButton.height,
+        );
+    }
+    private isOnExpandButton(x: number, y: number): boolean {
+        if (!this.isInnerMode() || !this.innerCollapsed) {
+            return false;
+        }
+        return this.isPointInElement(
+            x,
+            y,
+            this.expandButton.x,
+            this.expandButton.y,
+            this.expandButton.width,
+            this.expandButton.height,
+        );
+    }
+    private isInnerMode(): boolean {
+        return isInnerScrollbarMode(this.ctx.config);
+    }
+    private shouldDrawInnerScrollbar(): boolean {
+        if (!this.isInnerMode()) {
+            return true;
+        }
+        return !this.innerCollapsed && (this.innerVisible || this.isFocus || this.isDragging);
+    }
+    private canInteractWithScrollbar(): boolean {
+        return !this.isInnerMode() || this.shouldDrawInnerScrollbar();
+    }
+    private startInnerShowTimer() {
+        if (!this.isInnerMode() || this.innerVisible || this.innerCollapsed || this.innerShowTimer) {
+            return;
+        }
+        const delay = Math.max(0, this.ctx.config.SCROLLBAR_SHOW_DELAY || 0);
+        this.innerShowTimer = window.setTimeout(() => {
+            this.innerVisible = true;
+            this.innerShowTimer = 0;
+            this.ctx.emit('draw');
+        }, delay);
+    }
+    hideInnerScrollbar() {
+        if (!this.isInnerMode() || this.isDragging || this.innerCollapsed) {
+            return;
+        }
+        if (this.innerShowTimer) {
+            clearTimeout(this.innerShowTimer);
+            this.innerShowTimer = 0;
+        }
+        this.innerVisible = false;
+        this.isFocus = false;
+    }
 
     private updateScroll(e: WheelEvent) {
         const deltaX = e.deltaX;
@@ -203,8 +300,10 @@ class Scrollbar {
             header,
             stageHeight,
             stageWidth,
-            config: { SCROLLER_TRACK_SIZE = 0, SCROLLER_SIZE = 0, BORDER },
+            config: { SCROLLER_SIZE = 0, BORDER },
         } = this.ctx;
+        const layoutScrollerTrackSize = getLayoutScrollerTrackSize(this.ctx.config);
+        const overlayScrollerTrackSize = getOverlayScrollerTrackSize(this.ctx.config);
         const visibleWidth = stageWidth;
         const visibleHeight = stageHeight;
         const headerHeight = header.height;
@@ -212,16 +311,16 @@ class Scrollbar {
         const bodyHeight = body.height;
         const footerHeight = this.ctx.footer.height;
         if (this.type === 'vertical') {
-            this.visibleDistance = visibleHeight - SCROLLER_TRACK_SIZE - headerHeight;
-            this.distance = bodyHeight - this.visibleDistance + footerHeight;
-            this.trackX = visibleWidth - SCROLLER_TRACK_SIZE;
+            this.visibleDistance = visibleHeight - layoutScrollerTrackSize - headerHeight;
+            this.distance = Math.max(0, bodyHeight - this.visibleDistance + footerHeight);
+            this.trackX = visibleWidth - overlayScrollerTrackSize;
             this.trackY = 0;
             // 分割线
-            this.splitPoints = [this.trackX, headerHeight, this.trackX + SCROLLER_TRACK_SIZE, headerHeight];
-            this.trackWidth = SCROLLER_TRACK_SIZE;
+            this.splitPoints = [this.trackX, headerHeight, this.trackX + overlayScrollerTrackSize, headerHeight];
+            this.trackWidth = overlayScrollerTrackSize;
             this.trackHeight = visibleHeight;
             // 滚动条的X位置=轨道的X位置+（轨道的宽度-滚动条的宽度）/2
-            this.barX = this.trackX - 1 + (SCROLLER_TRACK_SIZE - SCROLLER_SIZE) / 2;
+            this.barX = this.trackX - 1 + (overlayScrollerTrackSize - SCROLLER_SIZE) / 2;
             this.barWidth = SCROLLER_SIZE;
             const ratio = this.distance ? this.visibleDistance / (bodyHeight + footerHeight) : 0;
             let _barHeight = Math.floor(ratio * this.visibleDistance);
@@ -233,29 +332,30 @@ class Scrollbar {
             }
             this.barHeight = _barHeight;
 
-            this.barY = headerHeight + (this.scroll / this.distance) * (this.visibleDistance - this.barHeight);
+            const progress = this.distance ? this.scroll / this.distance : 0;
+            this.barY = headerHeight + progress * (this.visibleDistance - this.barHeight);
             // 范围限制
             this.scroll = Math.max(0, Math.min(this.scroll, this.distance));
         } else {
-            this.visibleDistance = visibleWidth - SCROLLER_TRACK_SIZE;
-            this.distance = headerWidth - this.visibleDistance;
+            this.visibleDistance = visibleWidth - layoutScrollerTrackSize;
+            this.distance = Math.max(0, headerWidth - this.visibleDistance);
             // 分割线
             this.splitPoints = [
-                visibleWidth - SCROLLER_TRACK_SIZE,
-                visibleHeight - SCROLLER_TRACK_SIZE,
-                visibleWidth - SCROLLER_TRACK_SIZE,
+                visibleWidth - overlayScrollerTrackSize,
+                visibleHeight - overlayScrollerTrackSize,
+                visibleWidth - overlayScrollerTrackSize,
                 visibleHeight,
             ];
             const offset = BORDER ? 0 : 0.5; // 解决边框问题，补偿0.5px
             this.trackX = 0;
-            this.trackY = visibleHeight - SCROLLER_TRACK_SIZE + offset;
+            this.trackY = visibleHeight - overlayScrollerTrackSize + offset;
             this.trackWidth = visibleWidth;
-            this.trackHeight = SCROLLER_TRACK_SIZE;
+            this.trackHeight = overlayScrollerTrackSize;
 
             const ratio = this.distance ? this.visibleDistance / headerWidth : 0;
 
             let _barWidth = Math.floor(ratio * this.visibleDistance);
-            this.barY = this.trackY - 1 + (SCROLLER_TRACK_SIZE - SCROLLER_SIZE) / 2;
+            this.barY = this.trackY - 1 + (overlayScrollerTrackSize - SCROLLER_SIZE) / 2;
             // 最小30,超出可见区域则隐藏
             if (_barWidth < 30) {
                 _barWidth = 30;
@@ -264,16 +364,55 @@ class Scrollbar {
             }
             this.barWidth = _barWidth;
             this.barHeight = SCROLLER_SIZE;
-            this.barX = (this.scroll / this.distance) * (this.visibleDistance - this.barWidth);
+            const progress = this.distance ? this.scroll / this.distance : 0;
+            this.barX = progress * (this.visibleDistance - this.barWidth);
             // 范围限制
             this.scroll = Math.max(0, Math.min(this.scroll, this.distance));
         }
+        this.updateToggleButtons();
     }
-    draw() {
+    private updateToggleButtons() {
+        const size = Math.max(14, Math.min(20, getOverlayScrollerTrackSize(this.ctx.config) + 4));
+        if (this.type === 'vertical') {
+            const minY = this.ctx.header.height + 8;
+            const maxY = Math.max(minY, this.ctx.stageHeight - size - 8);
+            const y = Math.min(minY, maxY);
+            this.collapseButton = { x: this.trackX - size - 2, y, width: size, height: size };
+            this.expandButton = { x: this.ctx.stageWidth - size - 2, y, width: size, height: size };
+            return;
+        }
+        const x = 8;
+        this.collapseButton = { x, y: this.trackY - size - 2, width: size, height: size };
+        this.expandButton = { x, y: this.ctx.stageHeight - size - 2, width: size, height: size };
+    }
+    private drawToggleButton(rect: Rect, label: string) {
+        const {
+            config: { SCROLLER_FOCUS_COLOR, SCROLLER_TRACK_COLOR, BODY_TEXT_COLOR },
+        } = this.ctx;
+        this.ctx.paint.drawRect(rect.x, rect.y, rect.width, rect.height, {
+            borderColor: SCROLLER_FOCUS_COLOR,
+            fillColor: SCROLLER_TRACK_COLOR,
+            radius: 4,
+        });
+        this.ctx.paint.drawText(label, rect.x, rect.y - 1, rect.width, rect.height + 2, {
+            padding: 0,
+            align: 'center',
+            verticalAlign: 'middle',
+            color: BODY_TEXT_COLOR,
+        });
+    }
+    draw(): boolean {
         const {
             config: { SCROLLER_FOCUS_COLOR, SCROLLER_COLOR, BORDER_COLOR, BORDER, SCROLLER_TRACK_COLOR },
         } = this.ctx;
         this.updatedSize();
+        if (this.isInnerMode() && this.innerCollapsed) {
+            this.drawToggleButton(this.expandButton, this.type === 'vertical' ? '<' : '^');
+            return this.isFocus || this.isDragging;
+        }
+        if (this.isInnerMode() && !this.shouldDrawInnerScrollbar()) {
+            return this.isFocus || this.isDragging;
+        }
         let borderColor = BORDER_COLOR;
         if (!BORDER) {
             borderColor = 'transparent';
@@ -295,8 +434,10 @@ class Scrollbar {
                 borderWidth: 1,
             });
         }
-        // 悬浮状态
-        this.ctx.scrollerFocus = this.isFocus;
+        if (this.isInnerMode()) {
+            this.drawToggleButton(this.collapseButton, this.type === 'vertical' ? '>' : 'v');
+        }
+        return this.isFocus || this.isDragging;
     }
 }
 
@@ -318,6 +459,7 @@ export default class Scroller {
         this.ctx.on('mousedown', (e) => this.onMouseDown(e));
         this.ctx.on('mousemove', (e) => this.onMouseMove(e));
         this.ctx.on('mouseup', () => this.onMouseUp());
+        this.ctx.on('mouseout', (e: MouseEvent) => this.onMouseOut(e));
         this.ctx.on('touchmove', (e) => this.onTouchmove(e));
         this.ctx.on('touchstart', (e) => {
             this.onTouchstart(e);
@@ -380,10 +522,19 @@ export default class Scroller {
         this.horizontalScrollbar.onMouseUp();
         this.ctx.scrollerMove = false;
     }
+    onMouseOut(e: MouseEvent) {
+        if (this.ctx.containerElement.contains(e.relatedTarget as Node)) {
+            return;
+        }
+        this.verticalScrollbar.hideInnerScrollbar();
+        this.horizontalScrollbar.hideInnerScrollbar();
+        this.ctx.emit('draw');
+    }
 
     draw() {
-        this.verticalScrollbar.draw();
-        this.horizontalScrollbar.draw();
+        const verticalFocus = this.verticalScrollbar.draw();
+        const horizontalFocus = this.horizontalScrollbar.draw();
+        this.ctx.scrollerFocus = verticalFocus || horizontalFocus;
         const scrollX = Math.floor(this.horizontalScrollbar.scroll);
         const scrollY = Math.floor(this.verticalScrollbar.scroll);
         // 只有滚动条发生变化才触发绘制

@@ -3,6 +3,7 @@ dist
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+pnpm-workspace.yaml
 .idea
 .vscode
 .cursor

@@ -58,7 +58,9 @@ type EVirtTableOptions = {
 | CELL_WIDTH | Cell width | number | — | 100 |
 | CELL_HEIGHT | Cell height | number | — | 36 |
 | CELL_PADDING | Padding of the table body | number | — | 8 |
+| scrollbarMode | Scrollbar mode. `outer` reserves an outside scrollbar area; `inner` overlays scrollbars on top of the content | `outer` \| `inner` | — | `outer` |
 | SCROLLER_TRACK_SIZE | Scrollbar track size | number | — | 14 |
+| SCROLLBAR_SHOW_DELAY | Delay before inner scrollbars appear after hover, in milliseconds | number | — | 300 |
 | SCROLLER_SIZE | Scrollbar slider size | number | — | 8 |
 | SCROLLER_COLOR | Scrollbar slider color | string | — | #dee0e3 |
 | SCROLLER_FOCUS_COLOR | Scrollbar slider focus color | string | — | #bbbec4 |

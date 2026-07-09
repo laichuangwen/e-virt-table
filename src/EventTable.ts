@@ -2,6 +2,7 @@ import Cell from './Cell';
 import CellHeader from './CellHeader';
 import Context from './Context';
 import Row from './Row';
+import { isInnerScrollbarMode } from './ScrollbarMode';
 export default class EventTable {
     ctx: Context;
     private visibleHoverCell?: Cell;
@@ -272,6 +273,7 @@ export default class EventTable {
             return true;
         }
         const { SCROLLER_TRACK_SIZE } = this.ctx.config;
+        const innerScrollbar = isInnerScrollbarMode(this.ctx.config);
         // 滚动条移动不处理
         if (this.ctx.scrollerMove) {
             return true;
@@ -281,11 +283,11 @@ export default class EventTable {
             return true;
         }
         // 点击滚动条不处理
-        if (y > this.ctx.stageHeight - SCROLLER_TRACK_SIZE) {
+        if (!innerScrollbar && y > this.ctx.stageHeight - SCROLLER_TRACK_SIZE) {
             return true;
         }
         // 点击滚动条不处理
-        if (x > this.ctx.stageWidth - SCROLLER_TRACK_SIZE) {
+        if (!innerScrollbar && x > this.ctx.stageWidth - SCROLLER_TRACK_SIZE) {
             return true;
         }
         return false;

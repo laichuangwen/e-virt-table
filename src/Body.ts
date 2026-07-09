@@ -3,6 +3,7 @@ import type Context from './Context';
 import Row from './Row';
 import { TreeUtil, TreeUtilPosition } from './TreeUtil';
 import { ExpandLazyMethod, Position } from './types';
+import { getLayoutScrollerTrackSize } from './ScrollbarMode';
 export default class Body {
     private resizeTarget: Row | null = null; //调整行大小的目标
     private dragSource: Cell | null = null; //拖拽行的源
@@ -42,7 +43,6 @@ export default class Body {
             database,
             config: {
                 FOOTER_FIXED,
-                SCROLLER_TRACK_SIZE = 0,
                 HEIGHT,
                 EMPTY_BODY_HEIGHT = 0,
                 MAX_HEIGHT = 0,
@@ -51,6 +51,7 @@ export default class Body {
                 FOOTER_POSITION,
             },
         } = this.ctx;
+        const layoutScrollerTrackSize = getLayoutScrollerTrackSize(this.ctx.config);
         if (!header.width) {
             return;
         }
@@ -67,7 +68,7 @@ export default class Body {
         this.data = data;
         // 更新宽度
         this.width = header.width;
-        this.visibleWidth = this.ctx.stageWidth - SCROLLER_TRACK_SIZE;
+        this.visibleWidth = this.ctx.stageWidth - layoutScrollerTrackSize;
         // 底部高度
         const footerHeight = this.ctx.footer.height;
         this.ctx.isEmpty = !this.data.length;
@@ -75,11 +76,11 @@ export default class Body {
             this.height = EMPTY_BODY_HEIGHT;
         } else if (!this.data.length && HEIGHT) {
             // 如果有设置高度的情况，空数据时，高度也要保持为设置的高度
-            this.height = HEIGHT - header.height - footerHeight - SCROLLER_TRACK_SIZE;
+            this.height = HEIGHT - header.height - footerHeight - layoutScrollerTrackSize;
         }
 
         const { zoomScale } = this.ctx;
-        let containerHeight = this.height + header.height + SCROLLER_TRACK_SIZE;
+        let containerHeight = this.height + header.height + layoutScrollerTrackSize;
         containerHeight += footerHeight;
         let physicalStageHeight = zoomScale.contentToPhysical(containerHeight);
         const windowInnerHeight = window.innerHeight;
@@ -87,7 +88,7 @@ export default class Body {
         if (windowInnerHeight > top && ENABLE_OFFSET_HEIGHT && !HEIGHT) {
             const visibleHeight = windowInnerHeight - top;
             const _stageHeight = visibleHeight - OFFSET_HEIGHT;
-            if (_stageHeight > zoomScale.contentToPhysical(header.height + SCROLLER_TRACK_SIZE)) {
+            if (_stageHeight > zoomScale.contentToPhysical(header.height + layoutScrollerTrackSize)) {
                 physicalStageHeight = _stageHeight;
             } else if (zoomScale.contentToPhysical(containerHeight) > MAX_HEIGHT) {
                 physicalStageHeight = MAX_HEIGHT;
@@ -106,7 +107,7 @@ export default class Body {
             this.ctx.stagePhysicalHeight = stagePhysicalHeight;
         }
         // 可视区高度
-        let _visibleHeight = this.ctx.stageHeight - header.height - SCROLLER_TRACK_SIZE;
+        let _visibleHeight = this.ctx.stageHeight - header.height - layoutScrollerTrackSize;
         // 底部高度,如果是固定底部,可视区减上底部高度
         if (FOOTER_FIXED) {
             this.visibleHeight = _visibleHeight - footerHeight;
@@ -510,8 +511,9 @@ export default class Body {
             scrollX,
             header,
             stageWidth,
-            config: { HEADER_BG_COLOR, SCROLLER_TRACK_SIZE },
+            config: { HEADER_BG_COLOR },
         } = this.ctx;
+        const layoutScrollerTrackSize = getLayoutScrollerTrackSize(this.ctx.config);
 
         if (scrollX > 0 && fixedLeftWidth !== 0 && !this.ctx.isEmpty) {
             this.ctx.paint.drawShadow(this.x, this.y, fixedLeftWidth, this.height, {
@@ -525,7 +527,7 @@ export default class Body {
         // 右边阴影
         if (
             scrollX < Math.floor(header.width - stageWidth - 1) &&
-            fixedRightWidth !== SCROLLER_TRACK_SIZE &&
+            fixedRightWidth !== layoutScrollerTrackSize &&
             !this.ctx.isEmpty
         ) {
             const x = header.width - (this.x + this.width) + stageWidth - fixedRightWidth;

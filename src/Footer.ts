@@ -1,5 +1,6 @@
 import Context from './Context';
 import Row from './Row';
+import { getLayoutScrollerTrackSize } from './ScrollbarMode';
 
 export default class Footer {
     private ctx: Context;
@@ -20,8 +21,9 @@ export default class Footer {
         const {
             header,
             body,
-            config: { CELL_FOOTER_HEIGHT, FOOTER_FIXED, SCROLLER_TRACK_SIZE, FOOTER_POSITION },
+            config: { CELL_FOOTER_HEIGHT, FOOTER_FIXED, FOOTER_POSITION },
         } = this.ctx;
+        const layoutScrollerTrackSize = getLayoutScrollerTrackSize(this.ctx.config);
         // 更新宽度
         this.width = header.width;
         this.visibleWidth = header.visibleWidth;
@@ -35,7 +37,7 @@ export default class Footer {
             if (FOOTER_POSITION === 'top') {
                 this.y = this.ctx.header.height;
             } else {
-                this.y = this.ctx.stageHeight - this.height - SCROLLER_TRACK_SIZE;
+                this.y = this.ctx.stageHeight - this.height - layoutScrollerTrackSize;
             }
         } else {
             this.y = body.y + body.height;
@@ -54,8 +56,9 @@ export default class Footer {
             scrollX,
             header,
             stageWidth,
-            config: { HEADER_BG_COLOR, SCROLLER_TRACK_SIZE },
+            config: { HEADER_BG_COLOR },
         } = this.ctx;
+        const layoutScrollerTrackSize = getLayoutScrollerTrackSize(this.ctx.config);
         let y = this.y;
         // 不是footer固定时
         if (!this.ctx.config.FOOTER_FIXED) {
@@ -71,7 +74,7 @@ export default class Footer {
             });
         }
         // 右边阴影
-        if (scrollX < Math.floor(header.width - stageWidth - 1) && fixedRightWidth !== SCROLLER_TRACK_SIZE) {
+        if (scrollX < Math.floor(header.width - stageWidth - 1) && fixedRightWidth !== layoutScrollerTrackSize) {
             const x = header.width - (this.x + this.width) + stageWidth - fixedRightWidth;
             this.ctx.paint.drawShadow(x, y, fixedRightWidth, this.height, {
                 fillColor: HEADER_BG_COLOR,

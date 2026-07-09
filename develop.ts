@@ -568,6 +568,8 @@ const eVirtTable = new EVirtTable(canvas, {
         AUTO_ROW_HEIGHT: false,
         ROW_KEY: 'id',
         CELL_HEIGHT: 36,
+        scrollbarMode: 'inner',
+        SCROLLBAR_SHOW_DELAY: 200,
         // SELECTOR_AREA_MIN_X: 1,
         DEFAULT_EXPAND_ALL: false,
         ENABLE_AUTOFILL: true,

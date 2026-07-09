@@ -3,6 +3,7 @@ import { getMaxRow, calCrossSpan, toLeaf, sortFixed, throttle, filterHiddenColum
 import CellHeader from './CellHeader';
 import type { Column, ColumnDragChangeEvent } from './types';
 import { TreeUtil } from './TreeUtil';
+import { getLayoutScrollerTrackSize } from './ScrollbarMode';
 export default class Header {
     private ctx: Context; // 上下文
     private x = 0; // x坐标
@@ -52,8 +53,9 @@ export default class Header {
     }
     init(isBuffer = false) {
         const {
-            config: { HEADER_HEIGHT, SCROLLER_TRACK_SIZE },
+            config: { HEADER_HEIGHT },
         } = this.ctx;
+        const layoutScrollerTrackSize = getLayoutScrollerTrackSize(this.ctx.config);
         // 防止resizeAllColumn递归
         if (!isBuffer) {
             const columns = this.ctx.database.getColumns();
@@ -89,13 +91,13 @@ export default class Header {
         const { stageWidth, stagePhysicalWidth } = this.ctx.zoomScale.resolveStageWidth({
             containerPhysicalWidth: containerElement.width,
             contentWidth: this.width,
-            scrollerTrackSize: SCROLLER_TRACK_SIZE,
+            scrollerTrackSize: layoutScrollerTrackSize,
             fillContainer: this.resizeNum > 0,
         });
         this.ctx.stageWidth = stageWidth;
         this.ctx.stagePhysicalWidth = stagePhysicalWidth;
         this.ctx.stageElement.style.width = `${stagePhysicalWidth}px`;
-        this.visibleWidth = this.ctx.stageWidth - SCROLLER_TRACK_SIZE;
+        this.visibleWidth = this.ctx.stageWidth - layoutScrollerTrackSize;
 
         // 如果表头宽度小于可视宽度，平均分配
         const overWidth = this.visibleWidth - this.width;
@@ -106,7 +108,7 @@ export default class Header {
         const leafLeftCellHeaders = this.fixedLeftCellHeaders.filter((item) => !item.hasChildren);
         this.ctx.fixedLeftWidth = leafLeftCellHeaders.reduce((sum, _item) => sum + _item.width, 0);
         const leafRightCellHeaders = this.fixedRightCellHeaders.filter((item) => !item.hasChildren);
-        this.ctx.fixedRightWidth = leafRightCellHeaders.reduce((sum, _item) => sum + _item.width, SCROLLER_TRACK_SIZE);
+        this.ctx.fixedRightWidth = leafRightCellHeaders.reduce((sum, _item) => sum + _item.width, layoutScrollerTrackSize);
         // 更新最大列索引
         this.ctx.maxColIndex = this.leafCellHeaders.length - 1;
         this.ctx.header.x = this.x;
@@ -619,8 +621,9 @@ export default class Header {
             scrollX,
             header,
             stageWidth,
-            config: { HEADER_BG_COLOR, SCROLLER_TRACK_SIZE },
+            config: { HEADER_BG_COLOR },
         } = this.ctx;
+        const layoutScrollerTrackSize = getLayoutScrollerTrackSize(this.ctx.config);
 
         if (scrollX > 0 && fixedLeftWidth !== 0) {
             this.ctx.paint.drawShadow(this.x, this.y, fixedLeftWidth, this.height, {
@@ -632,7 +635,7 @@ export default class Header {
             });
         }
         // 右边阴影
-        if (scrollX < Math.floor(header.width - stageWidth - 1) && fixedRightWidth !== SCROLLER_TRACK_SIZE) {
+        if (scrollX < Math.floor(header.width - stageWidth - 1) && fixedRightWidth !== layoutScrollerTrackSize) {
             const x = header.width - (this.x + this.width) + stageWidth - fixedRightWidth;
             this.ctx.paint.drawShadow(x, this.y, fixedRightWidth, this.height, {
                 fillColor: HEADER_BG_COLOR,

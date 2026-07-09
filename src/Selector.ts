@@ -3,6 +3,7 @@ import type Cell from './Cell';
 import type CellHeader from './CellHeader';
 import { BeforePasteDataMethod, BeforeSetSelectorMethod, ChangeItem, ErrorResult, BeforeCopyMethod } from './types';
 import { throttle, decodeSpreadsheetStr, encodeToSpreadsheetStr } from './util';
+import { getLayoutScrollerTrackSize } from './ScrollbarMode';
 export default class Selector {
     private isCut = false;
     private isMultipleRow = false;
@@ -884,8 +885,9 @@ export default class Selector {
             body,
             scrollX,
             scrollY,
-            config: { SCROLLER_TRACK_SIZE, FOOTER_FIXED, FOOTER_POSITION, ENABLE_MERGE_CELL_LINK },
+            config: { FOOTER_FIXED, FOOTER_POSITION, ENABLE_MERGE_CELL_LINK },
         } = this.ctx;
+        const layoutScrollerTrackSize = getLayoutScrollerTrackSize(this.ctx.config);
         if (!focusCell) {
             return;
         }
@@ -911,7 +913,7 @@ export default class Selector {
                 footerHeight = footer.visibleHeight;
             }
         }
-        const diffBottom = drawY + cellheight - (stageHeight - footerHeight - SCROLLER_TRACK_SIZE);
+        const diffBottom = drawY + cellheight - (stageHeight - footerHeight - layoutScrollerTrackSize);
         let _scrollX = scrollX;
         let _scrollY = scrollY;
         // fixed禁用左右横向移动
