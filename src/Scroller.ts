@@ -1,5 +1,5 @@
 import Context from './Context';
-import { shouldDrawScrollerBorder } from './BorderStyle';
+import { shouldDrawRightBoundaryBorder, shouldDrawScrollerBorder } from './BorderStyle';
 export type ScrollbarType = 'horizontal' | 'vertical';
 
 class Scrollbar {
@@ -281,6 +281,7 @@ class Scrollbar {
             borderColor,
             fillColor: SCROLLER_TRACK_COLOR,
         });
+        this.drawRightBoundaryBorder();
         // 滚动条
         this.ctx.paint.drawRect(this.barX, this.barY, this.barWidth, this.barHeight, {
             fillColor: this.isFocus || this.isDragging ? SCROLLER_FOCUS_COLOR : SCROLLER_COLOR,
@@ -295,6 +296,24 @@ class Scrollbar {
         }
         // 悬浮状态
         this.ctx.scrollerFocus = this.isFocus;
+    }
+
+    private drawRightBoundaryBorder() {
+        const {
+            stageHeight,
+            config: { BORDER, BORDER_COLOR, SCROLLER_TRACK_SIZE = 0 },
+        } = this.ctx;
+        if (this.type !== 'vertical' || !shouldDrawRightBoundaryBorder(BORDER) || SCROLLER_TRACK_SIZE <= 0) {
+            return;
+        }
+        const bottom = stageHeight - SCROLLER_TRACK_SIZE;
+        if (bottom <= 0) {
+            return;
+        }
+        this.ctx.paint.drawLine([this.trackX, 0, this.trackX, bottom], {
+            borderColor: BORDER_COLOR,
+            borderWidth: 1,
+        });
     }
 }
 
