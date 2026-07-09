@@ -30,6 +30,6 @@ test('maps border modes to draw decisions', () => {
 
     assert.equal(mod.shouldDrawScrollerBorder('default'), true);
     assert.equal(mod.shouldDrawScrollerBorder('outer'), false);
-    assert.equal(mod.shouldDrawScrollerBorder('inner'), true);
+    assert.equal(mod.shouldDrawScrollerBorder('inner'), false);
     assert.equal(mod.shouldDrawScrollerBorder('none'), false);
 });

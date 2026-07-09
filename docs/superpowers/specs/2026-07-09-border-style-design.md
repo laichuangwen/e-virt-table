@@ -56,7 +56,7 @@ Canvas drawing stays in existing render classes. `Cell`, `CellHeader`, `Header`,
 - Body/footer cells draw their bottom horizontal separator.
 - Header bottom line and footer top line draw as internal separators.
 - Stage DOM border is hidden.
-- Scroller track borders and split lines draw only where they act as internal separators.
+- Scroller track borders and split lines do not draw.
 
 `none`:
 

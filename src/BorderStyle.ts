@@ -22,6 +22,5 @@ export function shouldDrawOuterBorder(value: BorderConfigValue): boolean {
 }
 
 export function shouldDrawScrollerBorder(value: BorderConfigValue): boolean {
-    const style = normalizeBorderStyle(value);
-    return style === 'default' || style === 'inner';
+    return normalizeBorderStyle(value) === 'default';
 }
