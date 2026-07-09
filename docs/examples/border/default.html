@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table - Border Default</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        const data = [
+            { id: 1, name: 'Test1', sex: 'Man', age: 28, address: 'test abc' },
+            { id: 2, name: 'Test2', sex: 'Women', age: 22, address: 'Guangzhou' },
+            { id: 3, name: 'Test3', sex: 'Man', age: 32, address: 'Shanghai' },
+            { id: 4, name: 'Test4', sex: 'Women', age: 24, address: 'Shanghai' },
+        ];
+
+        const columns = [
+            { title: 'No.', key: 'id', width: 70, readonly: true },
+            { title: 'Name', key: 'name', width: 240, readonly: true },
+            { title: 'Sex', key: 'sex', width: 240, readonly: true },
+            { title: 'Age', key: 'age', width: 240, readonly: true },
+            { title: 'Address', key: 'address', width: 260, readonly: true },
+        ];
+
+        new EVirtTable(document.getElementById('e-virt-table'), {
+            columns,
+            data,
+            footerData: [{ id: 'Total', name: '777', sex: '333', age: '111', address: '' }],
+            config: {
+                BORDER: 'default',
+                ROW_KEY: 'id',
+            },
+        });
+    </script>
+</html>

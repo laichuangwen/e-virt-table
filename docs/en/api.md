@@ -27,6 +27,7 @@ type EVirtTableOptions = {
 | DISABLED | Disable editing | boolean | — | false |
 | HEADER_FONT | Header font | string | — | 12px normal Arial |
 | BODY_FONT | Cell font | string | — | 12px normal Arial |
+| BORDER | Table border style. `true` equals `default`; `false` equals `inner`. | `boolean \| "default" \| "outer" \| "inner" \| "none"` | `true`, `false`, `default`, `outer`, `inner`, `none` | true |
 | BORDER_COLOR | Border color | string | — | #e1e6eb |
 | RESIZE_MIN_WIDTH | Minimum resizable width | number | — | 40 |
 | HEIGHT | Height (0 means auto fit) | number | — | 0 |

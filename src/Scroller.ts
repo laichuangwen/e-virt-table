@@ -1,4 +1,5 @@
 import Context from './Context';
+import { shouldDrawScrollerBorder } from './BorderStyle';
 export type ScrollbarType = 'horizontal' | 'vertical';
 
 class Scrollbar {
@@ -246,7 +247,7 @@ class Scrollbar {
                 visibleWidth - SCROLLER_TRACK_SIZE,
                 visibleHeight,
             ];
-            const offset = BORDER ? 0 : 0.5; // 解决边框问题，补偿0.5px
+            const offset = shouldDrawScrollerBorder(BORDER) ? 0 : 0.5; // 解决边框问题，补偿0.5px
             this.trackX = 0;
             this.trackY = visibleHeight - SCROLLER_TRACK_SIZE + offset;
             this.trackWidth = visibleWidth;
@@ -274,10 +275,7 @@ class Scrollbar {
             config: { SCROLLER_FOCUS_COLOR, SCROLLER_COLOR, BORDER_COLOR, BORDER, SCROLLER_TRACK_COLOR },
         } = this.ctx;
         this.updatedSize();
-        let borderColor = BORDER_COLOR;
-        if (!BORDER) {
-            borderColor = 'transparent';
-        }
+        const borderColor = shouldDrawScrollerBorder(BORDER) ? BORDER_COLOR : 'transparent';
         // 轨道
         this.ctx.paint.drawRect(this.trackX, this.trackY, this.trackWidth, this.trackHeight, {
             borderColor,

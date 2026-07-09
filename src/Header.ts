@@ -3,6 +3,7 @@ import { getMaxRow, calCrossSpan, toLeaf, sortFixed, throttle, filterHiddenColum
 import CellHeader from './CellHeader';
 import type { Column, ColumnDragChangeEvent } from './types';
 import { TreeUtil } from './TreeUtil';
+import { shouldDrawInternalHorizontalBorder } from './BorderStyle';
 export default class Header {
     private ctx: Context; // 上下文
     private x = 0; // x坐标
@@ -685,8 +686,11 @@ export default class Header {
     drawBottomLine() {
         const {
             stageWidth,
-            config: { BORDER_COLOR },
+            config: { BORDER_COLOR, BORDER },
         } = this.ctx;
+        if (!shouldDrawInternalHorizontalBorder(BORDER)) {
+            return;
+        }
         const poins = [0, this.height, stageWidth, this.height];
         this.ctx.paint.drawLine(poins, {
             borderColor: BORDER_COLOR,
