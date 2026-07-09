@@ -228,7 +228,7 @@ export default class EventTable {
      * @param e
      */
     private imageEnterAndLeave(cell: Cell | CellHeader, e: MouseEvent) {
-        if (this.ctx.dragRowIng || this.ctx.dragHeaderIng || this.ctx.selectColsIng || this.ctx.selectRowsIng || this.ctx.selectorMove || this.ctx.autofillMove) {
+        if (this.ctx.dragRowIng || this.ctx.dragHeaderIng || this.ctx.selectorMove || this.ctx.autofillMove) {
             return;
         }
         const { offsetY, offsetX } = this.ctx.getOffset(e);
