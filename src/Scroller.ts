@@ -3,6 +3,7 @@ import { shouldDrawRightBoundaryBorder, shouldDrawScrollerBorder, shouldDrawScro
 import {
     getLayoutScrollerTrackSize,
     getOverlayScrollerTrackSize,
+    getScrollbarCornerOffset,
     isInnerScrollbarMode,
     shouldDrawScrollbar,
     shouldDrawScrollbarTrackBackground,
@@ -13,16 +14,17 @@ function getScrollbarThumbSize(
     distance: number,
     visibleDistance: number,
     contentDistance: number,
+    trackDistance = visibleDistance,
     minSize = 30,
 ): number {
-    if (distance <= 0 || visibleDistance <= 0 || contentDistance <= 0) {
+    if (distance <= 0 || visibleDistance <= 0 || contentDistance <= 0 || trackDistance <= 0) {
         return 0;
     }
-    const size = Math.floor((visibleDistance / contentDistance) * visibleDistance);
+    const size = Math.floor((visibleDistance / contentDistance) * trackDistance);
     if (size < minSize) {
-        return minSize;
+        return Math.min(minSize, trackDistance);
     }
-    if (size > visibleDistance) {
+    if (size > trackDistance) {
         return 0;
     }
     return size;
@@ -45,6 +47,7 @@ class Scrollbar {
     private barHeight = 0;
     private distance = 0; // 滚动条的长度
     private visibleDistance = 0; //可见区域的长度
+    private thumbTrackDistance = 0;
     private clientX = 0;
     private clientY = 0;
     private dragStart = 0; // 拖拽开始的位置
@@ -132,10 +135,10 @@ class Scrollbar {
                 // 滚动条位置=（鼠标位置-滚动条的高度/2-头部的高度）/（可见区域的长度-滚动条的高度）*滚动条的长度
                 // 滚动到中间所以减去滚动条的高度/2
                 const offset = offsetY - this.ctx.header.height - this.barHeight / 2;
-                scroll = (offset / (this.visibleDistance - this.barHeight)) * this.distance;
+                scroll = (offset / (this.thumbTrackDistance - this.barHeight)) * this.distance;
             } else {
                 const offset = offsetX - this.barWidth / 2;
-                scroll = (offset / (this.visibleDistance - this.barWidth)) * this.distance;
+                scroll = (offset / (this.thumbTrackDistance - this.barWidth)) * this.distance;
             }
             this.scroll = Math.max(0, Math.min(scroll, this.distance));
         }
@@ -182,9 +185,9 @@ class Scrollbar {
             // scroll= 开始滚动条位置+（鼠标移动的距离/可见区域的长度）*滚动条的长度
             let scroll = 0;
             if (this.type === 'vertical') {
-                scroll = this.dragStart + (offset / (this.visibleDistance - this.barHeight)) * this.distance;
+                scroll = this.dragStart + (offset / (this.thumbTrackDistance - this.barHeight)) * this.distance;
             } else {
-                scroll = this.dragStart + (offset / (this.visibleDistance - this.barWidth)) * this.distance;
+                scroll = this.dragStart + (offset / (this.thumbTrackDistance - this.barWidth)) * this.distance;
             }
             this.scroll = Math.max(0, Math.min(scroll, this.distance));
         }
@@ -290,27 +293,40 @@ class Scrollbar {
         const headerWidth = header.width;
         const bodyHeight = body.height;
         const footerHeight = this.ctx.footer.height;
+        const verticalVisibleDistance = visibleHeight - layoutScrollerTrackSize - headerHeight;
+        const horizontalVisibleDistance = visibleWidth - layoutScrollerTrackSize;
+        const verticalDistance = Math.max(0, bodyHeight - verticalVisibleDistance + footerHeight);
+        const horizontalDistance = Math.max(0, headerWidth - horizontalVisibleDistance);
         if (this.type === 'vertical') {
-            this.visibleDistance = visibleHeight - layoutScrollerTrackSize - headerHeight;
-            this.distance = Math.max(0, bodyHeight - this.visibleDistance + footerHeight);
+            this.visibleDistance = verticalVisibleDistance;
+            this.distance = verticalDistance;
+            const cornerOffset = getScrollbarCornerOffset(this.ctx.config, horizontalDistance > 0);
+            this.thumbTrackDistance = Math.max(0, this.visibleDistance - cornerOffset);
             this.trackX = visibleWidth - overlayScrollerTrackSize;
             this.trackY = 0;
             // 分割线
             this.splitPoints = [this.trackX, headerHeight, this.trackX + overlayScrollerTrackSize, headerHeight];
             this.trackWidth = overlayScrollerTrackSize;
-            this.trackHeight = visibleHeight;
+            this.trackHeight = Math.max(0, visibleHeight - cornerOffset);
             // 滚动条的X位置=轨道的X位置+（轨道的宽度-滚动条的宽度）/2
             this.barX = this.trackX - 1 + (overlayScrollerTrackSize - SCROLLER_SIZE) / 2;
             this.barWidth = SCROLLER_SIZE;
-            this.barHeight = getScrollbarThumbSize(this.distance, this.visibleDistance, bodyHeight + footerHeight);
+            this.barHeight = getScrollbarThumbSize(
+                this.distance,
+                this.visibleDistance,
+                bodyHeight + footerHeight,
+                this.thumbTrackDistance,
+            );
             // 最小30,超出可见区域则隐藏
             const progress = this.distance ? this.scroll / this.distance : 0;
-            this.barY = headerHeight + progress * (this.visibleDistance - this.barHeight);
+            this.barY = headerHeight + progress * Math.max(0, this.thumbTrackDistance - this.barHeight);
             // 范围限制
             this.scroll = Math.max(0, Math.min(this.scroll, this.distance));
         } else {
-            this.visibleDistance = visibleWidth - layoutScrollerTrackSize;
-            this.distance = Math.max(0, headerWidth - this.visibleDistance);
+            this.visibleDistance = horizontalVisibleDistance;
+            this.distance = horizontalDistance;
+            const cornerOffset = getScrollbarCornerOffset(this.ctx.config, verticalDistance > 0);
+            this.thumbTrackDistance = Math.max(0, this.visibleDistance - cornerOffset);
             // 分割线
             this.splitPoints = [
                 visibleWidth - overlayScrollerTrackSize,
@@ -321,15 +337,20 @@ class Scrollbar {
             const offset = shouldDrawScrollerBorder(BORDER) ? 0 : 0.5; // 解决边框问题，补偿0.5px
             this.trackX = 0;
             this.trackY = visibleHeight - overlayScrollerTrackSize + offset;
-            this.trackWidth = visibleWidth;
+            this.trackWidth = Math.max(0, visibleWidth - cornerOffset);
             this.trackHeight = overlayScrollerTrackSize;
 
-            this.barWidth = getScrollbarThumbSize(this.distance, this.visibleDistance, headerWidth);
+            this.barWidth = getScrollbarThumbSize(
+                this.distance,
+                this.visibleDistance,
+                headerWidth,
+                this.thumbTrackDistance,
+            );
             this.barY = this.trackY - 1 + (overlayScrollerTrackSize - SCROLLER_SIZE) / 2;
             // 最小30,超出可见区域则隐藏
             this.barHeight = SCROLLER_SIZE;
             const progress = this.distance ? this.scroll / this.distance : 0;
-            this.barX = progress * (this.visibleDistance - this.barWidth);
+            this.barX = progress * Math.max(0, this.thumbTrackDistance - this.barWidth);
             // 范围限制
             this.scroll = Math.max(0, Math.min(this.scroll, this.distance));
         }

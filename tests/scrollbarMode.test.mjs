@@ -23,6 +23,13 @@ test('keeps overlay scrollbar size independent from layout reservation', () => {
     assert.equal(mod.getOverlayScrollerTrackSize({ scrollbarMode: 'outer', SCROLLER_TRACK_SIZE: 14 }), 14);
 });
 
+test('reserves a corner only when inner scrollbars intersect', () => {
+    assert.equal(mod.getScrollbarCornerOffset({ scrollbarMode: 'outer', SCROLLER_TRACK_SIZE: 14 }, true), 0);
+    assert.equal(mod.getScrollbarCornerOffset({ scrollbarMode: 'inner', SCROLLER_TRACK_SIZE: 14 }, false), 0);
+    assert.equal(mod.getScrollbarCornerOffset({ scrollbarMode: 'inner', SCROLLER_TRACK_SIZE: 14 }, true), 14);
+    assert.equal(mod.getScrollbarCornerOffset({ SCROLLBAR_MODE: 'inner', SCROLLER_TRACK_SIZE: 14 }, true), 14);
+});
+
 test('draws scrollbar track borders only in outer mode', () => {
     assert.equal(mod.shouldDrawScrollbarTrackBorder({}), true);
     assert.equal(mod.shouldDrawScrollbarTrackBorder({ scrollbarMode: 'outer' }), true);

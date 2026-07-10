@@ -23,6 +23,13 @@ export function getOverlayScrollerTrackSize(config: ScrollbarModeConfig): number
     return config.SCROLLER_TRACK_SIZE || 0;
 }
 
+export function getScrollbarCornerOffset(config: ScrollbarModeConfig, hasOppositeScrollbar: boolean): number {
+    if (!isInnerScrollbarMode(config) || !hasOppositeScrollbar) {
+        return 0;
+    }
+    return getOverlayScrollerTrackSize(config);
+}
+
 export function shouldDrawScrollbarTrackBorder(config: ScrollbarModeConfig): boolean {
     return !isInnerScrollbarMode(config);
 }
