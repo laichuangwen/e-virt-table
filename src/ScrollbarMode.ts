@@ -44,6 +44,13 @@ export type ScrollbarVisibilityState = {
     isDragging: boolean;
 };
 
+export function shouldStartInnerScrollbarShowTimer(
+    config: ScrollbarModeConfig,
+    isPointerInsideTable: boolean,
+): boolean {
+    return isInnerScrollbarMode(config) && isPointerInsideTable;
+}
+
 export function shouldDrawScrollbar(config: ScrollbarModeConfig, state: ScrollbarVisibilityState): boolean {
     if (!isInnerScrollbarMode(config)) {
         return true;

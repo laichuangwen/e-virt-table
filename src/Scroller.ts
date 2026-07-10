@@ -8,6 +8,7 @@ import {
     shouldDrawScrollbar,
     shouldDrawScrollbarTrackBackground,
     shouldDrawScrollbarTrackBorder,
+    shouldStartInnerScrollbarShowTimer,
 } from './ScrollbarMode';
 
 function getScrollbarThumbSize(
@@ -151,12 +152,15 @@ class Scrollbar {
         this.clientY = 0;
     }
 
-    onMouseMove(e: MouseEvent) {
+    onMouseMove(e: MouseEvent, isPointerInsideTable: boolean): boolean {
         const { clientX, clientY, buttons } = e;
         const offsetX = this.ctx.zoomScale.toLogical(e.offsetX);
         const offsetY = this.ctx.zoomScale.toLogical(e.offsetY);
-        if (this.isInnerMode()) {
+        let needsFullRedraw = false;
+        if (shouldStartInnerScrollbarShowTimer(this.ctx.config, isPointerInsideTable)) {
             this.startInnerShowTimer();
+        } else {
+            needsFullRedraw = this.hideInnerScrollbar();
         }
         // 没有鼠标按下时不处理，要重置抬起事件
         // 悬浮提示
@@ -169,10 +173,10 @@ class Scrollbar {
             this.isFocus = false;
         }
         if (buttons === 0) {
-            return;
+            return needsFullRedraw;
         }
         // 拖拽移动滚动条
-        if (clientX == this.clientX && clientY == this.clientY) return;
+        if (clientX == this.clientX && clientY == this.clientY) return needsFullRedraw;
         let offset = 0;
         if (this.type === 'horizontal') {
             offset = clientX - this.clientX;
@@ -191,6 +195,7 @@ class Scrollbar {
             }
             this.scroll = Math.max(0, Math.min(scroll, this.distance));
         }
+        return needsFullRedraw;
     }
 
     private isPointInElement(
@@ -247,16 +252,22 @@ class Scrollbar {
             this.ctx.emit('draw');
         }, delay);
     }
-    hideInnerScrollbar() {
-        if (!this.isInnerMode() || this.isDragging) {
+    private cancelInnerShowTimer() {
+        if (!this.innerShowTimer) {
             return;
         }
-        if (this.innerShowTimer) {
-            clearTimeout(this.innerShowTimer);
-            this.innerShowTimer = 0;
+        clearTimeout(this.innerShowTimer);
+        this.innerShowTimer = 0;
+    }
+    hideInnerScrollbar(): boolean {
+        if (!this.isInnerMode() || this.isDragging) {
+            return false;
         }
+        const needsFullRedraw = this.innerVisible || this.isFocus;
+        this.cancelInnerShowTimer();
         this.innerVisible = false;
         this.isFocus = false;
+        return needsFullRedraw;
     }
 
     private updateScroll(e: WheelEvent) {
@@ -551,9 +562,16 @@ export default class Scroller {
     }
 
     onMouseMove(e: MouseEvent) {
-        this.verticalScrollbar.onMouseMove(e);
-        this.horizontalScrollbar.onMouseMove(e);
-        this.draw();
+        const rect = this.ctx.containerElement.getBoundingClientRect();
+        const isPointerInsideTable =
+            e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+        const verticalNeedsFullRedraw = this.verticalScrollbar.onMouseMove(e, isPointerInsideTable);
+        const horizontalNeedsFullRedraw = this.horizontalScrollbar.onMouseMove(e, isPointerInsideTable);
+        if (verticalNeedsFullRedraw || horizontalNeedsFullRedraw) {
+            this.ctx.emit('draw');
+        } else {
+            this.draw();
+        }
     }
 
     onMouseUp() {

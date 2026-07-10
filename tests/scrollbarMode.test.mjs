@@ -68,3 +68,9 @@ test('draws inner scrollbars only while visible, focused, or dragging', () => {
         true,
     );
 });
+
+test('starts the inner scrollbar timer only while the pointer is inside the table', () => {
+    assert.equal(mod.shouldStartInnerScrollbarShowTimer({ scrollbarMode: 'inner' }, true), true);
+    assert.equal(mod.shouldStartInnerScrollbarShowTimer({ scrollbarMode: 'inner' }, false), false);
+    assert.equal(mod.shouldStartInnerScrollbarShowTimer({ scrollbarMode: 'outer' }, true), false);
+});
