@@ -60,7 +60,9 @@ type EVirtTableOptions = {
 | CELL_WIDTH | 表格 body 部分的宽度 | number | 100 |
 | CELL_HEIGHT | 表格 body 部分的行高 | number | 36 |
 | CELL_PADDING | 表格 body 部分的 padding | number | 8 |
+| scrollbarMode | 滚动条模式，`outer` 会预留外部滚动条区域，`inner` 会让滚动条覆盖在内容上 | `outer` \| `inner` | `outer` |
 | SCROLLER_TRACK_SIZE | 滚动条轨道尺寸 | number | 14 |
+| SCROLLBAR_SHOW_DELAY | 内部滚动条悬停后显示延迟，单位毫秒 | number | 300 |
 | SCROLLER_SIZE | 滚动条滑块尺寸 | number | 8 |
 | SCROLLER_COLOR | 滚动条滑块颜色 | string | #dee0e3 |
 | SCROLLER_FOCUS_COLOR | 滚动条滑块聚焦时的颜色 | string | #bbbec4 |

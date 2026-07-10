@@ -1,6 +1,7 @@
 import CellImage from './CellImage';
 import Context from './Context';
 import { CellType, Fixed } from './types';
+import { getLayoutScrollerTrackSize } from './ScrollbarMode';
 
 export default class BaseCell {
     ctx: Context;
@@ -45,11 +46,8 @@ export default class BaseCell {
         }
         if (this.fixed === 'right') {
             // 可见区域宽度 -到右边界的距离即(表头宽度 - x坐标)
-            const {
-                stageWidth,
-                config: { SCROLLER_TRACK_SIZE },
-            } = this.ctx;
-            const x = stageWidth - (this.ctx.header.width - this.x) - SCROLLER_TRACK_SIZE;
+            const { stageWidth } = this.ctx;
+            const x = stageWidth - (this.ctx.header.width - this.x) - getLayoutScrollerTrackSize(this.ctx.config);
             return x;
         }
         return this.x - this.ctx.scrollX;

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table - Inner Scrollbar</title>
+        <style>
+            body {
+                margin: 8px 32px 8px 8px;
+            }
+        </style>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        const columns = [
+            { title: 'No.', key: 'id', width: 80, fixed: 'left' },
+            { title: 'Name', key: 'name', width: 180 },
+            { title: 'State', key: 'state', width: 180 },
+            { title: 'City', key: 'city', width: 180 },
+            { title: 'Address', key: 'address', width: 320 },
+            { title: 'Email', key: 'email', width: 240 },
+            { title: 'Status', key: 'status', width: 160, fixed: 'right' },
+        ];
+        const data = Array.from({ length: 80 }, (_, index) => ({
+            id: `${index + 1}`,
+            name: `User ${index + 1}`,
+            state: 'California',
+            city: 'Los Angeles',
+            address: 'No. 189, Grove St, Los Angeles',
+            email: `user${index + 1}@example.com`,
+            status: index % 2 ? 'Done' : 'Pending',
+        }));
+
+        new EVirtTable(document.getElementById('e-virt-table'), {
+            columns,
+            data,
+            footerData: [{ id: 'Total', name: '80', state: '', city: '', address: '', email: '', status: '2 states' }],
+            config: {
+                HEIGHT: 340,
+                ROW_KEY: 'id',
+                ENABLE_AUTOFILL: true,
+                ENABLE_SELECTOR: true,
+                scrollbarMode: 'inner',
+                SCROLLBAR_SHOW_DELAY: 300,
+            },
+        });
+    </script>
+</html>

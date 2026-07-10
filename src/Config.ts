@@ -31,6 +31,7 @@ import {
     VerticalAlign,
 } from './types';
 import { getCssVar } from './util';
+import type { ScrollbarMode } from './ScrollbarMode';
 
 export default class Config {
     private _config: ConfigType = {};
@@ -134,6 +135,10 @@ export default class Config {
     ENABLE_ZOOM_WHEEL = true;
     /** 滚动条轨道尺寸 */
     SCROLLER_TRACK_SIZE = 14;
+    /** 滚动条模式，outer 为外部预留区域，inner 为覆盖在内容上 */
+    scrollbarMode: ScrollbarMode = 'outer';
+    /** 内部滚动条悬停后显示延迟 */
+    SCROLLBAR_SHOW_DELAY = 300;
     /** 滚动条滑块尺寸 */
     SCROLLER_SIZE = 8;
     /** 滚动条滑块颜色 */

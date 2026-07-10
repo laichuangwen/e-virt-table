@@ -1,5 +1,6 @@
 import type Cell from './Cell';
 import type Context from './Context';
+import { getLayoutScrollerTrackSize } from './ScrollbarMode';
 export default class Editor {
     private editorEl!: HTMLDivElement;
     private inputEl!: HTMLTextAreaElement;
@@ -258,9 +259,8 @@ export default class Editor {
             stageHeight,
             footer,
             header,
-            config: { SCROLLER_TRACK_SIZE },
         } = this.ctx;
-        const bottomY = stageHeight - footer.height - SCROLLER_TRACK_SIZE;
+        const bottomY = stageHeight - footer.height - getLayoutScrollerTrackSize(this.ctx.config);
         this.editorEl.style.bottom = `auto`;
         if (this.drawY < header.height) {
             this.editorEl.style.top = this.ctx.toVisualPx(header.height - 1);

@@ -19,3 +19,13 @@
 scroller/base
 h:420px
 :::
+
+## 内部滚动条
+
+设置 `config.scrollbarMode` 为 `inner` 后，表头、单元格和表尾会使用完整可视区域。滚动条在悬停延迟后覆盖在右侧和底部，鼠标移出表格后隐藏。
+
+::: demo
+
+scroller/inner
+h:380px
+:::

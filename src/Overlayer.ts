@@ -3,6 +3,7 @@ import type CellHeader from './CellHeader';
 import type Context from './Context';
 import type { OverlayerContainer, OverlayerView, OverlayerWrapper } from './types';
 import { throttle } from './util';
+import { getLayoutScrollerTrackSize } from './ScrollbarMode';
 export default class Overlayer {
     ctx: Context;
     observer?: MutationObserver;
@@ -120,8 +121,9 @@ export default class Overlayer {
         const {
             fixedLeftWidth,
             fixedRightWidth: _fixedRightWidth,
-            config: { SCROLLER_TRACK_SIZE, CSS_PREFIX },
+            config: { CSS_PREFIX },
         } = this.ctx;
+        const layoutScrollerTrackSize = getLayoutScrollerTrackSize(this.ctx.config);
         const { visibleWidth, visibleHeight, renderCellHeaders } = this.ctx.header;
         let centerCells: CellHeader[] = [];
         let leftCells: CellHeader[] = [];
@@ -138,7 +140,7 @@ export default class Overlayer {
             }
         });
         // 减去滚动条的宽度
-        const fixedRightWidth = _fixedRightWidth - SCROLLER_TRACK_SIZE;
+        const fixedRightWidth = _fixedRightWidth - layoutScrollerTrackSize;
         const left: OverlayerView = {
             key: 'left',
             style: {
@@ -216,11 +218,12 @@ export default class Overlayer {
         const {
             fixedLeftWidth,
             fixedRightWidth: _fixedRightWidth,
-            config: { SCROLLER_TRACK_SIZE, CSS_PREFIX },
+            config: { CSS_PREFIX },
         } = this.ctx;
+        const layoutScrollerTrackSize = getLayoutScrollerTrackSize(this.ctx.config);
         const { visibleWidth, visibleHeight } = this.ctx.body;
         // 减去滚动条的宽度
-        const fixedRightWidth = _fixedRightWidth - SCROLLER_TRACK_SIZE;
+        const fixedRightWidth = _fixedRightWidth - layoutScrollerTrackSize;
         const left: OverlayerView = {
             key: 'left',
             style: {
@@ -292,11 +295,12 @@ export default class Overlayer {
         const {
             fixedLeftWidth,
             fixedRightWidth: _fixedRightWidth,
-            config: { SCROLLER_TRACK_SIZE, CSS_PREFIX },
+            config: { CSS_PREFIX },
         } = this.ctx;
+        const layoutScrollerTrackSize = getLayoutScrollerTrackSize(this.ctx.config);
         const { visibleWidth, visibleHeight } = this.ctx.footer;
         // 减去滚动条的宽度
-        const fixedRightWidth = _fixedRightWidth - SCROLLER_TRACK_SIZE;
+        const fixedRightWidth = _fixedRightWidth - layoutScrollerTrackSize;
         const left: OverlayerView = {
             key: 'left',
             style: {
