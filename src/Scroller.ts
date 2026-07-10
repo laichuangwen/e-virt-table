@@ -5,6 +5,7 @@ import {
     getOverlayScrollerTrackSize,
     isInnerScrollbarMode,
     shouldDrawScrollbar,
+    shouldDrawScrollbarTrackBackground,
     shouldDrawScrollbarTrackBorder,
 } from './ScrollbarMode';
 
@@ -342,19 +343,23 @@ class Scrollbar {
             return this.isFocus || this.isDragging;
         }
         const drawTrackBorder = shouldDrawScrollbarTrackBorder(this.ctx.config);
+        const drawTrackBackground = shouldDrawScrollbarTrackBackground(this.ctx.config);
         const borderColor = drawTrackBorder && shouldDrawScrollerBorder(BORDER) ? BORDER_COLOR : 'transparent';
         const hasScrollbar = this.hasScrollbar();
         const drawTrack = shouldDrawScrollerTrack(BORDER, hasScrollbar);
         // 轨道
-        if (drawTrack) {
+        if (drawTrackBackground && drawTrack) {
             this.ctx.paint.drawRect(this.trackX, this.trackY, this.trackWidth, this.trackHeight, {
-                borderColor,
                 fillColor: SCROLLER_TRACK_COLOR,
             });
+            this.drawTrackHeaderBackground();
             if (drawTrackBorder) {
+                this.ctx.paint.drawRect(this.trackX, this.trackY, this.trackWidth, this.trackHeight, {
+                    borderColor,
+                });
                 this.drawRightBoundaryBorder();
             }
-        } else {
+        } else if (drawTrackBackground) {
             this.drawInactiveTrackBackground();
         }
         // 滚动条
@@ -372,6 +377,23 @@ class Scrollbar {
             });
         }
         return this.isFocus || this.isDragging;
+    }
+
+    private drawTrackHeaderBackground() {
+        if (this.type !== 'vertical' || this.trackWidth <= 0) {
+            return;
+        }
+        const {
+            header,
+            config: { HEADER_BG_COLOR },
+        } = this.ctx;
+        const height = Math.max(0, Math.min(header.height, this.trackHeight));
+        if (height <= 0) {
+            return;
+        }
+        this.ctx.paint.drawRect(this.trackX, this.trackY, this.trackWidth, height, {
+            fillColor: HEADER_BG_COLOR,
+        });
     }
 
     private drawInactiveTrackBackground() {

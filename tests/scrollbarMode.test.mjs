@@ -30,6 +30,13 @@ test('draws scrollbar track borders only in outer mode', () => {
     assert.equal(mod.shouldDrawScrollbarTrackBorder({ SCROLLBAR_MODE: 'inner' }), false);
 });
 
+test('draws scrollbar track backgrounds only in outer mode', () => {
+    assert.equal(mod.shouldDrawScrollbarTrackBackground({}), true);
+    assert.equal(mod.shouldDrawScrollbarTrackBackground({ scrollbarMode: 'outer' }), true);
+    assert.equal(mod.shouldDrawScrollbarTrackBackground({ scrollbarMode: 'inner' }), false);
+    assert.equal(mod.shouldDrawScrollbarTrackBackground({ SCROLLBAR_MODE: 'inner' }), false);
+});
+
 test('draws inner scrollbars only while visible, focused, or dragging', () => {
     const config = { scrollbarMode: 'inner' };
 

@@ -27,6 +27,10 @@ export function shouldDrawScrollbarTrackBorder(config: ScrollbarModeConfig): boo
     return !isInnerScrollbarMode(config);
 }
 
+export function shouldDrawScrollbarTrackBackground(config: ScrollbarModeConfig): boolean {
+    return !isInnerScrollbarMode(config);
+}
+
 export type ScrollbarVisibilityState = {
     innerVisible: boolean;
     isFocus: boolean;
