@@ -12,8 +12,8 @@ export default class CellImage {
     constructor(name: string, x: number, y: number, width: number, height: number, source?: HTMLImageElement) {
         this.source = source;
         this.name = name;
-        this.x = x;
-        this.y = y;
+        this.x = x - 1;
+        this.y = y - 1;
         this.width = width;
         this.height = height;
     }

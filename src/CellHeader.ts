@@ -172,11 +172,11 @@ export default class CellHeader extends BaseCell {
         this.displayText = this.getText();
         this.drawX = this.getDrawX();
         this.drawY = this.getDrawY();
-        this.updateSelection();
         this.drawTextX = this.drawX;
         this.drawTextY = this.drawY;
         this.drawTextWidth = this.width;
         this.drawTextHeight = this.height;
+        this.updateSelection();
         this.updateStyle();
     }
     draw() {
