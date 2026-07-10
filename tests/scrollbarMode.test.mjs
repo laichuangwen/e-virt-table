@@ -23,6 +23,13 @@ test('keeps overlay scrollbar size independent from layout reservation', () => {
     assert.equal(mod.getOverlayScrollerTrackSize({ scrollbarMode: 'outer', SCROLLER_TRACK_SIZE: 14 }), 14);
 });
 
+test('draws scrollbar track borders only in outer mode', () => {
+    assert.equal(mod.shouldDrawScrollbarTrackBorder({}), true);
+    assert.equal(mod.shouldDrawScrollbarTrackBorder({ scrollbarMode: 'outer' }), true);
+    assert.equal(mod.shouldDrawScrollbarTrackBorder({ scrollbarMode: 'inner' }), false);
+    assert.equal(mod.shouldDrawScrollbarTrackBorder({ SCROLLBAR_MODE: 'inner' }), false);
+});
+
 test('draws inner scrollbars only while visible, focused, or dragging', () => {
     const config = { scrollbarMode: 'inner' };
 

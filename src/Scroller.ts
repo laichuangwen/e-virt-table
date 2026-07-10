@@ -5,6 +5,7 @@ import {
     getOverlayScrollerTrackSize,
     isInnerScrollbarMode,
     shouldDrawScrollbar,
+    shouldDrawScrollbarTrackBorder,
 } from './ScrollbarMode';
 
 function getScrollbarThumbSize(
@@ -340,7 +341,8 @@ class Scrollbar {
         if (this.isInnerMode() && !this.shouldDrawInnerScrollbar()) {
             return this.isFocus || this.isDragging;
         }
-        const borderColor = shouldDrawScrollerBorder(BORDER) ? BORDER_COLOR : 'transparent';
+        const drawTrackBorder = shouldDrawScrollbarTrackBorder(this.ctx.config);
+        const borderColor = drawTrackBorder && shouldDrawScrollerBorder(BORDER) ? BORDER_COLOR : 'transparent';
         const hasScrollbar = this.hasScrollbar();
         const drawTrack = shouldDrawScrollerTrack(BORDER, hasScrollbar);
         // 轨道
@@ -349,7 +351,9 @@ class Scrollbar {
                 borderColor,
                 fillColor: SCROLLER_TRACK_COLOR,
             });
-            this.drawRightBoundaryBorder();
+            if (drawTrackBorder) {
+                this.drawRightBoundaryBorder();
+            }
         } else {
             this.drawInactiveTrackBackground();
         }
@@ -361,7 +365,7 @@ class Scrollbar {
             });
         }
         // 分割线范围外
-        if (drawTrack && this.splitPoints.length > 0) {
+        if (drawTrackBorder && drawTrack && this.splitPoints.length > 0) {
             this.ctx.paint.drawLine(this.splitPoints, {
                 borderColor,
                 borderWidth: 1,

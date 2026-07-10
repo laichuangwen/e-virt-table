@@ -23,6 +23,10 @@ export function getOverlayScrollerTrackSize(config: ScrollbarModeConfig): number
     return config.SCROLLER_TRACK_SIZE || 0;
 }
 
+export function shouldDrawScrollbarTrackBorder(config: ScrollbarModeConfig): boolean {
+    return !isInnerScrollbarMode(config);
+}
+
 export type ScrollbarVisibilityState = {
     innerVisible: boolean;
     isFocus: boolean;
