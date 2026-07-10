@@ -1,49 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { registerHooks } from 'node:module';
+import { spawnSync } from 'node:child_process';
 
-registerHooks({
-    resolve(specifier, context, nextResolve) {
-        if (specifier.startsWith('.') && !specifier.endsWith('.js')) {
-            return nextResolve(`${specifier}.js`, context);
-        }
-        return nextResolve(specifier, context);
-    },
-});
-
-const { default: Scroller } = await import('../dist/lib/Scroller.js');
+const loaderUrl = new URL('./fixtures/resolveJsExtension.mjs', import.meta.url).href;
+const fixtureUrl = new URL('./fixtures/innerScrollbarConstructor.mjs', import.meta.url).href;
 
 test('does not append inner scrollbar toggle controls', () => {
-    const originalDocument = globalThis.document;
-    let appendedElements = 0;
-
-    globalThis.document = {
-        createElement() {
-            return {
-                style: {},
-                setAttribute() {},
-                addEventListener() {},
-            };
+    const result = spawnSync(
+        process.execPath,
+        ['--experimental-loader', loaderUrl, '--input-type=module', '--eval', `await import(${JSON.stringify(fixtureUrl)});`],
+        {
+            encoding: 'utf8',
         },
-    };
+    );
 
-    try {
-        new Scroller({
-            scrollX: 0,
-            scrollY: 0,
-            containerElement: {
-                appendChild() {
-                    appendedElements += 1;
-                },
-            },
-            on() {},
-        });
-        assert.equal(appendedElements, 0);
-    } finally {
-        if (originalDocument === undefined) {
-            delete globalThis.document;
-        } else {
-            globalThis.document = originalDocument;
-        }
-    }
+    assert.equal(result.status, 0, result.stderr || result.stdout);
 });
