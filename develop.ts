@@ -5,6 +5,7 @@ import {
     BeforeDragRowParams,
     BeforeSetSelectorParams,
     BeforeValueChangeItem,
+    BorderStyle,
     Column,
     PastedDataOverflow,
     SelectableParams,
@@ -1301,6 +1302,12 @@ document.getElementById('zoomOut')?.addEventListener('click', () => {
 });
 document.getElementById('zoomReset')?.addEventListener('click', () => {
     eVirtTable.setZoom(1);
+});
+const borderStyleEl = document.getElementById('borderStyle') as HTMLSelectElement | null;
+borderStyleEl?.addEventListener('change', () => {
+    eVirtTable.loadConfig({
+        BORDER: borderStyleEl.value as BorderStyle,
+    });
 });
 // Ctrl + 滚轮缩放由 ENABLE_ZOOM_WHEEL 配置控制，默认开启
 

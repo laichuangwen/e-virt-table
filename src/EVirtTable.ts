@@ -30,6 +30,7 @@ import Loading from './Loading';
 import { FinderBar } from './FinderBar';
 import { LangConfig } from './Locale';
 import TextSelector from './TextSelector';
+import { normalizeBorderStyle, shouldDrawOuterBorder } from './BorderStyle';
 export default class EVirtTable {
     static locale: LangConfig;
     private options: EVirtTableOptions;
@@ -123,6 +124,7 @@ export default class EVirtTable {
         };
     }
     private doDraw(ignoreOverlayer = false) {
+        this.updateStageBorder();
         this.header.update();
         this.body.update();
         this.footer.update();
@@ -141,6 +143,12 @@ export default class EVirtTable {
         if (!ignoreOverlayer) {
             this.overlayer.draw();
         }
+    }
+    private updateStageBorder() {
+        const { BORDER, BORDER_COLOR, BORDER_RADIUS } = this.ctx.config;
+        this.ctx.stageElement.dataset.borderStyle = normalizeBorderStyle(BORDER);
+        this.ctx.stageElement.style.borderColor = shouldDrawOuterBorder(BORDER) ? BORDER_COLOR : 'transparent';
+        this.ctx.stageElement.style.borderRadius = `${BORDER_RADIUS}px`;
     }
     draw(ignoreOverlayer = false) {
         if (this.animationFrameId) {

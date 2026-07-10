@@ -622,11 +622,17 @@ export default class Body {
             row.drawContainer();
         });
         this.renderRows.forEach((row) => {
+            row.drawHorizontalBorder();
+        });
+        this.renderRows.forEach((row) => {
             row.drawCenter();
         });
         this.drawFixedShadow();
         this.renderRows.forEach((row) => {
             row.drawFixedContainer();
+        });
+        this.renderRows.forEach((row) => {
+            row.drawFixedHorizontalBorder();
         });
         this.renderRows.forEach((row) => {
             row.drawFixed();

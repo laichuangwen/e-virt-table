@@ -27,6 +27,7 @@ type EVirtTableOptions = {
 | DISABLED | 禁止编辑 | boolean | false |
 | HEADER_FONT | 表头字体 | string | 12px normal Arial |
 | BODY_FONT | 单元格字体 | string | 12px normal Arial |
+| BORDER | 表格边框样式，`true` 等同 `default`，`false` 等同 `inner` | `boolean \| "default" \| "outer" \| "inner" \| "none"` | true |
 | BORDER_COLOR | 区域边框颜色 | string | #e1e6eb |
 | RESIZE_MIN_WIDTH | 最小可调整宽度 | number | 40 |
 | HEIGHT | 高度，高度为 0 表示自适应 | number | 0 |

@@ -1,10 +1,31 @@
 import Context from './Context';
+import { shouldDrawRightBoundaryBorder, shouldDrawScrollerBorder, shouldDrawScrollerTrack } from './BorderStyle';
 import {
     getLayoutScrollerTrackSize,
     getOverlayScrollerTrackSize,
     isInnerScrollbarMode,
     shouldDrawScrollbar,
 } from './ScrollbarMode';
+
+function getScrollbarThumbSize(
+    distance: number,
+    visibleDistance: number,
+    contentDistance: number,
+    minSize = 30,
+): number {
+    if (distance <= 0 || visibleDistance <= 0 || contentDistance <= 0) {
+        return 0;
+    }
+    const size = Math.floor((visibleDistance / contentDistance) * visibleDistance);
+    if (size < minSize) {
+        return minSize;
+    }
+    if (size > visibleDistance) {
+        return 0;
+    }
+    return size;
+}
+
 export type ScrollbarType = 'horizontal' | 'vertical';
 
 class Scrollbar {
@@ -279,16 +300,8 @@ class Scrollbar {
             // 滚动条的X位置=轨道的X位置+（轨道的宽度-滚动条的宽度）/2
             this.barX = this.trackX - 1 + (overlayScrollerTrackSize - SCROLLER_SIZE) / 2;
             this.barWidth = SCROLLER_SIZE;
-            const ratio = this.distance ? this.visibleDistance / (bodyHeight + footerHeight) : 0;
-            let _barHeight = Math.floor(ratio * this.visibleDistance);
+            this.barHeight = getScrollbarThumbSize(this.distance, this.visibleDistance, bodyHeight + footerHeight);
             // 最小30,超出可见区域则隐藏
-            if (_barHeight < 30) {
-                _barHeight = 30;
-            } else if (_barHeight > this.visibleDistance) {
-                _barHeight = 0;
-            }
-            this.barHeight = _barHeight;
-
             const progress = this.distance ? this.scroll / this.distance : 0;
             this.barY = headerHeight + progress * (this.visibleDistance - this.barHeight);
             // 范围限制
@@ -303,23 +316,15 @@ class Scrollbar {
                 visibleWidth - overlayScrollerTrackSize,
                 visibleHeight,
             ];
-            const offset = BORDER ? 0 : 0.5; // 解决边框问题，补偿0.5px
+            const offset = shouldDrawScrollerBorder(BORDER) ? 0 : 0.5; // 解决边框问题，补偿0.5px
             this.trackX = 0;
             this.trackY = visibleHeight - overlayScrollerTrackSize + offset;
             this.trackWidth = visibleWidth;
             this.trackHeight = overlayScrollerTrackSize;
 
-            const ratio = this.distance ? this.visibleDistance / headerWidth : 0;
-
-            let _barWidth = Math.floor(ratio * this.visibleDistance);
+            this.barWidth = getScrollbarThumbSize(this.distance, this.visibleDistance, headerWidth);
             this.barY = this.trackY - 1 + (overlayScrollerTrackSize - SCROLLER_SIZE) / 2;
             // 最小30,超出可见区域则隐藏
-            if (_barWidth < 30) {
-                _barWidth = 30;
-            } else if (_barWidth >= this.visibleDistance) {
-                _barWidth = 0;
-            }
-            this.barWidth = _barWidth;
             this.barHeight = SCROLLER_SIZE;
             const progress = this.distance ? this.scroll / this.distance : 0;
             this.barX = progress * (this.visibleDistance - this.barWidth);
@@ -335,28 +340,97 @@ class Scrollbar {
         if (this.isInnerMode() && !this.shouldDrawInnerScrollbar()) {
             return this.isFocus || this.isDragging;
         }
-        let borderColor = BORDER_COLOR;
-        if (!BORDER) {
-            borderColor = 'transparent';
-        }
+        const borderColor = shouldDrawScrollerBorder(BORDER) ? BORDER_COLOR : 'transparent';
+        const hasScrollbar = this.hasScrollbar();
+        const drawTrack = shouldDrawScrollerTrack(BORDER, hasScrollbar);
         // 轨道
-        this.ctx.paint.drawRect(this.trackX, this.trackY, this.trackWidth, this.trackHeight, {
-            borderColor,
-            fillColor: SCROLLER_TRACK_COLOR,
-        });
+        if (drawTrack) {
+            this.ctx.paint.drawRect(this.trackX, this.trackY, this.trackWidth, this.trackHeight, {
+                borderColor,
+                fillColor: SCROLLER_TRACK_COLOR,
+            });
+            this.drawRightBoundaryBorder();
+        } else {
+            this.drawInactiveTrackBackground();
+        }
         // 滚动条
-        this.ctx.paint.drawRect(this.barX, this.barY, this.barWidth, this.barHeight, {
-            fillColor: this.isFocus || this.isDragging ? SCROLLER_FOCUS_COLOR : SCROLLER_COLOR,
-            radius: 4,
-        });
+        if (hasScrollbar) {
+            this.ctx.paint.drawRect(this.barX, this.barY, this.barWidth, this.barHeight, {
+                fillColor: this.isFocus || this.isDragging ? SCROLLER_FOCUS_COLOR : SCROLLER_COLOR,
+                radius: 4,
+            });
+        }
         // 分割线范围外
-        if (this.splitPoints.length > 0) {
+        if (drawTrack && this.splitPoints.length > 0) {
             this.ctx.paint.drawLine(this.splitPoints, {
                 borderColor,
                 borderWidth: 1,
             });
         }
         return this.isFocus || this.isDragging;
+    }
+
+    private drawInactiveTrackBackground() {
+        if (this.type !== 'vertical') {
+            return;
+        }
+        const {
+            footer,
+            header,
+            scrollY,
+            stageHeight,
+            config: {
+                BODY_BG_COLOR,
+                FOOTER_BG_COLOR,
+                FOOTER_FIXED,
+                FOOTER_POSITION,
+                HEADER_BG_COLOR,
+                SCROLLER_TRACK_SIZE = 0,
+            },
+        } = this.ctx;
+        const bottom = Math.max(0, stageHeight - SCROLLER_TRACK_SIZE);
+        if (bottom <= 0 || this.trackWidth <= 0) {
+            return;
+        }
+        this.ctx.paint.drawRect(this.trackX, 0, this.trackWidth, bottom, {
+            fillColor: BODY_BG_COLOR,
+        });
+        this.ctx.paint.drawRect(this.trackX, 0, this.trackWidth, header.height, {
+            fillColor: HEADER_BG_COLOR,
+        });
+        if (!footer.height) {
+            return;
+        }
+        const footerY = FOOTER_FIXED
+            ? FOOTER_POSITION === 'top'
+                ? header.height
+                : bottom - footer.height
+            : footer.y - scrollY;
+        const y = Math.max(header.height, Math.min(footerY, bottom));
+        const height = Math.max(0, Math.min(footer.height, bottom - y));
+        if (height > 0) {
+            this.ctx.paint.drawRect(this.trackX, y, this.trackWidth, height, {
+                fillColor: FOOTER_BG_COLOR,
+            });
+        }
+    }
+
+    private drawRightBoundaryBorder() {
+        const {
+            stageHeight,
+            config: { BORDER, BORDER_COLOR, SCROLLER_TRACK_SIZE = 0 },
+        } = this.ctx;
+        if (this.type !== 'vertical' || !shouldDrawRightBoundaryBorder(BORDER) || SCROLLER_TRACK_SIZE <= 0) {
+            return;
+        }
+        const bottom = stageHeight - SCROLLER_TRACK_SIZE;
+        if (bottom <= 0) {
+            return;
+        }
+        this.ctx.paint.drawLine([this.trackX, 0, this.trackX, bottom], {
+            borderColor: BORDER_COLOR,
+            borderWidth: 1,
+        });
     }
 }
 
