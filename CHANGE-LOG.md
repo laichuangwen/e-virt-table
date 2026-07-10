@@ -7,6 +7,13 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -  
 
+V1.4.3
+### Bug Fixes
+- fix:解决展开tree时加载数据会收缩
+- fix: 表头选中和文字重合
+- feat:添加边框配置功能
+- feat:添加滚动条样式配置
+
 V1.4.2
 ### Bug Fixes
 - fix:修复拓展表头选中文字导致不能多选表头
