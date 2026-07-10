@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table - Border None</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        const data = [
+            { id: 1, name: 'Test1', sex: 'Man', age: 28, address: 'test abc' },
+            { id: 2, name: 'Test2', sex: 'Women', age: 22, address: 'Guangzhou' },
+            { id: 3, name: 'Test3', sex: 'Man', age: 32, address: 'Shanghai' },
+            { id: 4, name: 'Test4', sex: 'Women', age: 24, address: 'Shanghai' },
+            { id: 5, name: 'Test5', sex: 'Man', age: 28, address: 'test abc' },
+            { id: 6, name: 'Test6', sex: 'Women', age: 22, address: 'Guangzhou' },
+            { id: 7, name: 'Test7', sex: 'Man', age: 32, address: 'Shanghai' },
+            { id: 8, name: 'Test8', sex: 'Women', age: 24, address: 'Shanghai' },
+            { id: 9, name: 'Test9', sex: 'Man', age: 28, address: 'test abc' },
+            { id: 10, name: 'Test10', sex: 'Women', age: 22, address: 'Guangzhou' },
+            { id: 11, name: 'Test11', sex: 'Man', age: 32, address: 'Shanghai' },
+            { id: 12, name: 'Test12', sex: 'Women', age: 24, address: 'Shanghai' },
+        ];
+
+        const columns = [
+            { title: 'No.', key: 'id', width: 70, readonly: false },
+            { title: 'Name', key: 'name', width: 240, readonly: false },
+            { title: 'Sex', key: 'sex', width: 240, readonly: false },
+            { title: 'Age', key: 'age', width: 240, readonly: false },
+            { title: 'Address', key: 'address', width: 260, readonly: true },
+        ];
+
+        new EVirtTable(document.getElementById('e-virt-table'), {
+            columns,
+            data,
+            footerData: [{ id: 'Total', name: '777', sex: '333', age: '111', address: '' }],
+            config: {
+                BORDER: 'none',
+                ROW_KEY: 'id',
+                HEIGHT: 300,
+            },
+        });
+    </script>
+</html>

@@ -301,6 +301,8 @@ export default class Editor {
         this.editorEl.style.top = this.ctx.toVisualPx(this.drawY);
         this.editorEl.style.bottom = `auto`;
         this.editorEl.style.maxWidth = 'none';
+        // 恢复border样式
+        this.editorEl.style.border = '';
         this.editorEl.style.maxHeight = `${visualMaxHeight}px`;
         if (['text'].includes(editorType)) {
             this.inputEl.style.opacity = '1';
@@ -435,6 +437,7 @@ export default class Editor {
         this.editorEl.style.maxWidth = `1px`;
         this.editorEl.style.maxHeight = `1px`;
         this.editorEl.style.zIndex = '-1';
+        this.editorEl.style.border = 'none';
     }
     clearEditor() {
         this.doneEdit();

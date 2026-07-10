@@ -23,6 +23,7 @@ import Context from './Context';
 import BaseCell from './BaseCell';
 import { Rule, Rules } from './Validator';
 import CellImage from './CellImage';
+import { shouldDrawFullCellBorder, shouldDrawInternalHorizontalBorder } from './BorderStyle';
 export default class Cell extends BaseCell {
     parentRowKey: string = '';
     parentRowKeys: string[] = [];
@@ -980,8 +981,9 @@ export default class Cell extends BaseCell {
             config: { BORDER_COLOR, BORDER },
         } = this.ctx;
         const { drawX, drawY } = this;
+        const drawFullBorder = shouldDrawFullCellBorder(BORDER);
         paint.drawRect(drawX, drawY, this.visibleWidth, this.visibleHeight, {
-            borderColor: BORDER ? BORDER_COLOR : 'transparent',
+            borderColor: drawFullBorder ? BORDER_COLOR : 'transparent',
             fillColor: this.drawCellBgColor,
         });
         // 列合并单元格
@@ -989,19 +991,25 @@ export default class Cell extends BaseCell {
             borderColor: 'transparent',
             fillColor: this.drawCellSkyBgColor,
         });
-
-        if (!BORDER) {
-            this.ctx.paint.drawLine(
-                [drawX, drawY + this.visibleHeight, drawX + this.visibleWidth, drawY + this.visibleHeight],
-                {
-                    borderColor: BORDER_COLOR,
-                    fillColor: BORDER_COLOR,
-                    borderWidth: 1,
-                    lineCap: 'round',
-                    lineJoin: 'round',
-                },
-            );
+    }
+    drawHorizontalBorder() {
+        const {
+            config: { BORDER_COLOR, BORDER },
+        } = this.ctx;
+        if (shouldDrawFullCellBorder(BORDER) || !shouldDrawInternalHorizontalBorder(BORDER)) {
+            return;
         }
+        const { drawX, drawY } = this;
+        this.ctx.paint.drawLine(
+            [drawX, drawY + this.visibleHeight, drawX + this.visibleWidth, drawY + this.visibleHeight],
+            {
+                borderColor: BORDER_COLOR,
+                fillColor: BORDER_COLOR,
+                borderWidth: 1,
+                lineCap: 'round',
+                lineJoin: 'round',
+            },
+        );
     }
     private drawAutofillPiont() {
         if (this.cellType === 'footer') {

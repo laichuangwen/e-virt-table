@@ -108,4 +108,14 @@ export default class Row {
             cell.drawContainer();
         });
     }
+    drawHorizontalBorder() {
+        this.noFixedCells.forEach((cell) => {
+            cell.drawHorizontalBorder();
+        });
+    }
+    drawFixedHorizontalBorder() {
+        this.fixedCells.forEach((cell) => {
+            cell.drawHorizontalBorder();
+        });
+    }
 }

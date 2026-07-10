@@ -3,6 +3,7 @@ import type CellHeader from './CellHeader';
 import type { Rule, Rules } from './Validator';
 import Config from './Config';
 import { TreeUtilPosition } from './TreeUtil';
+export type { BorderConfigValue, BorderStyle } from './BorderStyle';
 // 变成可选类型
 export type OptionalizeExcept<T, K extends keyof T> = Partial<Omit<T, K>> & Required<Pick<T, K>>;
 export type EVirtTableOptions = {
