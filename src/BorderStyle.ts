@@ -25,6 +25,11 @@ export function shouldDrawScrollerBorder(value: BorderConfigValue): boolean {
     return normalizeBorderStyle(value) === 'default';
 }
 
+export function shouldDrawScrollerTrack(value: BorderConfigValue, hasScrollbar: boolean): boolean {
+    return shouldDrawScrollerBorder(value) || hasScrollbar;
+}
+
 export function shouldDrawRightBoundaryBorder(value: BorderConfigValue): boolean {
-    return normalizeBorderStyle(value) === 'inner';
+    void value;
+    return false;
 }

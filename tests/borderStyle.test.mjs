@@ -35,7 +35,18 @@ test('maps border modes to draw decisions', () => {
 
     assert.equal(mod.shouldDrawRightBoundaryBorder('default'), false);
     assert.equal(mod.shouldDrawRightBoundaryBorder('outer'), false);
-    assert.equal(mod.shouldDrawRightBoundaryBorder('inner'), true);
+    assert.equal(mod.shouldDrawRightBoundaryBorder('inner'), false);
     assert.equal(mod.shouldDrawRightBoundaryBorder('none'), false);
-    assert.equal(mod.shouldDrawRightBoundaryBorder(false), true);
+    assert.equal(mod.shouldDrawRightBoundaryBorder(false), false);
+});
+
+test('hides non-default scroller track when no scrollbar is needed', () => {
+    assert.equal(mod.shouldDrawScrollerTrack('default', false), true);
+    assert.equal(mod.shouldDrawScrollerTrack('outer', false), false);
+    assert.equal(mod.shouldDrawScrollerTrack('inner', false), false);
+    assert.equal(mod.shouldDrawScrollerTrack('none', false), false);
+
+    assert.equal(mod.shouldDrawScrollerTrack('outer', true), true);
+    assert.equal(mod.shouldDrawScrollerTrack('inner', true), true);
+    assert.equal(mod.shouldDrawScrollerTrack('none', true), true);
 });
