@@ -513,9 +513,9 @@ export default class Database {
     }
     expandAll(expand: boolean) {
         this.expandMap.clear();
-        this.rowKeyMap.forEach((row: any) => {
+        this.rowKeyMap.forEach((row: any, rowKey: string) => {
             row.expand = expand;
-            this.expandMap.set(row.key, expand);
+            this.expandMap.set(rowKey, expand);
         });
         this.clearBufferData(); // 清除缓存数据
         this.ctx.emit('draw');
