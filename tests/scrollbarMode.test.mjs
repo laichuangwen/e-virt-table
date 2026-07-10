@@ -22,3 +22,28 @@ test('keeps overlay scrollbar size independent from layout reservation', () => {
     assert.equal(mod.getOverlayScrollerTrackSize({ scrollbarMode: 'inner', SCROLLER_TRACK_SIZE: 14 }), 14);
     assert.equal(mod.getOverlayScrollerTrackSize({ scrollbarMode: 'outer', SCROLLER_TRACK_SIZE: 14 }), 14);
 });
+
+test('draws inner scrollbars only while visible, focused, or dragging', () => {
+    const config = { scrollbarMode: 'inner' };
+
+    assert.equal(
+        mod.shouldDrawScrollbar(config, { innerVisible: false, isFocus: false, isDragging: false }),
+        false,
+    );
+    assert.equal(
+        mod.shouldDrawScrollbar(config, { innerVisible: true, isFocus: false, isDragging: false }),
+        true,
+    );
+    assert.equal(
+        mod.shouldDrawScrollbar(config, { innerVisible: false, isFocus: true, isDragging: false }),
+        true,
+    );
+    assert.equal(
+        mod.shouldDrawScrollbar(config, { innerVisible: false, isFocus: false, isDragging: true }),
+        true,
+    );
+    assert.equal(
+        mod.shouldDrawScrollbar({}, { innerVisible: false, isFocus: false, isDragging: false }),
+        true,
+    );
+});

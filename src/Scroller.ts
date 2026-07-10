@@ -1,7 +1,11 @@
 import Context from './Context';
-import { getLayoutScrollerTrackSize, getOverlayScrollerTrackSize, isInnerScrollbarMode } from './ScrollbarMode';
+import {
+    getLayoutScrollerTrackSize,
+    getOverlayScrollerTrackSize,
+    isInnerScrollbarMode,
+    shouldDrawScrollbar,
+} from './ScrollbarMode';
 export type ScrollbarType = 'horizontal' | 'vertical';
-type Rect = { x: number; y: number; width: number; height: number };
 
 class Scrollbar {
     private ctx: Context;
@@ -22,11 +26,7 @@ class Scrollbar {
     private clientY = 0;
     private dragStart = 0; // 拖拽开始的位置
     private innerVisible = false;
-    private innerCollapsed = false;
     private innerShowTimer = 0;
-    private collapseButton: Rect = { x: 0, y: 0, width: 0, height: 0 };
-    private expandButton: Rect = { x: 0, y: 0, width: 0, height: 0 };
-    private toggleButton: HTMLButtonElement;
     isDragging = false;
     scroll = 0;
 
@@ -38,7 +38,6 @@ class Scrollbar {
         } else {
             this.scroll = this.ctx.scrollX;
         }
-        this.toggleButton = this.createToggleButton();
     }
 
     onWheel(e: WheelEvent) {
@@ -202,16 +201,17 @@ class Scrollbar {
         return isInnerScrollbarMode(this.ctx.config);
     }
     private shouldDrawInnerScrollbar(): boolean {
-        if (!this.isInnerMode()) {
-            return true;
-        }
-        return !this.innerCollapsed && (this.innerVisible || this.isFocus || this.isDragging);
+        return shouldDrawScrollbar(this.ctx.config, {
+            innerVisible: this.innerVisible,
+            isFocus: this.isFocus,
+            isDragging: this.isDragging,
+        });
     }
     private canInteractWithScrollbar(): boolean {
         return !this.isInnerMode() || this.shouldDrawInnerScrollbar();
     }
     private startInnerShowTimer() {
-        if (!this.isInnerMode() || this.innerVisible || this.innerCollapsed || this.innerShowTimer) {
+        if (!this.isInnerMode() || this.innerVisible || this.innerShowTimer) {
             return;
         }
         const delay = Math.max(0, this.ctx.config.SCROLLBAR_SHOW_DELAY || 0);
@@ -222,7 +222,7 @@ class Scrollbar {
         }, delay);
     }
     hideInnerScrollbar() {
-        if (!this.isInnerMode() || this.isDragging || this.innerCollapsed) {
+        if (!this.isInnerMode() || this.isDragging) {
             return;
         }
         if (this.innerShowTimer) {
@@ -326,93 +326,13 @@ class Scrollbar {
             // 范围限制
             this.scroll = Math.max(0, Math.min(this.scroll, this.distance));
         }
-        this.updateToggleButtons();
-    }
-    private updateToggleButtons() {
-        const size = Math.max(14, Math.min(20, getOverlayScrollerTrackSize(this.ctx.config) + 4));
-        if (this.type === 'vertical') {
-            const minY = this.ctx.header.height + 2;
-            const maxY = Math.max(minY, this.ctx.stageHeight - size - 2);
-            const y = Math.max(minY, Math.min(this.barY + (this.barHeight - size) / 2, maxY));
-            this.collapseButton = { x: this.trackX - size - 2, y, width: size, height: size };
-            this.expandButton = { x: this.ctx.stageWidth + 2, y, width: size, height: size };
-            return;
-        }
-        const minX = 2;
-        const maxX = Math.max(minX, this.ctx.stageWidth - size - 2);
-        const x = Math.max(minX, Math.min(this.barX + (this.barWidth - size) / 2, maxX));
-        this.collapseButton = { x, y: this.trackY - size - 2, width: size, height: size };
-        this.expandButton = { x, y: this.ctx.stageHeight + 2, width: size, height: size };
-    }
-    private createToggleButton(): HTMLButtonElement {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = `e-virt-table-scrollbar-toggle e-virt-table-scrollbar-toggle-${this.type}`;
-        button.setAttribute('aria-label', this.type === 'vertical' ? 'toggle vertical scrollbar' : 'toggle horizontal scrollbar');
-        button.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.toggleInnerScrollbar();
-        });
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-        });
-        this.ctx.containerElement.appendChild(button);
-        return button;
-    }
-    private toggleInnerScrollbar() {
-        if (!this.isInnerMode() || !this.hasScrollbar()) {
-            return;
-        }
-        if (this.innerCollapsed) {
-            this.innerCollapsed = false;
-            this.innerVisible = true;
-        } else {
-            this.innerCollapsed = true;
-            this.innerVisible = false;
-            this.isFocus = false;
-        }
-        this.ctx.stageElement.style.cursor = 'default';
-        this.ctx.emit('draw');
-    }
-    private updateToggleButtonStyle() {
-        if (!this.isInnerMode() || !this.hasScrollbar()) {
-            this.toggleButton.style.display = 'none';
-            return;
-        }
-        const shouldShow = this.innerCollapsed || this.shouldDrawInnerScrollbar();
-        if (!shouldShow) {
-            this.toggleButton.style.display = 'none';
-            return;
-        }
-        const rect = this.innerCollapsed ? this.expandButton : this.collapseButton;
-        const label = this.innerCollapsed
-            ? this.type === 'vertical'
-                ? '<'
-                : '^'
-            : this.type === 'vertical'
-              ? '>'
-              : 'v';
-        this.toggleButton.textContent = label;
-        this.toggleButton.style.display = 'flex';
-        const containerRect = this.ctx.containerElement.getBoundingClientRect();
-        this.toggleButton.style.left = `${containerRect.left + this.ctx.toVisual(rect.x)}px`;
-        this.toggleButton.style.top = `${containerRect.top + this.ctx.toVisual(rect.y)}px`;
-        this.toggleButton.style.width = this.ctx.toVisualPx(rect.width);
-        this.toggleButton.style.height = this.ctx.toVisualPx(rect.height);
     }
     draw(): boolean {
         const {
             config: { SCROLLER_FOCUS_COLOR, SCROLLER_COLOR, BORDER_COLOR, BORDER, SCROLLER_TRACK_COLOR },
         } = this.ctx;
         this.updatedSize();
-        if (this.isInnerMode() && this.innerCollapsed) {
-            this.updateToggleButtonStyle();
-            return this.isFocus || this.isDragging;
-        }
         if (this.isInnerMode() && !this.shouldDrawInnerScrollbar()) {
-            this.updateToggleButtonStyle();
             return this.isFocus || this.isDragging;
         }
         let borderColor = BORDER_COLOR;
@@ -436,7 +356,6 @@ class Scrollbar {
                 borderWidth: 1,
             });
         }
-        this.updateToggleButtonStyle();
         return this.isFocus || this.isDragging;
     }
 }

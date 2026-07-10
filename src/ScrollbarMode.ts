@@ -22,3 +22,16 @@ export function getLayoutScrollerTrackSize(config: ScrollbarModeConfig): number 
 export function getOverlayScrollerTrackSize(config: ScrollbarModeConfig): number {
     return config.SCROLLER_TRACK_SIZE || 0;
 }
+
+export type ScrollbarVisibilityState = {
+    innerVisible: boolean;
+    isFocus: boolean;
+    isDragging: boolean;
+};
+
+export function shouldDrawScrollbar(config: ScrollbarModeConfig, state: ScrollbarVisibilityState): boolean {
+    if (!isInnerScrollbarMode(config)) {
+        return true;
+    }
+    return state.innerVisible || state.isFocus || state.isDragging;
+}
