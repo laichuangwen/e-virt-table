@@ -15,13 +15,21 @@
             { id: 2, name: 'Test2', sex: 'Women', age: 22, address: 'Guangzhou' },
             { id: 3, name: 'Test3', sex: 'Man', age: 32, address: 'Shanghai' },
             { id: 4, name: 'Test4', sex: 'Women', age: 24, address: 'Shanghai' },
+            { id: 5, name: 'Test5', sex: 'Man', age: 28, address: 'test abc' },
+            { id: 6, name: 'Test6', sex: 'Women', age: 22, address: 'Guangzhou' },
+            { id: 7, name: 'Test7', sex: 'Man', age: 32, address: 'Shanghai' },
+            { id: 8, name: 'Test8', sex: 'Women', age: 24, address: 'Shanghai' },
+            { id: 9, name: 'Test9', sex: 'Man', age: 28, address: 'test abc' },
+            { id: 10, name: 'Test10', sex: 'Women', age: 22, address: 'Guangzhou' },
+            { id: 11, name: 'Test11', sex: 'Man', age: 32, address: 'Shanghai' },
+            { id: 12, name: 'Test12', sex: 'Women', age: 24, address: 'Shanghai' },
         ];
 
         const columns = [
-            { title: 'No.', key: 'id', width: 70, readonly: true },
-            { title: 'Name', key: 'name', width: 240, readonly: true },
-            { title: 'Sex', key: 'sex', width: 240, readonly: true },
-            { title: 'Age', key: 'age', width: 240, readonly: true },
+            { title: 'No.', key: 'id', width: 70, readonly: false },
+            { title: 'Name', key: 'name', width: 240, readonly: false },
+            { title: 'Sex', key: 'sex', width: 240, readonly: false },
+            { title: 'Age', key: 'age', width: 240, readonly: false },
             { title: 'Address', key: 'address', width: 260, readonly: true },
         ];
 
@@ -32,6 +40,7 @@
             config: {
                 BORDER: 'none',
                 ROW_KEY: 'id',
+                HEIGHT: 300,
             },
         });
     </script>
