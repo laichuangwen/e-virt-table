@@ -22,7 +22,7 @@ h:420px
 
 ## Inner Scrollbar
 
-Set `config.scrollbarMode` to `inner` to let the header, cells, and footer use the full visible area. The scrollbars appear over the right and bottom edges after a hover delay. Use the arrow buttons on the scrollbars to collapse them temporarily, then use the edge arrows to restore them.
+Set `config.scrollbarMode` to `inner` to let the header, cells, and footer use the full visible area. The scrollbars appear over the right and bottom edges after a hover delay and hide when the pointer leaves the table.
 
 ::: demo
 

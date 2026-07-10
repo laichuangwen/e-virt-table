@@ -108,26 +108,6 @@
     outline: none;
     z-index: 10;
 }
-.e-virt-table-scrollbar-toggle {
-    position: fixed;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-    padding: 0;
-    border: 1px solid var(--evt-scroller-focus-color);
-    border-radius: 4px;
-    background: var(--evt-scroller-track-color);
-    color: var(--evt-body-text-color);
-    box-sizing: border-box;
-    font: 12px/1 Arial, sans-serif;
-    cursor: pointer;
-    user-select: none;
-    z-index: 120;
-}
-.e-virt-table-scrollbar-toggle:hover {
-    background: var(--evt-header-bg-color);
-}
 .e-virt-table-editor {
     position: absolute;
     top: -10000px;
