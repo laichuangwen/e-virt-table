@@ -30,6 +30,13 @@ test('reserves a corner only when inner scrollbars intersect', () => {
     assert.equal(mod.getScrollbarCornerOffset({ SCROLLBAR_MODE: 'inner', SCROLLER_TRACK_SIZE: 14 }, true), 14);
 });
 
+test('insets inner scrollbar thumbs from their trailing edge', () => {
+    assert.equal(mod.getScrollbarThumbEndInset({}), 0);
+    assert.equal(mod.getScrollbarThumbEndInset({ scrollbarMode: 'outer' }), 0);
+    assert.equal(mod.getScrollbarThumbEndInset({ scrollbarMode: 'inner' }), 1);
+    assert.equal(mod.getScrollbarThumbEndInset({ SCROLLBAR_MODE: 'inner' }), 1);
+});
+
 test('draws scrollbar track borders only in outer mode', () => {
     assert.equal(mod.shouldDrawScrollbarTrackBorder({}), true);
     assert.equal(mod.shouldDrawScrollbarTrackBorder({ scrollbarMode: 'outer' }), true);

@@ -30,6 +30,10 @@ export function getScrollbarCornerOffset(config: ScrollbarModeConfig, hasOpposit
     return getOverlayScrollerTrackSize(config);
 }
 
+export function getScrollbarThumbEndInset(config: ScrollbarModeConfig): number {
+    return isInnerScrollbarMode(config) ? 1 : 0;
+}
+
 export function shouldDrawScrollbarTrackBorder(config: ScrollbarModeConfig): boolean {
     return !isInnerScrollbarMode(config);
 }
