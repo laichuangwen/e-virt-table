@@ -249,11 +249,9 @@ export default class Editor {
         }
         this.inputEl.style.height = 'auto'; // 重置高度
         let scrollHeight = this.inputEl.scrollHeight;
-        // 物理高度换算为逻辑高度做比较
-        const scrollHeightLogical = this.ctx.toLogical(scrollHeight);
         let maxHeight = this.ctx.body.visibleHeight;
-        if (scrollHeightLogical > maxHeight) {
-            scrollHeight = this.ctx.toVisual(maxHeight);
+        if (scrollHeight > maxHeight) {
+            scrollHeight = maxHeight;
         }
         const {
             stageHeight,
@@ -263,12 +261,12 @@ export default class Editor {
         const bottomY = stageHeight - footer.height - getLayoutScrollerTrackSize(this.ctx.config);
         this.editorEl.style.bottom = `auto`;
         if (this.drawY < header.height) {
-            this.editorEl.style.top = this.ctx.toVisualPx(header.height - 1);
+            this.editorEl.style.top = `${header.height - 1}px`;
         }
-        if (this.drawY + this.ctx.toLogical(scrollHeight) > bottomY) {
-            this.editorEl.style.left = this.ctx.toVisualPx(this.drawX - 1);
+        if (this.drawY + scrollHeight > bottomY) {
+            this.editorEl.style.left = `${this.drawX - 1}px`;
             this.editorEl.style.top = `auto`;
-            this.editorEl.style.bottom = this.ctx.toVisualPx(stageHeight - bottomY);
+            this.editorEl.style.bottom = `${stageHeight - bottomY}px`;
         }
         this.inputEl.style.height = `${scrollHeight}px`; // 设置为内容的高度
     }
@@ -294,30 +292,29 @@ export default class Editor {
         if (height > maxHeight) {
             height = maxHeight;
         }
-        const visualMaxHeight = this.ctx.toVisual(maxHeight);
-        // 显示编辑器(drawX/drawY/width/height 为逻辑值,DOM 定位需*zoom)
+        // 显示编辑器
         this.editorEl.style.zIndex = '100';
-        this.editorEl.style.left = this.ctx.toVisualPx(this.drawX - 1);
-        this.editorEl.style.top = this.ctx.toVisualPx(this.drawY);
+        this.editorEl.style.left = `${this.drawX - 1}px`;
+        this.editorEl.style.top = `${this.drawY}px`;
         this.editorEl.style.bottom = `auto`;
         this.editorEl.style.maxWidth = 'none';
         // 恢复border样式
         this.editorEl.style.border = '';
-        this.editorEl.style.maxHeight = `${visualMaxHeight}px`;
+        this.editorEl.style.maxHeight = `${maxHeight}px`;
         if (['text'].includes(editorType)) {
             this.inputEl.style.opacity = '1';
             this.inputEl.style.position = 'relative';
-            this.inputEl.style.minWidth = this.ctx.toVisualPx(width - 1);
-            this.inputEl.style.minHeight = this.ctx.toVisualPx(height - 1);
-            this.inputEl.style.maxHeight = `${visualMaxHeight}px`;
-            this.inputEl.style.width = this.ctx.toVisualPx(width);
+            this.inputEl.style.minWidth = `${width - 1}px`;
+            this.inputEl.style.minHeight = `${height - 1}px`;
+            this.inputEl.style.maxHeight = `${maxHeight}px`;
+            this.inputEl.style.width = `${width}px`;
             this.inputEl.style.height = `auto`;
-            this.inputEl.style.padding = this.ctx.toVisualPx(CELL_PADDING);
+            this.inputEl.style.padding = `${CELL_PADDING}px`;
             this.inputEl.value = ''; // 清空
             if (value !== null) {
                 this.inputEl.value = value;
             }
-            if (this.ctx.toLogical(this.inputEl.scrollHeight) > height || this.drawY < header.height) {
+            if (this.inputEl.scrollHeight > height || this.drawY < header.height) {
                 this.autoSize();
             }
         } else {
@@ -432,8 +429,8 @@ export default class Editor {
         if (!cell) {
             return;
         }
-        this.editorEl.style.left = this.ctx.toVisualPx(cell.drawX);
-        this.editorEl.style.top = this.ctx.toVisualPx(cell.drawY);
+        this.editorEl.style.left = `${cell.drawX}px`;
+        this.editorEl.style.top = `${cell.drawY}px`;
         this.editorEl.style.maxWidth = `1px`;
         this.editorEl.style.maxHeight = `1px`;
         this.editorEl.style.zIndex = '-1';

@@ -29,11 +29,6 @@ try {
         stageElement: { style: {} },
         canvasElement: new FakeElement(),
         scrollerMove: false,
-        zoomScale: {
-            toLogical(value) {
-                return value;
-            },
-        },
         containerElement: {
             appendChild() {
                 appendedElements += 1;

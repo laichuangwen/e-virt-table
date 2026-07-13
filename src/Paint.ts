@@ -62,10 +62,9 @@ export class Paint {
     clearTextCache() {
         this.textCacheMap.clear();
     }
-    scale(dpr: number, zoom = 1) {
+    scale(dpr: number) {
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-        // dpr 保证清晰度,zoom 实现内容缩放,两者相乘按原生分辨率绘制,不会模糊
-        this.ctx.scale(dpr * zoom, dpr * zoom);
+        this.ctx.scale(dpr, dpr);
     }
     save() {
         this.ctx.save();

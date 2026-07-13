@@ -36,7 +36,7 @@ export default class Overlayer {
                     }
                     const rect = element.getBoundingClientRect();
                     const key = `${rowIndex}\u200b_${colIndex}`;
-                    map.set(key, this.ctx.zoomScale.domHeightToLogical(rect.height));
+                    map.set(key, Math.round(rect.height));
                 });
                 const overlayerAutoHeightMap = this.ctx.database.getOverlayerAutoHeightMap();
                 const isNeedUpdate = !this.arerMapsEqual(overlayerAutoHeightMap, map);
@@ -65,15 +65,20 @@ export default class Overlayer {
                 container.views.forEach((typeView: OverlayerWrapper) => {
                     const typeDiv = document.createElement('div');
                     typeDiv.className = typeView.class;
-                    this.ctx.zoomScale.assignScaledStyle(typeDiv, typeView.style);
+                    Object.assign(typeDiv.style, typeView.style);
                     typeView.views.forEach((cellWrapView) => {
                         const cellWrap = document.createElement('div');
-                        this.ctx.zoomScale.assignScaledStyle(cellWrap, cellWrapView.style);
+                        Object.assign(cellWrap.style, cellWrapView.style);
                         cellWrapView.cells.forEach((cell) => {
-                            const cellEl = this.ctx.zoomScale.createOverlayerCellElement(
-                                cell,
-                                this.ctx.config.CSS_PREFIX,
-                            );
+                            const cellEl = document.createElement('div');
+                            Object.assign(cellEl.style, cell.style);
+                            Object.keys(cell.domDataset || {}).forEach((key) => {
+                                cellEl.setAttribute(key, cell.domDataset[key]);
+                            });
+
+                            if (typeof cell.render === 'function') {
+                                cell.render(cellEl, cell);
+                            }
                             cellWrap.appendChild(cellEl);
                         });
                         typeDiv.appendChild(cellWrap);
