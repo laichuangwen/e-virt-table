@@ -12,7 +12,6 @@ import Cell from './Cell';
 import EventTable from './EventTable';
 import { FinderResult } from './FinderBar';
 import Locale from './Locale';
-import ZoomScale from './ZoomScale';
 export type ConfigType = Partial<typeof Config>;
 export type containerElementOptions = {
     containerElement: HTMLDivElement;
@@ -87,14 +86,8 @@ export default class Context {
     emptyElement?: HTMLDivElement;
     contextMenuElement?: HTMLDivElement;
     loadingElement?: HTMLDivElement;
-    stageWidth = 0; // 逻辑可视宽度(物理宽度/zoom)
-    stageHeight = 0; // 逻辑可视高度(物理高度/zoom)
-    stagePhysicalWidth = 0;
-    stagePhysicalHeight = 0;
-    zoomScale: ZoomScale;
-    get zoom() {
-        return this.zoomScale.value;
-    }
+    stageWidth = 0;
+    stageHeight = 0;
     paint: Paint;
     icons: Icons;
     domSelectionStr = '';
@@ -227,7 +220,6 @@ export default class Context {
         this.database = new Database(this, options);
         this.history = new History(this);
         this.icons = new Icons(this);
-        this.zoomScale = new ZoomScale();
     }
     setConfig(config: Config) {
         this.config = new Config(config);
@@ -398,32 +390,9 @@ export default class Context {
     getOffset(e: MouseEvent) {
         const { left, top } = this.containerElement.getBoundingClientRect();
         return {
-            offsetX: this.zoomScale.toLogical(e.clientX - left),
-            offsetY: this.zoomScale.toLogical(e.clientY - top),
+            offsetX: e.clientX - left,
+            offsetY: e.clientY - top,
         };
-    }
-    toVisual(value: number) {
-        return this.zoomScale.toVisual(value);
-    }
-    toLogical(value: number) {
-        return this.zoomScale.toLogical(value);
-    }
-    toVisualPx(value: number) {
-        return this.zoomScale.toPx(value);
-    }
-    scaleStyle<T extends Record<string, any>>(style: T) {
-        return this.zoomScale.scaleStyle(style);
-    }
-    setZoom(zoom: number): void {
-        const { MIN_ZOOM, MAX_ZOOM } = this.config;
-        if (!this.zoomScale.set(zoom, MIN_ZOOM, MAX_ZOOM)) {
-            return;
-        }
-        this.emit('zoomChange', this.zoomScale.value);
-        this.emit('resetHeader');
-    }
-    getZoom(): number {
-        return this.zoomScale.value;
     }
     hasEvent(event: string): boolean {
         return this.eventBus.has(event);
