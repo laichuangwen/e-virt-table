@@ -1284,34 +1284,12 @@ eVirtTable.on('dragRowChange', (data) => {
     console.log('dragRowChange', data);
 });
 
-// 内容缩放示例：容器大小不变，内容变大/变小（可见内容变多/变少），基于原生分辨率重绘不失清晰度
-const ZOOM_STEP = 0.1;
-const updateZoomLabel = () => {
-    const label = document.getElementById('zoom-label');
-    if (label) {
-        label.textContent = `${Math.round(eVirtTable.getZoom() * 100)}%`;
-    }
-};
-eVirtTable.on('zoomChange', updateZoomLabel);
-updateZoomLabel();
-document.getElementById('zoomIn')?.addEventListener('click', () => {
-    eVirtTable.setZoom(eVirtTable.getZoom() + ZOOM_STEP);
-});
-document.getElementById('zoomOut')?.addEventListener('click', () => {
-    eVirtTable.setZoom(eVirtTable.getZoom() - ZOOM_STEP);
-});
-document.getElementById('zoomReset')?.addEventListener('click', () => {
-    eVirtTable.setZoom(1);
-});
 const borderStyleEl = document.getElementById('borderStyle') as HTMLSelectElement | null;
 borderStyleEl?.addEventListener('change', () => {
     eVirtTable.loadConfig({
         BORDER: borderStyleEl.value as BorderStyle,
     });
 });
-// Ctrl + 滚轮缩放由 ENABLE_ZOOM_WHEEL 配置控制，默认开启
-
-// 销毁
 function destroy() {
     eVirtTable.destroy();
     window.removeEventListener('beforeunload', destroy);

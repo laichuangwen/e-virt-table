@@ -79,32 +79,27 @@ export default class Body {
             this.height = HEIGHT - header.height - footerHeight - layoutScrollerTrackSize;
         }
 
-        const { zoomScale } = this.ctx;
         let containerHeight = this.height + header.height + layoutScrollerTrackSize;
         containerHeight += footerHeight;
-        let physicalStageHeight = zoomScale.contentToPhysical(containerHeight);
+        let stageHeight = containerHeight;
         const windowInnerHeight = window.innerHeight;
         const { top } = this.containerRect || this.ctx.containerElement.getBoundingClientRect();
         if (windowInnerHeight > top && ENABLE_OFFSET_HEIGHT && !HEIGHT) {
             const visibleHeight = windowInnerHeight - top;
             const _stageHeight = visibleHeight - OFFSET_HEIGHT;
-            if (_stageHeight > zoomScale.contentToPhysical(header.height + layoutScrollerTrackSize)) {
-                physicalStageHeight = _stageHeight;
-            } else if (zoomScale.contentToPhysical(containerHeight) > MAX_HEIGHT) {
-                physicalStageHeight = MAX_HEIGHT;
+            if (_stageHeight > header.height + layoutScrollerTrackSize) {
+                stageHeight = _stageHeight;
+            } else if (containerHeight > MAX_HEIGHT) {
+                stageHeight = MAX_HEIGHT;
             }
         } else if (this.data.length && HEIGHT) {
-            physicalStageHeight = HEIGHT;
-        } else if (this.data.length && MAX_HEIGHT && zoomScale.contentToPhysical(containerHeight) > MAX_HEIGHT) {
-            physicalStageHeight = MAX_HEIGHT;
+            stageHeight = HEIGHT;
+        } else if (this.data.length && MAX_HEIGHT && containerHeight > MAX_HEIGHT) {
+            stageHeight = MAX_HEIGHT;
         }
-        if (physicalStageHeight > 0) {
-            const { stageHeight, stagePhysicalHeight } = zoomScale.applyStageHeight(
-                this.ctx.stageElement,
-                physicalStageHeight,
-            );
-            this.ctx.stageHeight = stageHeight;
-            this.ctx.stagePhysicalHeight = stagePhysicalHeight;
+        if (stageHeight > 0) {
+            this.ctx.stageHeight = Math.floor(stageHeight);
+            this.ctx.stageElement.style.height = `${this.ctx.stageHeight}px`;
         }
         // 可视区高度
         let _visibleHeight = this.ctx.stageHeight - header.height - layoutScrollerTrackSize;
@@ -125,9 +120,8 @@ export default class Body {
         this.ctx.body.visibleHeight = this.visibleHeight;
         this.ctx.body.data = data;
         const dpr = window.devicePixelRatio || 1; // 获取设备像素比
-        // canvas 缓冲区按物理尺寸*dpr,保证原生分辨率清晰
-        const canvasWidth = this.ctx.stagePhysicalWidth * dpr;
-        const canvasHeight = this.ctx.stagePhysicalHeight * dpr;
+        const canvasWidth = this.ctx.stageWidth * dpr;
+        const canvasHeight = this.ctx.stageHeight * dpr;
         canvasElement.width = Math.round(canvasWidth);
         canvasElement.height = Math.round(canvasHeight);
         const isEmpty = !this.data.length ? 'empty' : 'not-empty';
@@ -144,7 +138,7 @@ export default class Body {
         const _cssWidth = Math.round((canvasElement.width / dpr) * 10000) / 10000;
         const _cssHeight = Math.round((canvasElement.height / dpr) * 10000) / 10000;
         this.ctx.canvasElement.setAttribute('style', `height:${_cssHeight}px;width:${_cssWidth}px;`);
-        this.ctx.paint.scale(dpr, this.ctx.zoomScale.value);
+        this.ctx.paint.scale(dpr);
     }
     private initTree() {
         this.ctx.on('cellClick', (cell, e) => {

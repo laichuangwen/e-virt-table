@@ -70,8 +70,8 @@ export default class EventBrowser {
     private handleMousemove(e: Event) {
         const _e = e as MouseEvent;
         const rect = this.ctx.containerElement.getBoundingClientRect();
-        const x = this.ctx.zoomScale.toLogical(_e.clientX - rect.left);
-        const y = this.ctx.zoomScale.toLogical(_e.clientY - rect.top);
+        const x = _e.clientX - rect.left;
+        const y = _e.clientY - rect.top;
         this.ctx.mouseX = x;
         this.ctx.mouseY = y;
         this.ctx.emit('mousemove', e);
@@ -99,14 +99,6 @@ export default class EventBrowser {
         this.ctx.emit('keydown', e);
     }
     private handleWheel(e: Event) {
-        const _e = e as WheelEvent;
-        const { ENABLE_ZOOM_WHEEL } = this.ctx.config;
-        if (ENABLE_ZOOM_WHEEL && (_e.ctrlKey || _e.metaKey)) {
-            e.preventDefault();
-            const delta = _e.deltaY > 0 ? -0.1 : 0.1;
-            this.ctx.setZoom(this.ctx.getZoom() + delta);
-            return;
-        }
         this.ctx.emit('wheel', e);
     }
     private handleTouchstart(e: Event) {

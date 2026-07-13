@@ -127,12 +127,6 @@ export default class Config {
     CELL_HOVER_ICON_BG_COLOR = '#fff';
     /** hover编辑图标边框颜色 */
     CELL_HOVER_ICON_BORDER_COLOR = '#DDE0EA';
-    /** 内容缩放最小比例 */
-    MIN_ZOOM = 0.5;
-    /** 内容缩放最大比例 */
-    MAX_ZOOM = 2;
-    /** 启用 Ctrl + 滚轮内容缩放 */
-    ENABLE_ZOOM_WHEEL = true;
     /** 滚动条轨道尺寸 */
     SCROLLER_TRACK_SIZE = 14;
     /** 滚动条模式，outer 为外部预留区域，inner 为覆盖在内容上 */

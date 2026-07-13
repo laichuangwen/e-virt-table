@@ -256,16 +256,6 @@ export default class EVirtTable {
     doLayout() {
         this.ctx.emit('draw');
     }
-    /**
-     * 设置内容缩放比例(容器大小不变,内容变大/变小,基于原生分辨率重绘不失清晰度)
-     * @param zoom 缩放比例,范围 MIN_ZOOM ~ MAX_ZOOM
-     */
-    setZoom(zoom: number) {
-        this.ctx.setZoom(zoom);
-    }
-    getZoom() {
-        return this.ctx.getZoom();
-    }
     getChangedData() {
         return this.ctx.database.getChangedData();
     }

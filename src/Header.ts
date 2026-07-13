@@ -89,15 +89,15 @@ export default class Header {
         this.render(spanColumns, 0);
         this.ctx.database.updateColIndexKeyMap(this.leafCellHeaders);
         const containerElement = this.ctx.containerElement.getBoundingClientRect();
-        const { stageWidth, stagePhysicalWidth } = this.ctx.zoomScale.resolveStageWidth({
-            containerPhysicalWidth: containerElement.width,
-            contentWidth: this.width,
-            scrollerTrackSize: layoutScrollerTrackSize,
-            fillContainer: this.resizeNum > 0,
-        });
-        this.ctx.stageWidth = stageWidth;
-        this.ctx.stagePhysicalWidth = stagePhysicalWidth;
-        this.ctx.stageElement.style.width = `${stagePhysicalWidth}px`;
+        if (this.resizeNum > 0) {
+            this.ctx.stageWidth = Math.floor(containerElement.width);
+        } else {
+            this.ctx.stageWidth = Math.min(
+                Math.floor(this.width + layoutScrollerTrackSize),
+                Math.floor(containerElement.width),
+            );
+        }
+        this.ctx.stageElement.style.width = `${this.ctx.stageWidth}px`;
         this.visibleWidth = this.ctx.stageWidth - layoutScrollerTrackSize;
 
         // 如果表头宽度小于可视宽度，平均分配

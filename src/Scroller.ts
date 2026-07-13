@@ -75,8 +75,8 @@ class Scrollbar {
     onTouchmove(e: TouchEvent) {
         const { clientY, clientX } = e.touches[0];
         // 物理滑动距离换算为逻辑距离
-        const deltaY = this.ctx.zoomScale.toLogical(clientY - this.clientY);
-        const deltaX = this.ctx.zoomScale.toLogical(clientX - this.clientX);
+        const deltaY = clientY - this.clientY;
+        const deltaX = clientX - this.clientX;
         let scroll = 0;
         if (this.type === 'vertical') {
             scroll = Math.max(0, Math.min(this.dragStart - deltaY, this.distance));
@@ -182,8 +182,6 @@ class Scrollbar {
         } else {
             offset = clientY - this.clientY;
         }
-        // 物理位移换算为逻辑位移
-        offset = this.ctx.zoomScale.toLogical(offset);
         if (this.isDragging && offset !== 0) {
             // scroll= 开始滚动条位置+（鼠标移动的距离/可见区域的长度）*滚动条的长度
             let scroll = 0;
