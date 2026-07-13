@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process';
 const loaderUrl = new URL('./fixtures/resolveJsExtension.mjs', import.meta.url).href;
 const fixtureUrl = new URL('./fixtures/innerScrollbarConstructor.mjs', import.meta.url).href;
 
-test('does not append inner scrollbar toggle controls', () => {
+test('constructs inner scrollbars without controls and supports overlay targets', () => {
     const result = spawnSync(
         process.execPath,
         ['--experimental-loader', loaderUrl, '--input-type=module', '--eval', `await import(${JSON.stringify(fixtureUrl)});`],

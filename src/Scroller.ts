@@ -114,9 +114,7 @@ class Scrollbar {
         }
 
         const { clientX, clientY } = e;
-        // 滚动条按逻辑坐标绘制,鼠标 offset 是物理像素,需换算
-        const offsetX = this.ctx.zoomScale.toLogical(e.offsetX);
-        const offsetY = this.ctx.zoomScale.toLogical(e.offsetY);
+        const { offsetX, offsetY } = this.ctx.getOffset(e);
         if (clientX == this.clientX && clientY == this.clientY) return;
         if (this.isInnerMode()) {
             if (!this.canInteractWithScrollbar()) {
@@ -156,8 +154,7 @@ class Scrollbar {
 
     onMouseMove(e: MouseEvent, isPointerInsideTable: boolean): boolean {
         const { clientX, clientY, buttons } = e;
-        const offsetX = this.ctx.zoomScale.toLogical(e.offsetX);
-        const offsetY = this.ctx.zoomScale.toLogical(e.offsetY);
+        const { offsetX, offsetY } = this.ctx.getOffset(e);
         let needsFullRedraw = false;
         if (shouldStartInnerScrollbarShowTimer(this.ctx.config, isPointerInsideTable)) {
             this.startInnerShowTimer();
@@ -168,7 +165,7 @@ class Scrollbar {
         // 悬浮提示
         const isScrollbarHover =
             this.canInteractWithScrollbar() && (this.isOnScrollbar(offsetX, offsetY) || this.isOnTrack(offsetX, offsetY));
-        if (isScrollbarHover && e.target === this.ctx.canvasElement) {
+        if (isScrollbarHover && isPointerInsideTable) {
             this.isFocus = true;
             this.ctx.stageElement.style.cursor = 'pointer';
         } else {
