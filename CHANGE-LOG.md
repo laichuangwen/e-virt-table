@@ -6,6 +6,10 @@ Vx.x.x(TPL)
 -   Style changes
 -   Dependencies Changes
 -  
+V1.4.4
+### Bug Fixes
+- feat:移除表格缩放功能
+- fix: 修复dom 格子时 inner scrollbar不可滚动
 
 V1.4.3
 ### Bug Fixes
