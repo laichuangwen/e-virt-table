@@ -8,6 +8,15 @@
             body {
                 margin: 8px 32px 8px 8px;
             }
+
+            .status-layer-cell {
+                box-sizing: border-box;
+                display: flex;
+                align-items: center;
+                width: 100%;
+                height: 100%;
+                padding: 0 10px;
+            }
         </style>
     </head>
     <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
@@ -15,6 +24,13 @@
         <div id="e-virt-table"></div>
     </body>
     <script>
+        function renderStatusLayer(parent, cell) {
+            const cellElement = document.createElement('div');
+            cellElement.className = 'status-layer-cell';
+            cellElement.textContent = cell.text ?? '';
+            parent.appendChild(cellElement);
+        }
+
         const columns = [
             { title: 'No.', key: 'id', width: 80, fixed: 'left' },
             { title: 'Name', key: 'name', width: 180 },
@@ -22,7 +38,15 @@
             { title: 'City', key: 'city', width: 180 },
             { title: 'Address', key: 'address', width: 320 },
             { title: 'Email', key: 'email', width: 240 },
-            { title: 'Status', key: 'status', width: 160, fixed: 'right' },
+            {
+                title: 'Status',
+                key: 'status',
+                width: 160,
+                fixed: 'right',
+                renderHeader: renderStatusLayer,
+                render: renderStatusLayer,
+                renderFooter: renderStatusLayer,
+            },
         ];
         const data = Array.from({ length: 80 }, (_, index) => ({
             id: `${index + 1}`,
