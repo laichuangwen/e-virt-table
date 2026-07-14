@@ -131,7 +131,7 @@ export type SortDirection = 'asc' | 'desc' | 'none';
 export type SortStateMapItem = { direction: SortDirection; timestamp: number };
 export type SortStateMap = Map<string, SortStateMapItem>;
 export type SortByType = 'number' | 'string' | 'date' | 'api' | ((a: any, b: any) => number);
-export type RenderType =  'default' | 'both';
+export type RenderType = 'default' | 'both';
 export interface Column {
     key: string;
     title: string;
@@ -157,7 +157,7 @@ export interface Column {
     rowspan?: number;
     sort?: number;
     sortBy?: SortByType;
-    sortIconType?: 'default' | 'up-down' | 'left-right';
+    sortIconType?: 'up-down' | 'left-right' | 'loop';
     sortIconName?: string; // 默认排序图标
     sortAscIconName?: string; // 升序排序图标
     sortDescIconName?: string; // 降序排序图标

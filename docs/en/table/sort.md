@@ -11,7 +11,7 @@
 | Parameter         | Description              | Type                                                                   | Default   |
 | ----------------- | ------------------------ | ---------------------------------------------------------------------- | --------- |
 | sortBy            | Sorting type             | `'number'`, `'string'`, `'date'`, `(a: rowData, b: rowData) => number` | -         |
-| sortIconType      | Sort icon interaction    | `'default'`, `'up-down'`, `'left-right'`                               | `default` |
+| sortIconType      | Sort icon interaction    | `'up-down'`, `'left-right'`, `'loop'`                                  | `up-down` |
 | sortIconName      | Default sort icon        | `string`                                                               | -         |
 | sortAscIconName   | Ascending sort icon      | `string`                                                               | -         |
 | sortDescIconName  | Descending sort icon     | `string`                                                               | -         |
@@ -97,7 +97,7 @@ Use custom functions for complex sorting logic.
 
 ## Basic Usage
 
-When a column is configured with the `sortBy` property, the table header will display a sort icon. Clicking the icon cycles through: no sorting → ascending → descending → no sorting.
+When a column is configured with the `sortBy` property, the table header will display a sort icon. By default it uses up/down interaction: click the top half for ascending, the bottom half for descending.
 
 ::: demo
 
@@ -129,24 +129,13 @@ h:400px
 
 Use `sortIconType` to control how clicking the sort icon changes sort direction.
 
-| Value          | Description                                                                                          |
-| -------------- | ---------------------------------------------------------------------------------------------------- |
-| `default`      | Click cycles through: none → ascending → descending → none (default)                                 |
-| `up-down`      | Click the top half for ascending, bottom half for descending; click the same area again to clear     |
-| `left-right`   | Click the left half for ascending, right half for descending; click the same area again to clear     |
+| Value          | Description                                                                                                      |
+| -------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `up-down`      | Click the top half for ascending, bottom half for descending; click the same area again to clear (default)       |
+| `left-right`   | Click the left half for ascending, right half for descending; click the same area again to clear                 |
+| `loop`         | Click cycles through: none → ascending → descending → none                                                       |
 
-### default
-
-```javascript
-{
-    title: 'Name',
-    key: 'name',
-    sortBy: 'string',
-    sortIconType: 'default' // optional, defaults to 'default'
-}
-```
-
-### up-down
+### up-down (default)
 
 Best for up/down arrow sort icons. Click the top half for ascending, the bottom half for descending.
 
@@ -155,7 +144,7 @@ Best for up/down arrow sort icons. Click the top half for ascending, the bottom 
     title: 'Age',
     key: 'age',
     sortBy: 'number',
-    sortIconType: 'up-down'
+    sortIconType: 'up-down' // optional, defaults to 'up-down'
 }
 ```
 
@@ -169,6 +158,19 @@ Best for left/right arrow sort icons. Click the left half for ascending, the rig
     key: 'salary',
     sortBy: 'number',
     sortIconType: 'left-right'
+}
+```
+
+### loop
+
+Click the whole icon to cycle through sort directions in a fixed order.
+
+```javascript
+{
+    title: 'Name',
+    key: 'name',
+    sortBy: 'string',
+    sortIconType: 'loop'
 }
 ```
 

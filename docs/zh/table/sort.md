@@ -11,7 +11,7 @@
 | 参数             | 说明         | 类型                                                                   | 默认值    |
 | ---------------- | ------------ | ---------------------------------------------------------------------- | --------- |
 | sortBy           | 排序类型     | `'number'`, `'string'`, `'date'`, `(a: rowData, b: rowData) => number` | -         |
-| sortIconType     | 排序图标交互 | `'default'`, `'up-down'`, `'left-right'`                               | `default` |
+| sortIconType     | 排序图标交互 | `'up-down'`, `'left-right'`, `'loop'`                                  | `up-down` |
 | sortIconName     | 默认排序图标 | `string`                                                               | -         |
 | sortAscIconName  | 升序排序图标 | `string`                                                               | -         |
 | sortDescIconName | 降序排序图标 | `string`                                                               | -         |
@@ -101,7 +101,7 @@
 
 ## 基础用法
 
-当列配置了 `sortBy` 属性时，表头会显示排序图标。点击图标可以循环切换：不排序 → 升序 → 降序 → 不排序。
+当列配置了 `sortBy` 属性时，表头会显示排序图标。默认按上下分区交互：点击上半部分升序，下半部分降序。
 
 ::: demo
 
@@ -136,22 +136,11 @@ h:400px
 
 | 值           | 说明                                                                 |
 | ------------ | -------------------------------------------------------------------- |
-| `default`    | 点击图标循环切换：不排序 → 升序 → 降序 → 不排序（默认）             |
-| `up-down`    | 点击图标上半部分切换升序，下半部分切换降序；再次点击同区域可取消排序 |
+| `up-down`    | 点击图标上半部分切换升序，下半部分切换降序；再次点击同区域可取消排序（默认） |
 | `left-right` | 点击图标左半部分切换升序，右半部分切换降序；再次点击同区域可取消排序 |
+| `loop`       | 点击图标循环切换：不排序 → 升序 → 降序 → 不排序                      |
 
-### default（默认）
-
-```javascript
-{
-    title: '姓名',
-    key: 'name',
-    sortBy: 'string',
-    sortIconType: 'default' // 可省略，默认为 default
-}
-```
-
-### up-down（上下分区）
+### up-down（上下分区，默认）
 
 适合上下箭头类排序图标。点击上半区升序，下半区降序。
 
@@ -160,7 +149,7 @@ h:400px
     title: '年龄',
     key: 'age',
     sortBy: 'number',
-    sortIconType: 'up-down'
+    sortIconType: 'up-down' // 可省略，默认为 up-down
 }
 ```
 
@@ -174,6 +163,19 @@ h:400px
     key: 'salary',
     sortBy: 'number',
     sortIconType: 'left-right'
+}
+```
+
+### loop（循环切换）
+
+点击整块图标按固定顺序循环切换排序方向。
+
+```javascript
+{
+    title: '姓名',
+    key: 'name',
+    sortBy: 'string',
+    sortIconType: 'loop'
 }
 ```
 

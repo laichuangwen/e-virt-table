@@ -125,7 +125,7 @@ export default class Header {
             if (!cellHeader.isImageInside('sort', e)) {
                 return;
             }
-            const { sortIconType = 'default' } = cellHeader.column;
+            const { sortIconType = 'up-down' } = cellHeader.column;
             const direction = cellHeader.getImageClickDirection('sort', e);
             let newDirection: SortDirection = 'none';
             // 优化排序方向切换逻辑
@@ -139,20 +139,20 @@ export default class Header {
                 }
                 return action;
             }
-            if (direction && (sortIconType === 'up-down' || sortIconType === 'left-right')) {
-                if (direction.includes('up') || direction.includes('left')) {
-                    newDirection = getNextDirection(currentState.direction, 'asc');
-                } else if (direction.includes('down') || direction.includes('right')) {
-                    newDirection = getNextDirection(currentState.direction, 'desc');
-                }
-            } else {
-                // 默认循环 不排序->升序->降序->不排序
+            if (sortIconType === 'loop') {
+                // 循环切换：不排序->升序->降序->不排序
                 if (currentState.direction === 'none') {
                     newDirection = 'asc';
                 } else if (currentState.direction === 'asc') {
                     newDirection = 'desc';
                 } else {
                     newDirection = 'none';
+                }
+            } else if (direction && (sortIconType === 'up-down' || sortIconType === 'left-right')) {
+                if (direction.includes('up') || direction.includes('left')) {
+                    newDirection = getNextDirection(currentState.direction, 'asc');
+                } else if (direction.includes('down') || direction.includes('right')) {
+                    newDirection = getNextDirection(currentState.direction, 'desc');
                 }
             }
             this.ctx.database.setSortState(cellHeader.key, newDirection);
