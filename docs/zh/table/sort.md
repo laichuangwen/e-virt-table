@@ -8,12 +8,13 @@
 
 ## Column
 
-| 参数             | 说明         | 类型                                                                   | 默认值 |
-| ---------------- | ------------ | ---------------------------------------------------------------------- | ------ |
-| sortBy           | 排序类型     | `'number'`, `'string'`, `'date'`, `(a: rowData, b: rowData) => number` | -      |
-| sortIconName     | 默认排序图标 | `string`                                                               | -      |
-| sortAscIconName  | 升序排序图标 | `string`                                                               | -      |
-| sortDescIconName | 降序排序图标 | `string`                                                               | -      |
+| 参数             | 说明         | 类型                                                                   | 默认值    |
+| ---------------- | ------------ | ---------------------------------------------------------------------- | --------- |
+| sortBy           | 排序类型     | `'number'`, `'string'`, `'date'`, `(a: rowData, b: rowData) => number` | -         |
+| sortIconType     | 排序图标交互 | `'default'`, `'up-down'`, `'left-right'`                               | `default` |
+| sortIconName     | 默认排序图标 | `string`                                                               | -         |
+| sortAscIconName  | 升序排序图标 | `string`                                                               | -         |
+| sortDescIconName | 降序排序图标 | `string`                                                               | -         |
 
 ## Events
 
@@ -126,6 +127,59 @@ h:400px
 ::: demo
 
 sort/icon
+h:400px
+:::
+
+## 排序图标交互类型
+
+通过 `sortIconType` 控制点击排序图标时的交互方式。
+
+| 值           | 说明                                                                 |
+| ------------ | -------------------------------------------------------------------- |
+| `default`    | 点击图标循环切换：不排序 → 升序 → 降序 → 不排序（默认）             |
+| `up-down`    | 点击图标上半部分切换升序，下半部分切换降序；再次点击同区域可取消排序 |
+| `left-right` | 点击图标左半部分切换升序，右半部分切换降序；再次点击同区域可取消排序 |
+
+### default（默认）
+
+```javascript
+{
+    title: '姓名',
+    key: 'name',
+    sortBy: 'string',
+    sortIconType: 'default' // 可省略，默认为 default
+}
+```
+
+### up-down（上下分区）
+
+适合上下箭头类排序图标。点击上半区升序，下半区降序。
+
+```javascript
+{
+    title: '年龄',
+    key: 'age',
+    sortBy: 'number',
+    sortIconType: 'up-down'
+}
+```
+
+### left-right（左右分区）
+
+适合左右箭头类排序图标。点击左半区升序，右半区降序。
+
+```javascript
+{
+    title: '薪资',
+    key: 'salary',
+    sortBy: 'number',
+    sortIconType: 'left-right'
+}
+```
+
+::: demo
+
+sort/icon-type
 h:400px
 :::
 

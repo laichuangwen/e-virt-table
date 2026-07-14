@@ -8,12 +8,13 @@
 
 ## Column
 
-| Parameter         | Description      | Type                                                                   | Default |
-| ----------------- | ---------------- | ---------------------------------------------------------------------- | ------- |
-| sortBy            | Sorting type     | `'number'`, `'string'`, `'date'`, `(a: rowData, b: rowData) => number` | -       |
-| sortIconName      | Default sort icon | `string`                                                               | -       |
-| sortAscIconName   | Ascending sort icon | `string`                                                               | -       |
-| sortDescIconName  | Descending sort icon | `string`                                                               | -       |
+| Parameter         | Description              | Type                                                                   | Default   |
+| ----------------- | ------------------------ | ---------------------------------------------------------------------- | --------- |
+| sortBy            | Sorting type             | `'number'`, `'string'`, `'date'`, `(a: rowData, b: rowData) => number` | -         |
+| sortIconType      | Sort icon interaction    | `'default'`, `'up-down'`, `'left-right'`                               | `default` |
+| sortIconName      | Default sort icon        | `string`                                                               | -         |
+| sortAscIconName   | Ascending sort icon      | `string`                                                               | -         |
+| sortDescIconName  | Descending sort icon     | `string`                                                               | -         |
 
 ## Events
 
@@ -121,6 +122,59 @@ Different sorting types display different icons. You need to configure SVG icons
 ::: demo
 
 sort/icon
+h:400px
+:::
+
+## Sort Icon Interaction Type
+
+Use `sortIconType` to control how clicking the sort icon changes sort direction.
+
+| Value          | Description                                                                                          |
+| -------------- | ---------------------------------------------------------------------------------------------------- |
+| `default`      | Click cycles through: none → ascending → descending → none (default)                                 |
+| `up-down`      | Click the top half for ascending, bottom half for descending; click the same area again to clear     |
+| `left-right`   | Click the left half for ascending, right half for descending; click the same area again to clear     |
+
+### default
+
+```javascript
+{
+    title: 'Name',
+    key: 'name',
+    sortBy: 'string',
+    sortIconType: 'default' // optional, defaults to 'default'
+}
+```
+
+### up-down
+
+Best for up/down arrow sort icons. Click the top half for ascending, the bottom half for descending.
+
+```javascript
+{
+    title: 'Age',
+    key: 'age',
+    sortBy: 'number',
+    sortIconType: 'up-down'
+}
+```
+
+### left-right
+
+Best for left/right arrow sort icons. Click the left half for ascending, the right half for descending.
+
+```javascript
+{
+    title: 'Salary',
+    key: 'salary',
+    sortBy: 'number',
+    sortIconType: 'left-right'
+}
+```
+
+::: demo
+
+sort/icon-type
 h:400px
 :::
 

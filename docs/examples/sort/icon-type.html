@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table - Sort Icon Type</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        let data = [
+            {
+                id: 1,
+                name: 'John Smith',
+                age: 25,
+                salary: 50000,
+                department: 'Technology',
+                joinDate: '2023-01-15',
+            },
+            {
+                id: 2,
+                name: 'Sarah Johnson',
+                age: 30,
+                salary: 65000,
+                department: 'Marketing',
+                joinDate: '2022-08-20',
+            },
+            {
+                id: 3,
+                name: 'Michael Brown',
+                age: 28,
+                salary: 55000,
+                department: 'Technology',
+                joinDate: '2023-03-10',
+            },
+            {
+                id: 4,
+                name: 'Emily Davis',
+                age: 35,
+                salary: 75000,
+                department: 'Sales',
+                joinDate: '2021-12-05',
+            },
+            {
+                id: 5,
+                name: 'David Wilson',
+                age: 27,
+                salary: 48000,
+                department: 'HR',
+                joinDate: '2023-06-18',
+            },
+            {
+                id: 6,
+                name: 'Lisa Anderson',
+                age: 32,
+                salary: 70000,
+                department: 'Technology',
+                joinDate: '2022-11-12',
+            },
+            {
+                id: 7,
+                name: 'Robert Taylor',
+                age: 29,
+                salary: 58000,
+                department: 'Marketing',
+                joinDate: '2023-02-28',
+            },
+            {
+                id: 8,
+                name: 'Jennifer Martinez',
+                age: 33,
+                salary: 72000,
+                department: 'Sales',
+                joinDate: '2022-05-15',
+            },
+        ];
+
+        let columns = [
+            {
+                title: 'ID',
+                key: 'id',
+                width: 80,
+                align: 'center',
+                readonly: true,
+            },
+            {
+                title: 'Name (default)',
+                key: 'name',
+                width: 160,
+                align: 'left',
+                sortBy: 'string',
+                sortIconType: 'default',
+                readonly: true,
+            },
+            {
+                title: 'Age (up-down)',
+                key: 'age',
+                width: 140,
+                align: 'center',
+                sortBy: 'number',
+                sortIconType: 'up-down',
+                readonly: true,
+            },
+            {
+                title: 'Salary (left-right)',
+                key: 'salary',
+                width: 160,
+                align: 'right',
+                sortBy: 'number',
+                sortIconType: 'left-right',
+                readonly: true,
+                formatter: ({ value }) => {
+                    return `$${value.toLocaleString()}`;
+                },
+            },
+            {
+                title: 'Department',
+                key: 'department',
+                width: 120,
+                align: 'left',
+                sortBy: 'string',
+                sortIconType: 'up-down',
+                readonly: true,
+            },
+            {
+                title: 'Join Date',
+                key: 'joinDate',
+                width: 120,
+                align: 'center',
+                sortBy: 'date',
+                sortIconType: 'left-right',
+                readonly: true,
+            },
+        ];
+
+        const eVirtTable = new EVirtTable(document.getElementById('e-virt-table'), {
+            columns,
+            data,
+            config: {
+                BORDER: true,
+                STRIPE: true,
+                CELL_HEIGHT: 40,
+                HEADER_HEIGHT: 40,
+                ROW_KEY: 'id',
+                ENABLE_SELECTOR: true,
+                ENABLE_KEYBOARD: true,
+                HIGHLIGHT_HOVER_ROW: true,
+            },
+        });
+    </script>
+</html>
