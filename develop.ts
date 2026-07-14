@@ -330,6 +330,10 @@ let columns: Column[] = [
             cellEl.innerHTML = cell.value || ''; // 设置单元格内容
             pEl.appendChild(cellEl);
         },
+        selectorCellValueType: 'displayText',
+        formatterSelectorValue: ({ value }) => {
+            return `合：${value}`;
+        },
     },
     {
         title: '请假开始时间',

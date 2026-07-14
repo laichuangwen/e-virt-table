@@ -187,6 +187,7 @@ export interface Column {
     hideDisabled?: boolean;
     fixedDisabled?: boolean;
     selectorCellValueType?: SelectorCellValueType;
+    formatterSelectorValue?: FormatterMethod;
     maxLineClamp?: LineClampType; // 行高超出多少行显示省略号
     maxLineClampHeader?: LineClampType; // 表头行高超出多少行显示省略号
     precision?: number; // 精度,数字类型有效

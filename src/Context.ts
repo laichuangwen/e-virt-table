@@ -308,7 +308,22 @@ export default class Context {
                 const cell = this.database.getVirtualBodyCell(rowIndex, colIndex);
                 if (cell) {
                     // 选择器值类型
-                    if (cell.selectorCellValueType === 'displayText') {
+                    if (cell?.column?.formatterSelectorValue) {
+                        const {
+                            row,
+                            rowIndex,
+                            colIndex,
+                            column,
+                        } = cell;
+                        const value = cell.column.formatterSelectorValue({
+                            row,
+                            rowIndex,
+                            colIndex,
+                            column,
+                            value: cell.getValue(),
+                        });
+                        cellsData.push(value);
+                    } else if (cell.selectorCellValueType === 'displayText') {
                         cellsData.push(cell.displayText);
                     } else {
                         // 默认value
