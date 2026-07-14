@@ -6,6 +6,12 @@ Vx.x.x(TPL)
 -   Style changes
 -   Dependencies Changes
 -  
+
+V1.4.5
+### Bug Fixes
+- feat:添加排序图标类型，支持排序图标上下左右点击切换不同的排序
+- feat:添加formatterSelectorValue 支持格式化复制内容
+
 V1.4.4
 ### Bug Fixes
 - feat:移除表格缩放功能
