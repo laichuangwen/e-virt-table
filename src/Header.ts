@@ -148,10 +148,16 @@ export default class Header {
                 } else {
                     newDirection = 'none';
                 }
-            } else if (direction && (sortIconType === 'up-down' || sortIconType === 'left-right')) {
-                if (direction.includes('up') || direction.includes('left')) {
+            } else if (direction && (sortIconType === 'up-down')) {
+                if (direction.includes('up')) {
                     newDirection = getNextDirection(currentState.direction, 'asc');
-                } else if (direction.includes('down') || direction.includes('right')) {
+                } else if (direction.includes('down')) {
+                    newDirection = getNextDirection(currentState.direction, 'desc');
+                }
+            } else if (direction && sortIconType === 'left-right') {
+                if (direction.includes('left')) {
+                    newDirection = getNextDirection(currentState.direction, 'asc');
+                } else if (direction.includes('right')) {
                     newDirection = getNextDirection(currentState.direction, 'desc');
                 }
             }
