@@ -94,4 +94,29 @@ export default class BaseCell {
         }
         return false;
     }
+    // 判断图片点击方向返回点击上下左右
+    getImageClickDirection(key: string, e: MouseEvent) {
+        const { offsetX, offsetY } = this.ctx.getOffset(e);
+        const image = this.getImage(key);
+        if (!image) return null;
+        const localX = offsetX - image.x;
+        const localY = offsetY - image.y;
+        const halfWidth = image.width / 2;
+        const halfHeight = image.height / 2;
+        if (localY < halfHeight) {
+            // 上
+            if (localX < halfWidth) {
+                return 'up-left';
+            } else {
+                return 'up-right';
+            }
+        } else {
+            // 下
+            if (localX < halfWidth) {
+                return 'down-left';
+            } else {
+                return 'down-right';
+            }
+        }
+    }
 }

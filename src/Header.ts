@@ -1,7 +1,7 @@
 import Context from './Context';
 import { getMaxRow, calCrossSpan, toLeaf, sortFixed, throttle, filterHiddenColumns } from './util';
 import CellHeader from './CellHeader';
-import type { Column, ColumnDragChangeEvent } from './types';
+import type { Column, ColumnDragChangeEvent, SortDirection } from './types';
 import { TreeUtil } from './TreeUtil';
 import { shouldDrawInternalHorizontalBorder } from './BorderStyle';
 import { getLayoutScrollerTrackSize } from './ScrollbarMode';
@@ -125,15 +125,35 @@ export default class Header {
             if (!cellHeader.isImageInside('sort', e)) {
                 return;
             }
+            const { sortIconType = 'default' } = cellHeader.column;
+            const direction = cellHeader.getImageClickDirection('sort', e);
+            let newDirection: SortDirection = 'none';
+            // 优化排序方向切换逻辑
             const currentState = this.ctx.database.getSortState(cellHeader.key);
-            let newDirection: 'asc' | 'desc' | 'none';
-            // 按照 不排序->升序->降序->不排序 的顺序循环
-            if (currentState.direction === 'none') {
-                newDirection = 'asc';
-            } else if (currentState.direction === 'asc') {
-                newDirection = 'desc';
+            function getNextDirection(direction: SortDirection, action: 'asc' | 'desc'): SortDirection {
+                // 按照 不排序->升序/降序->不排序 的顺序循环
+                if (direction === 'none') {
+                    return action;
+                } else if (direction === action) {
+                    return 'none';
+                }
+                return action;
+            }
+            if (direction && (sortIconType === 'up-down' || sortIconType === 'left-right')) {
+                if (direction.includes('up') || direction.includes('left')) {
+                    newDirection = getNextDirection(currentState.direction, 'asc');
+                } else if (direction.includes('down') || direction.includes('right')) {
+                    newDirection = getNextDirection(currentState.direction, 'desc');
+                }
             } else {
-                newDirection = 'none';
+                // 默认循环 不排序->升序->降序->不排序
+                if (currentState.direction === 'none') {
+                    newDirection = 'asc';
+                } else if (currentState.direction === 'asc') {
+                    newDirection = 'desc';
+                } else {
+                    newDirection = 'none';
+                }
             }
             this.ctx.database.setSortState(cellHeader.key, newDirection);
         });

@@ -157,6 +157,7 @@ export interface Column {
     rowspan?: number;
     sort?: number;
     sortBy?: SortByType;
+    sortIconType?: 'default' | 'up-down' | 'left-right';
     sortIconName?: string; // 默认排序图标
     sortAscIconName?: string; // 升序排序图标
     sortDescIconName?: string; // 降序排序图标

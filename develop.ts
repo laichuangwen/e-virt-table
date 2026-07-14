@@ -193,6 +193,7 @@ let columns: Column[] = [
         key: 'phone',
         maxLineClamp: 'auto',
         sortBy: 'string',
+        sortIconType: 'up-down',
         align: 'center',
         verticalAlign: 'bottom',
         // fixed: 'right',
