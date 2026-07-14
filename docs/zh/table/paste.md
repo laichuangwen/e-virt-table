@@ -63,3 +63,14 @@ h:320px
 paste/before-copy
 h:320px
 :::
+
+## 格式化复制内容
+
+列配置 `formatterSelectorValue` 可以单独格式化复制内容，不会改变单元格显示值。回调接收当前单元格的原始 `value`、`row`、`rowIndex`、`colIndex` 和 `column`。
+
+下面示例中，价格在表格内显示为 `$1,299.00`，选中价格单元格并使用 `Ctrl/Cmd + C` 复制后，内容为 `USD 1299.00`。
+
+::: demo
+paste/formatter-selector-value
+h:320px
+:::

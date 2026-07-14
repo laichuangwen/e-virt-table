@@ -61,3 +61,14 @@ h:320px
 paste/before-copy
 h:320px
 :::
+
+## Format Copied Values
+
+Use the column option `formatterSelectorValue` to format copied content without changing the value displayed in the cell. The callback receives the cell's raw `value`, `row`, `rowIndex`, `colIndex`, and `column`.
+
+In this example, the table displays `$1,299.00`. Select a price cell and press `Ctrl/Cmd + C`; the copied content is `USD 1299.00`.
+
+::: demo
+paste/formatter-selector-value
+h:320px
+:::

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table - Format Copied Values</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        const data = [
+            { id: 1, product: 'Laptop stand', price: 1299, currency: 'USD', symbol: '$' },
+            { id: 2, product: 'Desk lamp', price: 899.5, currency: 'EUR', symbol: '€' },
+            { id: 3, product: 'Mechanical keyboard', price: 699, currency: 'CNY', symbol: '¥' },
+            { id: 4, product: 'Wireless mouse', price: 79.9, currency: 'USD', symbol: '$' },
+            { id: 5, product: 'Monitor arm', price: 159.8, currency: 'EUR', symbol: '€' },
+        ];
+
+        const columns = [
+            {
+                type: 'index',
+                key: 'index',
+                width: 60,
+            },
+            {
+                title: 'Product',
+                key: 'product',
+                width: 220,
+                readonly: true,
+            },
+            {
+                title: 'Price',
+                key: 'price',
+                width: 180,
+                align: 'right',
+                readonly: true,
+                formatter: ({ value, row }) => {
+                    return `${row.symbol}${Number(value).toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                    })}`;
+                },
+                formatterSelectorValue: ({ value, row }) => {
+                    return `${row.currency} ${Number(value).toFixed(2)}`;
+                },
+            },
+        ];
+
+        new EVirtTable(document.getElementById('e-virt-table'), {
+            data,
+            columns,
+            config: {
+                ROW_KEY: 'id',
+                ENABLE_SELECTOR: true,
+                ENABLE_KEYBOARD: true,
+                ENABLE_COPY: true,
+            },
+        });
+    </script>
+</html>
