@@ -11,6 +11,16 @@
 
 兼容旧写法：`true` 等同 `default`，`false` 等同 `inner`。
 
+`HEADER_BORDER_COLOR` 和 `FOOTER_BORDER_COLOR` 可分别设置表头、表尾的单元格边框及分割线颜色。未设置时继承 `BORDER_COLOR`。
+
+## 自定义区域边框颜色
+
+::: demo
+
+border/color
+h:320px
+:::
+
 ## 完整边框
 
 ::: demo

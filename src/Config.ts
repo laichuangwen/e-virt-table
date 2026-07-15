@@ -81,6 +81,8 @@ export default class Config {
     ENABLE_HEADER_STICKY = false;
     /** 表头背景色 */
     HEADER_BG_COLOR = '#F8FAFF';
+    /** 表头边框及分割线颜色，未设置时继承 BORDER_COLOR */
+    HEADER_BORDER_COLOR: string | undefined = undefined;
     /** body 背景色 */
     BODY_BG_COLOR = '#FFF';
     /** 表头文本颜色 */
@@ -203,6 +205,8 @@ export default class Config {
     ERROR_TIP_COLOR = '#ED3F14';
     /** 合计底部背景色 */
     FOOTER_BG_COLOR = '#fafafa';
+    /** 合计底部边框及分割线颜色，未设置时继承 BORDER_COLOR */
+    FOOTER_BORDER_COLOR: string | undefined = undefined;
     /** 合计底部固定 */
     FOOTER_FIXED = true;
     /** 合计底部位置 */

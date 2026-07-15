@@ -11,6 +11,16 @@
 
 Compatibility: `true` equals `default`, and `false` equals `inner`.
 
+`HEADER_BORDER_COLOR` and `FOOTER_BORDER_COLOR` customize header and footer cell borders and divider colors. Unset values inherit `BORDER_COLOR`.
+
+## Custom Section Border Colors
+
+::: demo
+
+border/color
+h:320px
+:::
+
 ## Full Border
 
 ::: demo

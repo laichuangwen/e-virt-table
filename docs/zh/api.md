@@ -29,6 +29,8 @@ type EVirtTableOptions = {
 | BODY_FONT | 单元格字体 | string | 12px normal Arial |
 | BORDER | 表格边框样式，`true` 等同 `default`，`false` 等同 `inner` | `boolean \| "default" \| "outer" \| "inner" \| "none"` | true |
 | BORDER_COLOR | 区域边框颜色 | string | #e1e6eb |
+| HEADER_BORDER_COLOR | 表头单元格边框及表头分割线颜色 | string | `BORDER_COLOR` |
+| FOOTER_BORDER_COLOR | 表尾单元格边框及表尾分割线颜色 | string | `BORDER_COLOR` |
 | RESIZE_MIN_WIDTH | 最小可调整宽度 | number | 40 |
 | HEIGHT | 高度，高度为 0 表示自适应 | number | 0 |
 | COLUMNS_ALIGN | 全局水平对齐方式 | `"left"`, `"center"`, `"right"` | left |

@@ -12,6 +12,20 @@ test('normalizes border config values', () => {
     assert.equal(mod.normalizeBorderStyle('none'), 'none');
 });
 
+test('resolves header and footer border colors with the shared border color as fallback', () => {
+    const inherited = { BORDER_COLOR: '#shared' };
+    assert.equal(mod.resolveHeaderBorderColor(inherited), '#shared');
+    assert.equal(mod.resolveFooterBorderColor(inherited), '#shared');
+
+    const customized = {
+        BORDER_COLOR: '#shared',
+        HEADER_BORDER_COLOR: '#header',
+        FOOTER_BORDER_COLOR: '#footer',
+    };
+    assert.equal(mod.resolveHeaderBorderColor(customized), '#header');
+    assert.equal(mod.resolveFooterBorderColor(customized), '#footer');
+});
+
 test('maps border modes to draw decisions', () => {
     assert.equal(mod.shouldDrawFullCellBorder('default'), true);
     assert.equal(mod.shouldDrawFullCellBorder('outer'), false);

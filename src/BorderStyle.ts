@@ -1,6 +1,20 @@
 export type BorderStyle = 'default' | 'outer' | 'inner' | 'none';
 export type BorderConfigValue = boolean | BorderStyle;
 
+type SectionBorderColorConfig = {
+    BORDER_COLOR: string;
+    HEADER_BORDER_COLOR?: string;
+    FOOTER_BORDER_COLOR?: string;
+};
+
+export function resolveHeaderBorderColor(config: SectionBorderColorConfig): string {
+    return config.HEADER_BORDER_COLOR ?? config.BORDER_COLOR;
+}
+
+export function resolveFooterBorderColor(config: SectionBorderColorConfig): string {
+    return config.FOOTER_BORDER_COLOR ?? config.BORDER_COLOR;
+}
+
 export function normalizeBorderStyle(value: BorderConfigValue): BorderStyle {
     if (value === true) return 'default';
     if (value === false) return 'inner';

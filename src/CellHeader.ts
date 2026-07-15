@@ -5,7 +5,7 @@ import BaseCell from './BaseCell';
 import { Rule, Rules } from './Validator';
 import { TextInfo } from './Paint';
 import CellImage from './CellImage';
-import { shouldDrawFullCellBorder } from './BorderStyle';
+import { resolveHeaderBorderColor, shouldDrawFullCellBorder } from './BorderStyle';
 export default class CellHeader extends BaseCell {
     align: Align;
     hideHeaderSelection = false;
@@ -195,14 +195,12 @@ export default class CellHeader extends BaseCell {
         });
     }
     private drawEdge() {
-        const {
-            paint,
-            config: { BORDER_COLOR, BORDER },
-        } = this.ctx;
+        const { paint, config } = this.ctx;
+        const { BORDER } = config;
 
         // 有边框的情况下，绘制边框
         paint.drawRect(this.drawX, this.drawY, this.width, this.height, {
-            borderColor: shouldDrawFullCellBorder(BORDER) ? BORDER_COLOR : 'transparent',
+            borderColor: shouldDrawFullCellBorder(BORDER) ? resolveHeaderBorderColor(config) : 'transparent',
             fillColor: this.drawCellBgColor,
         });
     }

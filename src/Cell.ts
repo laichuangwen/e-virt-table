@@ -23,7 +23,11 @@ import Context from './Context';
 import BaseCell from './BaseCell';
 import { Rule, Rules } from './Validator';
 import CellImage from './CellImage';
-import { shouldDrawFullCellBorder, shouldDrawInternalHorizontalBorder } from './BorderStyle';
+import {
+    resolveFooterBorderColor,
+    shouldDrawFullCellBorder,
+    shouldDrawInternalHorizontalBorder,
+} from './BorderStyle';
 export default class Cell extends BaseCell {
     parentRowKey: string = '';
     parentRowKeys: string[] = [];
@@ -976,14 +980,14 @@ export default class Cell extends BaseCell {
         };
     }
     drawContainer() {
-        const {
-            paint,
-            config: { BORDER_COLOR, BORDER },
-        } = this.ctx;
+        const { paint, config } = this.ctx;
+        const { BORDER } = config;
         const { drawX, drawY } = this;
         const drawFullBorder = shouldDrawFullCellBorder(BORDER);
+        const borderColor =
+            this.cellType === 'footer' ? resolveFooterBorderColor(config) : config.BORDER_COLOR;
         paint.drawRect(drawX, drawY, this.visibleWidth, this.visibleHeight, {
-            borderColor: drawFullBorder ? BORDER_COLOR : 'transparent',
+            borderColor: drawFullBorder ? borderColor : 'transparent',
             fillColor: this.drawCellBgColor,
         });
         // 列合并单元格
@@ -993,18 +997,19 @@ export default class Cell extends BaseCell {
         });
     }
     drawHorizontalBorder() {
-        const {
-            config: { BORDER_COLOR, BORDER },
-        } = this.ctx;
+        const { config } = this.ctx;
+        const { BORDER } = config;
         if (shouldDrawFullCellBorder(BORDER) || !shouldDrawInternalHorizontalBorder(BORDER)) {
             return;
         }
         const { drawX, drawY } = this;
+        const borderColor =
+            this.cellType === 'footer' ? resolveFooterBorderColor(config) : config.BORDER_COLOR;
         this.ctx.paint.drawLine(
             [drawX, drawY + this.visibleHeight, drawX + this.visibleWidth, drawY + this.visibleHeight],
             {
-                borderColor: BORDER_COLOR,
-                fillColor: BORDER_COLOR,
+                borderColor,
+                fillColor: borderColor,
                 borderWidth: 1,
                 lineCap: 'round',
                 lineJoin: 'round',
