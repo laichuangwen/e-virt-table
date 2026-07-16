@@ -9,6 +9,12 @@ Vx.x.x(TPL)
 
 V1.4.5
 ### Bug Fixes
+- fix:修复编辑变动后校验没有提示
+- feat:body和header footer的边框颜色可配置；
+- feat:添加canValueChange，valueChange，方便更改值
+
+V1.4.5
+### Bug Fixes
 - feat:添加排序图标类型，支持排序图标上下左右点击切换不同的排序
 - feat:添加formatterSelectorValue 支持格式化复制内容
 
