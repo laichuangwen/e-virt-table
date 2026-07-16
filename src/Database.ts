@@ -646,6 +646,7 @@ export default class Database {
                 oldValue,
                 row,
             };
+
             if (cell?.type === 'number') {
                 if (['', undefined, null].includes(value)) {
                     value = null;
@@ -706,6 +707,16 @@ export default class Database {
                     message,
                 });
             }
+            // 检查是否允许修改
+            if (typeof cell?.column?.canValueChange === 'function') {
+                const canChange = await cell.column.canValueChange({
+                    ..._changeItem,
+                    value,
+                });
+                if (!canChange) {
+                    value = oldValue;
+                };
+            }
             // 过滤无效项和相同值项
             if (value !== oldValue) {
                 changeList.push({
@@ -736,12 +747,17 @@ export default class Database {
         }
         const promsieValidators: Promise<unknown>[] = [];
         changeList.forEach((data) => {
-            promsieValidators.push(this.getValidator(data.rowKey, data.key));
             const { value, rowKey, key, row } = data;
             const oldValue = this.getItemValue(rowKey, key);
             rowList.set(rowKey, row);
             // 不加历史，不重绘，不是编辑器，不检验只读
             this.setItemValue(rowKey, key, value, false, false, false, _checkReadonly);
+            // 触发valueChange事件
+            const cell = this.getVirtualBodyCellByKey(rowKey, key);
+            if (typeof cell?.column?.valueChange === 'function') {
+                cell.column.valueChange(data);
+            }
+            promsieValidators.push(this.getValidator(data.rowKey, data.key));
             historyList.push({
                 rowKey,
                 key,

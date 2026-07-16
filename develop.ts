@@ -33,6 +33,9 @@ let columns: Column[] = [
         width: 120,
         dragRow: true,
         fixed: 'left',
+        // afterValueChange: (changeItem: AfterValueChangeItem) => {
+        //     console.log(changeItem);
+        // },
         // hide: () => 3 > 2,
     },
     // {
@@ -202,6 +205,30 @@ let columns: Column[] = [
         // formatterFooter: ({ value }) => {
         //     return `合：${value}`;
         // },
+        canValueChange: async (changeItem: BeforeValueChangeItem) => {
+            // 是不是手机号
+            if (changeItem.value && !/^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/.test(changeItem.value)) {
+                console.log('不是手机号');
+                return false;
+            }
+            return true;
+
+            // return new Promise((resolve) => {
+            //     setTimeout(() => {
+            //         if (changeItem.value && !/^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/.test(changeItem.value)) {
+            //             console.log('不是手机号');
+            //             resolve(false);
+            //         }
+            //         resolve(true);
+            //     }, 1000);
+            // })
+        },
+        valueChange: (changeItem: BeforeValueChangeItem) => {
+            console.log('valueChange', changeItem);
+            const { row, key, value } = changeItem;
+            row.customerRemarks = value ? `联动手机号：${value}` : '';
+            row.purchasePrice = null;// 清空看校验生效
+        },
         width: 100,
         // renderHeader: (pEl, cell) => {
         //     const cellEl = document.createElement('div');
@@ -411,12 +438,12 @@ let columns: Column[] = [
                 required: true,
                 message: '请输入',
             },
-            {
-                // required: false,
-                message: '最多输入两位小数',
-                // 只能输入数字或小数点，且小数点后最多两位
-                pattern: /^(\d+(\.\d{1,2})?|\.?\d{1,2})$/,
-            },
+            // {
+            //     // required: false,
+            //     message: '最多输入两位小数',
+            //     // 只能输入数字或小数点，且小数点后最多两位
+            //     pattern: /^(\d+(\.\d{1,2})?|\.?\d{1,2})$/,
+            // },
         ],
     },
     {
@@ -896,9 +923,10 @@ eVirtTable.on('error', (error) => {
 eVirtTable.on('hoverIconClick', (cell) => {
     console.log('hoverIconClick', cell);
 });
-// eVirtTable.on('change', (changeList) => {
-//     eVirtTable.validate();
-// });
+eVirtTable.on('change', (changeList) => {
+    // eVirtTable.validate();
+    console.log(changeList);
+});
 eVirtTable.on('onPastedDataOverflow', (val: PastedDataOverflow) => {
     const { overflowColCount, overflowRowCount } = val;
     if (overflowRowCount > 0) {
@@ -950,10 +978,10 @@ if (dateEl) {
             dateEl.style.display = 'none';
         }
     });
-    eVirtTable.on('change', (value) => {
-        console.log(value);
-        // console.log(eVirtTable.hasValidationError());
-    });
+    // eVirtTable.on('change', (value) => {
+    //     console.log(value);
+    //     // console.log(eVirtTable.hasValidationError());
+    // });
     dateEl.addEventListener('change', function (event) {
         if (!event.target) {
             return;

@@ -302,6 +302,8 @@ type EVirtTableOptions = {
 | autoRowHeight | Adaptive row height | boolean | false |
 | dragDisabled | Disable column drag for current column | boolean | false |
 | selectorCellValueType | Selector Cell Value Type | `SelectorCellValueType` | `value` |
+| canValueChange | Column-level gate before write; return `false` to reject | ^[Function]`(BeforeValueChangeItem)=>boolean\|Promise<boolean>` | — |
+| valueChange | Column-level callback after value is written | ^[Function]`(BeforeValueChangeItem)=>void` | — |
 
 ## Row
 
@@ -379,6 +381,14 @@ type BeforeChangeItem = {
     value: any;
     oldValue: any;
     row: any;
+};
+type BeforeValueChangeItem = {
+    rowKey: string;
+    key: string;
+    value: any;
+    oldValue?: any;
+    row?: any;
+    errorTip?: boolean;
 };
 type BeforeSetSelectorParams = {
     focusCell?: Cell;

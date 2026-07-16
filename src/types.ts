@@ -195,6 +195,8 @@ export interface Column {
     max?: number; // 最大值,数字类型有效
     maxlength?: number; // 最大长度,字符串类型有效
     mixedRender?: boolean; // 混合渲染,dom和canvas一起渲染
+    canValueChange?: (changeItem: BeforeValueChangeItem) => Promise<boolean> | boolean; // 是否允许被修改
+    valueChange?: (changeItem: BeforeValueChangeItem) => void;
 }
 export type LineClampType = number | 'auto';
 export type HistoryAction = 'back' | 'forward' | 'none';
