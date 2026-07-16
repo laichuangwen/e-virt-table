@@ -2,11 +2,13 @@
 
 ## Column
 
-| 参数        | 说明               | 类型    | 默认值 |
-| ----------- | ------------------ | ------- | ------ |
-| readonly    | 控制列只读         | boolean | false  |
-| editorType  | 编辑器类型         | sting   | false  |
-| editorProps | 传递给编辑器的属性 | object  | {}     |
+| 参数           | 说明                                       | 类型                                                                                      | 默认值 |
+| -------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------- | ------ |
+| readonly       | 控制列只读                                 | boolean                                                                                   | false  |
+| editorType     | 编辑器类型                                 | sting                                                                                     | false  |
+| editorProps    | 传递给编辑器的属性                         | object                                                                                    | {}     |
+| canValueChange | 列级别值变更拦截，返回 `false` 则取消本次修改 | ^[Function]`(BeforeValueChangeItem)=>boolean\|Promise<boolean>`                           | —      |
+| valueChange    | 列级别值变更成功后的回调，常用于联动赋值   | ^[Function]`(BeforeValueChangeItem)=>void`                                                | —      |
 
 ## Row
 
@@ -33,7 +35,18 @@ type BeforeChangeItem = {
     oldValue: any;
     row: any;
 };
+type BeforeValueChangeItem = {
+    rowKey: string;
+    key: string;
+    value: any;
+    oldValue?: any;
+    row?: any;
+    errorTip?: boolean;
+};
 ```
+
+> 执行顺序：数字/长度等内置校验 → `canValueChange` → `BEFORE_VALUE_CHANGE_METHOD` → 写入数据 → `valueChange` → 校验器。
+
 ## Methods
 
 | 方法名称             | 说明                             | 参数                                                  |
@@ -125,6 +138,30 @@ h:350px
 ::: demo
 
 readonly/value-change
+h:350px
+:::
+
+## 列级别拦截修改（canValueChange）
+
+- `canValueChange` 在写入前按列拦截，支持同步或异步（`Promise`）
+- 返回 `false` 时本次修改会被取消，单元格保持原值
+- 适用于手机号格式、业务权限、异步校验等场景
+
+::: demo
+
+readonly/can-value-change
+h:350px
+:::
+
+## 列级别值变更回调（valueChange）
+
+- `valueChange` 在值成功写入后触发
+- 常用于字段联动：修改 A 列后同步更新 B 列展示内容
+- 与表格级 `change` 事件不同，它是**列级别**回调，只作用于配置了该函数的列
+
+::: demo
+
+readonly/column-value-change
 h:350px
 :::
 

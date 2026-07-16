@@ -313,6 +313,8 @@ type EVirtTableOptions = {
 | max | 数字最大值 | number | — |
 | maxlength | 字符串最大长度 | number | — |
 | mixedRender | 混合渲染，dom和canvas一起渲染 | boolean | false |
+| canValueChange | 列级别值变更拦截，返回 `false` 取消本次修改 | ^[Function]`(BeforeValueChangeItem)=>boolean\|Promise<boolean>` | — |
+| valueChange | 列级别值变更成功后回调 | ^[Function]`(BeforeValueChangeItem)=>void` | — |
 
 ## Row
 
@@ -391,6 +393,14 @@ type BeforeChangeItem = {
     value: any;
     oldValue: any;
     row: any;
+};
+type BeforeValueChangeItem = {
+    rowKey: string;
+    key: string;
+    value: any;
+    oldValue?: any;
+    row?: any;
+    errorTip?: boolean;
 };
 type BeforeSetSelectorParams = {
     focusCell?: Cell;

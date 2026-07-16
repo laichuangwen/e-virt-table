@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+        <p style="margin: 8px 0; color: #86909c; font-size: 12px">
+            Try editing Phone: only a valid CN mobile number is accepted (async check ~300ms). Invalid values are rejected.
+        </p>
+    </body>
+    <script>
+        const phoneReg =
+            /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/;
+        let data = [
+            {
+                name: 'Tom',
+                phone: '13800138000',
+                city: 'Los Angeles',
+                address: 'No. 189, Grove St, Los Angeles',
+            },
+            {
+                name: 'Jerry',
+                phone: '13900139000',
+                city: 'San Francisco',
+                address: 'No. 1, Market St, San Francisco',
+            },
+            {
+                name: 'Alice',
+                phone: '',
+                city: 'Seattle',
+                address: 'No. 88, Pike St, Seattle',
+            },
+        ];
+        let columns = [
+            {
+                title: 'Name',
+                key: 'name',
+                width: 120,
+            },
+            {
+                title: 'Phone',
+                key: 'phone',
+                width: 160,
+                // Return false to cancel the change; supports Promise
+                canValueChange: async (changeItem) => {
+                    const { value } = changeItem;
+                    // Allow clearing
+                    if (value === '' || value == null) {
+                        return true;
+                    }
+                    return new Promise((resolve) => {
+                        setTimeout(() => {
+                            const ok = phoneReg.test(String(value));
+                            if (!ok) {
+                                console.warn('canValueChange rejected: invalid phone', value);
+                            }
+                            resolve(ok);
+                        }, 300);
+                    });
+                },
+            },
+            {
+                title: 'City',
+                key: 'city',
+            },
+            {
+                title: 'Address',
+                key: 'address',
+                width: 220,
+            },
+        ];
+        const target = document.getElementById('e-virt-table');
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                ENABLE_SELECTOR: true,
+            },
+        });
+    </script>
+</html>

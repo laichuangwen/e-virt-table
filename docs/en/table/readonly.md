@@ -2,11 +2,13 @@
 
 ## Column
 
-| Parameter   | Description       | Type     | Default |
-| ----------- | ----------------- | -------- | ------- |
-| readonly    | Control column readonly | boolean  | false   |
-| editorType  | Editor type       | string   | false   |
-| editorProps | Properties passed to the editor | object | {}      |
+| Parameter      | Description                                              | Type                                                                            | Default |
+| -------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------- | ------- |
+| readonly       | Control column readonly                                  | boolean                                                                         | false   |
+| editorType     | Editor type                                              | string                                                                          | false   |
+| editorProps    | Properties passed to the editor                          | object                                                                          | {}      |
+| canValueChange | Column-level gate before write; return `false` to reject | ^[Function]`(BeforeValueChangeItem)=>boolean\|Promise<boolean>`                 | —       |
+| valueChange    | Column-level callback after value is written successfully | ^[Function]`(BeforeValueChangeItem)=>void`                                      | —       |
 
 ## Row
 
@@ -33,7 +35,17 @@ type BeforeChangeItem = {
     oldValue: any;
     row: any;
 };
+type BeforeValueChangeItem = {
+    rowKey: string;
+    key: string;
+    value: any;
+    oldValue?: any;
+    row?: any;
+    errorTip?: boolean;
+};
 ```
+
+> Order: built-in number/length checks → `canValueChange` → `BEFORE_VALUE_CHANGE_METHOD` → write → `valueChange` → validators.
 
 ## Methods
 
@@ -124,6 +136,30 @@ h:350px
 ::: demo
 
 readonly/value-change
+h:350px
+:::
+
+## Column-level Reject Change (`canValueChange`)
+
+- `canValueChange` runs per column before writing; sync or async (`Promise`) are both supported
+- Return `false` to cancel the change and keep the old value
+- Typical use: phone format, business permission, async validation
+
+::: demo
+
+readonly/can-value-change
+h:350px
+:::
+
+## Column-level Value Change Callback (`valueChange`)
+
+- `valueChange` fires after the value is written successfully
+- Common for field linkage: update column B when column A changes
+- Unlike the table-level `change` event, this is a **column-level** callback and only runs on columns that define it
+
+::: demo
+
+readonly/column-value-change
 h:350px
 :::
 

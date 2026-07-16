@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <div id="e-virt-table"></div>
+        <p style="margin: 8px 0; color: #86909c; font-size: 12px">
+            Edit Phone: Remarks is updated via column <code>valueChange</code> linkage.
+        </p>
+    </body>
+    <script>
+        let data = [
+            {
+                name: 'Tom',
+                phone: '13800138000',
+                remarks: '联动手机号：13800138000',
+                city: 'Los Angeles',
+            },
+            {
+                name: 'Jerry',
+                phone: '13900139000',
+                remarks: '联动手机号：13900139000',
+                city: 'San Francisco',
+            },
+            {
+                name: 'Alice',
+                phone: '',
+                remarks: '',
+                city: 'Seattle',
+            },
+        ];
+        let columns = [
+            {
+                title: 'Name',
+                key: 'name',
+                width: 120,
+            },
+            {
+                title: 'Phone',
+                key: 'phone',
+                width: 160,
+                // Fires after the value is written successfully
+                valueChange: (changeItem) => {
+                    const { row, value } = changeItem;
+                    row.remarks = value ? `联动手机号：${value}` : '';
+                    console.log('valueChange', changeItem);
+                },
+            },
+            {
+                title: 'Remarks',
+                key: 'remarks',
+                width: 220,
+                readonly: true,
+            },
+            {
+                title: 'City',
+                key: 'city',
+            },
+        ];
+        const target = document.getElementById('e-virt-table');
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                ENABLE_SELECTOR: true,
+            },
+        });
+    </script>
+</html>
