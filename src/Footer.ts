@@ -1,6 +1,6 @@
 import Context from './Context';
 import Row from './Row';
-import { resolveFooterBorderColor, shouldDrawInternalHorizontalBorder } from './BorderStyle';
+import { shouldDrawInternalHorizontalBorder } from './BorderStyle';
 import { getLayoutScrollerTrackSize } from './ScrollbarMode';
 
 export default class Footer {
@@ -107,7 +107,7 @@ export default class Footer {
         }
         const poins = [0, this.y, stageWidth, this.y];
         this.ctx.paint.drawLine(poins, {
-            borderColor: resolveFooterBorderColor(config),
+            borderColor: config.BORDER_COLOR,
             borderWidth: 1,
         });
     }

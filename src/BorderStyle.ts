@@ -1,3 +1,5 @@
+import type { Fixed } from './types';
+
 export type BorderStyle = 'default' | 'outer' | 'inner' | 'none';
 export type BorderConfigValue = boolean | BorderStyle;
 
@@ -28,6 +30,23 @@ export function shouldDrawFullCellBorder(value: BorderConfigValue): boolean {
 export function shouldDrawInternalHorizontalBorder(value: BorderConfigValue): boolean {
     const style = normalizeBorderStyle(value);
     return style === 'default' || style === 'inner';
+}
+
+export function shouldDrawSectionColumnDivider(value: BorderConfigValue): boolean {
+    const style = normalizeBorderStyle(value);
+    return style === 'default' || style === 'inner';
+}
+
+export function getSectionColumnDividerSide(
+    fixed: Fixed | undefined,
+    x: number,
+    width: number,
+    sectionWidth: number,
+): 'left' | 'right' | null {
+    if (fixed === 'right') {
+        return x > 0.01 ? 'left' : null;
+    }
+    return x + width < sectionWidth - 0.01 ? 'right' : null;
 }
 
 export function shouldDrawOuterBorder(value: BorderConfigValue): boolean {

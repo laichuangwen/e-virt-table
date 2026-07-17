@@ -6,14 +6,14 @@
 | --- | --- |
 | `default` | Full border, including outer border, row lines and column lines |
 | `outer` | Only show the table outer border |
-| `inner` | Only show internal horizontal row lines |
+| `inner` | Show only internal horizontal row lines in the body, while keeping internal column dividers in the header and footer |
 | `none` | Hide table border lines |
 
 Compatibility: `true` equals `default`, and `false` equals `inner`.
 
-`HEADER_BORDER_COLOR` and `FOOTER_BORDER_COLOR` customize header and footer cell borders and divider colors. Unset values inherit `BORDER_COLOR`.
+`HEADER_BORDER_COLOR` and `FOOTER_BORDER_COLOR` only customize internal column dividers in the header and footer. Unset values inherit `BORDER_COLOR`. The table outer border, header bottom boundary, footer top boundary, and all other horizontal lines always use `BORDER_COLOR`.
 
-## Custom Section Border Colors
+## Custom Column Divider Colors
 
 ::: demo
 
@@ -37,7 +37,7 @@ border/outer
 h:320px
 :::
 
-## Inner Row Lines
+## Inner Borders
 
 ::: demo
 

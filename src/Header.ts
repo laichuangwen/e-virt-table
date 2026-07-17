@@ -3,7 +3,7 @@ import { getMaxRow, calCrossSpan, toLeaf, sortFixed, throttle, filterHiddenColum
 import CellHeader from './CellHeader';
 import type { Column, ColumnDragChangeEvent, SortDirection } from './types';
 import { TreeUtil } from './TreeUtil';
-import { resolveHeaderBorderColor, shouldDrawInternalHorizontalBorder } from './BorderStyle';
+import { shouldDrawInternalHorizontalBorder } from './BorderStyle';
 import { getLayoutScrollerTrackSize } from './ScrollbarMode';
 export default class Header {
     private ctx: Context; // 上下文
@@ -720,7 +720,7 @@ export default class Header {
         }
         const poins = [0, this.height, stageWidth, this.height];
         this.ctx.paint.drawLine(poins, {
-            borderColor: resolveHeaderBorderColor(config),
+            borderColor: config.BORDER_COLOR,
             borderWidth: 1,
         });
     }

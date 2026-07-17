@@ -5,7 +5,12 @@ import BaseCell from './BaseCell';
 import { Rule, Rules } from './Validator';
 import { TextInfo } from './Paint';
 import CellImage from './CellImage';
-import { resolveHeaderBorderColor, shouldDrawFullCellBorder } from './BorderStyle';
+import {
+    getSectionColumnDividerSide,
+    resolveHeaderBorderColor,
+    shouldDrawFullCellBorder,
+    shouldDrawSectionColumnDivider,
+} from './BorderStyle';
 export default class CellHeader extends BaseCell {
     align: Align;
     hideHeaderSelection = false;
@@ -195,13 +200,37 @@ export default class CellHeader extends BaseCell {
         });
     }
     private drawEdge() {
-        const { paint, config } = this.ctx;
-        const { BORDER } = config;
-
-        // 有边框的情况下，绘制边框
+        const { paint } = this.ctx;
         paint.drawRect(this.drawX, this.drawY, this.width, this.height, {
-            borderColor: shouldDrawFullCellBorder(BORDER) ? resolveHeaderBorderColor(config) : 'transparent',
             fillColor: this.drawCellBgColor,
+        });
+        this.drawColumnDivider();
+        this.drawHorizontalDivider();
+    }
+    private drawColumnDivider() {
+        const { paint, config, header } = this.ctx;
+        if (!shouldDrawSectionColumnDivider(config.BORDER)) {
+            return;
+        }
+        const side = getSectionColumnDividerSide(this.fixed, this.x, this.width, header.width);
+        if (!side) {
+            return;
+        }
+        const x = side === 'left' ? this.drawX : this.drawX + this.visibleWidth;
+        paint.drawLine([x, this.drawY, x, this.drawY + this.visibleHeight], {
+            borderColor: resolveHeaderBorderColor(config),
+            borderWidth: 1,
+        });
+    }
+    private drawHorizontalDivider() {
+        const { paint, config, header } = this.ctx;
+        if (!shouldDrawFullCellBorder(config.BORDER) || this.y + this.height >= header.height) {
+            return;
+        }
+        const y = this.drawY + this.visibleHeight;
+        paint.drawLine([this.drawX, y, this.drawX + this.visibleWidth, y], {
+            borderColor: config.BORDER_COLOR,
+            borderWidth: 1,
         });
     }
     private drawText() {

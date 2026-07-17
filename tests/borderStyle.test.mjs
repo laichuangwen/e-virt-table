@@ -54,6 +54,20 @@ test('maps border modes to draw decisions', () => {
     assert.equal(mod.shouldDrawRightBoundaryBorder(false), false);
 });
 
+test('maps section column dividers and fixed boundaries', () => {
+    assert.equal(mod.shouldDrawSectionColumnDivider('default'), true);
+    assert.equal(mod.shouldDrawSectionColumnDivider('inner'), true);
+    assert.equal(mod.shouldDrawSectionColumnDivider(false), true);
+    assert.equal(mod.shouldDrawSectionColumnDivider('outer'), false);
+    assert.equal(mod.shouldDrawSectionColumnDivider('none'), false);
+
+    assert.equal(mod.getSectionColumnDividerSide('', 0, 100, 300), 'right');
+    assert.equal(mod.getSectionColumnDividerSide('left', 0, 100, 300), 'right');
+    assert.equal(mod.getSectionColumnDividerSide('right', 200, 100, 300), 'left');
+    assert.equal(mod.getSectionColumnDividerSide('', 200, 100, 300), null);
+    assert.equal(mod.getSectionColumnDividerSide('right', 0, 300, 300), null);
+});
+
 test('hides non-default scroller track when no scrollbar is needed', () => {
     assert.equal(mod.shouldDrawScrollerTrack('default', false), true);
     assert.equal(mod.shouldDrawScrollerTrack('outer', false), false);

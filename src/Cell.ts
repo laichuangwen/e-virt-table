@@ -24,9 +24,11 @@ import BaseCell from './BaseCell';
 import { Rule, Rules } from './Validator';
 import CellImage from './CellImage';
 import {
+    getSectionColumnDividerSide,
     resolveFooterBorderColor,
     shouldDrawFullCellBorder,
     shouldDrawInternalHorizontalBorder,
+    shouldDrawSectionColumnDivider,
 } from './BorderStyle';
 export default class Cell extends BaseCell {
     parentRowKey: string = '';
@@ -985,26 +987,43 @@ export default class Cell extends BaseCell {
         const { drawX, drawY } = this;
         const drawFullBorder = shouldDrawFullCellBorder(BORDER);
         const borderColor =
-            this.cellType === 'footer' ? resolveFooterBorderColor(config) : config.BORDER_COLOR;
+            drawFullBorder && this.cellType !== 'footer' ? config.BORDER_COLOR : undefined;
         paint.drawRect(drawX, drawY, this.visibleWidth, this.visibleHeight, {
-            borderColor: drawFullBorder ? borderColor : 'transparent',
+            borderColor,
             fillColor: this.drawCellBgColor,
         });
         // 列合并单元格
         paint.drawRect(drawX, drawY, this.width, this.height, {
-            borderColor: 'transparent',
             fillColor: this.drawCellSkyBgColor,
+        });
+        this.drawFooterColumnDivider();
+    }
+    private drawFooterColumnDivider() {
+        const { paint, config, header } = this.ctx;
+        if (this.cellType !== 'footer' || !shouldDrawSectionColumnDivider(config.BORDER)) {
+            return;
+        }
+        const side = getSectionColumnDividerSide(this.fixed, this.x, this.width, header.width);
+        if (!side) {
+            return;
+        }
+        const x = side === 'left' ? this.drawX : this.drawX + this.visibleWidth;
+        paint.drawLine([x, this.drawY, x, this.drawY + this.visibleHeight], {
+            borderColor: resolveFooterBorderColor(config),
+            borderWidth: 1,
         });
     }
     drawHorizontalBorder() {
         const { config } = this.ctx;
         const { BORDER } = config;
-        if (shouldDrawFullCellBorder(BORDER) || !shouldDrawInternalHorizontalBorder(BORDER)) {
+        if (
+            !shouldDrawInternalHorizontalBorder(BORDER) ||
+            (this.cellType !== 'footer' && shouldDrawFullCellBorder(BORDER))
+        ) {
             return;
         }
         const { drawX, drawY } = this;
-        const borderColor =
-            this.cellType === 'footer' ? resolveFooterBorderColor(config) : config.BORDER_COLOR;
+        const borderColor = config.BORDER_COLOR;
         this.ctx.paint.drawLine(
             [drawX, drawY + this.visibleHeight, drawX + this.visibleWidth, drawY + this.visibleHeight],
             {

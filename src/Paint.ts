@@ -180,19 +180,19 @@ export class Paint {
         { borderWidth = 1, borderColor, fillColor, radius = 0 }: RectOptions = {},
     ) {
         this.ctx.save();
-        this.ctx.beginPath();
-        // 填充颜色
         if (fillColor !== undefined) {
             this.ctx.fillStyle = fillColor;
         }
-
-        // 线条宽度及绘制颜色
         if (borderColor !== undefined) {
             this.ctx.lineWidth = borderWidth;
             this.ctx.strokeStyle = borderColor;
         }
+        this.ctx.beginPath();
         if (radius === 0) {
-            // 绘制矩形路径，- 0.5解决1px模糊的问题
+            if (fillColor !== undefined) {
+                this.ctx.fillRect(x, y, width, height);
+            }
+            // Keep the half-pixel offset for crisp 1px strokes only.
             this.ctx.rect(x - 0.5, y - 0.5, width, height);
         } else {
             // 确保 radius 是一个包含四个元素的数组
@@ -205,12 +205,9 @@ export class Paint {
             this.ctx.arcTo(x, y, x + tl, y, tl); // draw top side and top-left corner
         }
 
-        // 如果有填充色，则填充
-        if (fillColor !== undefined) {
+        if (fillColor !== undefined && radius !== 0) {
             this.ctx.fill();
         }
-
-        // 如果有绘制色，则绘制
         if (borderColor !== undefined) {
             this.ctx.stroke();
         }
