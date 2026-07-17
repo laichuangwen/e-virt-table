@@ -13,15 +13,6 @@ Compatibility: `true` equals `default`, and `false` equals `inner`.
 
 `HEADER_BORDER_COLOR` and `FOOTER_BORDER_COLOR` customize header and footer cell borders and divider colors. Unset values inherit `BORDER_COLOR`.
 
-They can also be configured with CSS variables. `e-virt-table` automatically reads the kebab-case `--evt-*` variable matching each config name:
-
-```css
-:root {
-    --evt-header-border-color: #3b82f6;
-    --evt-footer-border-color: #f59e0b;
-}
-```
-
 ## Custom Section Border Colors
 
 ::: demo

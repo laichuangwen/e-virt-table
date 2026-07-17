@@ -1,5 +1,4 @@
-/* Keep library defaults below application and adapter theme variables, even when this CSS is injected later. */
-:where(:root) {
+:root {
     --evt-header-font: 12px normal Arial;
     --evt-body-font: 12px normal Arial;
     --evt-color-white: #fff;
@@ -65,7 +64,7 @@
     --evt-context-menu-item-hover-bg-color: #f5f5f5;
     --evt-context-menu-text-size: 13px;
 }
-:where(.dark) {
+.dark {
     --evt-border-color: #363637;
     --evt-header-bg-color: #141414;
     --evt-body-bg-color: #141414;

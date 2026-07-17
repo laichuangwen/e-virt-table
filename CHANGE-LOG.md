@@ -5,11 +5,7 @@ Vx.x.x(TPL)
 -   Performance Improvements
 -   Style changes
 -   Dependencies Changes
--
-
-V1.4.7
-### Bug Fixes
-- fix: lower default CSS variable specificity so adapter and application themes override injected defaults
+-  
 
 V1.4.5
 ### Bug Fixes
