@@ -13,6 +13,15 @@
 
 `HEADER_BORDER_COLOR` 和 `FOOTER_BORDER_COLOR` 可分别设置表头、表尾的单元格边框及分割线颜色。未设置时继承 `BORDER_COLOR`。
 
+也可通过 CSS 变量配置。`e-virt-table` 会自动读取配置名对应的 kebab-case `--evt-*` 变量：
+
+```css
+:root {
+    --evt-header-border-color: #3b82f6;
+    --evt-footer-border-color: #f59e0b;
+}
+```
+
 ## 自定义区域边框颜色
 
 ::: demo
