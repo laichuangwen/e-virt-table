@@ -12,10 +12,12 @@
 
 ## Config
 
-| 参数                    | 说明           | 类型    | 可选值 | 默认值 |
-| ----------------------- | -------------- | ------- | ------ | ------ |
-| RESIZE_COLUMN_MIN_WIDTH | 列宽最小值     | number  | —      | 40     |
-| ENABLE_RESIZE_COLUMN    | 启用列宽可调整 | boolean | —      | true   |
+| 参数                        | 说明                                 | 类型    | 可选值 | 默认值         |
+| --------------------------- | ------------------------------------ | ------- | ------ | -------------- |
+| RESIZE_COLUMN_MIN_WIDTH     | 列宽最小值                           | number  | —      | 40             |
+| ENABLE_RESIZE_COLUMN        | 启用列宽可调整                       | boolean | —      | true           |
+| RESIZE_COLUMN_DIVIDER_COLOR | 表头、表尾静态可调整列分割线颜色     | string  | —      | `BORDER_COLOR` |
+| RESIZE_COLUMN_LINE_COLOR    | 拖动调整列宽时的贯穿引导线颜色       | string  | —      | #e1e6eb        |
 
 ## Events
 
@@ -72,6 +74,7 @@ h:320px
 ## 可调整列宽度
 
 -   `config.ENABLE_RESIZE_COLUMN`为 true,可启用调整列宽，默认 true
+-   可通过 `config.RESIZE_COLUMN_DIVIDER_COLOR` 或 CSS 变量 `--evt-resize-column-divider-color` 设置静态列分割线颜色；未设置时使用 `BORDER_COLOR`
 -   `resizeColumnChange`为调整列后的回调
 
 ::: demo

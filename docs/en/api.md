@@ -29,8 +29,6 @@ type EVirtTableOptions = {
 | BODY_FONT | Cell font | string | — | 12px normal Arial |
 | BORDER | Table border style. `true` equals `default`; `false` equals `inner`. | `boolean \| "default" \| "outer" \| "inner" \| "none"` | `true`, `false`, `default`, `outer`, `inner`, `none` | true |
 | BORDER_COLOR | Border color | string | — | #e1e6eb |
-| HEADER_BORDER_COLOR | Header internal column divider color | string | — | `BORDER_COLOR` |
-| FOOTER_BORDER_COLOR | Footer internal column divider color | string | — | `BORDER_COLOR` |
 | RESIZE_MIN_WIDTH | Minimum resizable width | number | — | 40 |
 | HEIGHT | Height (0 means auto fit) | number | — | 0 |
 | COLUMNS_ALIGN | Horizontal alignment | `"left"`, `"center"`, `"right"` | left |
@@ -107,6 +105,7 @@ type EVirtTableOptions = {
 | ENABLE_RESIZE_ROW | Enable row height adjustment | boolean | — | true |
 | ENABLE_RESIZE_COLUMN | Enable column width adjustment | boolean | — | true |
 | RESIZE_ROW_LINE_COLOR | Row adjustment line color | string | — | #e1e6eb |
+| RESIZE_COLUMN_DIVIDER_COLOR | Static header and footer divider color for resizable columns | string | — | `BORDER_COLOR` |
 | RESIZE_COLUMN_LINE_COLOR | Column adjustment line color | string | — | #e1e6eb |
 | RESIZE_ROW_MIN_HEIGHT | Minimum row height adjustment | number | — | 36 |
 | RESIZE_COLUMN_MIN_WIDTH | Minimum column width adjustment | number | — | 40 |

@@ -6,6 +6,7 @@ const cellHeaderSource = await readFile(new URL('../src/CellHeader.ts', import.m
 const headerSource = await readFile(new URL('../src/Header.ts', import.meta.url), 'utf8');
 const cellSource = await readFile(new URL('../src/Cell.ts', import.meta.url), 'utf8');
 const footerSource = await readFile(new URL('../src/Footer.ts', import.meta.url), 'utf8');
+const configSource = await readFile(new URL('../src/Config.ts', import.meta.url), 'utf8');
 
 function getMethodSource(source, methodName, nextMethodName) {
     const start = source.indexOf(methodName);
@@ -15,14 +16,23 @@ function getMethodSource(source, methodName, nextMethodName) {
     return source.slice(start, end);
 }
 
-test('uses section colors only for header and footer column dividers', () => {
+test('uses the resize divider color for header and footer column dividers', () => {
     const headerColumnDivider = getMethodSource(cellHeaderSource, 'private drawColumnDivider()', 'private drawHorizontalDivider()');
     const footerColumnDivider = getMethodSource(cellSource, 'private drawFooterColumnDivider()', 'drawHorizontalBorder()');
 
-    assert.match(headerColumnDivider, /resolveHeaderBorderColor\(config\)/);
-    assert.match(headerColumnDivider, /getSectionColumnDividerSide/);
-    assert.match(footerColumnDivider, /resolveFooterBorderColor\(config\)/);
-    assert.match(footerColumnDivider, /getSectionColumnDividerSide/);
+    assert.match(headerColumnDivider, /resolveResizeColumnDividerColor\(config\)/);
+    assert.match(headerColumnDivider, /getColumnDividerSide/);
+    assert.match(footerColumnDivider, /resolveResizeColumnDividerColor\(config\)/);
+    assert.match(footerColumnDivider, /getColumnDividerSide/);
+});
+
+test('keeps the static divider color separate from the active resize guide', () => {
+    const resizeGuide = getMethodSource(headerSource, 'private drawTipLine()', 'private drawDragTip()');
+
+    assert.match(resizeGuide, /RESIZE_COLUMN_LINE_COLOR/);
+    assert.doesNotMatch(resizeGuide, /RESIZE_COLUMN_DIVIDER_COLOR/);
+    assert.match(configSource, /RESIZE_COLUMN_DIVIDER_COLOR/);
+    assert.doesNotMatch(configSource, /HEADER_BORDER_COLOR|FOOTER_BORDER_COLOR/);
 });
 
 test('uses BORDER_COLOR for header and footer horizontal boundaries', () => {
@@ -33,7 +43,7 @@ test('uses BORDER_COLOR for header and footer horizontal boundaries', () => {
 
     for (const source of [headerBottom, footerTop, headerHorizontalDivider, footerHorizontalDivider]) {
         assert.match(source, /BORDER_COLOR/);
-        assert.doesNotMatch(source, /resolve(?:Header|Footer)BorderColor/);
+        assert.doesNotMatch(source, /resolveResizeColumnDividerColor/);
     }
 });
 

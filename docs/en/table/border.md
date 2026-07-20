@@ -11,9 +11,9 @@
 
 Compatibility: `true` equals `default`, and `false` equals `inner`.
 
-`HEADER_BORDER_COLOR` and `FOOTER_BORDER_COLOR` only customize internal column dividers in the header and footer. Unset values inherit `BORDER_COLOR`. The table outer border, header bottom boundary, footer top boundary, and all other horizontal lines always use `BORDER_COLOR`.
+When column resizing is enabled, `RESIZE_COLUMN_DIVIDER_COLOR` or the `--evt-resize-column-divider-color` CSS variable customizes the static column dividers in the header and footer. It falls back to `BORDER_COLOR` when unset or when column resizing is disabled. `RESIZE_COLUMN_LINE_COLOR` still controls only the full-height guide shown while dragging.
 
-## Custom Column Divider Colors
+## Resizable Column Divider Color
 
 ::: demo
 

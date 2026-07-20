@@ -12,18 +12,17 @@ test('normalizes border config values', () => {
     assert.equal(mod.normalizeBorderStyle('none'), 'none');
 });
 
-test('resolves header and footer border colors with the shared border color as fallback', () => {
-    const inherited = { BORDER_COLOR: '#shared' };
-    assert.equal(mod.resolveHeaderBorderColor(inherited), '#shared');
-    assert.equal(mod.resolveFooterBorderColor(inherited), '#shared');
+test('resolves the resizable column divider color with the shared border color as fallback', () => {
+    const inherited = { BORDER_COLOR: '#shared', ENABLE_RESIZE_COLUMN: true };
+    assert.equal(mod.resolveResizeColumnDividerColor(inherited), '#shared');
 
     const customized = {
         BORDER_COLOR: '#shared',
-        HEADER_BORDER_COLOR: '#header',
-        FOOTER_BORDER_COLOR: '#footer',
+        ENABLE_RESIZE_COLUMN: true,
+        RESIZE_COLUMN_DIVIDER_COLOR: '#divider',
     };
-    assert.equal(mod.resolveHeaderBorderColor(customized), '#header');
-    assert.equal(mod.resolveFooterBorderColor(customized), '#footer');
+    assert.equal(mod.resolveResizeColumnDividerColor(customized), '#divider');
+    assert.equal(mod.resolveResizeColumnDividerColor({ ...customized, ENABLE_RESIZE_COLUMN: false }), '#shared');
 });
 
 test('maps border modes to draw decisions', () => {
@@ -55,17 +54,17 @@ test('maps border modes to draw decisions', () => {
 });
 
 test('maps section column dividers and fixed boundaries', () => {
-    assert.equal(mod.shouldDrawSectionColumnDivider('default'), true);
-    assert.equal(mod.shouldDrawSectionColumnDivider('inner'), true);
-    assert.equal(mod.shouldDrawSectionColumnDivider(false), true);
-    assert.equal(mod.shouldDrawSectionColumnDivider('outer'), false);
-    assert.equal(mod.shouldDrawSectionColumnDivider('none'), false);
+    assert.equal(mod.shouldDrawColumnDivider('default'), true);
+    assert.equal(mod.shouldDrawColumnDivider('inner'), true);
+    assert.equal(mod.shouldDrawColumnDivider(false), true);
+    assert.equal(mod.shouldDrawColumnDivider('outer'), false);
+    assert.equal(mod.shouldDrawColumnDivider('none'), false);
 
-    assert.equal(mod.getSectionColumnDividerSide('', 0, 100, 300), 'right');
-    assert.equal(mod.getSectionColumnDividerSide('left', 0, 100, 300), 'right');
-    assert.equal(mod.getSectionColumnDividerSide('right', 200, 100, 300), 'left');
-    assert.equal(mod.getSectionColumnDividerSide('', 200, 100, 300), null);
-    assert.equal(mod.getSectionColumnDividerSide('right', 0, 300, 300), null);
+    assert.equal(mod.getColumnDividerSide('', 0, 100, 300), 'right');
+    assert.equal(mod.getColumnDividerSide('left', 0, 100, 300), 'right');
+    assert.equal(mod.getColumnDividerSide('right', 200, 100, 300), 'left');
+    assert.equal(mod.getColumnDividerSide('', 200, 100, 300), null);
+    assert.equal(mod.getColumnDividerSide('right', 0, 300, 300), null);
 });
 
 test('hides non-default scroller track when no scrollbar is needed', () => {

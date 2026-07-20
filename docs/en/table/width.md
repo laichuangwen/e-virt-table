@@ -12,10 +12,12 @@
 
 ## Config
 
-| Parameter               | Description                     | Type    | Default |
-| ----------------------- | ------------------------------- | ------- | ------------- |
-| RESIZE_COLUMN_MIN_WIDTH | Adjustable Minimum column width | number  | 40            |
-| ENABLE_RESIZE_COLUMN    | Enable column width adjustment  | boolean | true          |
+| Parameter                   | Description                                                  | Type    | Default        |
+| --------------------------- | ------------------------------------------------------------ | ------- | -------------- |
+| RESIZE_COLUMN_MIN_WIDTH     | Adjustable minimum column width                              | number  | 40             |
+| ENABLE_RESIZE_COLUMN        | Enable column width adjustment                               | boolean | true           |
+| RESIZE_COLUMN_DIVIDER_COLOR | Static header and footer divider color for resizable columns | string  | `BORDER_COLOR` |
+| RESIZE_COLUMN_LINE_COLOR    | Full-height guide color while resizing a column              | string  | #e1e6eb        |
 
 ## Events
 
@@ -72,6 +74,7 @@ h:320px
 ## Adjustable Column Width
 
 -   If `config.ENABLE_RESIZE_COLUMN` is set to true, column width adjustment can be enabled, default is true.
+-   Use `config.RESIZE_COLUMN_DIVIDER_COLOR` or the `--evt-resize-column-divider-color` CSS variable to customize static column dividers. Unset values use `BORDER_COLOR`.
 -   `resizeColumnChange` is the callback after adjustment.
 
 ::: demo

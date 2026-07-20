@@ -3,18 +3,17 @@ import type { Fixed } from './types';
 export type BorderStyle = 'default' | 'outer' | 'inner' | 'none';
 export type BorderConfigValue = boolean | BorderStyle;
 
-type SectionBorderColorConfig = {
+type ResizeColumnDividerColorConfig = {
     BORDER_COLOR: string;
-    HEADER_BORDER_COLOR?: string;
-    FOOTER_BORDER_COLOR?: string;
+    ENABLE_RESIZE_COLUMN: boolean;
+    RESIZE_COLUMN_DIVIDER_COLOR?: string;
 };
 
-export function resolveHeaderBorderColor(config: SectionBorderColorConfig): string {
-    return config.HEADER_BORDER_COLOR ?? config.BORDER_COLOR;
-}
-
-export function resolveFooterBorderColor(config: SectionBorderColorConfig): string {
-    return config.FOOTER_BORDER_COLOR ?? config.BORDER_COLOR;
+export function resolveResizeColumnDividerColor(config: ResizeColumnDividerColorConfig): string {
+    if (!config.ENABLE_RESIZE_COLUMN) {
+        return config.BORDER_COLOR;
+    }
+    return config.RESIZE_COLUMN_DIVIDER_COLOR ?? config.BORDER_COLOR;
 }
 
 export function normalizeBorderStyle(value: BorderConfigValue): BorderStyle {
@@ -32,12 +31,12 @@ export function shouldDrawInternalHorizontalBorder(value: BorderConfigValue): bo
     return style === 'default' || style === 'inner';
 }
 
-export function shouldDrawSectionColumnDivider(value: BorderConfigValue): boolean {
+export function shouldDrawColumnDivider(value: BorderConfigValue): boolean {
     const style = normalizeBorderStyle(value);
     return style === 'default' || style === 'inner';
 }
 
-export function getSectionColumnDividerSide(
+export function getColumnDividerSide(
     fixed: Fixed | undefined,
     x: number,
     width: number,

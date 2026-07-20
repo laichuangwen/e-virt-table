@@ -3,7 +3,12 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>e-virt-table - Border Colors</title>
+        <title>e-virt-table - Resize Column Divider Color</title>
+        <style>
+            :root {
+                --evt-resize-column-divider-color: #3b82f6;
+            }
+        </style>
     </head>
     <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
     <body>
@@ -34,8 +39,7 @@
             config: {
                 BORDER: 'default',
                 BORDER_COLOR: '#cbd5e1',
-                HEADER_BORDER_COLOR: '#3b82f6',
-                FOOTER_BORDER_COLOR: '#f59e0b',
+                ENABLE_RESIZE_COLUMN: true,
                 ROW_KEY: 'id',
                 HEIGHT: 300,
             },

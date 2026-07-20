@@ -11,9 +11,9 @@
 
 兼容旧写法：`true` 等同 `default`，`false` 等同 `inner`。
 
-`HEADER_BORDER_COLOR` 和 `FOOTER_BORDER_COLOR` 只设置表头、表尾内部的列分割线颜色，未设置时继承 `BORDER_COLOR`。表格外边框、表头下边界、表尾上边界及其他横线始终使用 `BORDER_COLOR`。
+启用列宽调整时，`RESIZE_COLUMN_DIVIDER_COLOR` 或 CSS 变量 `--evt-resize-column-divider-color` 可设置表头、表尾的静态列分割线颜色。未设置或禁用列宽调整时使用 `BORDER_COLOR`。`RESIZE_COLUMN_LINE_COLOR` 仍只控制拖动调整列宽时的贯穿引导线。
 
-## 自定义列分割线颜色
+## 可调整列宽分割线颜色
 
 ::: demo
 

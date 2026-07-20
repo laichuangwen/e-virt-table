@@ -6,10 +6,10 @@ import { Rule, Rules } from './Validator';
 import { TextInfo } from './Paint';
 import CellImage from './CellImage';
 import {
-    getSectionColumnDividerSide,
-    resolveHeaderBorderColor,
+    getColumnDividerSide,
+    resolveResizeColumnDividerColor,
     shouldDrawFullCellBorder,
-    shouldDrawSectionColumnDivider,
+    shouldDrawColumnDivider,
 } from './BorderStyle';
 export default class CellHeader extends BaseCell {
     align: Align;
@@ -209,16 +209,16 @@ export default class CellHeader extends BaseCell {
     }
     private drawColumnDivider() {
         const { paint, config, header } = this.ctx;
-        if (!shouldDrawSectionColumnDivider(config.BORDER)) {
+        if (!shouldDrawColumnDivider(config.BORDER)) {
             return;
         }
-        const side = getSectionColumnDividerSide(this.fixed, this.x, this.width, header.width);
+        const side = getColumnDividerSide(this.fixed, this.x, this.width, header.width);
         if (!side) {
             return;
         }
         const x = side === 'left' ? this.drawX : this.drawX + this.visibleWidth;
         paint.drawLine([x, this.drawY, x, this.drawY + this.visibleHeight], {
-            borderColor: resolveHeaderBorderColor(config),
+            borderColor: resolveResizeColumnDividerColor(config),
             borderWidth: 1,
         });
     }

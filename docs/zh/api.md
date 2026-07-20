@@ -29,8 +29,6 @@ type EVirtTableOptions = {
 | BODY_FONT | 单元格字体 | string | 12px normal Arial |
 | BORDER | 表格边框样式，`true` 等同 `default`，`false` 等同 `inner` | `boolean \| "default" \| "outer" \| "inner" \| "none"` | true |
 | BORDER_COLOR | 区域边框颜色 | string | #e1e6eb |
-| HEADER_BORDER_COLOR | 表头内部列分割线颜色 | string | `BORDER_COLOR` |
-| FOOTER_BORDER_COLOR | 表尾内部列分割线颜色 | string | `BORDER_COLOR` |
 | RESIZE_MIN_WIDTH | 最小可调整宽度 | number | 40 |
 | HEIGHT | 高度，高度为 0 表示自适应 | number | 0 |
 | COLUMNS_ALIGN | 全局水平对齐方式 | `"left"`, `"center"`, `"right"` | left |
@@ -108,6 +106,7 @@ type EVirtTableOptions = {
 | ENABLE_RESIZE_ROW | 启用调整行高 | boolean | true |
 | ENABLE_RESIZE_COLUMN | 启用调整列宽 | boolean | true |
 | RESIZE_ROW_LINE_COLOR | 行调整线颜色 | string | #e1e6eb |
+| RESIZE_COLUMN_DIVIDER_COLOR | 可调整列宽时表头、表尾静态列分割线颜色 | string | `BORDER_COLOR` |
 | RESIZE_COLUMN_LINE_COLOR | 列调整线颜色 | string | #e1e6eb |
 | RESIZE_ROW_MIN_HEIGHT | 最小调整行高 | number | 36 |
 | RESIZE_COLUMN_MIN_WIDTH | 最小调整列宽 | number | 40 |

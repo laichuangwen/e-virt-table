@@ -24,11 +24,11 @@ import BaseCell from './BaseCell';
 import { Rule, Rules } from './Validator';
 import CellImage from './CellImage';
 import {
-    getSectionColumnDividerSide,
-    resolveFooterBorderColor,
+    getColumnDividerSide,
+    resolveResizeColumnDividerColor,
     shouldDrawFullCellBorder,
     shouldDrawInternalHorizontalBorder,
-    shouldDrawSectionColumnDivider,
+    shouldDrawColumnDivider,
 } from './BorderStyle';
 export default class Cell extends BaseCell {
     parentRowKey: string = '';
@@ -1000,16 +1000,16 @@ export default class Cell extends BaseCell {
     }
     private drawFooterColumnDivider() {
         const { paint, config, header } = this.ctx;
-        if (this.cellType !== 'footer' || !shouldDrawSectionColumnDivider(config.BORDER)) {
+        if (this.cellType !== 'footer' || !shouldDrawColumnDivider(config.BORDER)) {
             return;
         }
-        const side = getSectionColumnDividerSide(this.fixed, this.x, this.width, header.width);
+        const side = getColumnDividerSide(this.fixed, this.x, this.width, header.width);
         if (!side) {
             return;
         }
         const x = side === 'left' ? this.drawX : this.drawX + this.visibleWidth;
         paint.drawLine([x, this.drawY, x, this.drawY + this.visibleHeight], {
-            borderColor: resolveFooterBorderColor(config),
+            borderColor: resolveResizeColumnDividerColor(config),
             borderWidth: 1,
         });
     }
