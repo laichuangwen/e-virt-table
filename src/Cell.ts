@@ -24,10 +24,8 @@ import BaseCell from './BaseCell';
 import { Rule, Rules } from './Validator';
 import CellImage from './CellImage';
 import {
-    getColumnDividerSide,
     shouldDrawFullCellBorder,
     shouldDrawInternalHorizontalBorder,
-    shouldDrawColumnDivider,
 } from './BorderStyle';
 export default class Cell extends BaseCell {
     parentRowKey: string = '';
@@ -985,8 +983,7 @@ export default class Cell extends BaseCell {
         const { BORDER } = config;
         const { drawX, drawY } = this;
         const drawFullBorder = shouldDrawFullCellBorder(BORDER);
-        const borderColor =
-            drawFullBorder && this.cellType !== 'footer' ? config.BORDER_COLOR : undefined;
+        const borderColor = drawFullBorder ? config.BORDER_COLOR : undefined;
         paint.drawRect(drawX, drawY, this.visibleWidth, this.visibleHeight, {
             borderColor,
             fillColor: this.drawCellBgColor,
@@ -994,22 +991,6 @@ export default class Cell extends BaseCell {
         // 列合并单元格
         paint.drawRect(drawX, drawY, this.width, this.height, {
             fillColor: this.drawCellSkyBgColor,
-        });
-        this.drawFooterColumnDivider();
-    }
-    private drawFooterColumnDivider() {
-        const { paint, config, header } = this.ctx;
-        if (this.cellType !== 'footer' || !shouldDrawColumnDivider(config.BORDER)) {
-            return;
-        }
-        const side = getColumnDividerSide(this.fixed, this.x, this.width, header.width);
-        if (!side) {
-            return;
-        }
-        const x = side === 'left' ? this.drawX : this.drawX + this.visibleWidth;
-        paint.drawLine([x, this.drawY, x, this.drawY + this.visibleHeight], {
-            borderColor: config.BORDER_COLOR,
-            borderWidth: 1,
         });
     }
     drawHorizontalBorder() {

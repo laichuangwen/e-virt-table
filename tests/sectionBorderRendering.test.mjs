@@ -17,14 +17,23 @@ function getMethodSource(source, methodName, nextMethodName) {
 }
 
 test('uses the resize divider color only for header column dividers', () => {
-    const headerColumnDivider = getMethodSource(cellHeaderSource, 'private drawColumnDivider()', 'private drawHorizontalDivider()');
-    const footerColumnDivider = getMethodSource(cellSource, 'private drawFooterColumnDivider()', 'drawHorizontalBorder()');
+    const headerEdge = getMethodSource(cellHeaderSource, 'private drawEdge()', 'private drawColumnDivider(');
+    const headerColumnDivider = getMethodSource(cellHeaderSource, 'private drawColumnDivider(', 'private drawHorizontalDivider()');
+    const footerContainer = getMethodSource(cellSource, 'drawContainer()', 'drawHorizontalBorder()');
 
-    assert.match(headerColumnDivider, /resolveResizeColumnDividerColor\(config\)/);
+    assert.match(headerEdge, /resolveResizeColumnDividerColor\(config\)/);
     assert.match(headerColumnDivider, /getColumnDividerSide/);
-    assert.match(footerColumnDivider, /config\.BORDER_COLOR/);
-    assert.match(footerColumnDivider, /getColumnDividerSide/);
-    assert.doesNotMatch(footerColumnDivider, /resolveResizeColumnDividerColor|RESIZE_COLUMN_DIVIDER_COLOR/);
+    assert.match(footerContainer, /config\.BORDER_COLOR/);
+    assert.doesNotMatch(footerContainer, /resolveResizeColumnDividerColor|RESIZE_COLUMN_DIVIDER_COLOR/);
+});
+
+test('preserves legacy full-cell borders when no resize divider override is set', () => {
+    const headerEdge = getMethodSource(cellHeaderSource, 'private drawEdge()', 'private drawColumnDivider(');
+    const footerContainer = getMethodSource(cellSource, 'drawContainer()', 'drawHorizontalBorder()');
+
+    assert.match(headerEdge, /resizeColumnDividerColor === undefined/);
+    assert.match(headerEdge, /borderColor: drawFullCellBorder \? config\.BORDER_COLOR : undefined/);
+    assert.match(footerContainer, /borderColor = drawFullBorder \? config\.BORDER_COLOR : undefined/);
 });
 
 test('keeps the static divider color separate from the active resize guide', () => {
@@ -49,12 +58,11 @@ test('uses BORDER_COLOR for header and footer horizontal boundaries', () => {
 });
 
 test('fills section cells separately from their dividers', () => {
-    const headerEdge = getMethodSource(cellHeaderSource, 'private drawEdge()', 'private drawColumnDivider()');
-    const footerContainer = getMethodSource(cellSource, 'drawContainer()', 'private drawFooterColumnDivider()');
+    const headerEdge = getMethodSource(cellHeaderSource, 'private drawEdge()', 'private drawColumnDivider(');
+    const footerContainer = getMethodSource(cellSource, 'drawContainer()', 'drawHorizontalBorder()');
 
-    assert.doesNotMatch(headerEdge, /borderColor/);
-    assert.match(headerEdge, /this\.drawColumnDivider\(\)/);
-    assert.match(footerContainer, /this\.cellType !== 'footer'/);
+    assert.match(headerEdge, /fillColor: this\.drawCellBgColor/);
+    assert.match(headerEdge, /this\.drawColumnDivider\(resizeColumnDividerColor\)/);
+    assert.match(footerContainer, /fillColor: this\.drawCellBgColor/);
     assert.doesNotMatch(footerContainer, /borderColor: 'transparent'/);
-    assert.match(footerContainer, /this\.drawFooterColumnDivider\(\)/);
 });

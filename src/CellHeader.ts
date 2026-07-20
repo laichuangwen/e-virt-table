@@ -199,16 +199,21 @@ export default class CellHeader extends BaseCell {
         });
     }
     private drawEdge() {
-        const { paint } = this.ctx;
+        const { paint, config } = this.ctx;
+        const resizeColumnDividerColor = resolveResizeColumnDividerColor(config);
+        const drawFullCellBorder =
+            shouldDrawFullCellBorder(config.BORDER) && resizeColumnDividerColor === undefined;
         paint.drawRect(this.drawX, this.drawY, this.width, this.height, {
+            borderColor: drawFullCellBorder ? config.BORDER_COLOR : undefined,
             fillColor: this.drawCellBgColor,
         });
-        this.drawColumnDivider();
-        this.drawHorizontalDivider();
+        if (!drawFullCellBorder) {
+            this.drawColumnDivider(resizeColumnDividerColor);
+            this.drawHorizontalDivider();
+        }
     }
-    private drawColumnDivider() {
-        const { paint, config, header } = this.ctx;
-        const borderColor = resolveResizeColumnDividerColor(config);
+    private drawColumnDivider(borderColor: string | undefined) {
+        const { paint, header } = this.ctx;
         if (borderColor === undefined) {
             return;
         }

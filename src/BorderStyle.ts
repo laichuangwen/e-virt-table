@@ -4,8 +4,6 @@ export type BorderStyle = 'default' | 'outer' | 'inner' | 'none';
 export type BorderConfigValue = boolean | BorderStyle;
 
 type ResizeColumnDividerColorConfig = {
-    BORDER: BorderConfigValue;
-    BORDER_COLOR: string;
     ENABLE_RESIZE_COLUMN: boolean;
     RESIZE_COLUMN_DIVIDER_COLOR?: string;
 };
@@ -13,10 +11,7 @@ type ResizeColumnDividerColorConfig = {
 export function resolveResizeColumnDividerColor(
     config: ResizeColumnDividerColorConfig,
 ): string | undefined {
-    if (config.ENABLE_RESIZE_COLUMN && config.RESIZE_COLUMN_DIVIDER_COLOR !== undefined) {
-        return config.RESIZE_COLUMN_DIVIDER_COLOR;
-    }
-    return shouldDrawFullCellBorder(config.BORDER) ? config.BORDER_COLOR : undefined;
+    return config.ENABLE_RESIZE_COLUMN ? config.RESIZE_COLUMN_DIVIDER_COLOR : undefined;
 }
 
 export function normalizeBorderStyle(value: BorderConfigValue): BorderStyle {
@@ -32,10 +27,6 @@ export function shouldDrawFullCellBorder(value: BorderConfigValue): boolean {
 export function shouldDrawInternalHorizontalBorder(value: BorderConfigValue): boolean {
     const style = normalizeBorderStyle(value);
     return style === 'default' || style === 'inner';
-}
-
-export function shouldDrawColumnDivider(value: BorderConfigValue): boolean {
-    return shouldDrawFullCellBorder(value);
 }
 
 export function getColumnDividerSide(
