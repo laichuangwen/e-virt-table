@@ -12,17 +12,27 @@ test('normalizes border config values', () => {
     assert.equal(mod.normalizeBorderStyle('none'), 'none');
 });
 
-test('resolves the resizable column divider color with the shared border color as fallback', () => {
-    const inherited = { BORDER_COLOR: '#shared', ENABLE_RESIZE_COLUMN: true };
+test('resolves the header resize divider color from the explicit override or border mode', () => {
+    const inherited = { BORDER: 'default', BORDER_COLOR: '#shared', ENABLE_RESIZE_COLUMN: true };
     assert.equal(mod.resolveResizeColumnDividerColor(inherited), '#shared');
 
+    for (const border of ['inner', 'outer', 'none', false]) {
+        assert.equal(mod.resolveResizeColumnDividerColor({ ...inherited, BORDER: border }), undefined);
+    }
+
     const customized = {
-        BORDER_COLOR: '#shared',
-        ENABLE_RESIZE_COLUMN: true,
+        ...inherited,
         RESIZE_COLUMN_DIVIDER_COLOR: '#divider',
     };
-    assert.equal(mod.resolveResizeColumnDividerColor(customized), '#divider');
+    for (const border of ['default', 'inner', 'outer', 'none']) {
+        assert.equal(mod.resolveResizeColumnDividerColor({ ...customized, BORDER: border }), '#divider');
+    }
+
     assert.equal(mod.resolveResizeColumnDividerColor({ ...customized, ENABLE_RESIZE_COLUMN: false }), '#shared');
+    assert.equal(
+        mod.resolveResizeColumnDividerColor({ ...customized, BORDER: 'inner', ENABLE_RESIZE_COLUMN: false }),
+        undefined,
+    );
 });
 
 test('maps border modes to draw decisions', () => {
@@ -55,8 +65,9 @@ test('maps border modes to draw decisions', () => {
 
 test('maps section column dividers and fixed boundaries', () => {
     assert.equal(mod.shouldDrawColumnDivider('default'), true);
-    assert.equal(mod.shouldDrawColumnDivider('inner'), true);
-    assert.equal(mod.shouldDrawColumnDivider(false), true);
+    assert.equal(mod.shouldDrawColumnDivider(true), true);
+    assert.equal(mod.shouldDrawColumnDivider('inner'), false);
+    assert.equal(mod.shouldDrawColumnDivider(false), false);
     assert.equal(mod.shouldDrawColumnDivider('outer'), false);
     assert.equal(mod.shouldDrawColumnDivider('none'), false);
 

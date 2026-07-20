@@ -16,7 +16,7 @@
 | --------------------------- | ------------------------------------ | ------- | ------ | -------------- |
 | RESIZE_COLUMN_MIN_WIDTH     | 列宽最小值                           | number  | —      | 40             |
 | ENABLE_RESIZE_COLUMN        | 启用列宽可调整                       | boolean | —      | true           |
-| RESIZE_COLUMN_DIVIDER_COLOR | 表头、表尾静态可调整列分割线颜色     | string  | —      | `BORDER_COLOR` |
+| RESIZE_COLUMN_DIVIDER_COLOR | 表头静态可调整列分割线颜色          | string  | —      | —              |
 | RESIZE_COLUMN_LINE_COLOR    | 拖动调整列宽时的贯穿引导线颜色       | string  | —      | #e1e6eb        |
 
 ## Events
@@ -74,7 +74,8 @@ h:320px
 ## 可调整列宽度
 
 -   `config.ENABLE_RESIZE_COLUMN`为 true,可启用调整列宽，默认 true
--   可通过 `config.RESIZE_COLUMN_DIVIDER_COLOR` 或 CSS 变量 `--evt-resize-column-divider-color` 设置静态列分割线颜色；未设置时使用 `BORDER_COLOR`
+-   可通过 `config.RESIZE_COLUMN_DIVIDER_COLOR` 或 CSS 变量 `--evt-resize-column-divider-color` 显式设置表头静态列分割线颜色
+-   未设置时，`default` 使用 `BORDER_COLOR`，`inner`、`outer`、`none` 不绘制表头列分割线；该配置不影响表尾
 -   `resizeColumnChange`为调整列后的回调
 
 ::: demo
@@ -85,7 +86,7 @@ h:320px
 
 ## 可调整列宽分割线颜色
 
-蓝色静态列分割线由 `--evt-resize-column-divider-color` 控制；拖动列宽时，红色贯穿引导线由 `RESIZE_COLUMN_LINE_COLOR` 控制。
+蓝色表头静态列分割线由 `--evt-resize-column-divider-color` 控制；表尾继续遵循 `BORDER` 与 `BORDER_COLOR`，不受该配置影响。拖动列宽时，红色贯穿引导线由 `RESIZE_COLUMN_LINE_COLOR` 控制。
 
 ::: demo
 

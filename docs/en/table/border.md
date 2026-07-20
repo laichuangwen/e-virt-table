@@ -6,7 +6,7 @@
 | --- | --- |
 | `default` | Full border, including outer border, row lines and column lines |
 | `outer` | Only show the table outer border |
-| `inner` | Show only internal horizontal row lines in the body, while keeping internal column dividers in the header and footer |
+| `inner` | Show only internal horizontal row lines without internal column dividers |
 | `none` | Hide table border lines |
 
 Compatibility: `true` equals `default`, and `false` equals `inner`.

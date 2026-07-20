@@ -16,7 +16,7 @@
 | --------------------------- | ------------------------------------------------------------ | ------- | -------------- |
 | RESIZE_COLUMN_MIN_WIDTH     | Adjustable minimum column width                              | number  | 40             |
 | ENABLE_RESIZE_COLUMN        | Enable column width adjustment                               | boolean | true           |
-| RESIZE_COLUMN_DIVIDER_COLOR | Static header and footer divider color for resizable columns | string  | `BORDER_COLOR` |
+| RESIZE_COLUMN_DIVIDER_COLOR | Static header divider color for resizable columns            | string  | —              |
 | RESIZE_COLUMN_LINE_COLOR    | Full-height guide color while resizing a column              | string  | #e1e6eb        |
 
 ## Events
@@ -74,7 +74,8 @@ h:320px
 ## Adjustable Column Width
 
 -   If `config.ENABLE_RESIZE_COLUMN` is set to true, column width adjustment can be enabled, default is true.
--   Use `config.RESIZE_COLUMN_DIVIDER_COLOR` or the `--evt-resize-column-divider-color` CSS variable to customize static column dividers. Unset values use `BORDER_COLOR`.
+-   Use `config.RESIZE_COLUMN_DIVIDER_COLOR` or the `--evt-resize-column-divider-color` CSS variable to explicitly set static header column dividers.
+-   When unset, `default` uses `BORDER_COLOR`; `inner`, `outer`, and `none` draw no header column dividers. This setting does not affect the footer.
 -   `resizeColumnChange` is the callback after adjustment.
 
 ::: demo
@@ -85,7 +86,7 @@ h:320px
 
 ## Resizable Column Divider Color
 
-The blue static column dividers use `--evt-resize-column-divider-color`. While resizing, the red full-height guide uses `RESIZE_COLUMN_LINE_COLOR`.
+The blue static header column dividers use `--evt-resize-column-divider-color`. The footer continues to follow `BORDER` and `BORDER_COLOR` and is not affected by this setting. While resizing, the red full-height guide uses `RESIZE_COLUMN_LINE_COLOR`.
 
 ::: demo
 

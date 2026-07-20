@@ -106,7 +106,7 @@ type EVirtTableOptions = {
 | ENABLE_RESIZE_ROW | 启用调整行高 | boolean | true |
 | ENABLE_RESIZE_COLUMN | 启用调整列宽 | boolean | true |
 | RESIZE_ROW_LINE_COLOR | 行调整线颜色 | string | #e1e6eb |
-| RESIZE_COLUMN_DIVIDER_COLOR | 可调整列宽时表头、表尾静态列分割线颜色 | string | `BORDER_COLOR` |
+| RESIZE_COLUMN_DIVIDER_COLOR | 可调整列宽时表头静态列分割线颜色 | string | — |
 | RESIZE_COLUMN_LINE_COLOR | 列调整线颜色 | string | #e1e6eb |
 | RESIZE_ROW_MIN_HEIGHT | 最小调整行高 | number | 36 |
 | RESIZE_COLUMN_MIN_WIDTH | 最小调整列宽 | number | 40 |

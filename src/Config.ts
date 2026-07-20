@@ -275,7 +275,7 @@ export default class Config {
     ENABLE_RESIZE_ROW = true;
     /** 启用列宽可调整 */
     ENABLE_RESIZE_COLUMN = true;
-    /** 可调整列宽的静态列分割线颜色，未设置时继承 BORDER_COLOR */
+    /** 可调整列宽时的表头静态列分割线颜色 */
     RESIZE_COLUMN_DIVIDER_COLOR: string | undefined = undefined;
     /** 行调整线颜色 */
     RESIZE_ROW_LINE_COLOR = '#e1e6eb';

@@ -25,7 +25,6 @@ import { Rule, Rules } from './Validator';
 import CellImage from './CellImage';
 import {
     getColumnDividerSide,
-    resolveResizeColumnDividerColor,
     shouldDrawFullCellBorder,
     shouldDrawInternalHorizontalBorder,
     shouldDrawColumnDivider,
@@ -1009,7 +1008,7 @@ export default class Cell extends BaseCell {
         }
         const x = side === 'left' ? this.drawX : this.drawX + this.visibleWidth;
         paint.drawLine([x, this.drawY, x, this.drawY + this.visibleHeight], {
-            borderColor: resolveResizeColumnDividerColor(config),
+            borderColor: config.BORDER_COLOR,
             borderWidth: 1,
         });
     }

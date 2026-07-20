@@ -16,14 +16,15 @@ function getMethodSource(source, methodName, nextMethodName) {
     return source.slice(start, end);
 }
 
-test('uses the resize divider color for header and footer column dividers', () => {
+test('uses the resize divider color only for header column dividers', () => {
     const headerColumnDivider = getMethodSource(cellHeaderSource, 'private drawColumnDivider()', 'private drawHorizontalDivider()');
     const footerColumnDivider = getMethodSource(cellSource, 'private drawFooterColumnDivider()', 'drawHorizontalBorder()');
 
     assert.match(headerColumnDivider, /resolveResizeColumnDividerColor\(config\)/);
     assert.match(headerColumnDivider, /getColumnDividerSide/);
-    assert.match(footerColumnDivider, /resolveResizeColumnDividerColor\(config\)/);
+    assert.match(footerColumnDivider, /config\.BORDER_COLOR/);
     assert.match(footerColumnDivider, /getColumnDividerSide/);
+    assert.doesNotMatch(footerColumnDivider, /resolveResizeColumnDividerColor|RESIZE_COLUMN_DIVIDER_COLOR/);
 });
 
 test('keeps the static divider color separate from the active resize guide', () => {

@@ -9,7 +9,6 @@ import {
     getColumnDividerSide,
     resolveResizeColumnDividerColor,
     shouldDrawFullCellBorder,
-    shouldDrawColumnDivider,
 } from './BorderStyle';
 export default class CellHeader extends BaseCell {
     align: Align;
@@ -209,7 +208,8 @@ export default class CellHeader extends BaseCell {
     }
     private drawColumnDivider() {
         const { paint, config, header } = this.ctx;
-        if (!shouldDrawColumnDivider(config.BORDER)) {
+        const borderColor = resolveResizeColumnDividerColor(config);
+        if (borderColor === undefined) {
             return;
         }
         const side = getColumnDividerSide(this.fixed, this.x, this.width, header.width);
@@ -218,7 +218,7 @@ export default class CellHeader extends BaseCell {
         }
         const x = side === 'left' ? this.drawX : this.drawX + this.visibleWidth;
         paint.drawLine([x, this.drawY, x, this.drawY + this.visibleHeight], {
-            borderColor: resolveResizeColumnDividerColor(config),
+            borderColor,
             borderWidth: 1,
         });
     }

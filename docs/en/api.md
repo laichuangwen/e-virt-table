@@ -105,7 +105,7 @@ type EVirtTableOptions = {
 | ENABLE_RESIZE_ROW | Enable row height adjustment | boolean | — | true |
 | ENABLE_RESIZE_COLUMN | Enable column width adjustment | boolean | — | true |
 | RESIZE_ROW_LINE_COLOR | Row adjustment line color | string | — | #e1e6eb |
-| RESIZE_COLUMN_DIVIDER_COLOR | Static header and footer divider color for resizable columns | string | — | `BORDER_COLOR` |
+| RESIZE_COLUMN_DIVIDER_COLOR | Static header divider color for resizable columns | string | — | — |
 | RESIZE_COLUMN_LINE_COLOR | Column adjustment line color | string | — | #e1e6eb |
 | RESIZE_ROW_MIN_HEIGHT | Minimum row height adjustment | number | — | 36 |
 | RESIZE_COLUMN_MIN_WIDTH | Minimum column width adjustment | number | — | 40 |
