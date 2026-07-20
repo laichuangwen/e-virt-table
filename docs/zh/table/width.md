@@ -82,3 +82,13 @@ h:320px
 width/resize
 h:320px
 :::
+
+## 可调整列宽分割线颜色
+
+蓝色静态列分割线由 `--evt-resize-column-divider-color` 控制；拖动列宽时，红色贯穿引导线由 `RESIZE_COLUMN_LINE_COLOR` 控制。
+
+::: demo
+
+width/resize-divider-color
+h:320px
+:::

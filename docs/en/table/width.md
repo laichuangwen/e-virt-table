@@ -82,3 +82,13 @@ h:320px
 width/resize
 h:320px
 :::
+
+## Resizable Column Divider Color
+
+The blue static column dividers use `--evt-resize-column-divider-color`. While resizing, the red full-height guide uses `RESIZE_COLUMN_LINE_COLOR`.
+
+::: demo
+
+width/resize-divider-color
+h:320px
+:::
