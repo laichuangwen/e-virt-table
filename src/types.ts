@@ -170,6 +170,7 @@ export interface Column {
     renderHeaderType?: RenderType;
     renderFooterType?: RenderType;
     formatter?: FormatterMethod;
+    formatterFinderValue?: FormatterMethod;
     formatterFooter?: FormatterMethod;
     autoRowHeight?: boolean;
     overflowTooltipShow?: boolean;

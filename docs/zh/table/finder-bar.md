@@ -11,10 +11,26 @@
 | ENABLE_FINDER        | 启用查找器             | boolean | true               |
 | FINDER_CELL_BG_COLOR | 当前查找结果格子背景色 | string  | `rgb(255,229,144)` |
 
-## 例子
+## Column
+
+| 参数                 | 说明                                                   | 类型                                                         | 默认值 |
+| -------------------- | ------------------------------------------------------ | ------------------------------------------------------------ | ------ |
+| formatterFinderValue | 自定义查找文本，会与单元格原有文本合并，单元格只计一次 | `({row, column, rowIndex, colIndex, value}) => string \| void` | —      |
+
+## 基础例子
 
 ::: demo 查找器
 
 finder-bar/base
 h:700px
+:::
+
+## 查找覆盖层内容
+
+覆盖层只渲染可视区域，因此查找器不会扫描 DOM。使用 `formatterFinderValue` 提供覆盖层的语义文本，可同时搜索 Canvas 单元格文本和覆盖层文本，并支持未渲染到视口的行。
+
+::: demo 查找覆盖层内容
+
+finder-bar/layer
+h:520px
 :::

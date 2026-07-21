@@ -31,6 +31,7 @@ export default class Cell extends BaseCell {
     parentRowKey: string = '';
     parentRowKeys: string[] = [];
     formatter?: FormatterMethod;
+    formatterFinderValue?: FormatterMethod;
     formatterFooter?: FormatterMethod;
     hoverIconName?: string = '';
     operation = false;
@@ -140,6 +141,7 @@ export default class Cell extends BaseCell {
         this.renderFooter = column.renderFooter;
         this.hoverIconName = column.hoverIconName;
         this.formatter = column.formatter;
+        this.formatterFinderValue = column.formatterFinderValue;
         this.formatterFooter = column.formatterFooter;
         this.maxLineClamp = column.maxLineClamp || 'auto';
         this.precision = column.precision;
@@ -919,6 +921,18 @@ export default class Cell extends BaseCell {
         }
         this.value = this.ctx.database.getItemValue(this.rowKey, this.key);
         return this.value;
+    }
+    getFinderText() {
+        if (typeof this.formatterFinderValue !== 'function') {
+            return undefined;
+        }
+        return this.formatterFinderValue({
+            row: this.row,
+            rowIndex: this.rowIndex,
+            colIndex: this.colIndex,
+            column: this.column,
+            value: this.getValue(),
+        });
     }
     getValue() {
         return this.ctx.database.getItemValue(this.rowKey, this.key);

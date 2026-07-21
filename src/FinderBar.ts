@@ -1,5 +1,6 @@
 import Context from './Context';
 import { expandSvg, svgLoading } from './Icons';
+import { mergeFinderSearchText } from './FinderSearch';
 
 export interface FinderResult {
     type: 'header' | 'body';
@@ -88,8 +89,8 @@ export class FinderBar {
             for (let i = 0; i <= maxRowIndex; i++) {
                 for (let j = 0; j <= maxColIndex; j++) {
                     const cell = this.ctx.database.getVirtualBodyCell(i, j, false);
-                    const text = cell?.getText();
-                    if (['string', 'number'].includes(typeof text)) {
+                    const text = mergeFinderSearchText(cell?.getText(), cell?.getFinderText());
+                    if (text !== undefined) {
                         this.searchData.push({
                             rowIndex: i,
                             colIndex: j,
