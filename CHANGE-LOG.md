@@ -7,17 +7,19 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -  
 
-V1.4.7
+V1.4.8
 ### Feature
 - feat: `ROW_KEY` 支持方法形式，返回行唯一标识（统一转为字符串）
+- feat: 优化查找器
+- fix:修复index类型还有输入背景色
   
 
-V1.4.6
+V1.4.7
 ### Bug Fixes
 - fix:修复边框问题，拓展无边框调整提示线
   
 
-V1.4.5
+V1.4.6
 ### Bug Fixes
 - fix:修复编辑变动后校验没有提示
 - feat:body和header footer的边框颜色可配置；
