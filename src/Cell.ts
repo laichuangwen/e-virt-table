@@ -33,6 +33,7 @@ export default class Cell extends BaseCell {
     parentRowKeys: string[] = [];
     formatter?: FormatterMethod;
     formatterFinderValue?: FinderFormatterMethod;
+    formatterFinderFooterValue?: FinderFormatterMethod;
     formatterFooter?: FormatterMethod;
     hoverIconName?: string = '';
     operation = false;
@@ -143,6 +144,7 @@ export default class Cell extends BaseCell {
         this.hoverIconName = column.hoverIconName;
         this.formatter = column.formatter;
         this.formatterFinderValue = column.formatterFinderValue;
+        this.formatterFinderFooterValue = column.formatterFinderFooterValue;
         this.formatterFooter = column.formatterFooter;
         this.maxLineClamp = column.maxLineClamp || 'auto';
         this.precision = column.precision;
@@ -849,16 +851,16 @@ export default class Cell extends BaseCell {
      * 获取显示文本
      * @returns
      */
-    getDisplayText() {
+    getDisplayText(text = this.text) {
         if (this.cellType === 'footer') {
             // 插槽不显示文本
             if (this.renderFooter && this.renderFooterType === 'default') {
                 return '';
             }
-            if (this.text === null || this.text === undefined) {
+            if (text === null || text === undefined) {
                 return '';
             }
-            return this.text;
+            return `${text}`;
         } else {
             // cellType === "body"
             // 被跨度单元格
@@ -873,10 +875,10 @@ export default class Cell extends BaseCell {
             if (this.type === 'index-selection' && selectionImage && selectionImage.visible) {
                 return '';
             }
-            if (this.text === null || this.text === undefined) {
+            if (text === null || text === undefined) {
                 return '';
             }
-            return `${this.text}`;
+            return `${text}`;
         }
     }
     /**
@@ -927,18 +929,22 @@ export default class Cell extends BaseCell {
         this.value = this.ctx.database.getItemValue(this.rowKey, this.key);
         return this.value;
     }
-    getFinderText() {
-        if (typeof this.formatterFinderValue !== 'function') {
-            return this.getValue();
+    getFinderText(): string {
+        const displayText = this.getDisplayText(this.getText());
+        const formatterFinder =
+            this.cellType === 'footer' ? this.formatterFinderFooterValue : this.formatterFinderValue;
+        if (typeof formatterFinder !== 'function') {
+            return displayText;
         }
-        return this.formatterFinderValue({
-            cellType: this.cellType,
+        const finderText = formatterFinder({
             row: this.row,
             rowIndex: this.rowIndex,
             colIndex: this.colIndex,
             column: this.column,
-            value: this.getDisplayText(),
-        }) || '';
+            value: this.cellType === 'footer' ? this.row[this.key] : this.getValue(),
+            displayText,
+        });
+        return finderText === undefined || finderText === null ? displayText : `${finderText}`;
     }
     getValue() {
         return this.ctx.database.getItemValue(this.rowKey, this.key);

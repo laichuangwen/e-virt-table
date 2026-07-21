@@ -171,6 +171,8 @@ export interface Column {
     renderFooterType?: RenderType;
     formatter?: FormatterMethod;
     formatterFinderValue?: FinderFormatterMethod;
+    formatterFinderHeaderValue?: FinderHeaderFormatterMethod;
+    formatterFinderFooterValue?: FinderFormatterMethod;
     formatterFooter?: FormatterMethod;
     autoRowHeight?: boolean;
     overflowTooltipShow?: boolean;
@@ -347,11 +349,16 @@ export type ContextMenuItemParams = {
 export type ConfigType = Partial<Config>;
 export type FilterMethod = (rows: any[]) => any[];
 export type FormatterMethod = (params: CellParams) => string | void;
-export type FinderCellParams = Omit<CellParams, 'row'> & {
-    cellType: CellType;
-    row?: any;
+export type FinderCellParams = CellParams & {
+    displayText: string;
+};
+export type FinderHeaderParams = CellHeaderParams & {
+    rowIndex: number;
+    value: string;
+    displayText: string;
 };
 export type FinderFormatterMethod = (params: FinderCellParams) => string | void;
+export type FinderHeaderFormatterMethod = (params: FinderHeaderParams) => string | void;
 export type CellStyleMethod = (params: CellStyleParams) => CellStyleOptions | void;
 export type CellHeaderStyleMethod = (params: CellHeaderParams) => CellStyleOptions | void;
 export type CellReadonlyMethod = (params: CellParams) => boolean | void;

@@ -288,7 +288,9 @@ type EVirtTableOptions = {
 | renderHeader | 自定义渲染头部方法 | string\|Function | — |
 | renderHeaderType | 配置both就是dom和canvas共存显示 | `RenderType`（`default`、`both`） | `default` |
 | formatter | 格式化方法 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — |
-| formatterFinderValue | 自定义 Header、Body、Footer 查找文本，与单元格文本合并搜索 | ^[Function]`({cellType,row,column,rowIndex,colIndex,value})=>string\|void` | — |
+| formatterFinderValue | 自定义 Body 查找文本；返回 `undefined` 回退显示文本，返回空字符串排除查找 | ^[Function]`({row,column,rowIndex,colIndex,value,displayText})=>string\|void` | — |
+| formatterFinderHeaderValue | 自定义 Header 查找文本；返回 `undefined` 回退显示文本，返回空字符串排除查找 | ^[Function]`({column,rowIndex,colIndex,value,displayText})=>string\|void` | — |
+| formatterFinderFooterValue | 自定义 Footer 查找文本；返回 `undefined` 回退显示文本，返回空字符串排除查找 | ^[Function]`({row,column,rowIndex,colIndex,value,displayText})=>string\|void` | — |
 | formatterFooter | 格式化底部方法 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — |
 | readonly | 是否只读 | boolean | false |
 | children | 子列 | Column[] | — |

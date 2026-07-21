@@ -78,8 +78,8 @@ export class FinderBar {
                 if (!header) {
                     continue;
                 }
-                const text = header?.getFinderText();
-                if (![undefined, '', null].includes(text)) {
+                const text = header.getFinderText();
+                if (text) {
                     this.searchData.push({
                         rowIndex: header.level,
                         colIndex: header.colIndex,
@@ -94,11 +94,11 @@ export class FinderBar {
                 for (let j = 0; j <= maxColIndex; j++) {
                     const cell = this.ctx.database.getVirtualBodyCell(i, j, false);
                     const text = cell?.getFinderText();
-                    if (![undefined, '', null].includes(text)) {
+                    if (text) {
                         this.searchData.push({
                             rowIndex: i,
                             colIndex: j,
-                            text: `${text}`,
+                            text,
                             type: 'body',
                         });
                     }
@@ -106,8 +106,8 @@ export class FinderBar {
             }
             for (const row of this.ctx.footer.renderRows) {
                 for (const cell of row.cells) {
-                    const text = cell?.getFinderText();
-                    if (![undefined, '', null].includes(text)) {
+                    const text = cell.getFinderText();
+                    if (text) {
                         this.searchData.push({
                             rowIndex: cell.rowIndex,
                             colIndex: cell.colIndex,

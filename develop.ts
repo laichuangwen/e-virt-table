@@ -249,12 +249,7 @@ let columns: Column[] = [
         key: 'sex',
         // readonly: false,
         mixedRender: true,
-        formatterFinderValue: ({ cellType, value }) => {
-            if (cellType === 'header') {
-                return `性别`;
-            }
-            return value;
-        },
+        formatterFinderHeaderValue: () => '性别',
         // render: "sex",
         // rules: [
         //     {

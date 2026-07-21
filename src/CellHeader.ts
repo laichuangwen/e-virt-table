@@ -1,6 +1,6 @@
 import type Context from './Context';
 import { generateShortUUID } from './util';
-import type { Align, CellHeaderStyleMethod, Column, FinderFormatterMethod, Fixed, LineClampType, Render, RenderType, Type, VerticalAlign } from './types';
+import type { Align, CellHeaderStyleMethod, Column, FinderHeaderFormatterMethod, Fixed, LineClampType, Render, RenderType, Type, VerticalAlign } from './types';
 import BaseCell from './BaseCell';
 import { Rule, Rules } from './Validator';
 import { TextInfo } from './Paint';
@@ -17,7 +17,7 @@ export default class CellHeader extends BaseCell {
     fixed?: Fixed;
     minWidth?: number;
     maxWidth?: number;
-    formatterFinderValue?: FinderFormatterMethod;
+    formatterFinderHeaderValue?: FinderHeaderFormatterMethod;
     widthFillDisable: boolean;
     type: Type | '';
     operation = false;
@@ -89,7 +89,7 @@ export default class CellHeader extends BaseCell {
         this.key = column.key;
         this.minWidth = column.minWidth;
         this.maxWidth = column.maxWidth;
-        this.formatterFinderValue = column.formatterFinderValue;
+        this.formatterFinderHeaderValue = column.formatterFinderHeaderValue;
         this.hide = (typeof column.hide === 'function' ? column.hide(column) : column.hide) || false;
         this.type = column.type || '';
         this.editorType = column.editorType || 'text';
@@ -200,18 +200,19 @@ export default class CellHeader extends BaseCell {
             }
         });
     }
-    getFinderText() {
-        if (typeof this.formatterFinderValue !== 'function') {
-            return this.displayText;
+    getFinderText(): string {
+        const displayText = this.displayText;
+        if (typeof this.formatterFinderHeaderValue !== 'function') {
+            return displayText;
         }
-        return this.formatterFinderValue({
-            cellType: 'header',
-            row: this.row,
+        const finderText = this.formatterFinderHeaderValue({
             rowIndex: this.level,
             colIndex: this.colIndex,
             column: this.column,
-            value: this.displayText,
-        }) || '';
+            value: this.text,
+            displayText,
+        });
+        return finderText === undefined || finderText === null ? displayText : `${finderText}`;
     }
     private drawEdge() {
         const { paint, config } = this.ctx;

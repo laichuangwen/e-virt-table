@@ -13,9 +13,13 @@
 
 ## Column
 
-| Parameter            | Description                                                              | Type                                                          | Default |
-| -------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------- | ------- |
-| formatterFinderValue | Custom Header, Body, and Footer finder text; use `cellType` to identify the section; each cell counts once after merging | `({cellType, row, column, rowIndex, colIndex, value}) => string \| void` | —       |
+| Parameter                      | Description                    | Type                                                                            | Default |
+| ------------------------------ | ------------------------------ | ------------------------------------------------------------------------------- | ------- |
+| formatterFinderValue           | Custom Body finder text        | `({row, column, rowIndex, colIndex, value, displayText}) => string \| void`      | —       |
+| formatterFinderHeaderValue     | Custom Header finder text      | `({column, rowIndex, colIndex, value, displayText}) => string \| void`           | —       |
+| formatterFinderFooterValue     | Custom Footer finder text      | `({row, column, rowIndex, colIndex, value, displayText}) => string \| void`      | —       |
+
+Returning a string replaces the default finder text for that section. Returning `undefined` falls back to the Canvas display text. Returning an empty string excludes the cell from the finder. `value` is the raw value and `displayText` is the Canvas display text.
 
 ## Basic Example
 
@@ -27,7 +31,7 @@ h:700px
 
 ## Find Overlay Content
 
-The overlay renders only visible rows, so the finder does not scan DOM nodes. Use `formatterFinderValue` to provide semantic overlay text and `cellType` to distinguish Header, Body, and Footer. Canvas text and all three overlay sections remain searchable, including Body rows outside the current viewport.
+The overlay renders only visible rows, so the finder does not scan DOM nodes. Use `formatterFinderHeaderValue`, `formatterFinderValue`, and `formatterFinderFooterValue` to provide the complete semantic text for Header, Body, and Footer overlays. All three overlay sections remain searchable, including Body rows outside the current viewport.
 
 ::: demo Find Overlay Content
 
