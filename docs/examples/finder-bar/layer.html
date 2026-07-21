@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -37,7 +37,7 @@
         <div id="e-virt-table"></div>
     </body>
     <script>
-        const getStatusText = (row) => (row.uploaded ? '已上传' : '未上传');
+        const getStatusText = (row) => (row.uploaded ? `已上传` : `未上传`);
 
         const renderTextLayer = (parent, text) => {
             const wrapper = document.createElement('div');
@@ -84,7 +84,8 @@
                 formatterFinderValue({ cellType, row }) {
                     if (cellType === 'header') return assetHeaderText;
                     if (cellType === 'footer') return assetFooterText;
-                    return getStatusText(row);
+                    // body,需要拼接素材编码和状态文本
+                    return `${row.assetCode} ${getStatusText(row)}`;
                 },
             },
             { title: '负责人', key: 'owner', width: 180 },
