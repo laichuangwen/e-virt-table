@@ -1,6 +1,6 @@
 # API
 
--  When declaring `ROW_KEY`, the corresponding field must be of string type.
+-  When declaring `ROW_KEY`, field values or method return values are normalized to strings. A key is auto-generated when not configured.
 ## EVirtTable
 
 EVirtTable(target: HTMLDivElement, options: EVirtTableOptions)
@@ -23,7 +23,7 @@ type EVirtTableOptions = {
 | Parameter | Description | Type | Optional Values | Default Value |
 | --- | --- | --- | --- | --- |
 | CSS_PREFIX | CSS class name prefix | string | — | e-virt-table |
-| ROW_KEY | Unique key for rows | string | — | — |
+| ROW_KEY | Unique row key: field name, or a method that returns the key | `string \| ((row: any) => string)` | — | — |
 | DISABLED | Disable editing | boolean | — | false |
 | HEADER_FONT | Header font | string | — | 12px normal Arial |
 | BODY_FONT | Cell font | string | — | 12px normal Arial |

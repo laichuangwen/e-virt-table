@@ -1,6 +1,6 @@
 ﻿# API
 
--   声明ROW_KEY时对应字段必须为字符串类型
+-   声明 `ROW_KEY` 时，字段值或方法返回值会统一转为字符串；未配置时自动生成
 ## EVirtTable
 
 EVirtTable(target: HTMLDivElement, options: EVirtTableOptions)
@@ -23,7 +23,7 @@ type EVirtTableOptions = {
 | 参数 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | CSS_PREFIX | CSS 类名前缀 | string | e-virt-table |
-| ROW_KEY | 行的唯一标识键 | string | — |
+| ROW_KEY | 行的唯一标识：字段名，或返回唯一标识的方法 | `string \| ((row: any) => string)` | — |
 | DISABLED | 禁止编辑 | boolean | false |
 | HEADER_FONT | 表头字体 | string | 12px normal Arial |
 | BODY_FONT | 单元格字体 | string | 12px normal Arial |

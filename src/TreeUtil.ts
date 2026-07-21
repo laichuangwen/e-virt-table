@@ -1,7 +1,9 @@
 export type TreeUtilPosition = 'none' | 'before' | 'after' | 'inside';
 
+type TreeKey = string | ((node: any) => any);
+
 interface TreeConfig {
-  key?: string;
+  key?: TreeKey;
   childrenKey?: string;
 }
 
@@ -13,7 +15,7 @@ interface NodeInfo {
 
 export class TreeUtil {
   private root: any[];
-  private key: string;
+  private key: TreeKey;
   private childrenKey: string;
 
   constructor(initialData: any[], config?: TreeConfig) {
@@ -30,7 +32,7 @@ export class TreeUtil {
     if (position === 'none') {
       return;
     }
-    if (sourceKey === targetKey) {
+    if (String(sourceKey) === String(targetKey)) {
       return;
     }
 
@@ -71,10 +73,24 @@ export class TreeUtil {
     targetArray.splice(insertIndex, 0, sourceNode);
   }
 
+  private getNodeKey(node: any) {
+    if (typeof this.key === 'function') {
+      return this.key(node);
+    }
+    return node[this.key];
+  }
+
+  private isSameKey(a: any, b: any) {
+    if (a === undefined || a === null || b === undefined || b === null) {
+      return false;
+    }
+    return String(a) === String(b);
+  }
+
   private findNodeWithParent(tree: any[], nodeKey: any, parent: any | null = null): NodeInfo | null {
     for (let i = 0; i < tree.length; i++) {
       const node = tree[i];
-      if (node[this.key] === nodeKey) return { parent, index: i, node };
+      if (this.isSameKey(this.getNodeKey(node), nodeKey)) return { parent, index: i, node };
       const children = node[this.childrenKey];
       if (Array.isArray(children)) {
         const found = this.findNodeWithParent(children, nodeKey, node);
@@ -88,7 +104,7 @@ export class TreeUtil {
     const children = node[this.childrenKey];
     if (!Array.isArray(children)) return false;
     for (const child of children) {
-      if (child[this.key] === targetKey) return true;
+      if (this.isSameKey(this.getNodeKey(child), targetKey)) return true;
       if (this.isDescendant(child, targetKey)) return true;
     }
     return false;

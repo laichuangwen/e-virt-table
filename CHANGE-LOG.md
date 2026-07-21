@@ -7,6 +7,11 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -  
 
+V1.4.7
+### Feature
+- feat: `ROW_KEY` 支持方法形式，返回行唯一标识（统一转为字符串）
+  
+
 V1.4.6
 ### Bug Fixes
 - fix:修复边框问题，拓展无边框调整提示线

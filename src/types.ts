@@ -344,6 +344,8 @@ export type ContextMenuItemParams = {
     hide: () => void;
 };
 export type ConfigType = Partial<Config>;
+/** 自定义行唯一标识，需返回稳定的字符串 */
+export type RowKeyMethod = (row: any) => string;
 export type FilterMethod = (rows: any[]) => any[];
 export type FormatterMethod = (params: CellParams) => string | void;
 export type CellStyleMethod = (params: CellStyleParams) => CellStyleOptions | void;

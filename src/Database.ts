@@ -8,6 +8,7 @@ import type {
     Column,
     FilterMethod,
     Position,
+    RowKeyMethod,
     SelectableMethod,
     EVirtTableOptions,
     BeforeCellValueChangeMethod,
@@ -120,6 +121,21 @@ export default class Database {
         this.bufferData = [];
     }
     /**
+     * 解析行唯一标识，统一转为 string
+     */
+    private resolveRowKey(item: any, rowKeyConfig: string | RowKeyMethod = '') {
+        let raw: any;
+        if (typeof rowKeyConfig === 'function') {
+            raw = rowKeyConfig(item);
+        } else if (rowKeyConfig) {
+            raw = item[rowKeyConfig];
+        }
+        if (raw !== undefined && raw !== null) {
+            return String(raw);
+        }
+        return generateShortUUID();
+    }
+    /**
      * 初始化数据
      * @param dataList
      * @param level
@@ -138,8 +154,7 @@ export default class Database {
             if (TREE_CHILDREN_KEY !== 'children') {
                 item.children = item[TREE_CHILDREN_KEY];
             }
-            const _rowKey = item[ROW_KEY]; // 行唯一标识,否则就rowKey
-            const rowKey = _rowKey !== undefined && _rowKey !== null ? _rowKey?.toString() : generateShortUUID();
+            const rowKey = this.resolveRowKey(item, ROW_KEY);
             this.itemRowKeyMap.set(item, rowKey);
             const height = item._height || CELL_HEIGHT;
             const readonly = item._readonly;

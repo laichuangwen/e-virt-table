@@ -24,6 +24,7 @@ import {
     FooterPosition,
     FormatterMethod,
     MenuItem,
+    RowKeyMethod,
     SelectableMethod,
     SelectorCellValueType,
     SpanMethod,
@@ -39,8 +40,8 @@ export default class Config {
     CSS_PREFIX = 'e-virt-table';
     /** 图标集合 */
     ICONS: IconType[] = [];
-    /** 行的唯一标识键 */
-    ROW_KEY = '';
+    /** 行的唯一标识：字段名，或返回唯一标识的方法 */
+    ROW_KEY: string | RowKeyMethod = '';
     /** 禁用编辑,优先等级最高 */
     DISABLED = false;
     /** 表头字体 */
