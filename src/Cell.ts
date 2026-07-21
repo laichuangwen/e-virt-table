@@ -929,7 +929,7 @@ export default class Cell extends BaseCell {
     }
     getFinderText() {
         if (typeof this.formatterFinderValue !== 'function') {
-            return undefined;
+            return this.getValue();
         }
         return this.formatterFinderValue({
             cellType: this.cellType,
@@ -937,7 +937,7 @@ export default class Cell extends BaseCell {
             rowIndex: this.rowIndex,
             colIndex: this.colIndex,
             column: this.column,
-            value: this.cellType === 'footer' ? this.row[this.key] : this.getValue(),
+            value: this.getDisplayText(),
         });
     }
     getValue() {

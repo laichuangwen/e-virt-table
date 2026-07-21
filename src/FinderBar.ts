@@ -72,31 +72,13 @@ export class FinderBar {
         this.showLoading();
         this.searchData = [];
         setTimeout(() => {
-            const getSearchText = (...values: unknown[]): string | undefined => {
-                const texts = values
-                    .filter((value): value is string | number => ['string', 'number'].includes(typeof value))
-                    .map((value) => `${value}`)
-                    .filter((value) => value.length > 0);
-                return texts.length ? [...new Set(texts)].join('\n') : undefined;
-            };
             const { allCellHeaders } = this.ctx.header;
             for (let i = 0; i < allCellHeaders.length; i++) {
                 const header = allCellHeaders[i];
                 if (!header) {
                     continue;
                 }
-                const { formatterFinderValue } = header.column;
-                const finderText =
-                    typeof formatterFinderValue === 'function'
-                        ? formatterFinderValue({
-                              cellType: 'header',
-                              rowIndex: header.level,
-                              colIndex: header.colIndex,
-                              column: header.column,
-                              value: header.text,
-                          })
-                        : undefined;
-                const text = getSearchText(header.text, finderText);
+                const text = header?.getFinderText();
                 if (text !== undefined) {
                     this.searchData.push({
                         rowIndex: header.level,
@@ -111,7 +93,7 @@ export class FinderBar {
             for (let i = 0; i <= maxRowIndex; i++) {
                 for (let j = 0; j <= maxColIndex; j++) {
                     const cell = this.ctx.database.getVirtualBodyCell(i, j, false);
-                    const text = getSearchText(cell?.getText(), cell?.getFinderText());
+                    const text = cell?.getFinderText();
                     if (text !== undefined) {
                         this.searchData.push({
                             rowIndex: i,
@@ -124,7 +106,7 @@ export class FinderBar {
             }
             for (const row of this.ctx.footer.renderRows) {
                 for (const cell of row.cells) {
-                    const text = getSearchText(cell.getText(), cell.getFinderText());
+                    const text = cell?.getFinderText();
                     if (text !== undefined) {
                         this.searchData.push({
                             rowIndex: cell.rowIndex,
