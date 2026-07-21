@@ -938,7 +938,7 @@ export default class Cell extends BaseCell {
             colIndex: this.colIndex,
             column: this.column,
             value: this.getDisplayText(),
-        });
+        }) || '';
     }
     getValue() {
         return this.ctx.database.getItemValue(this.rowKey, this.key);

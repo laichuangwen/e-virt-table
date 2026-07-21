@@ -211,7 +211,7 @@ export default class CellHeader extends BaseCell {
             colIndex: this.colIndex,
             column: this.column,
             value: this.displayText,
-        });
+        }) || '';
     }
     private drawEdge() {
         const { paint, config } = this.ctx;
