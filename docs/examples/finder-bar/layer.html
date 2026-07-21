@@ -41,7 +41,7 @@
 
         const data = Array.from({ length: 80 }, (_, index) => ({
             id: index + 1,
-            assetCode: `qa${String(5400 + index).padStart(5, '0')}`,
+            assetCode: `ASSET-${String(index + 1).padStart(4, '0')}`,
             uploaded: index % 3 !== 0,
             owner: ['Alice', 'Bob', 'Carol'][index % 3],
         }));

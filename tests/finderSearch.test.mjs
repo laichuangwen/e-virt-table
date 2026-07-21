@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises';
 const mod = await import('../dist/lib/FinderSearch.js');
 
 test('merges regular and custom finder text into one cell search value', () => {
-    assert.equal(mod.mergeFinderSearchText('qa05415', '已上传'), 'qa05415\n已上传');
+    assert.equal(mod.mergeFinderSearchText('ASSET-0016', '已上传'), 'ASSET-0016\n已上传');
 });
 
 test('deduplicates finder text and ignores unsupported values', () => {
