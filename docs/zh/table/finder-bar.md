@@ -15,7 +15,7 @@
 
 | 参数                 | 说明                                                   | 类型                                                         | 默认值 |
 | -------------------- | ------------------------------------------------------ | ------------------------------------------------------------ | ------ |
-| formatterFinderValue | 自定义查找文本，会与单元格原有文本合并，单元格只计一次 | `({row, column, rowIndex, colIndex, value}) => string \| void` | —      |
+| formatterFinderValue | 自定义 Header、Body、Footer 查找文本；通过 `cellType` 区分区域，与原文本合并后每个单元格只计一次 | `({cellType, row, column, rowIndex, colIndex, value}) => string \| void` | —      |
 
 ## 基础例子
 
@@ -27,7 +27,7 @@ h:700px
 
 ## 查找覆盖层内容
 
-覆盖层只渲染可视区域，因此查找器不会扫描 DOM。使用 `formatterFinderValue` 提供覆盖层的语义文本，可同时搜索 Canvas 单元格文本和覆盖层文本，并支持未渲染到视口的行。
+覆盖层只渲染可视区域，因此查找器不会扫描 DOM。使用 `formatterFinderValue` 提供覆盖层的语义文本，并通过 `cellType` 区分 Header、Body 和 Footer。Canvas 单元格文本和三类覆盖层文本都可搜索，Body 也支持未渲染到视口的行。
 
 ::: demo 查找覆盖层内容
 

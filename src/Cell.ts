@@ -7,6 +7,7 @@ import type {
     CellType,
     Render,
     FormatterMethod,
+    FinderFormatterMethod,
     CellTypeMethod,
     CellRenderMethod,
     CellEditorMethod,
@@ -31,7 +32,7 @@ export default class Cell extends BaseCell {
     parentRowKey: string = '';
     parentRowKeys: string[] = [];
     formatter?: FormatterMethod;
-    formatterFinderValue?: FormatterMethod;
+    formatterFinderValue?: FinderFormatterMethod;
     formatterFooter?: FormatterMethod;
     hoverIconName?: string = '';
     operation = false;
@@ -544,6 +545,10 @@ export default class Cell extends BaseCell {
                     this.drawTextFont = font;
                 }
             }
+            const { rowIndex, colIndex, type } = this.ctx.finderBar;
+            if (rowIndex === this.rowIndex && colIndex === this.colIndex && type === 'footer') {
+                bgColor = FINDER_CELL_BG_COLOR;
+            }
             // 合计底部背景色
             this.drawCellSkyBgColor = 'transparent';
             this.drawCellBgColor = bgColor;
@@ -927,11 +932,12 @@ export default class Cell extends BaseCell {
             return undefined;
         }
         return this.formatterFinderValue({
+            cellType: this.cellType,
             row: this.row,
             rowIndex: this.rowIndex,
             colIndex: this.colIndex,
             column: this.column,
-            value: this.getValue(),
+            value: this.cellType === 'footer' ? this.row[this.key] : this.getValue(),
         });
     }
     getValue() {

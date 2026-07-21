@@ -15,7 +15,7 @@
 
 | Parameter            | Description                                                              | Type                                                          | Default |
 | -------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------- | ------- |
-| formatterFinderValue | Custom finder text merged with existing cell text; each cell counts once | `({row, column, rowIndex, colIndex, value}) => string \| void` | —       |
+| formatterFinderValue | Custom Header, Body, and Footer finder text; use `cellType` to identify the section; each cell counts once after merging | `({cellType, row, column, rowIndex, colIndex, value}) => string \| void` | —       |
 
 ## Basic Example
 
@@ -27,7 +27,7 @@ h:700px
 
 ## Find Overlay Content
 
-The overlay renders only visible rows, so the finder does not scan DOM nodes. Use `formatterFinderValue` to provide semantic overlay text. Canvas text and overlay text remain searchable, including rows outside the current viewport.
+The overlay renders only visible rows, so the finder does not scan DOM nodes. Use `formatterFinderValue` to provide semantic overlay text and `cellType` to distinguish Header, Body, and Footer. Canvas text and all three overlay sections remain searchable, including Body rows outside the current viewport.
 
 ::: demo Find Overlay Content
 

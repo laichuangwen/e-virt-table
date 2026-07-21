@@ -39,12 +39,21 @@
     <script>
         const getStatusText = (row) => (row.uploaded ? '已上传' : '未上传');
 
+        const renderTextLayer = (parent, text) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'asset-cell';
+            wrapper.textContent = text;
+            parent.appendChild(wrapper);
+        };
+
         const data = Array.from({ length: 80 }, (_, index) => ({
             id: index + 1,
             assetCode: `ASSET-${String(index + 1).padStart(4, '0')}`,
             uploaded: index % 3 !== 0,
             owner: ['Alice', 'Bob', 'Carol'][index % 3],
         }));
+        const assetHeaderText = '素材标识';
+        const assetFooterText = `共 ${data.length} 条`;
 
         const columns = [
             { type: 'index', key: 'index', width: 70 },
@@ -52,6 +61,9 @@
                 title: '素材编码',
                 key: 'assetCode',
                 width: 240,
+                renderHeader(parent) {
+                    renderTextLayer(parent, assetHeaderText);
+                },
                 render(parent, cell) {
                     const wrapper = document.createElement('div');
                     wrapper.className = 'asset-cell';
@@ -66,7 +78,12 @@
                     wrapper.append(code, status);
                     parent.appendChild(wrapper);
                 },
-                formatterFinderValue({ row }) {
+                renderFooter(parent) {
+                    renderTextLayer(parent, assetFooterText);
+                },
+                formatterFinderValue({ cellType, row }) {
+                    if (cellType === 'header') return assetHeaderText;
+                    if (cellType === 'footer') return assetFooterText;
                     return getStatusText(row);
                 },
             },
@@ -76,6 +93,7 @@
         new EVirtTable(document.getElementById('e-virt-table'), {
             columns,
             data,
+            footerData: [{ assetCode: data.length, owner: '' }],
             config: {
                 ROW_KEY: 'id',
                 HEIGHT: 360,

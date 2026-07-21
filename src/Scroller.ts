@@ -1,4 +1,5 @@
 import Context from './Context';
+import type { CellType } from './types';
 import { shouldDrawRightBoundaryBorder, shouldDrawScrollerBorder, shouldDrawScrollerTrack } from './BorderStyle';
 import {
     getLayoutScrollerTrackSize,
@@ -524,8 +525,8 @@ export default class Scroller {
         this.ctx.on('setScrollY', (scrollY: number) => {
             this.setScrollY(scrollY);
         });
-        this.ctx.on('scrollToIndex', (rowIndex: number, colIndex: number) => {
-            this.scrollToIndex(rowIndex, colIndex);
+        this.ctx.on('scrollToIndex', (rowIndex: number, colIndex: number, cellType: CellType = 'body') => {
+            this.scrollToIndex(rowIndex, colIndex, cellType);
         });
         this.ctx.on('cellHeaderMousedown', () => {
             this.mousedownHeader = true;
@@ -643,8 +644,23 @@ export default class Scroller {
         const { top } = database.getPositionForRowIndex(rowIndex);
         this.setScrollY(top - body.visibleHeight / 2);
     }
-    scrollToIndex(rowIndex: number, colIndex: number) {
-        this.scrollToRowIndex(rowIndex);
+    scrollToFooterRowIndex(rowIndex: number) {
+        const { body, config, footer } = this.ctx;
+        if (config.FOOTER_FIXED) {
+            return;
+        }
+        const row = footer.renderRows.find((item) => item.rowIndex === rowIndex);
+        if (!row) {
+            return;
+        }
+        this.setScrollY(row.y - body.y - (body.visibleHeight - row.height) / 2);
+    }
+    scrollToIndex(rowIndex: number, colIndex: number, cellType: CellType = 'body') {
+        if (cellType === 'body') {
+            this.scrollToRowIndex(rowIndex);
+        } else if (cellType === 'footer') {
+            this.scrollToFooterRowIndex(rowIndex);
+        }
         this.scrollToColIndex(colIndex);
     }
     scrollToRowKey(rowKey: string) {

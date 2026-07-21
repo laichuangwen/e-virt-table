@@ -280,7 +280,7 @@ type EVirtTableOptions = {
 | renderHeader | Custom header render method | string\|Function | — | — |
 | renderHeaderType | "both" enables the simultaneous display of both DOM and Canvas | `RenderType` | `default`, `both` | `default` |
 | formatter | Formatter method | ^[Function]`({row, column, rowIndex, colIndex, value})=>string\|void` | — | — |
-| formatterFinderValue | Custom finder text merged with the cell text | ^[Function]`({row, column, rowIndex, colIndex, value})=>string\|void` | — | — |
+| formatterFinderValue | Custom Header, Body, and Footer finder text merged with the cell text | ^[Function]`({cellType, row, column, rowIndex, colIndex, value})=>string\|void` | — | — |
 | formatterFooter | Footer formatter method | ^[Function]`({row, column, rowIndex, colIndex, value})=>string\|void` | — | — |
 | readonly | Read-only column | boolean | — | false |
 | children | Child columns | Column[] | — | — |
