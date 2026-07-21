@@ -586,7 +586,7 @@ export default class Cell extends BaseCell {
         let textColor = BODY_TEXT_COLOR;
 
         // 只读
-        if (!this.ctx.database.getReadonly(this.rowKey, this.key)) {
+        if (!this.ctx.database.getReadonly(this.rowKey, this.key) && !['index', 'index-selection'].includes(this.type)) {
             bgColor = EDIT_BG_COLOR;
             textColor = READONLY_TEXT_COLOR;
         }
