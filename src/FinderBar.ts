@@ -1,8 +1,9 @@
 import Context from './Context';
 import { expandSvg, svgLoading } from './Icons';
+import type { CellType } from './types';
 
 export interface FinderResult {
-    type: 'header' | 'body';
+    type: CellType;
     rowIndex: number;
     colIndex: number;
     text: string;
@@ -74,11 +75,15 @@ export class FinderBar {
             const { allCellHeaders } = this.ctx.header;
             for (let i = 0; i < allCellHeaders.length; i++) {
                 const header = allCellHeaders[i];
-                if (header && ['string', 'number'].includes(typeof header.text)) {
+                if (!header) {
+                    continue;
+                }
+                const text = header.getFinderText();
+                if (text) {
                     this.searchData.push({
-                        rowIndex: 0,
+                        rowIndex: header.level,
                         colIndex: header.colIndex,
-                        text: `${header.text}`,
+                        text,
                         type: 'header',
                         colKey: header.key,
                     });
@@ -88,13 +93,26 @@ export class FinderBar {
             for (let i = 0; i <= maxRowIndex; i++) {
                 for (let j = 0; j <= maxColIndex; j++) {
                     const cell = this.ctx.database.getVirtualBodyCell(i, j, false);
-                    const text = cell?.getText();
-                    if (['string', 'number'].includes(typeof text)) {
+                    const text = cell?.getFinderText();
+                    if (text) {
                         this.searchData.push({
                             rowIndex: i,
                             colIndex: j,
-                            text: `${text}`,
+                            text,
                             type: 'body',
+                        });
+                    }
+                }
+            }
+            for (const row of this.ctx.footer.renderRows) {
+                for (const cell of row.cells) {
+                    const text = cell.getFinderText();
+                    if (text) {
+                        this.searchData.push({
+                            rowIndex: cell.rowIndex,
+                            colIndex: cell.colIndex,
+                            text,
+                            type: 'footer',
                         });
                     }
                 }
@@ -217,7 +235,7 @@ export class FinderBar {
         const result = this.searchResults[this.currentIndex];
         this.ctx.finderBar = result;
         const { rowIndex, colIndex } = result;
-        this.ctx.emit('scrollToIndex', rowIndex, colIndex);
+        this.ctx.emit('scrollToIndex', rowIndex, colIndex, result.type);
     }
 
     private navigateNext(): void {

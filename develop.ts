@@ -249,6 +249,7 @@ let columns: Column[] = [
         key: 'sex',
         // readonly: false,
         mixedRender: true,
+        formatterFinderHeaderValue: () => '性别',
         // render: "sex",
         // rules: [
         //     {

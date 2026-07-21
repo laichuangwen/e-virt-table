@@ -7,6 +7,7 @@ import type {
     CellType,
     Render,
     FormatterMethod,
+    FinderFormatterMethod,
     CellTypeMethod,
     CellRenderMethod,
     CellEditorMethod,
@@ -31,6 +32,8 @@ export default class Cell extends BaseCell {
     parentRowKey: string = '';
     parentRowKeys: string[] = [];
     formatter?: FormatterMethod;
+    formatterFinderValue?: FinderFormatterMethod;
+    formatterFinderFooterValue?: FinderFormatterMethod;
     formatterFooter?: FormatterMethod;
     hoverIconName?: string = '';
     operation = false;
@@ -140,6 +143,8 @@ export default class Cell extends BaseCell {
         this.renderFooter = column.renderFooter;
         this.hoverIconName = column.hoverIconName;
         this.formatter = column.formatter;
+        this.formatterFinderValue = column.formatterFinderValue;
+        this.formatterFinderFooterValue = column.formatterFinderFooterValue;
         this.formatterFooter = column.formatterFooter;
         this.maxLineClamp = column.maxLineClamp || 'auto';
         this.precision = column.precision;
@@ -542,6 +547,10 @@ export default class Cell extends BaseCell {
                     this.drawTextFont = font;
                 }
             }
+            const { rowIndex, colIndex, type } = this.ctx.finderBar;
+            if (rowIndex === this.rowIndex && colIndex === this.colIndex && type === 'footer') {
+                bgColor = FINDER_CELL_BG_COLOR;
+            }
             // 合计底部背景色
             this.drawCellSkyBgColor = 'transparent';
             this.drawCellBgColor = bgColor;
@@ -842,16 +851,16 @@ export default class Cell extends BaseCell {
      * 获取显示文本
      * @returns
      */
-    getDisplayText() {
+    getDisplayText(text = this.text) {
         if (this.cellType === 'footer') {
             // 插槽不显示文本
             if (this.renderFooter && this.renderFooterType === 'default') {
                 return '';
             }
-            if (this.text === null || this.text === undefined) {
+            if (text === null || text === undefined) {
                 return '';
             }
-            return this.text;
+            return `${text}`;
         } else {
             // cellType === "body"
             // 被跨度单元格
@@ -866,10 +875,10 @@ export default class Cell extends BaseCell {
             if (this.type === 'index-selection' && selectionImage && selectionImage.visible) {
                 return '';
             }
-            if (this.text === null || this.text === undefined) {
+            if (text === null || text === undefined) {
                 return '';
             }
-            return `${this.text}`;
+            return `${text}`;
         }
     }
     /**
@@ -919,6 +928,23 @@ export default class Cell extends BaseCell {
         }
         this.value = this.ctx.database.getItemValue(this.rowKey, this.key);
         return this.value;
+    }
+    getFinderText(): string {
+        const displayText = this.getDisplayText(this.getText());
+        const formatterFinder =
+            this.cellType === 'footer' ? this.formatterFinderFooterValue : this.formatterFinderValue;
+        if (typeof formatterFinder !== 'function') {
+            return displayText;
+        }
+        const finderText = formatterFinder({
+            row: this.row,
+            rowIndex: this.rowIndex,
+            colIndex: this.colIndex,
+            column: this.column,
+            value: this.cellType === 'footer' ? this.row[this.key] : this.getValue(),
+            displayText,
+        });
+        return finderText === undefined || finderText === null ? displayText : `${finderText}`;
     }
     getValue() {
         return this.ctx.database.getItemValue(this.rowKey, this.key);
