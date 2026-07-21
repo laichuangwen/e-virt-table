@@ -7,6 +7,11 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -  
 
+V1.4.6
+### Bug Fixes
+- fix:修复边框问题，拓展无边框调整提示线
+  
+
 V1.4.5
 ### Bug Fixes
 - fix:修复编辑变动后校验没有提示
