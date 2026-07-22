@@ -86,7 +86,7 @@ h:320px
 
 ## 可调整列宽分割线颜色
 
-蓝色表头静态列分割线由 `--evt-resize-column-divider-color` 控制；表尾继续遵循 `BORDER` 与 `BORDER_COLOR`，不受该配置影响。拖动列宽时，红色贯穿引导线由 `RESIZE_COLUMN_LINE_COLOR` 控制。
+蓝色表头静态列分割线由 `--evt-resize-column-divider-color` 控制；表尾继续遵循 `BORDER` 与 `BORDER_COLOR`，不受该配置影响。示例同时固定左侧 `No.` 列和右侧 `Address` 列，固定区与滚动区交界处优先显示固定列阴影。拖动列宽时，红色贯穿引导线由 `RESIZE_COLUMN_LINE_COLOR` 控制。
 
 ::: demo
 

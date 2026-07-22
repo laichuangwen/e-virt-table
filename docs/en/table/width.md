@@ -86,7 +86,7 @@ h:320px
 
 ## Resizable Column Divider Color
 
-The blue static header column dividers use `--evt-resize-column-divider-color`. The footer continues to follow `BORDER` and `BORDER_COLOR` and is not affected by this setting. While resizing, the red full-height guide uses `RESIZE_COLUMN_LINE_COLOR`.
+The blue static header column dividers use `--evt-resize-column-divider-color`. The footer continues to follow `BORDER` and `BORDER_COLOR` and is not affected by this setting. The example fixes the `No.` column on the left and the `Address` column on the right, so fixed-column shadows take precedence at the boundaries of the scrollable area. While resizing, the red full-height guide uses `RESIZE_COLUMN_LINE_COLOR`.
 
 ::: demo
 
