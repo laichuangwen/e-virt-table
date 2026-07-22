@@ -319,6 +319,7 @@ export default class Editor {
             }
         } else {
             this.inputEl.style.opacity = '0';
+            this.inputEl.style.zIndex = '-1';
             this.inputEl.style.width = '1px';
             this.inputEl.style.height = '1px';
             this.inputEl.style.position = 'absolute';
