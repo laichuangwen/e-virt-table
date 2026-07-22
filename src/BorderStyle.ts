@@ -8,6 +8,11 @@ type ResizeColumnDividerColorConfig = {
     RESIZE_COLUMN_DIVIDER_COLOR?: string;
 };
 
+type ColumnDividerBoundaries = {
+    fixedLeftEnd?: number;
+    fixedRightStart?: number;
+};
+
 export function resolveResizeColumnDividerColor(
     config: ResizeColumnDividerColorConfig,
 ): string | undefined {
@@ -34,9 +39,14 @@ export function getColumnDividerSide(
     x: number,
     width: number,
     sectionWidth: number,
+    boundaries: ColumnDividerBoundaries = {},
 ): 'left' | 'right' | null {
+    const { fixedLeftEnd = sectionWidth, fixedRightStart = 0 } = boundaries;
     if (fixed === 'right') {
-        return x > 0.01 ? 'left' : null;
+        return x > fixedRightStart + 0.01 ? 'left' : null;
+    }
+    if (fixed === 'left') {
+        return x + width < fixedLeftEnd - 0.01 ? 'right' : null;
     }
     return x + width < sectionWidth - 0.01 ? 'right' : null;
 }

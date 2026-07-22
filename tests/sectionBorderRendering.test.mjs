@@ -23,6 +23,11 @@ test('uses the resize divider color only for header column dividers', () => {
 
     assert.match(headerEdge, /resolveResizeColumnDividerColor\(config\)/);
     assert.match(headerColumnDivider, /getColumnDividerSide/);
+    assert.match(headerColumnDivider, /const fixedLeftEnd = scrollX > 0 \? fixedLeftWidth : undefined/);
+    assert.match(headerColumnDivider, /fixedRightStart/);
+    assert.match(headerColumnDivider, /getLayoutScrollerTrackSize\(config\)/);
+    assert.match(headerColumnDivider, /scrollX > 0/);
+    assert.match(headerColumnDivider, /scrollX < Math\.floor\(header\.width - stageWidth - 1\)/);
     assert.match(footerContainer, /config\.BORDER_COLOR/);
     assert.doesNotMatch(footerContainer, /resolveResizeColumnDividerColor|RESIZE_COLUMN_DIVIDER_COLOR/);
 });

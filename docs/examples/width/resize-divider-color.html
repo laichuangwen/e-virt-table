@@ -25,11 +25,11 @@
         ];
 
         const columns = [
-            { title: 'No.', key: 'id', width: 70, readonly: true },
+            { title: 'No.', key: 'id', width: 70, readonly: true, fixed: 'left' },
             { title: 'Name', key: 'name', width: 240, readonly: true },
             { title: 'Sex', key: 'sex', width: 240, readonly: true },
             { title: 'Age', key: 'age', width: 240, readonly: true },
-            { title: 'Address', key: 'address', width: 260, readonly: false },
+            { title: 'Address', key: 'address', width: 260, readonly: false, fixed: 'right' },
         ];
 
         new EVirtTable(document.getElementById('e-virt-table'), {

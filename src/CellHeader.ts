@@ -10,6 +10,7 @@ import {
     resolveResizeColumnDividerColor,
     shouldDrawFullCellBorder,
 } from './BorderStyle';
+import { getLayoutScrollerTrackSize } from './ScrollbarMode';
 export default class CellHeader extends BaseCell {
     align: Align;
     hideHeaderSelection = false;
@@ -229,11 +230,18 @@ export default class CellHeader extends BaseCell {
         }
     }
     private drawColumnDivider(borderColor: string | undefined) {
-        const { paint, header } = this.ctx;
+        const { paint, header, config, fixedLeftWidth, fixedRightWidth, scrollX, stageWidth } = this.ctx;
         if (borderColor === undefined) {
             return;
         }
-        const side = getColumnDividerSide(this.fixed, this.x, this.width, header.width);
+        const fixedLeftEnd = scrollX > 0 ? fixedLeftWidth : undefined;
+        const fixedRightStart = scrollX < Math.floor(header.width - stageWidth - 1)
+            ? header.width - fixedRightWidth + getLayoutScrollerTrackSize(config)
+            : undefined;
+        const side = getColumnDividerSide(this.fixed, this.x, this.width, header.width, {
+            fixedLeftEnd,
+            fixedRightStart,
+        });
         if (!side) {
             return;
         }

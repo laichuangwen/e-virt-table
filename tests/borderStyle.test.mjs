@@ -60,6 +60,23 @@ test('maps column divider sides around fixed boundaries', () => {
     assert.equal(mod.getColumnDividerSide('right', 0, 300, 300), null);
 });
 
+test('omits resize dividers where fixed sections meet their shadows', () => {
+    const boundaries = {
+        fixedLeftEnd: 200,
+        fixedRightStart: 300,
+    };
+
+    assert.equal(mod.getColumnDividerSide('left', 0, 100, 400, boundaries), 'right');
+    assert.equal(mod.getColumnDividerSide('left', 100, 100, 400, boundaries), null);
+    assert.equal(mod.getColumnDividerSide('right', 300, 50, 400, boundaries), null);
+    assert.equal(mod.getColumnDividerSide('right', 350, 50, 400, boundaries), 'left');
+});
+
+test('keeps fixed-section dividers when their shadows are inactive', () => {
+    assert.equal(mod.getColumnDividerSide('left', 100, 100, 400), 'right');
+    assert.equal(mod.getColumnDividerSide('right', 300, 50, 400), 'left');
+});
+
 test('hides non-default scroller track when no scrollbar is needed', () => {
     assert.equal(mod.shouldDrawScrollerTrack('default', false), true);
     assert.equal(mod.shouldDrawScrollerTrack('outer', false), false);
