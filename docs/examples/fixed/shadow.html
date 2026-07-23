@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <style>
+        :root {
+            --evt-fixed-column-shadow-color: rgba(15, 23, 42, 0.2);
+            --evt-fixed-column-shadow-fade-color: rgba(15, 23, 42, 0);
+        }
+        #e-virt-table {
+            width: 720px;
+            max-width: 100%;
+        }
+    </style>
+    <body>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        const data = [
+            { name: 'Olivia', team: 'Design', project: 'Dashboard', owner: 'Mia', progress: '82%', status: 'Active' },
+            { name: 'Ethan', team: 'Platform', project: 'Workspace', owner: 'Leo', progress: '64%', status: 'Active' },
+            { name: 'Sophia', team: 'Growth', project: 'Insights', owner: 'Ava', progress: '91%', status: 'Review' },
+            { name: 'Noah', team: 'Mobile', project: 'Companion', owner: 'Liam', progress: '48%', status: 'Active' },
+            { name: 'Emma', team: 'Design', project: 'Components', owner: 'Mia', progress: '76%', status: 'Review' },
+            { name: 'Lucas', team: 'Platform', project: 'Automation', owner: 'Leo', progress: '35%', status: 'Planned' },
+        ];
+        const columns = [
+            { title: 'Name', key: 'name', width: 112, fixed: 'left', readonly: true },
+            { title: 'Team', key: 'team', width: 120, readonly: true },
+            { title: 'Project', key: 'project', width: 160, readonly: true },
+            { title: 'Owner', key: 'owner', width: 110, readonly: true },
+            { title: 'Progress', key: 'progress', width: 104, readonly: true },
+            { title: 'Status', key: 'status', width: 96, fixed: 'right', readonly: true },
+        ];
+        const grid = new EVirtTable(document.getElementById('e-virt-table'), {
+            data,
+            columns,
+            footerData: [{ name: `${data.length} members`, status: '3 states' }],
+            config: {
+                HEIGHT: 288,
+                STRIPE: true,
+                FIXED_COLUMN_SHADOW_WIDTH: 10,
+            },
+        });
+
+        setTimeout(() => grid.scrollXTo(120), 100);
+    </script>
+</html>

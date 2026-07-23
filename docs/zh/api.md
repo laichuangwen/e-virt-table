@@ -29,6 +29,9 @@ type EVirtTableOptions = {
 | BODY_FONT | 单元格字体 | string | 12px normal Arial |
 | BORDER | 表格边框样式，`true` 等同 `default`，`false` 等同 `inner` | `boolean \| "default" \| "outer" \| "inner" \| "none"` | true |
 | BORDER_COLOR | 区域边框颜色 | string | #e1e6eb |
+| FIXED_COLUMN_SHADOW_COLOR | 固定列阴影靠近边界的颜色 | string | `rgba(0,0,0,0.1)` |
+| FIXED_COLUMN_SHADOW_FADE_COLOR | 固定列阴影渐隐末端的颜色 | string | `rgba(0,0,0,0)` |
+| FIXED_COLUMN_SHADOW_WIDTH | 固定列阴影宽度，设为 `0` 可关闭阴影 | number | 4 |
 | RESIZE_MIN_WIDTH | 最小可调整宽度 | number | 40 |
 | HEIGHT | 高度，高度为 0 表示自适应 | number | 0 |
 | COLUMNS_ALIGN | 全局水平对齐方式 | `"left"`, `"center"`, `"right"` | left |

@@ -648,7 +648,12 @@ export default class Header {
             scrollX,
             header,
             stageWidth,
-            config: { HEADER_BG_COLOR },
+            config: {
+                HEADER_BG_COLOR,
+                FIXED_COLUMN_SHADOW_COLOR,
+                FIXED_COLUMN_SHADOW_FADE_COLOR,
+                FIXED_COLUMN_SHADOW_WIDTH,
+            },
         } = this.ctx;
         const layoutScrollerTrackSize = getLayoutScrollerTrackSize(this.ctx.config);
 
@@ -656,9 +661,9 @@ export default class Header {
             this.ctx.paint.drawShadow(this.x, this.y, fixedLeftWidth, this.height, {
                 fillColor: HEADER_BG_COLOR,
                 side: 'right',
-                shadowWidth: 4,
-                colorStart: 'rgba(0,0,0,0.1)',
-                colorEnd: 'rgba(0,0,0,0)',
+                shadowWidth: FIXED_COLUMN_SHADOW_WIDTH,
+                colorStart: FIXED_COLUMN_SHADOW_COLOR,
+                colorEnd: FIXED_COLUMN_SHADOW_FADE_COLOR,
             });
         }
         // 右边阴影
@@ -667,9 +672,9 @@ export default class Header {
             this.ctx.paint.drawShadow(x, this.y, fixedRightWidth, this.height, {
                 fillColor: HEADER_BG_COLOR,
                 side: 'left',
-                shadowWidth: 4,
-                colorStart: 'rgba(0,0,0,0)',
-                colorEnd: 'rgba(0,0,0,0.1)',
+                shadowWidth: FIXED_COLUMN_SHADOW_WIDTH,
+                colorStart: FIXED_COLUMN_SHADOW_FADE_COLOR,
+                colorEnd: FIXED_COLUMN_SHADOW_COLOR,
             });
         }
     }

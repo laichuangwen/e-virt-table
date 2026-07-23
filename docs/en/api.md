@@ -29,6 +29,9 @@ type EVirtTableOptions = {
 | BODY_FONT | Cell font | string | — | 12px normal Arial |
 | BORDER | Table border style. `true` equals `default`; `false` equals `inner`. | `boolean \| "default" \| "outer" \| "inner" \| "none"` | `true`, `false`, `default`, `outer`, `inner`, `none` | true |
 | BORDER_COLOR | Border color | string | — | #e1e6eb |
+| FIXED_COLUMN_SHADOW_COLOR | Fixed-column shadow color next to the boundary | string | — | `rgba(0,0,0,0.1)` |
+| FIXED_COLUMN_SHADOW_FADE_COLOR | Fixed-column shadow color at the faded edge | string | — | `rgba(0,0,0,0)` |
+| FIXED_COLUMN_SHADOW_WIDTH | Fixed-column shadow width; set to `0` to disable it | number | — | 4 |
 | RESIZE_MIN_WIDTH | Minimum resizable width | number | — | 40 |
 | HEIGHT | Height (0 means auto fit) | number | — | 0 |
 | COLUMNS_ALIGN | Horizontal alignment | `"left"`, `"center"`, `"right"` | left |

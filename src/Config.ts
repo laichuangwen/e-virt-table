@@ -56,6 +56,12 @@ export default class Config {
     STRIPE_COLOR = '#fafafa';
     /** 区域边框颜色 */
     BORDER_COLOR = '#e1e6eb';
+    /** 固定列阴影靠近边界的颜色 */
+    FIXED_COLUMN_SHADOW_COLOR = 'rgba(0,0,0,0.1)';
+    /** 固定列阴影渐隐末端的颜色 */
+    FIXED_COLUMN_SHADOW_FADE_COLOR = 'rgba(0,0,0,0)';
+    /** 固定列阴影宽度 */
+    FIXED_COLUMN_SHADOW_WIDTH = 4;
     /** 高度，为 0 表示自适应 */
     HEIGHT = 0;
     /** 占位文本颜色 */

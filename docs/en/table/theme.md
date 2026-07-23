@@ -39,6 +39,8 @@ h:500px
     --evt-editor-bg-color: #fff;
     --evt-editor-text-color: #333;
     --evt-border-color: #e1e6eb;
+    --evt-fixed-column-shadow-color: rgba(0, 0, 0, 0.1);
+    --evt-fixed-column-shadow-fade-color: rgba(0, 0, 0, 0);
     --evt-body-bg-color: #fff;
     --evt-stripe-color: #fafafa;
     --evt-placeholder-color: #cdd0dc;

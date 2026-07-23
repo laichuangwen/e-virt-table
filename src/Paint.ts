@@ -99,6 +99,10 @@ export class Paint {
             this.ctx.fillStyle = fillColor;
             this.ctx.fillRect(x, y, width, height);
         }
+        if (!Number.isFinite(shadowWidth) || shadowWidth <= 0) {
+            this.ctx.restore();
+            return;
+        }
         let gradient: CanvasGradient;
         switch (side) {
             case 'left':
