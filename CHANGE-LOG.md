@@ -6,9 +6,13 @@ Vx.x.x(TPL)
 -   Style changes
 -   Dependencies Changes
 -  
-V1.4.9
+V1.4.10
 ### Feature
 - feat:固定列阴影支持自定义颜色和宽度
+
+
+V1.4.9
+### Feature
 - fix:修复调整列宽分割线颜色fixed时的bug
 - fix:解决自定义编辑器时聚焦出现错位问题
 
