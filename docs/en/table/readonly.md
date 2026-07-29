@@ -45,7 +45,7 @@ type BeforeValueChangeItem = {
 };
 ```
 
-> Order: built-in number/length checks → `canValueChange` → `BEFORE_VALUE_CHANGE_METHOD` → write → `valueChange` → validators.
+> Order: built-in number/length checks → `canValueChange` → `BEFORE_VALUE_CHANGE_METHOD` → write → validators → `valueChange` / `change` (callbacks include `errorTip`).
 
 ## Methods
 
@@ -153,7 +153,8 @@ h:350px
 
 ## Column-level Value Change Callback (`valueChange`)
 
-- `valueChange` fires after the value is written successfully
+- `valueChange` fires after the value is written and validation has finished
+- Callback includes `errorTip` to tell whether the current cell failed validation
 - Common for field linkage: update column B when column A changes
 - Unlike the table-level `change` event, this is a **column-level** callback and only runs on columns that define it
 

@@ -31,7 +31,19 @@ type Rules = Rule[];
 
 | 事件名称            | 说明                         | 回调参数 |
 | ------------------- | ---------------------------- | -------- |
+| change              | 值变更后回调（含校验结果）   | `BeforeValueChangeItem[]`，含 `errorTip` |
 | validateChangedData | 更改值后全部校验通过后的回调 | Array[]  |
+
+```ts
+type BeforeValueChangeItem = {
+    rowKey: string;
+    key: string;
+    value: any;
+    oldValue?: any;
+    row?: any;
+    errorTip?: boolean; // 当前单元格是否校验失败
+};
+```
 
 ## 校验器
 - 注意validateChangedData事件，全部校验通过后才会回调更改的结果
@@ -40,6 +52,19 @@ type Rules = Rule[];
 
 validator/base
 h:350px
+:::
+
+## 校验结果 errorTip
+
+- 值写入后会先跑完 `rules` 校验，再触发列级 `valueChange` 与表格级 `change`
+- 回调参数中的 `errorTip`：`true` 表示该单元格校验失败，`false` 表示通过
+- 适合在联动赋值、日志、状态列中根据校验结果做分支处理
+- 整表无校验错误时才会触发 `validateChangedData`
+
+::: demo
+
+validator/error-tip
+h:420px
 :::
 
 ## 自定义校验器

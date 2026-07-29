@@ -45,7 +45,7 @@ type BeforeValueChangeItem = {
 };
 ```
 
-> 执行顺序：数字/长度等内置校验 → `canValueChange` → `BEFORE_VALUE_CHANGE_METHOD` → 写入数据 → `valueChange` → 校验器。
+> 执行顺序：数字/长度等内置校验 → `canValueChange` → `BEFORE_VALUE_CHANGE_METHOD` → 写入数据 → 校验器 → `valueChange` / `change`（回调含 `errorTip`）。
 
 ## Methods
 
@@ -155,7 +155,8 @@ h:350px
 
 ## 列级别值变更回调（valueChange）
 
-- `valueChange` 在值成功写入后触发
+- `valueChange` 在值成功写入且完成校验后触发
+- 回调参数含 `errorTip`，可判断当前单元格是否校验失败
 - 常用于字段联动：修改 A 列后同步更新 B 列展示内容
 - 与表格级 `change` 事件不同，它是**列级别**回调，只作用于配置了该函数的列
 

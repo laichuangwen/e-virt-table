@@ -157,7 +157,7 @@ type EVirtTableOptions = {
 
 | Name  | Description | Type |
 | --- | --- | --- |
-| change | Data change callback including copy and autofill | `{rowKey, key, value, row}` |
+| change | Data change callback including copy and autofill; includes validation result `errorTip` | `{rowKey, key, value, row, errorTip}` |
 | selectionChange | Selection change callback | `rows` |
 | validateChangedData | Data change callback including copy and autofill, only called when all data passes validation | `{rowKey, key, value, row}` |
 | autofillChange | Callback for autofill | `{rowKey, key, value, row}` |
@@ -308,7 +308,7 @@ type EVirtTableOptions = {
 | dragDisabled | Disable column drag for current column | boolean | false |
 | selectorCellValueType | Selector Cell Value Type | `SelectorCellValueType` | `value` |
 | canValueChange | Column-level gate before write; return `false` to reject | ^[Function]`(BeforeValueChangeItem)=>boolean\|Promise<boolean>` | — |
-| valueChange | Column-level callback after value is written | ^[Function]`(BeforeValueChangeItem)=>void` | — |
+| valueChange | Column-level callback after value is written and validated; includes `errorTip` | ^[Function]`(BeforeValueChangeItem)=>void` | — |
 
 ## Row
 

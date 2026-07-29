@@ -28,9 +28,21 @@ type Rules = Rule[];
 
 ## Events
 
-| Name                | Description                         | Callback Parameters |
-| ------------------- | ----------------------------------- | ------------------- |
-| validateChangedData | Callback after all validations pass | Array[]             |
+| Name                | Description                                      | Callback Parameters |
+| ------------------- | ------------------------------------------------ | ------------------- |
+| change              | Fired after value change (includes validation)   | `BeforeValueChangeItem[]` with `errorTip` |
+| validateChangedData | Callback after all validations pass              | Array[]             |
+
+```ts
+type BeforeValueChangeItem = {
+    rowKey: string;
+    key: string;
+    value: any;
+    oldValue?: any;
+    row?: any;
+    errorTip?: boolean; // whether this cell failed validation
+};
+```
 
 ## Validator
 - Note the validateChangedData event, which will only callback the changed results after all validations pass
@@ -39,6 +51,19 @@ type Rules = Rule[];
 
 validator/base
 h:350px
+:::
+
+## Validation Result `errorTip`
+
+- After the value is written, `rules` run first, then column-level `valueChange` and table-level `change` fire
+- `errorTip` in the callback: `true` means validation failed for that cell, `false` means it passed
+- Useful for linkage, logging, or status columns based on validation result
+- `validateChangedData` only fires when the whole table has no validation errors
+
+::: demo
+
+validator/error-tip
+h:420px
 :::
 
 ## Custom Validator

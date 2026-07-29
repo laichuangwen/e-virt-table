@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <p style="margin: 8px 0; color: #86909c; font-size: 12px">
+            Edit <code>Quantity</code> or <code>Email</code>. After validation,
+            <code>valueChange</code> / <code>change</code> receive <code>errorTip</code>
+            (see console).
+        </p>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        let data = [
+            {
+                name: 'Tom',
+                quantity: '5',
+                email: 'tom@example.com',
+                status: 'OK',
+            },
+            {
+                name: 'Jerry',
+                quantity: '12',
+                email: 'jerry',
+                status: '',
+            },
+            {
+                name: 'Alice',
+                quantity: '',
+                email: '',
+                status: '',
+            },
+        ];
+        let columns = [
+            {
+                title: 'Name',
+                key: 'name',
+                width: 100,
+                readonly: true,
+            },
+            {
+                title: 'Quantity',
+                key: 'quantity',
+                width: 120,
+                rules: [
+                    {
+                        required: true,
+                        message: 'Please enter quantity',
+                    },
+                    {
+                        pattern: /^(0|[1-9]\d*)$/,
+                        message: 'Please enter 0 or a positive integer',
+                    },
+                    {
+                        validator(rule, value, callback) {
+                            if (Number(value) > 10) {
+                                callback('Quantity cannot be greater than 10');
+                            } else {
+                                callback();
+                            }
+                        },
+                    },
+                ],
+                // Fires after rules validation; errorTip indicates whether this cell failed
+                valueChange: (changeItem) => {
+                    const { row, value, errorTip } = changeItem;
+                    row.status = errorTip ? `Invalid: ${value}` : `OK: ${value}`;
+                    console.log('valueChange', changeItem);
+                },
+            },
+            {
+                title: 'Email',
+                key: 'email',
+                width: 180,
+                rules: [
+                    {
+                        required: true,
+                        message: 'Please enter email',
+                    },
+                    {
+                        pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                        message: 'Please enter a valid email',
+                    },
+                ],
+                valueChange: (changeItem) => {
+                    console.log('valueChange', changeItem);
+                },
+            },
+            {
+                title: 'Status',
+                key: 'status',
+                width: 160,
+                readonly: true,
+            },
+        ];
+        const target = document.getElementById('e-virt-table');
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                ENABLE_SELECTOR: true,
+                ENABLE_HISTORY: true,
+            },
+        });
+        grid.on('change', (changeList) => {
+            console.log('change', changeList);
+        });
+        // Only fires when the whole table has no validation errors
+        grid.on('validateChangedData', (changeData) => {
+            console.log('validateChangedData', changeData);
+        });
+    </script>
+</html>

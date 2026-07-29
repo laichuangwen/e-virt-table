@@ -164,7 +164,7 @@ type EVirtTableOptions = {
 
 | 事件名称                  | 说明                                                                     | 回调参数                                          |
 | ------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------- |
-| change                    | `常用方法之一`，数据改变回调包括复制填充等                               | `{rowKey,key,value,row}`                          |
+| change                    | `常用方法之一`，数据改变回调包括复制填充等；含校验结果 `errorTip`         | `{rowKey,key,value,row,errorTip}`                 |
 | selectionChange           | `常用方法之一`选择改变回调                                               | `rows`                                            |
 | validateChangedData       | `常用方法之一`，数据改变回调包括复制填充等，只有数据全部通过校验才会回调 | `{rowKey,key,value,row}`                          |
 | autofillChange            | 填充回调                                                                 | `{rowKey,key,value,row}`                          |
@@ -321,7 +321,7 @@ type EVirtTableOptions = {
 | maxlength | 字符串最大长度 | number | — |
 | mixedRender | 混合渲染，dom和canvas一起渲染 | boolean | false |
 | canValueChange | 列级别值变更拦截，返回 `false` 取消本次修改 | ^[Function]`(BeforeValueChangeItem)=>boolean\|Promise<boolean>` | — |
-| valueChange | 列级别值变更成功后回调 | ^[Function]`(BeforeValueChangeItem)=>void` | — |
+| valueChange | 列级别值变更且校验完成后回调，参数含 `errorTip` | ^[Function]`(BeforeValueChangeItem)=>void` | — |
 
 ## Row
 
