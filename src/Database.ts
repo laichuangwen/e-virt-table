@@ -767,11 +767,6 @@ export default class Database {
             rowList.set(rowKey, row);
             // 不加历史，不重绘，不是编辑器，不检验只读
             this.setItemValue(rowKey, key, value, false, false, false, _checkReadonly);
-            // 触发valueChange事件
-            const cell = this.getVirtualBodyCellByKey(rowKey, key);
-            if (typeof cell?.column?.valueChange === 'function') {
-                cell.column.valueChange(data);
-            }
             promsieValidators.push(this.getValidator(data.rowKey, data.key));
             historyList.push({
                 rowKey,
@@ -788,6 +783,15 @@ export default class Database {
         }
         const changeListValid = changeList.map((item) => {
             const errorTip = !!this.getValidationError(item.rowKey, item.key).length;
+            // 触发valueChange事件
+            const { rowKey, key } = item;
+            const cell = this.getVirtualBodyCellByKey(rowKey, key);
+            if (typeof cell?.column?.valueChange === 'function') {
+                cell.column.valueChange({
+                    ...item,
+                    errorTip,
+                });
+            }
             return {
                 ...item,
                 errorTip,
