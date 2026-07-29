@@ -6,6 +6,13 @@ Vx.x.x(TPL)
 -   Style changes
 -   Dependencies Changes
 -  
+
+V1.4.11
+### Feature
+- fix:修复validateChangedData失效问题
+- feat:拓展valueChange里可回调errorTip
+
+
 V1.4.10
 ### Feature
 - feat:固定列阴影支持自定义颜色和宽度
