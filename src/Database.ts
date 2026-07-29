@@ -1599,7 +1599,11 @@ export default class Database {
                 };
                 const validator = new Validator(rules);
                 const _errors = validator.validate(ruleParam);
-                this.setValidationError(rowKey, key, _errors);
+                if (_errors.length) {
+                    this.setValidationError(rowKey, key, _errors);
+                } else {
+                    this.clearValidationError(rowKey, key);
+                }
                 resolve(_errors);
             } else {
                 this.clearValidationError(rowKey, key);

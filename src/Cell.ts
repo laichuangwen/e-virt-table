@@ -315,15 +315,12 @@ export default class Cell extends BaseCell {
     validate() {
         this.ctx.database
             .getValidator(this.rowKey, this.key)
-            .then(() => {
-                this.ctx.database.setValidationError(this.rowKey, this.key, []);
-                this.message = '';
-            })
-            .catch((errors) => {
+            .then((errors) => {
                 if (Array.isArray(errors) && errors.length) {
                     const [err] = errors;
                     this.message = err.message;
-                    this.ctx.database.setValidationError(this.rowKey, this.key, errors);
+                } else {
+                    this.message = '';
                 }
             })
             .finally(() => {
