@@ -295,7 +295,7 @@ type EVirtTableOptions = {
 | formatterFinderHeaderValue | 自定义 Header 查找文本；返回 `undefined` 回退显示文本，返回空字符串排除查找 | ^[Function]`({column,rowIndex,colIndex,value,displayText})=>string\|void` | — |
 | formatterFinderFooterValue | 自定义 Footer 查找文本；返回 `undefined` 回退显示文本，返回空字符串排除查找 | ^[Function]`({row,column,rowIndex,colIndex,value,displayText})=>string\|void` | — |
 | formatterFooter | 格式化底部方法 | ^[Function]`({row, column, rowIndex, colIndex,value})=>string\|viod` | — |
-| readonly | 是否只读 | boolean | false |
+| readonly | 是否只读，支持方法按单元格动态判断 | ^[boolean / Function]`boolean \| CellReadonlyMethod` | false |
 | children | 子列 | Column[] | — |
 | column | 当前列对象 | Column | — |
 | hoverIconName | 悬浮图标名字，可ICONS配置 | string | — |

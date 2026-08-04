@@ -4,7 +4,7 @@
 
 | Parameter      | Description                                              | Type                                                                            | Default |
 | -------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------- | ------- |
-| readonly       | Control column readonly                                  | boolean                                                                         | false   |
+| readonly       | Control column readonly; supports a method for per-cell control | ^[boolean / Function]`boolean \| ({row, column, rowIndex, colIndex, value})=>boolean\|void` | false   |
 | editorType     | Editor type                                              | string                                                                          | false   |
 | editorProps    | Properties passed to the editor                          | object                                                                          | {}      |
 | canValueChange | Column-level gate before write; return `false` to reject | ^[Function]`(BeforeValueChangeItem)=>boolean\|Promise<boolean>`                 | —       |
@@ -80,6 +80,18 @@ h:350px
 ::: demo
 
 readonly/column
+h:350px
+:::
+
+## Column Method Readonly
+
+-   `column.readonly` accepts a method to decide readonly per cell
+-   Returning `undefined` falls through to `BODY_CELL_READONLY_METHOD` / row readonly
+-   Example: Quantity is readonly when &gt; 10; Address is readonly when empty
+
+::: demo
+
+readonly/column-method
 h:350px
 :::
 

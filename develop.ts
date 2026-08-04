@@ -192,7 +192,7 @@ let columns: Column[] = [
         ],
     },
     {
-        title: '手机号',
+        title: '手机号111111111111111111111111111111',
         key: 'phone',
         maxLineClamp: 'auto',
         sortBy: 'string',

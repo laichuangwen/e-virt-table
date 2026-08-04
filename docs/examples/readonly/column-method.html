@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <body>
+        <p style="margin: 8px 0; color: #86909c; font-size: 12px">
+            Column <code>readonly</code> as a function: Address is readonly when empty;
+            Quantity is readonly when value &gt; 10.
+        </p>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        let data = [
+            {
+                name: 'Tom',
+                quantity: '5',
+                address: 'No. 189, Grove St',
+                city: 'Los Angeles',
+            },
+            {
+                name: 'Jerry',
+                quantity: '12',
+                address: '',
+                city: 'San Francisco',
+            },
+            {
+                name: 'Alice',
+                quantity: '3',
+                address: 'Main Street',
+                city: 'Seattle',
+            },
+        ];
+        let columns = [
+            {
+                title: 'Name',
+                key: 'name',
+                width: 100,
+            },
+            {
+                title: 'Quantity',
+                key: 'quantity',
+                width: 120,
+                // Column-level readonly method
+                readonly: ({ value }) => Number(value) > 10,
+            },
+            {
+                title: 'Address',
+                key: 'address',
+                width: 200,
+                // Readonly when empty; editable after filled
+                readonly: (item) => {
+                    console.log(item);
+                    return false;
+                },
+            },
+            {
+                title: 'City',
+                key: 'city',
+            },
+        ];
+        const target = document.getElementById('e-virt-table');
+        const grid = new EVirtTable(target, {
+            data,
+            columns,
+            config: {
+                ENABLE_SELECTOR: true,
+            },
+        });
+    </script>
+</html>

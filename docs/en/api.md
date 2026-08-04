@@ -287,7 +287,7 @@ type EVirtTableOptions = {
 | formatterFinderHeaderValue | Custom Header finder text; `undefined` falls back to display text and an empty string excludes the cell | ^[Function]`({column, rowIndex, colIndex, value, displayText})=>string\|void` | — | — |
 | formatterFinderFooterValue | Custom Footer finder text; `undefined` falls back to display text and an empty string excludes the cell | ^[Function]`({row, column, rowIndex, colIndex, value, displayText})=>string\|void` | — | — |
 | formatterFooter | Footer formatter method | ^[Function]`({row, column, rowIndex, colIndex, value})=>string\|void` | — | — |
-| readonly | Read-only column | boolean | — | false |
+| readonly | Read-only column; supports a method for per-cell control | ^[boolean / Function]`boolean \| CellReadonlyMethod` | — | false |
 | children | Child columns | Column[] | — | — |
 | column | Current column object | Column | — | — |
 | hoverIconName | Hover icon name, ICONS configurable | string | — |

@@ -107,7 +107,7 @@ export default class CellHeader extends BaseCell {
         this.widthFillDisable = column.widthFillDisable || false;
         this.rowspan = column.rowspan || 1;
         this.rules = column.rules;
-        this.readonly = column.readonly || false;
+        this.readonly = typeof column.readonly === 'boolean' ? column.readonly : false;
         this.required = column.required || false;
         this.sortIconName = column.sortIconName || 'sort-default';
         this.sortAscIconName = column.sortAscIconName || 'sort-asc';

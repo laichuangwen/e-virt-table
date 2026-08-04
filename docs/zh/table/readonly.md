@@ -4,7 +4,7 @@
 
 | 参数           | 说明                                       | 类型                                                                                      | 默认值 |
 | -------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------- | ------ |
-| readonly       | 控制列只读                                 | boolean                                                                                   | false  |
+| readonly       | 控制列只读，支持方法按单元格动态判断       | ^[boolean / Function]`boolean \| ({row, column, rowIndex, colIndex, value})=>boolean\|void` | false  |
 | editorType     | 编辑器类型                                 | sting                                                                                     | false  |
 | editorProps    | 传递给编辑器的属性                         | object                                                                                    | {}     |
 | canValueChange | 列级别值变更拦截，返回 `false` 则取消本次修改 | ^[Function]`(BeforeValueChangeItem)=>boolean\|Promise<boolean>`                           | —      |
@@ -81,6 +81,18 @@ h:350px
 ::: demo
 
 readonly/column
+h:350px
+:::
+
+## 列方法控制只读
+
+-   `column.readonly` 支持传入方法，按单元格动态返回是否只读
+-   返回 `undefined` 时继续走 `BODY_CELL_READONLY_METHOD` / 行只读等后续逻辑
+-   下例：Quantity 大于 10 只读；Address 为空时只读
+
+::: demo
+
+readonly/column-method
 h:350px
 :::
 

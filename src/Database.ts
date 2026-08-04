@@ -1550,6 +1550,18 @@ export default class Database {
                 return readonly;
             }
         }
+        if (typeof colHeader.column?.readonly === 'function') {
+            const readonly = colHeader.column.readonly({
+                row: row.item,
+                rowIndex: row.rowIndex,
+                colIndex: colHeader.colIndex,
+                column: colHeader.column,
+                value: this.getItemValue(rowKey, key),
+            });
+            if (readonly !== undefined) {
+                return readonly;
+            }
+        }
         return colReadonly || rowReadonly;
     }
     clearValidate() {

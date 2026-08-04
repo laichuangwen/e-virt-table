@@ -180,7 +180,7 @@ export interface Column {
     overflowTooltipMaxWidth?: number;
     overflowTooltipPlacement?: OverflowTooltipPlacement;
     required?: boolean;
-    readonly?: boolean;
+    readonly?: boolean | CellReadonlyMethod;
     children?: Column[];
     column?: Column;
     rules?: Rules | Rule;
