@@ -4,6 +4,13 @@ import type Context from './Context';
 import type { OverlayerContainer, OverlayerView, OverlayerWrapper } from './types';
 import { throttle } from './util';
 import { getLayoutScrollerTrackSize } from './ScrollbarMode';
+
+type HeaderSortIconLayout = {
+    cell: CellHeader;
+    cellEl: HTMLDivElement;
+    sortIconEl: HTMLImageElement;
+};
+
 export default class Overlayer {
     ctx: Context;
     observer?: MutationObserver;
@@ -59,6 +66,7 @@ export default class Overlayer {
         if (this.ctx.overlayerElement.getAttribute('data-overlayer') === 'default') {
             this.ctx.on('overlayerChange', (container) => {
                 const overlayerEl = this.ctx.overlayerElement;
+                const headerSortIconLayouts: HeaderSortIconLayout[] = [];
                 // 移除所有子元素
                 overlayerEl.replaceChildren();
                 Object.assign(overlayerEl.style, container.style);
@@ -76,17 +84,112 @@ export default class Overlayer {
                                 cellEl.setAttribute(key, cell.domDataset[key]);
                             });
 
+                            if (typeView.type === 'header') {
+                                this.reserveHeaderSortIconSpace(cellEl, cell as CellHeader);
+                            }
+
                             if (typeof cell.render === 'function') {
                                 cell.render(cellEl, cell);
                             }
                             cellWrap.appendChild(cellEl);
+                            if (typeView.type === 'header') {
+                                const headerCell = cell as CellHeader;
+                                const sortIconEl = this.appendHeaderSortIcon(cellWrap, headerCell);
+                                if (sortIconEl) {
+                                    headerSortIconLayouts.push({ cell: headerCell, cellEl, sortIconEl });
+                                }
+                            }
                         });
                         typeDiv.appendChild(cellWrap);
                     });
                     overlayerEl.appendChild(typeDiv);
                 });
+                this.layoutHeaderSortIcons(headerSortIconLayouts);
             });
         }
+    }
+    private reserveHeaderSortIconSpace(cellEl: HTMLDivElement, cell: CellHeader) {
+        const sortImage = cell.getImage('sort');
+        if (!sortImage?.source) {
+            return;
+        }
+        cellEl.style.boxSizing = 'border-box';
+        if (cell.renderHeaderType === 'both' && cell.textInfo) {
+            const leftInset = sortImage.x - cell.drawX + sortImage.width + 4;
+            cellEl.style.paddingLeft = `${leftInset}px`;
+            return;
+        }
+        cellEl.style.paddingRight = `${this.ctx.config.CELL_PADDING + sortImage.width + 4}px`;
+    }
+    private appendHeaderSortIcon(cellWrap: HTMLDivElement, cell: CellHeader) {
+        const sortImage = cell.getImage('sort');
+        if (!sortImage?.visible || !sortImage.source) {
+            return;
+        }
+        const decorationEl = document.createElement('div');
+        decorationEl.className = `${this.ctx.config.CSS_PREFIX}-overlayer-header-decoration`;
+        Object.assign(decorationEl.style, cell.style, {
+            pointerEvents: 'none',
+            zIndex: '1',
+        });
+
+        const sortIconEl = document.createElement('img');
+        sortIconEl.className = `${this.ctx.config.CSS_PREFIX}-overlayer-header-sort-icon`;
+        sortIconEl.dataset.columnKey = cell.key;
+        sortIconEl.src = sortImage.source.src;
+        sortIconEl.alt = '';
+        sortIconEl.draggable = false;
+        sortIconEl.setAttribute('aria-hidden', 'true');
+        Object.assign(sortIconEl.style, {
+            position: 'absolute',
+            left: `${sortImage.x - cell.drawX}px`,
+            top: `${sortImage.y - cell.drawY - 1}px`,
+            width: `${sortImage.width}px`,
+            height: `${sortImage.height}px`,
+            cursor: 'pointer',
+            pointerEvents: 'auto',
+            userSelect: 'none',
+        });
+        decorationEl.appendChild(sortIconEl);
+        cellWrap.appendChild(decorationEl);
+        return sortIconEl;
+    }
+    private layoutHeaderSortIcons(layouts: HeaderSortIconLayout[]) {
+        layouts.forEach(({ cell, cellEl, sortIconEl }) => {
+            if (cell.renderHeaderType === 'both' && cell.textInfo) {
+                return;
+            }
+            const contentRight = this.getHeaderContentRight(cellEl);
+            const sortImage = cell.getImage('sort');
+            if (contentRight === undefined || !sortImage) {
+                return;
+            }
+            const cellRect = cellEl.getBoundingClientRect();
+            const maxLeft = cell.width - this.ctx.config.CELL_PADDING - sortImage.width;
+            const left = Math.max(
+                this.ctx.config.CELL_PADDING,
+                Math.min(contentRight - cellRect.left + 4, maxLeft),
+            );
+            sortIconEl.style.left = `${left}px`;
+            sortImage.x = cell.drawX + left;
+        });
+    }
+    private getHeaderContentRight(cellEl: HTMLDivElement) {
+        const childRights = Array.from(cellEl.children)
+            .map((child) => child.getBoundingClientRect())
+            .filter((rect) => rect.width > 0 || rect.height > 0)
+            .map((rect) => rect.right);
+        if (childRights.length) {
+            return Math.max(...childRights);
+        }
+        if (!cellEl.textContent) {
+            return undefined;
+        }
+        const range = document.createRange();
+        range.selectNodeContents(cellEl);
+        const right = range.getBoundingClientRect().right;
+        range.detach();
+        return right;
     }
     draw() {
         const overlayer = this.getContainer();

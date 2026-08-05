@@ -195,7 +195,11 @@ export default class CellHeader extends BaseCell {
         this.drawRequired();
     }
     drawImages() {
-        this.getImages().forEach((image) => {
+        const isDefaultOverlayer = this.ctx.overlayerElement.getAttribute('data-overlayer') === 'default';
+        this.getImages().forEach((image, key) => {
+            if (key === 'sort' && this.render && isDefaultOverlayer) {
+                return;
+            }
             if (image.visible && image.source) {
                 this.ctx.paint.drawImage(image.source, image.x, image.y, image.width, image.height);
             }
@@ -267,6 +271,7 @@ export default class CellHeader extends BaseCell {
             paint,
             config: { HEADER_FONT, CELL_PADDING },
         } = this.ctx;
+        this.textInfo = undefined;
         const cacheTextKey = `${this.displayText}_${this.drawTextWidth}_${this.drawTextFont}`;
         this.ellipsis = paint.drawText(
             this.displayText,
@@ -386,14 +391,19 @@ export default class CellHeader extends BaseCell {
         }
     }
     private updateSortIcon() {
-        // 如果没有sortBy配置且不是后端排序，不显示排序图标
-        if (!this.column.sortBy || !this.textInfo) {
+        if (!this.column.sortBy) {
+            this.cellImages.delete('sort');
             return;
         }
-        const { right, top, height } = this.textInfo;
-        const x = right + 4;
-        const y = top + (height - 16) / 2;
         const iconSize = 16;
+        const { CELL_PADDING } = this.ctx.config;
+        let x = this.drawX + this.width - CELL_PADDING - iconSize;
+        let y = this.drawY + (this.height - iconSize) / 2;
+        if (this.textInfo) {
+            const { right, top, height } = this.textInfo;
+            x = right + 4;
+            y = top + (height - iconSize) / 2;
+        }
         let iconName = this.sortIconName;
         // 前端排序
         const sortState = this.ctx.database.getSortState(this.key);

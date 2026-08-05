@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table - Sortable Custom Headers</title>
+    </head>
+    <script src="https://unpkg.com/e-virt-table/dist/index.umd.js"></script>
+    <style>
+        html,
+        body,
+        #e-virt-table {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        .custom-header-content {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 100%;
+            padding: 0 8px;
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+
+        .custom-header-badge {
+            padding: 2px 5px;
+            color: #166534;
+            font-size: 10px;
+            line-height: 1;
+            background: #dcfce7;
+            border: 1px solid #86efac;
+            border-radius: 3px;
+        }
+
+        .both-header-follow {
+            display: inline-flex;
+            align-items: center;
+            height: 100%;
+            color: #2563eb;
+            font-size: 13px;
+            line-height: 1;
+            pointer-events: none;
+        }
+    </style>
+    <body>
+        <div id="e-virt-table"></div>
+    </body>
+    <script>
+        const data = [
+            { id: 1, name: 'Charlie', score: 91, status: 'Active' },
+            { id: 2, name: 'Alice', score: 87, status: 'Paused' },
+            { id: 3, name: 'Bob', score: 95, status: 'Active' },
+            { id: 4, name: 'Dana', score: 82, status: 'Paused' },
+        ];
+
+        const columns = [
+            { title: 'ID', key: 'id', width: 70 },
+            {
+                title: 'Name',
+                key: 'name',
+                width: 190,
+                sortBy: 'string',
+                sortIconType: 'loop',
+                renderHeader(parent) {
+                    const content = document.createElement('span');
+                    content.className = 'custom-header-content';
+
+                    const label = document.createElement('strong');
+                    label.textContent = 'Member';
+                    const badge = document.createElement('span');
+                    badge.className = 'custom-header-badge';
+                    badge.textContent = 'A-Z';
+
+                    content.append(label, badge);
+                    parent.appendChild(content);
+                },
+            },
+            {
+                title: 'Score',
+                key: 'score',
+                width: 170,
+                headerAlign: 'center',
+                align: 'center',
+                sortBy: 'number',
+                sortIconType: 'loop',
+                renderHeaderType: 'both',
+                renderHeader(parent) {
+                    const follow = document.createElement('span');
+                    follow.className = 'both-header-follow';
+                    follow.textContent = '?';
+                    parent.appendChild(follow);
+                },
+            },
+            {
+                title: 'Status',
+                key: 'status',
+                width: 160,
+                sortBy: 'string',
+                sortIconType: 'loop',
+            },
+        ];
+
+        new EVirtTable(document.getElementById('e-virt-table'), {
+            columns,
+            data,
+            config: {
+                BORDER: true,
+                HEADER_HEIGHT: 52,
+                CELL_HEIGHT: 40,
+                ROW_KEY: 'id',
+            },
+        });
+    </script>
+</html>

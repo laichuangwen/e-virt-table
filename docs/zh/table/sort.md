@@ -109,6 +109,16 @@ sort/base
 h:400px
 :::
 
+## 自定义表头排序
+
+自定义表头只要配置了 `sortBy`，同样会自动显示排序图标，不需要额外配置。`renderHeaderType: 'both'` 与原有 Canvas 表头内容保持兼容。
+
+::: demo
+
+sort/render-header
+h:320px
+:::
+
 
 ## 多列排序
 

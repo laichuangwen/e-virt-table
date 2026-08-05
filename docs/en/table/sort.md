@@ -105,6 +105,16 @@ sort/base
 h:400px
 :::
 
+## Sortable Custom Headers
+
+A custom header automatically displays the sort icon when its column defines `sortBy`. No additional option is required. Existing `renderHeaderType: 'both'` headers remain supported.
+
+::: demo
+
+sort/render-header
+h:320px
+:::
+
 ## Multi-Column Sorting
 <!-- 表格支持多列排序。当多个列被排序时，会按照点击顺序（越晚的升降序越是主要排序依据）依次应用排序 -->
 When `SORT_STRICTLY=false`, the table support multi-column sorting. When multiple columns are sorted, sorting will be applied in order of clicking (the later ascending and descending order is more stronger)..
