@@ -730,7 +730,7 @@ export default class Database {
                 });
                 if (!canChange) {
                     value = oldValue;
-                };
+                }
             }
             // 过滤无效项和相同值项
             if (value !== oldValue) {
@@ -1573,7 +1573,8 @@ export default class Database {
     getValidator(rowKey: string, key: string) {
         // 只读不验证
         const readonly = this.ctx.database.getReadonly(rowKey, key);
-        if (readonly) {
+        const { ENABLE_READONLY_VALIDATE } = this.ctx.config;
+        if (!ENABLE_READONLY_VALIDATE && readonly) {
             return new Promise((resolve) => {
                 resolve([]);
             });
