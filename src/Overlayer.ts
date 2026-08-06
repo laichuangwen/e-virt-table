@@ -140,6 +140,11 @@ export default class Overlayer {
         sortIconEl.alt = '';
         sortIconEl.draggable = false;
         sortIconEl.setAttribute('aria-hidden', 'true');
+        sortIconEl.addEventListener('click', (event) => {
+            event.stopPropagation();
+            this.ctx.clickCellHeader = cell;
+            this.ctx.emit('cellHeaderClick', cell, event);
+        });
         Object.assign(sortIconEl.style, {
             position: 'absolute',
             left: `${sortImage.x - cell.drawX}px`,
