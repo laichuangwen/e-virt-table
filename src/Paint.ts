@@ -267,10 +267,10 @@ export class Paint {
             offsetLeft,
             offsetRight,
         });
-        this.ctx.textBaseline = 'top';
+        this.ctx.textBaseline = 'middle';
         this.ctx.textAlign = 'left';
         layout.lines.forEach((line) => {
-            this.ctx.fillText(line.text, line.drawX, line.drawY);
+            this.ctx.fillText(line.text, line.drawX, line.drawY + layout.lineHeight / 2);
         });
         if (options.textCallback && layout.lines.length) {
             const maxLineWidth = layout.lines.reduce((max, line) => Math.max(max, line.width), 0);
