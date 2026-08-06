@@ -206,6 +206,8 @@ export default class Config {
     READONLY_COLOR = '#fff';
     /** 单元格只读文本颜色 */
     READONLY_TEXT_COLOR = '#4E5969';
+    /**启用单元格只读触发校验 */
+    ENABLE_READONLY_VALIDATE = false;
     /** 单元格错误提示文本颜色 */
     ERROR_TIP_COLOR = '#ED3F14';
     /** 合计底部背景色 */
