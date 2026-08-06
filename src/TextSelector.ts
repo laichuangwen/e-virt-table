@@ -273,7 +273,7 @@ export default class TextSelector {
         const ctx = this.ctx.paint.getCtx();
         ctx.save();
         ctx.font = layout.font;
-        ctx.textBaseline = 'top';
+        ctx.textBaseline = 'middle';
         ctx.textAlign = 'left';
         byLine.forEach((lineGlyphs) => {
             const first = lineGlyphs[0];
@@ -282,7 +282,7 @@ export default class TextSelector {
             ctx.fillRect(first.x, first.y - 1, last.x + last.width - first.x, first.height);
             ctx.fillStyle = selectedColor;
             for (const glyph of lineGlyphs) {
-                ctx.fillText(glyph.char, glyph.x, glyph.y);
+                ctx.fillText(glyph.char, glyph.x, glyph.y + layout.lineHeight / 2);
             }
         });
         ctx.restore();
