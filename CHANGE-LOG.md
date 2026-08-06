@@ -7,6 +7,13 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -  
 
+V1.4.12
+### Feature
+- fix(CellImage): 修正图标偏移问及文本居中问题
+- feat:只读列支持方法控制
+- feat:在config中增加启用只读单元格校验配置
+- 增加batchSetItemValue，setItemValue，setItemValueByEditor参数checkReadonly参数支持只读数据更改
+
 V1.4.11
 ### Feature
 - fix:修复validateChangedData失效问题
