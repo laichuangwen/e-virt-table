@@ -348,6 +348,10 @@ export default class Cell extends BaseCell {
     isInsideVisible(x: number, y: number) {
         return x >= this.drawX && x <= this.drawX + this.visibleWidth && y >= this.drawY && y <= this.drawY + this.visibleHeight;
     }
+    private getCenteredImageY(imageHeight: number) {
+        // CellImage applies a -1px drawing offset; compensate so the final image bounds stay centered.
+        return this.drawY + (this.visibleHeight - imageHeight) / 2 + 1;
+    }
     private updateTree() {
         const { CELL_PADDING = 0 } = this.ctx.config;
         const { rowKey, cellType } = this;
@@ -383,7 +387,7 @@ export default class Cell extends BaseCell {
             this.align = 'left';
         }
         let iconX = drawX + iconOffsetX + CELL_PADDING;
-        let iconY = this.drawY + (this.visibleHeight - iconHeight) / 2;
+        let iconY = this.getCenteredImageY(iconHeight);
         let drawTextX = iconOffsetX + this.drawX + iconWidth - 0.5;
         const selectionImage = this.getImage('selection');
         const dragImage = this.getImage('drag');
@@ -410,18 +414,19 @@ export default class Cell extends BaseCell {
         if (iconX + iconWidth + CELL_PADDING > this.drawX + this.visibleWidth) {
             return;
         }
-        if (iconY + iconHeight + CELL_PADDING > this.drawY + this.visibleHeight) {
+        const treeImage = new CellImage(iconName, iconX, iconY, iconWidth, iconHeight, icon);
+        if (treeImage.y + treeImage.height + CELL_PADDING > this.drawY + this.visibleHeight) {
             return;
         }
         // 不论是否需要绘制图标，都更新图标的“基准位置”，供树线使用
-        this.setImage('tree', new CellImage(iconName, iconX, iconY, iconWidth, iconHeight, icon));
+        this.setImage('tree', treeImage);
         // 树连线仅在绘制阶段调用，避免在 update 阶段被清屏
     }
     private updateDragImage() {
         if (this.cellType === 'body' && this.column.dragRow) {
             const { DRAG_ROW_ICON_SIZE, CELL_PADDING } = this.ctx.config;
             const dragImageX = this.drawX + CELL_PADDING / 2;
-            const dragImageY = this.drawY + (this.visibleHeight - DRAG_ROW_ICON_SIZE) / 2;
+            const dragImageY = this.getCenteredImageY(DRAG_ROW_ICON_SIZE);
             const dragImage = new CellImage('drag', dragImageX, dragImageY, DRAG_ROW_ICON_SIZE, DRAG_ROW_ICON_SIZE, this.ctx.icons.get('drag'));
             if (this.rowspan === 0) {
                 dragImage.setVisible(false);
