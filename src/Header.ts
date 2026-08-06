@@ -122,11 +122,11 @@ export default class Header {
     }
     private initSort() {
         this.ctx.on('cellHeaderClick', (cellHeader, e) => {
-            if (!cellHeader.isImageInside('sort', e)) {
+            const direction = this.getSortIconClickDirection(cellHeader, e);
+            if (!direction) {
                 return;
             }
             const { sortIconType = 'up-down' } = cellHeader.column;
-            const direction = cellHeader.getImageClickDirection('sort', e);
             let newDirection: SortDirection = 'none';
             // 优化排序方向切换逻辑
             const currentState = this.ctx.database.getSortState(cellHeader.key);
@@ -163,6 +163,23 @@ export default class Header {
             }
             this.ctx.database.setSortState(cellHeader.key, newDirection);
         });
+    }
+    private getSortIconClickDirection(cellHeader: CellHeader, e: MouseEvent) {
+        const target = e.target;
+        if (
+            target instanceof HTMLElement &&
+            target.classList.contains(`${this.ctx.config.CSS_PREFIX}-overlayer-header-sort-icon`) &&
+            target.dataset.columnKey === cellHeader.key
+        ) {
+            const rect = target.getBoundingClientRect();
+            const vertical = e.clientY - rect.top < rect.height / 2 ? 'up' : 'down';
+            const horizontal = e.clientX - rect.left < rect.width / 2 ? 'left' : 'right';
+            return `${vertical}-${horizontal}`;
+        }
+        if (!cellHeader.isImageInside('sort', e)) {
+            return null;
+        }
+        return cellHeader.getImageClickDirection('sort', e);
     }
     private initSelection() {
         this.ctx.on('cellHeaderClick', (cellHeader, e) => {
