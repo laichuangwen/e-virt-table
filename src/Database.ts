@@ -732,6 +732,14 @@ export default class Database {
                     value = oldValue;
                 }
             }
+            // 执行column的beforeValueChange方法
+            if (typeof cell?.column?.beforeValueChange === 'function') {
+                const beforeValueChange = await cell.column.beforeValueChange({
+                    ..._changeItem,
+                    value,
+                });
+                value = beforeValueChange.value;
+            }
             // 过滤无效项和相同值项
             if (value !== oldValue) {
                 changeList.push({

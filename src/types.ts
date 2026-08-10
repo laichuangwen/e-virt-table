@@ -200,6 +200,7 @@ export interface Column {
     mixedRender?: boolean; // 混合渲染,dom和canvas一起渲染
     canValueChange?: (changeItem: BeforeValueChangeItem) => Promise<boolean> | boolean; // 是否允许被修改
     valueChange?: (changeItem: BeforeValueChangeItem) => void;
+    beforeValueChange?: (changeItem: BeforeValueChangeItem) => BeforeValueChangeItem | Promise<BeforeValueChangeItem>;
 }
 export type LineClampType = number | 'auto';
 export type HistoryAction = 'back' | 'forward' | 'none';
