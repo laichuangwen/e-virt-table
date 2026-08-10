@@ -35,6 +35,13 @@ function getScrollbarThumbSize(
 
 export type ScrollbarType = 'horizontal' | 'vertical';
 
+export function getHorizontalWheelDelta(e: Pick<WheelEvent, 'deltaX' | 'deltaY' | 'shiftKey'>): number {
+    if (!e.shiftKey) {
+        return e.deltaX;
+    }
+    return Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+}
+
 class Scrollbar {
     private ctx: Context;
     private type: ScrollbarType;
@@ -269,7 +276,6 @@ class Scrollbar {
     }
 
     private updateScroll(e: WheelEvent) {
-        const deltaX = e.deltaX;
         const deltaY = e.deltaY;
         if (this.type === 'vertical' && e.shiftKey === false) {
             // 只有在滚动条需要滚动时才阻止默认事件
@@ -279,11 +285,16 @@ class Scrollbar {
             }
             this.scroll = Math.max(0, Math.min(this.scroll + deltaY, this.distance));
         } else if (this.type === 'horizontal') {
-            if (e.shiftKey) {
-                this.scroll = Math.max(0, Math.min(this.scroll + deltaY, this.distance));
-            } else {
-                this.scroll = Math.max(0, Math.min(this.scroll + deltaX, this.distance));
+            const delta = getHorizontalWheelDelta(e);
+            const hasScrollbar = this.hasScrollbar();
+            if (
+                delta !== 0 &&
+                hasScrollbar &&
+                !((this.scroll === 0 && delta < 0) || (this.scroll === this.distance && delta > 0))
+            ) {
+                e.preventDefault();
             }
+            this.scroll = Math.max(0, Math.min(this.scroll + delta, this.distance));
         }
     }
     private updatedSize() {
