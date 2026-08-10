@@ -7,6 +7,13 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -  
 
+V1.4.13
+### Feature
+- fix:选中文本居中问题
+- fix:修复mac快捷横向滚动问题
+
+
+
 V1.4.12
 ### Feature
 - fix(CellImage): 修正图标偏移问及文本居中问题
