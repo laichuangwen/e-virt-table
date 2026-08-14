@@ -72,12 +72,29 @@ export default class TextSelector {
         this.ctx.on('mouseup', () => this.onMouseUp());
         this.ctx.on('cellHeaderHoverChange', (cell) => this.yieldToColumnDrag(cell));
         this.ctx.on('cellHoverChange', () => this.yieldToColumnDrag());
+        this.ctx.on('setSelector', () => this.yieldToSelectorSpan());
         this.ctx.on('keydown', (e) => this.onCopyKeydown(e));
         this.ctx.on('outsideMousedown', () => this.resetSelection());
     }
 
     private get canSelect() {
-        return this.ctx.config.ENABLE_TEXT_SELECTION && !this.ctx.editing && !this.ctx.finding;
+        return (
+            this.ctx.config.ENABLE_TEXT_SELECTION &&
+            !this.ctx.editing &&
+            !this.ctx.finding &&
+            !this.isSelectorSpanningCells
+        );
+    }
+
+    /** Selector 跨格子（含整行/整列）时，禁用文字选中 */
+    private get isSelectorSpanningCells() {
+        return this.ctx.selector.enable && !this.ctx.selectOnlyOne && !this.ctx.onlyMergeCell;
+    }
+
+    private yieldToSelectorSpan() {
+        if (this.isSelectorSpanningCells) {
+            this.resetSelection();
+        }
     }
 
     /** 跨表头列或从表头拖入 body 时，让位给列/区域选择 */
@@ -239,7 +256,7 @@ export default class TextSelector {
     }
 
     draw() {
-        if (!this.ctx.config.ENABLE_TEXT_SELECTION) {
+        if (!this.ctx.config.ENABLE_TEXT_SELECTION || this.isSelectorSpanningCells) {
             return;
         }
         const range = this.getSelectionRange();
@@ -308,6 +325,15 @@ export default class TextSelector {
     }
 
     private resetSelection() {
+        if (
+            !this.activeCellKey &&
+            this.selectionStart === null &&
+            !this.pending &&
+            !this.ctx.textSelecting &&
+            !this.ctx.textSelectionStr
+        ) {
+            return;
+        }
         this.activeCellKey = '';
         this.selectionStart = null;
         this.selectionEnd = null;
