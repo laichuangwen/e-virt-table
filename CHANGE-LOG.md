@@ -7,6 +7,11 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -  
 
+V1.4.14
+### Feature
+- feat(TextSelector): 增强文本选择逻辑，以处理跨单元格场景
+- feat: 在column列配置中增加 beforeValueChange 函数
+
 V1.4.13
 ### Feature
 - fix:选中文本居中问题
