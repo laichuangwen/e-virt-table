@@ -1,0 +1,63 @@
+name: Release
+
+on:
+    push:
+        branches: ['main']
+    workflow_dispatch:
+
+permissions:
+    contents: write
+
+jobs:
+    release:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Read version
+              id: ver
+              run: |
+                  VERSION=$(node -p "require('./package.json').version")
+                  echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+                  echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+                  echo "Version: $VERSION"
+
+            - name: Skip if tag exists
+              id: check
+              run: |
+                  if git rev-parse "refs/tags/${{ steps.ver.outputs.tag }}" >/dev/null 2>&1; then
+                      echo "exists=true" >> "$GITHUB_OUTPUT"
+                      echo "Tag ${{ steps.ver.outputs.tag }} already exists, skip release."
+                  else
+                      echo "exists=false" >> "$GITHUB_OUTPUT"
+                      echo "Tag ${{ steps.ver.outputs.tag }} not found, will create release."
+                  fi
+
+            - name: Extract changelog
+              if: steps.check.outputs.exists == 'false'
+              run: |
+                  VERSION="${{ steps.ver.outputs.version }}"
+                  awk -v ver="$VERSION" '
+                      $0 == "V" ver { found=1; next }
+                      found && /^V[0-9]/ { exit }
+                      found { print }
+                  ' CHANGE-LOG.md > /tmp/notes.md
+                  # 去掉首尾空行
+                  sed -i '/./,$!d' /tmp/notes.md
+                  if [ ! -s /tmp/notes.md ]; then
+                      echo "Release v${VERSION}" > /tmp/notes.md
+                  fi
+                  echo "----- Release notes -----"
+                  cat /tmp/notes.md
+
+            - name: Create GitHub Release
+              if: steps.check.outputs.exists == 'false'
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: ${{ steps.ver.outputs.tag }}
+                  name: v${{ steps.ver.outputs.version }}
+                  body_path: /tmp/notes.md
+                  generate_release_notes: false
