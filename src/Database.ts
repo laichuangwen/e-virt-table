@@ -666,7 +666,7 @@ export default class Database {
                 if (['', undefined, null].includes(value)) {
                     value = null;
                 } else if (/^-?\d+(\.\d+)?$/.test(String(value))) {
-                    // 正则获取小数点后的精度
+                    // 先截取精度，再基于截取后的值判断最大最小
                     const precision = getNumberPrecision(value);
                     if (typeof cell.precision === 'number' && cell.precision >= 0 && precision > cell.precision) {
                         const factor = 10 ** cell.precision;
@@ -678,7 +678,10 @@ export default class Database {
                             code: 'ERR_NUMBER_PRECISION',
                             message,
                         });
-                    } else if (typeof cell.min === 'number' && Number(value) < cell.min) {
+                    } else {
+                        value = Number(value);
+                    }
+                    if (typeof cell.min === 'number' && Number(value) < cell.min) {
                         const message = this.ctx.locale.getText('numberMin', { min: cell.min });
                         value = cell.min;
                         errList.push({
@@ -696,8 +699,6 @@ export default class Database {
                             code: 'ERR_NUMBER_MAX',
                             message,
                         });
-                    } else {
-                        value = Number(value);
                     }
                 } else {
                     value = oldValue;
