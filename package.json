@@ -9,6 +9,7 @@
     "types": "dist/lib/index.d.ts",
     "scripts": {
         "dev": "vite",
+        "dev:v2": "vite --config vite.config.v2.mts",
         "dev:install": "cd docs && npm install",
         "dev:docs": "npm run build && npm run copy-dist && cd docs && npm run dev",
         "install:docs": "cd docs && npm install",
@@ -55,6 +56,7 @@
         "vite-plugin-css-injected-by-js": "^3.5.2"
     },
     "dependencies": {
-        "@floating-ui/dom": "^1.6.11"
+        "@floating-ui/dom": "^1.6.11",
+        "lit-html": "^3.3.3"
     }
 }

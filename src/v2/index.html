@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>e-virt-table develop</title>
+    </head>
+    <style>
+        html:root {
+            --evt-header-font: 12px normal Arial;
+            --evt-body-font: 12px normal Arial;
+        }
+    </style>
+    <body>
+        <div id="app">
+            <div>
+                <button id="instantiation">获取实例</button>
+                <button id="validator">校验</button>
+                <button id="setValidator">设置错误</button>
+                <button id="expandAll">展开tree</button>
+                <button id="setConfig">设置config</button>
+                <button id="loadData">加载数据</button>
+                <input id="search-text" placeholder="请输入" type="text" />
+                <button id="search">搜素</button>
+                <button id="pre">上一页</button>
+                <button id="next">下一页</button>
+                <button id="clearSelection">清除选中</button>
+                <button id="updateCssVar">切换主题</button>
+                <button id="getCurrentRow">获取高亮行</button>
+                <button id="clearEditableData">清空</button>
+                <button id="setReadOnly">设置只读值</button>
+                <button id="getChangedValues">获取改变值</button>
+                <button id="clearChangeData">清空改变值</button>
+                <button id="visible">显示</button>
+                <button id="hide">隐藏</button>
+                <button id="setLocaleZh">设置中文</button>
+                <button id="setLocaleEn">设置英文</button>
+                <label for="borderStyle" style="margin-left: 12px">Border</label>
+                <select id="borderStyle">
+                    <option value="default">default</option>
+                    <option value="outer">outer</option>
+                    <option value="inner">inner</option>
+                    <option value="none">none</option>
+                </select>
+            </div>
+            <div style="position: relative">
+                <div id="e-virt-table">
+                    <div id="e-virt-table-editor" class="e-virt-table-editor">
+                        <input id="e-virt-table-date" style="display: none" type="date" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script type="module" src="/develop.ts"></script>
+    </body>
+</html>
