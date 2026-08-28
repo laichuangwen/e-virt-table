@@ -7,6 +7,10 @@ Vx.x.x(TPL)
 -   Dependencies Changes
 -  
 
+V1.4.15
+### Feature
+- fix: 精度超出限制未参与最大最小值判断问题
+
 V1.4.14
 ### Feature
 - feat(TextSelector): 增强文本选择逻辑，以处理跨单元格场景
