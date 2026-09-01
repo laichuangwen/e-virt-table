@@ -1,5 +1,6 @@
+import type Context from "./Context";
 import { Icon, IconConfig } from "./Icon";
-import { Paint } from "./Paint";
+import type { Paint } from "./Paint";
 
 export interface IconWithShadowConfig extends IconConfig {
     borderColor: string;
@@ -16,8 +17,8 @@ export class IconWithShadow extends Icon {
     borderWidth: number;
     radius: number;
 
-    constructor(paint: Paint, config: IconWithShadowConfig) {
-        super(paint, config);
+    constructor(context: Context, config: IconWithShadowConfig) {
+        super(context, config);
         this.borderColor = config.borderColor;
         this.fillColor = config.fillColor;
         this.padding = config.padding ?? 0;

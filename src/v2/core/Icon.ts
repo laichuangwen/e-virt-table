@@ -1,4 +1,5 @@
-import { Paint } from "./Paint";
+import type Context from "./Context";
+import type { Paint } from "./Paint";
 import { Shape, ShapeConfig } from "./Shape"
 export type IconSource = string | HTMLImageElement;
 export interface IconConfig extends ShapeConfig {
@@ -10,18 +11,18 @@ export class Icon extends Shape {
     source!: IconSource;
     name: string;
     color: string = 'currentColor';
-    constructor(paint: Paint, config: IconConfig) {
-        super(paint, { zIndex: 100, ...config })
+    constructor(context: Context, config: IconConfig) {
+        super(context, { zIndex: 100, ...config })
         this.name = config.name
         this.color = config.color || 'currentColor';
         this.initSource(config.source)
-        this.on('pointerenter', () => {
-            this.paint.setCursor('pointer')
+        this.on('pointerenter:self', () => {
+            this.context.paint.setCursor('pointer')
         })
-        this.on('pointerleave', () => {
-            this.paint.setCursor('default')
+        this.on('pointerleave:self', () => {
+            this.context.paint.setCursor('default')
         })
-        this.on('click', () => {
+        this.on('click:self', () => {
             console.log('click', this.name);
         }, { stopPropagation: true })
         // this.on('pointerdown', () => {

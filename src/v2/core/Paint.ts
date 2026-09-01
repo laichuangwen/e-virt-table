@@ -52,6 +52,10 @@ export class Paint {
         if (!ctx) throw new Error('canvas context not found')
         this.ctx = ctx
     }
+    scale(dpr: number) {
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctx.scale(dpr, dpr);
+    }
     addShape(shape: Shape) {
         // 按 zIndex 升序插入；同级保持后添加更靠上（数组更靠后）
         const idx = this.shapes.findIndex((s) => s.zIndex > shape.zIndex)
@@ -245,6 +249,8 @@ export class Paint {
         this.ctx.restore();
     }
     draw() {
+        const { canvas } = this.ctx
+        this.ctx.clearRect(0, 0, canvas.width, canvas.height)
         this.shapes.forEach(shape => shape.draw())
     }
 }

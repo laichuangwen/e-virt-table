@@ -1,12 +1,15 @@
-import { EVirtTableOptions } from "../../types";
-import { EventBus } from "./EventBus";
+import { Column, EVirtTableOptions } from "../../types";
+// import { EventBus } from "./EventBus";
 import { Paint } from "./Paint";
 import Config from './Config';
-import EventBrowser from "./EventBrowser";
+import EvitListener from "./EvitListener";
+import Store from "./Store";
+import type { Text } from "./Text";
 export default class Context {
+    private animationFrameId: number | undefined = undefined;
+    private listener: EvitListener;
     config: Config;
-    eventBus: EventBus;
-    private eventBrowser: EventBrowser;
+    store: Store;
     containerElement!: HTMLDivElement;
     stageElement!: HTMLDivElement;
     canvasElement!: HTMLCanvasElement;
@@ -20,7 +23,9 @@ export default class Context {
     paint: Paint;
     domSelectionStr = '';
     textSelectionStr = '';
+    /** 文本划选进行中；全局同时只允许一个 Text 划选 */
     textSelecting = false;
+    selectingText: Text | null = null;
     isMouseoverTargetContainer = false;
     mousedown = false;
     isEmpty = false; // 是否空数据
@@ -52,45 +57,66 @@ export default class Context {
     maxRowIndex = 0;
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
         this.config = new Config();
+        this.store = new Store({
+            columns: options.columns as unknown as any,
+            data: options.data as unknown as any,
+        });
         this.createContainer(target, options);
-        this.eventBus = new EventBus();
-        this.eventBrowser = new EventBrowser(this);
         this.paint = new Paint(this.canvasElement);
+        this.initWH();
+        this.listener = new EvitListener(this);
+        console.log(this.store);
+
     }
     private createContainer(containerElement: HTMLDivElement, options: EVirtTableOptions) {
-        const stageElement = document.createElement('div');
-        const canvasElement = document.createElement('canvas');
-        const overlayerElement = options.overlayerElement || document.createElement('div');
-        const editorElement = options.editorElement || document.createElement('div');
-        const emptyElement = options.emptyElement || document.createElement('div');
-        const contextMenuElement = options.contextMenuElement || document.createElement('div');
+        this.containerElement = containerElement;
+        this.stageElement = document.createElement('div');
+        this.canvasElement = document.createElement('canvas');
+        this.overlayerElement = options.overlayerElement || document.createElement('div');
+        this.editorElement = options.editorElement || document.createElement('div');
+        this.emptyElement = options.emptyElement || document.createElement('div');
+        this.contextMenuElement = options.contextMenuElement || document.createElement('div');
         const { classPrefix } = this.config;
-        containerElement.className = `${classPrefix}-container`;
-        containerElement.tabIndex = 0;
-        canvasElement.className = `${classPrefix}-canvas`;
-        overlayerElement.className = `${classPrefix}-overlayer`;
-        stageElement.className = `${classPrefix}-stage`;
-        editorElement.className = `${classPrefix}-editor`;
-        emptyElement.className = `${classPrefix}-empty`;
-        contextMenuElement.className = `${classPrefix}-context-menu`;
-        stageElement.appendChild(canvasElement);
-        stageElement.appendChild(overlayerElement);
-        containerElement.appendChild(stageElement);
-        containerElement.appendChild(editorElement);
-        containerElement.appendChild(emptyElement);
-        containerElement.appendChild(contextMenuElement);
-        this.canvasElement = canvasElement;
-        this.stageElement = stageElement;
-        this.overlayerElement = overlayerElement;
-        this.editorElement = editorElement;
-        this.emptyElement = emptyElement;
-        this.contextMenuElement = contextMenuElement;
+        this.containerElement.className = `${classPrefix}-container`;
+        this.containerElement.tabIndex = 0;
+        this.canvasElement.className = `${classPrefix}-canvas`;
+        this.overlayerElement.className = `${classPrefix}-overlayer`;
+        this.stageElement.className = `${classPrefix}-stage`;
+        this.editorElement.className = `${classPrefix}-editor`;
+        this.emptyElement.className = `${classPrefix}-empty`;
+        this.contextMenuElement.className = `${classPrefix}-context-menu`;
+        this.stageElement.appendChild(this.canvasElement);
+        this.stageElement.appendChild(this.overlayerElement);
+        this.containerElement.appendChild(this.stageElement);
+        this.containerElement.appendChild(this.editorElement);
+        this.containerElement.appendChild(this.emptyElement);
+        this.containerElement.appendChild(this.contextMenuElement);
+    }
+    initWH() {
+        const containerElement = this.containerElement.getBoundingClientRect();
+        this.stageWidth = Math.floor(containerElement.width);
+        this.stageHeight = Math.floor(containerElement.height);
+        this.stageElement.style.width = `${this.stageWidth}px`;
+        this.stageElement.style.height = `${this.stageHeight}px`;
+        const dpr = window.devicePixelRatio || 1; // 获取设备像素比
+        this.canvasElement.width = Math.round(this.stageWidth * dpr);
+        this.canvasElement.height = Math.round(this.stageHeight * dpr);
+        this.canvasElement.style.width = `${this.stageWidth}px`;
+        this.canvasElement.style.height = `${this.stageHeight}px`;
+        this.paint.scale(dpr);
     }
     draw() {
-        this.paint.draw();
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+        }
+        this.animationFrameId = requestAnimationFrame(() => {
+            console.time('draw');
+            this.initWH();
+            this.paint.draw();
+            console.timeEnd('draw');
+        });
     }
     destroy() {
-        this.eventBrowser.destroy();
-        this.eventBus.destroy();
+        this.listener.destroy();
     }
 }
