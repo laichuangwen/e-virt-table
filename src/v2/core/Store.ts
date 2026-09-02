@@ -545,6 +545,7 @@ class Store {
             console.log('sumHeight', this.sumHeight);
             console.log('sumWidth', this.sumWidth);
             console.log('maxColLevel', this.maxColLevel);
+            console.log('maxColLevel', this.maxColLevel);
             console.timeEnd('store update');
         }
     }
