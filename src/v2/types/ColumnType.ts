@@ -57,6 +57,7 @@ export interface Column {
     hoverIconName?: string;
     placeholder?: string;
     width?: number;
+    height?: number;
     minWidth?: number;
     maxWidth?: number;
     widthFillDisable?: boolean;

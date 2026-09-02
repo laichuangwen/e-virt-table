@@ -5,9 +5,11 @@ import Config from './Config';
 import EvitListener from "./EvitListener";
 import Store from "./Store";
 import type { Text } from "./Text";
+import Scroller from "./Scroller";
 export default class Context {
     private animationFrameId: number | undefined = undefined;
     private listener: EvitListener;
+    private scroller: Scroller;
     config: Config;
     store: Store;
     containerElement!: HTMLDivElement;
@@ -56,17 +58,21 @@ export default class Context {
     maxColIndex = 0;
     maxRowIndex = 0;
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
+        console.time('Context constructor');
         this.config = new Config();
+        console.time('Store constructor');
         this.store = new Store({
             columns: options.columns as unknown as any,
             data: options.data as unknown as any,
         });
+        console.timeEnd('Store constructor');
         this.createContainer(target, options);
         this.paint = new Paint(this.canvasElement);
         this.initWH();
         this.listener = new EvitListener(this);
-        console.log(this.store);
-
+        this.scroller = new Scroller(this);
+        // console.log(this.store);
+        console.timeEnd('Context constructor');
     }
     private createContainer(containerElement: HTMLDivElement, options: EVirtTableOptions) {
         this.containerElement = containerElement;
@@ -94,8 +100,14 @@ export default class Context {
     }
     initWH() {
         const containerElement = this.containerElement.getBoundingClientRect();
+        const { top } = containerElement;
+        const windowInnerHeight = window.innerHeight;
+        const visibleHeight = windowInnerHeight - top;
+        if (visibleHeight > 0) {
+            this.stageHeight = Math.floor(visibleHeight - 8);
+        }
         this.stageWidth = Math.floor(containerElement.width);
-        this.stageHeight = Math.floor(containerElement.height);
+        // this.stageHeight = Math.floor(containerElement.height);
         this.stageElement.style.width = `${this.stageWidth}px`;
         this.stageElement.style.height = `${this.stageHeight}px`;
         const dpr = window.devicePixelRatio || 1; // 获取设备像素比
@@ -115,6 +127,8 @@ export default class Context {
             this.paint.draw();
             console.timeEnd('draw');
         });
+        // this.initWH();
+        // this.paint.draw();
     }
     destroy() {
         this.listener.destroy();

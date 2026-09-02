@@ -7,6 +7,7 @@ type WithPrefix<
         [K in keyof T as `${K & string}:${P}`]: T[K]
     }
 type NativeListenertMap = {
+    wheel: WheelEvent
     click: MouseEvent
     dblclick: MouseEvent
     pointermove: PointerEvent
@@ -50,11 +51,12 @@ export default class EvitListener {
     private init() {
         this.resizeObserver = new ResizeObserver(() => {
             // this.context.initWH();
+            // this.context.store.update();
             this.context.draw();
-            console.log('containerResize');
             this.emit('containerResize', this.context.containerElement);
         });
         this.resizeObserver.observe(this.context.containerElement);
+        this.bind(this.context.stageElement, 'wheel', { passive: false });
         this.bind(this.context.stageElement, 'click');
         this.bind(this.context.stageElement, 'dblclick');
         this.bind(this.context.stageElement, 'pointermove');

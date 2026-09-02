@@ -1,5 +1,7 @@
 import { Column } from "./ColumnType";
-import { ConfigType } from "./index";
+import Config from "../core/Config";
+
+type ConfigType = Partial<Config>;
 
 export type EVirtTableOptions = {
     columns: Column[];

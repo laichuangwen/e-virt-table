@@ -1,9 +1,10 @@
-import type { Column, Fixed, FlatRow, RowNodeKey } from '../types';
+import type { Fixed, Column } from "../types";
 
 export type RowNodeProps = {
     data: Record<string, any>;
     store: Store;
 };
+type RowNodeKey = string | number;
 type ColNodeKey = string | number;
 export type CheckState = 'unchecked' | 'checked' | 'indeterminate';
 type RowData = Record<string, any>;
@@ -82,7 +83,7 @@ export class ColNode {
         }
         this.colStore.setWidth(this.column.width ?? 100);
         this.colStore.setHeight(this.column.height ?? 16);
-        this.colStore.setHide(this.column.hide ?? false);
+        this.colStore.setHide(typeof this.column.hide === 'function' ? this.column.hide({}) : this.column.hide ?? false);
         this.colStore.setSort(this.column.sort ?? 0);
         this.colStore.setFixed(this.column.fixed ?? '');
         this.initChildrenNodes(props.column);
@@ -341,14 +342,14 @@ class Store {
     childrenColKey = 'children';
     hasTree = true;
     hasSelection = false;
-    debug = false;
+    debug = true;
     defaultRowHeight = 36;
     maxColLevel = 0;
     sumHeight = 0;
     sumWidth = 0;
     columns: Column[] = [];
     data: any[] = [];
-    flatRows: FlatRow[] = [];
+    // flatRows: FlatRow[] = [];
     leafColNodes: ColNode[] = [];
     rowStoreMaps: Map<RowNodeKey, RowStore> = new Map();
     colStoreMaps: Map<string, ColStore> = new Map();
@@ -509,26 +510,6 @@ class Store {
         });
         this.update();
     }
-    buildFlatRows(): FlatRow[] {
-        const rows: FlatRow[] = [];
-        let y = 0;
-        const walk = (node: RowNode): void => {
-            for (const child of node.childrenNodes) {
-                rows.push({
-                    node: child,
-                    key: child.key,
-                    y,
-                    height: child.height,
-                    rowIndex: child.rowIndex,
-                    level: child.level,
-                });
-                y += child.height;
-                if (child.expand) walk(child);
-            }
-        };
-        walk(this.rootRowNode);
-        return rows;
-    }
     buildLeafColNodes(): ColNode[] {
         const leaves: ColNode[] = [];
         const walk = (node: ColNode): void => {
@@ -558,7 +539,6 @@ class Store {
         this.sumHeight = this.rootRowNode.getSumHeight();
         this.sumWidth = this.rootColNode.getSumWidth();
         this.maxColLevel = this.rootColNode.getMaxColLevel();
-        this.flatRows = this.buildFlatRows();
         this.leafColNodes = this.buildLeafColNodes();
         if (this.debug) {
             console.log('rowNodes SIZE:', this.rowNodeMaps.size);
