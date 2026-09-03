@@ -73,6 +73,10 @@ export default class Context {
         this.scroller = new Scroller(this);
         // console.log(this.store);
         console.timeEnd('Context constructor');
+        this.scroller.setScrollY(1000000000);
+        this.scroller.setScrollX(1000000000);
+        console.log('scrollY', this.scrollY);
+        console.log('scrollX', this.scrollX);
     }
     private createContainer(containerElement: HTMLDivElement, options: EVirtTableOptions) {
         this.containerElement = containerElement;
@@ -105,6 +109,8 @@ export default class Context {
         const visibleHeight = windowInnerHeight - top;
         if (visibleHeight > 0) {
             this.stageHeight = Math.floor(visibleHeight - 8);
+            console.log('stageHeight', this.stageHeight);
+            
         }
         this.stageWidth = Math.floor(containerElement.width);
         // this.stageHeight = Math.floor(containerElement.height);
@@ -122,10 +128,10 @@ export default class Context {
             cancelAnimationFrame(this.animationFrameId);
         }
         this.animationFrameId = requestAnimationFrame(() => {
-            console.time('draw');
+            // console.time('draw');
             this.initWH();
             this.paint.draw();
-            console.timeEnd('draw');
+            // console.timeEnd('draw');
         });
         // this.initWH();
         // this.paint.draw();

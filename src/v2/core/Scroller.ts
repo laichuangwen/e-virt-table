@@ -2,38 +2,59 @@ import { ScrollbarType } from "../types";
 import Context from "./Context";
 import { Paint } from "./Paint";
 import { Shape, ShapeConfig } from "./Shape";
-
-function getScrollbarThumbConfig(context: Context, scrollbar: Scrollbar): ShapeConfig {
+type ScrollbarThumbConfig = ShapeConfig & {
+    ratio: number;
+}
+function getScrollbarThumbConfig(context: Context, scrollbar: Scrollbar): ScrollbarThumbConfig {
+    const MIN_SIZE = 30;
     const { SCROLLER_SIZE, SCROLLER_TRACK_SIZE } = context.config;
+    const padding = (SCROLLER_TRACK_SIZE - SCROLLER_SIZE) / 2;
+    const getThumbSize = (sum: number, scrollbarSize: number) => {
+        const size = Math.floor((scrollbarSize / sum) * scrollbarSize);
+        return Math.max(MIN_SIZE, size);
+    }
+    const getThumbVisible = (sum: number, scrollbarSize: number) => {
+        return sum > scrollbarSize;
+    }
+    // 获取比例
+    const getRatio = (sum: number, scrollbarSize: number) => {
+        const thumbSize = getThumbSize(sum, scrollbarSize);
+        // 4位小数
+        return (sum - scrollbarSize) / (scrollbarSize - thumbSize);
+    }
     if (scrollbar.type === 'vertical') {
-        // body + footer
-        const contentDistance = context.store.sumHeight;
-        const visibleDistance = scrollbar.height;
-        // const trackDistance = scrollbar.distance;
-        const size = Math.floor((visibleDistance / contentDistance) * visibleDistance);
+        const ratio = getRatio(context.store.sumHeight, scrollbar.height);
         return {
-            x: scrollbar.x + (SCROLLER_TRACK_SIZE - SCROLLER_SIZE) / 2,
-            y: 0,
+            x: scrollbar.x + padding,
+            y: context.scrollY / ratio,// 根据比例计算滚动条位置
             width: SCROLLER_SIZE,
-            height: Math.min(30, size),
+            height: getThumbSize(context.store.sumHeight, scrollbar.height),
+            visible: getThumbVisible(context.store.sumHeight, scrollbar.height),
+            ratio,
         };
     }
-    const contentDistance = context.store.sumWidth;
-    const visibleDistance = scrollbar.width;
-    const size = Math.floor((visibleDistance / contentDistance) * visibleDistance);
+    const ratio = getRatio(context.store.sumWidth, scrollbar.width);
+    console.log('scrollbar',scrollbar.width);
     return {
-        x: 0,
-        y: scrollbar.y + (SCROLLER_TRACK_SIZE - SCROLLER_SIZE) / 2,
-        width: Math.min(30, size),
+        x: context.scrollX / ratio,
+        y: scrollbar.y + padding,
+        width: getThumbSize(context.store.sumWidth, scrollbar.width),
         height: SCROLLER_SIZE,
+        visible: getThumbVisible(context.store.sumWidth, scrollbar.width),
+        ratio: getRatio(context.store.sumWidth, scrollbar.width),
     };
 }
 
 class ScrollbarThumb extends Shape {
+    private ratio: number;
     private scrollbar: Scrollbar;
     private color: string;
+    private pointerdownOffset = 0; // 鼠标按下时相对于滚动条的偏移量
+    private isDragging = false;
     constructor(context: Context, scrollbar: Scrollbar) {
-        super(context, getScrollbarThumbConfig(context, scrollbar));
+        const { ratio, ..._config } = getScrollbarThumbConfig(context, scrollbar);
+        super(context, _config);
+        this.ratio = ratio;
         this.scrollbar = scrollbar;
         const { SCROLLER_COLOR, SCROLLER_FOCUS_COLOR } = context.config;
         this.color = SCROLLER_COLOR;
@@ -42,25 +63,56 @@ class ScrollbarThumb extends Shape {
             this.context.draw();
         });
         this.on('pointerleave:self', () => {
+            if (this.isDragging) return;
             this.color = SCROLLER_COLOR;
             this.context.draw();
         });
-        this.on('pointerdown:self', () => {
-            console.log('ScrollbarThumb=>pointerdown:self');
+        this.on('pointerdown:self', (e) => {
+            this.isDragging = true;
+            const { x, y } = this.context.paint.getRelativePosition(e);
+            this.pointerdownOffset = this.scrollbar.type === 'vertical' ? y - this.y : x - this.x;
         }, {
             stopPropagation: true,
         });
         this.on('pointerup', () => {
-            console.log('ScrollbarThumb=>pointerup:self');
+            this.isDragging = false;
+            this.color = SCROLLER_COLOR;
+            this.pointerdownOffset = 0;
+            this.context.draw();
         });
-        console.log('ScrollbarThumb', this.x, this.y, this.width, this.height);
+        this.on('pointermove', (e) => {
+            if (!this.isDragging) return;
+            const { x, y } = this.context.paint.getRelativePosition(e);
+            this.setXY(x, y);
+            this.context.draw();
+        });
     }
-    render(paint: Paint) {
+    get maxScrollSize() {
+        return this.scrollbar.type === 'vertical' ? this.context.store.sumHeight - this.scrollbar.height : this.context.store.sumWidth - this.scrollbar.width;
+    }
+    init() {
         const config = getScrollbarThumbConfig(this.context, this.scrollbar);
         this.x = config.x;
         this.y = config.y;
         this.width = config.width;
         this.height = config.height;
+        this.visible = config.visible || false;
+        this.ratio = config.ratio;
+    }
+    private setXY(x: number, y: number) {
+        const config = getScrollbarThumbConfig(this.context, this.scrollbar);
+        if (this.scrollbar.type === 'vertical') {
+            const max = this.scrollbar.height - this.height;
+            this.y = Math.max(0, Math.min(y - this.pointerdownOffset, max));
+            this.x = config.x;
+            this.context.scrollY = this.y * this.ratio;
+        } else {
+            const max = this.scrollbar.width - this.width;
+            this.x = Math.max(0, Math.min(x - this.pointerdownOffset, max));
+            this.y = config.y;
+        }
+    }
+    render(paint: Paint) {
         paint.drawRect(this.x, this.y, this.width, this.height, {
             fillColor: this.color,
             radius: 4,
@@ -92,6 +144,9 @@ class Scrollbar extends Shape {
     constructor(context: Context, type: ScrollbarType) {
         super(context, getScrollbarConfig(context, type));
         this.type = type;
+        this.on('resizeObserver', () => {
+            this.init();
+        });
         this.on('pointerdown:self', () => {
             console.log('Scrollbar', this.type);
         });
@@ -103,12 +158,15 @@ class Scrollbar extends Shape {
         });
         this.thumb = new ScrollbarThumb(this.context, this);
     }
-    render(paint: Paint) {
+    init() {
         const config = getScrollbarConfig(this.context, this.type);
         this.x = config.x;
         this.y = config.y;
         this.width = config.width;
         this.height = config.height;
+        this.thumb.init();
+    }
+    render(paint: Paint) {
         const { SCROLLER_TRACK_COLOR } = this.context.config;
         paint.drawRect(this.x, this.y, this.width, this.height, {
             fillColor: SCROLLER_TRACK_COLOR,
@@ -123,5 +181,21 @@ export default class Scroller {
         this.context = context;
         this.verticalScrollbar = new Scrollbar(this.context, 'vertical');
         this.horizontalScrollbar = new Scrollbar(this.context, 'horizontal');
+    }
+    get getMaxScrollY() {
+        return this.context.store.sumHeight - this.verticalScrollbar.height;
+    }
+    get getMaxScrollX() {
+        return this.context.store.sumWidth - this.horizontalScrollbar.width;
+    }
+    setScrollY(scrollY: number) {
+        this.verticalScrollbar.init();
+        this.context.scrollY = Math.max(0, Math.min(scrollY, this.getMaxScrollY));
+        this.context.draw();
+    }
+    setScrollX(scrollX: number) {
+        this.horizontalScrollbar.init();
+        this.context.scrollX = Math.max(0, Math.min(scrollX, this.getMaxScrollX));
+        this.context.draw();
     }
 }

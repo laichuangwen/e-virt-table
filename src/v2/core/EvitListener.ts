@@ -7,6 +7,7 @@ type WithPrefix<
         [K in keyof T as `${K & string}:${P}`]: T[K]
     }
 type NativeListenertMap = {
+    resize: ResizeObserverEntry;
     wheel: WheelEvent
     click: MouseEvent
     dblclick: MouseEvent
@@ -16,6 +17,7 @@ type NativeListenertMap = {
     pointerleave: PointerEvent
     pointerenter: PointerEvent
     pointercancel: PointerEvent
+    resizeObserver: ResizeObserverEntry[]
 }
 type SelfListenertMap = WithPrefix<NativeListenertMap, 'self'>;
 type CustomListenertMap = {
@@ -49,19 +51,21 @@ export default class EvitListener {
         this.init();
     }
     private init() {
-        this.resizeObserver = new ResizeObserver(() => {
+        this.resizeObserver = new ResizeObserver((entries) => {
             // this.context.initWH();
             // this.context.store.update();
+            this.emit('resizeObserver', entries);
+            this.context.paint.dispatchListener('resizeObserver', entries);
             this.context.draw();
-            this.emit('containerResize', this.context.containerElement);
         });
         this.resizeObserver.observe(this.context.containerElement);
+        this.bind(window, 'pointerdown');
+        this.bind(window, 'pointermove');
+        this.bind(window, 'pointerup');
+        this.bind(window, 'resize');
         this.bind(this.context.stageElement, 'wheel', { passive: false });
         this.bind(this.context.stageElement, 'click');
         this.bind(this.context.stageElement, 'dblclick');
-        this.bind(this.context.stageElement, 'pointermove');
-        this.bind(this.context.stageElement, 'pointerdown');
-        this.bind(this.context.stageElement, 'pointerup');
         this.bind(this.context.stageElement, 'pointerleave');
         this.bind(this.context.stageElement, 'pointerenter');
         this.bind(this.context.stageElement, 'pointercancel');
