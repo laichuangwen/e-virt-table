@@ -100,7 +100,8 @@
     box-sizing: border-box;
     z-index: 10;
     border-radius: 8px;
-    border: 1px solid var(--evt-border-color);
+    /* border: 1px solid var(--evt-border-color); */
+    touch-action: none;
 }
 .e-virt-table-canvas {
     position: absolute;
@@ -111,6 +112,7 @@
     border: none;
     outline: none;
     z-index: 10;
+    touch-action: none;
 }
 .e-virt-table-editor {
     position: absolute;

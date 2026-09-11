@@ -11,6 +11,8 @@ type NativeListenertMap = {
     wheel: WheelEvent
     click: MouseEvent
     dblclick: MouseEvent
+    touchmove: TouchEvent
+    touchstart: TouchEvent
     pointermove: PointerEvent
     pointerdown: PointerEvent
     pointerup: PointerEvent
@@ -52,11 +54,9 @@ export default class EvitListener {
     }
     private init() {
         this.resizeObserver = new ResizeObserver((entries) => {
-            // this.context.initWH();
-            // this.context.store.update();
+            this.context.initWH();
             this.emit('resizeObserver', entries);
             this.context.paint.dispatchListener('resizeObserver', entries);
-            this.context.draw();
         });
         this.resizeObserver.observe(this.context.containerElement);
         this.bind(window, 'pointerdown');
@@ -64,6 +64,8 @@ export default class EvitListener {
         this.bind(window, 'pointerup');
         this.bind(window, 'resize');
         this.bind(this.context.stageElement, 'wheel', { passive: false });
+        this.bind(this.context.stageElement, 'touchstart', { passive: false });
+        this.bind(this.context.stageElement, 'touchmove', { passive: false });
         this.bind(this.context.stageElement, 'click');
         this.bind(this.context.stageElement, 'dblclick');
         this.bind(this.context.stageElement, 'pointerleave');

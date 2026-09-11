@@ -1,13 +1,13 @@
 import type Context from "./Context";
 import type { Paint } from "./Paint";
-import { Shape, ShapeConfig } from "./Shape"
+import { Widget, WidgetConfig } from "./Widget"
 export type IconSource = string | HTMLImageElement;
-export interface IconConfig extends ShapeConfig {
+export interface IconConfig extends WidgetConfig {
     source: IconSource;
     name: string;
     color?: string;
 }
-export class Icon extends Shape {
+export class Icon extends Widget {
     source!: IconSource;
     name: string;
     color: string = 'currentColor';

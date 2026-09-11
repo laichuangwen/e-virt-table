@@ -1,7 +1,7 @@
 import type Context from './Context'
 import { Icon } from './Icon'
 import type { Paint } from './Paint'
-import { Shape, type ShapeConfig } from './Shape'
+import { Widget, type WidgetConfig } from './Widget'
 
 export type TextAlign = 'left' | 'center' | 'right'
 export type VerticalAlign = 'top' | 'middle' | 'bottom'
@@ -22,7 +22,7 @@ export interface Padding {
   left: number
 }
 
-export interface TextConfig extends ShapeConfig {
+export interface TextConfig extends WidgetConfig {
   text: string
   padding?: PaddingInput
   maxLineClamp?: number
@@ -353,7 +353,7 @@ function alignTextX(
   return boxX + (boxW - textW) / 2
 }
 
-export class Text extends Shape {
+export class Text extends Widget {
   text: string
   private selAnchor = 0
   private selFocus = 0
@@ -373,7 +373,7 @@ export class Text extends Shape {
     this.afterIcons = (config.afterIcons ?? []).filter((icon) => icon.visible)
     this.box = this.createContentBox()
     this.on('pointerdown:self', (e) => this.handlePointerDown(e))
-    this.on('pointermove:self', (e) => this.handlePointerMove(e))
+    this.on('pointermove', (e) => this.handlePointerMove(e))
     this.on('pointerup', (e) => this.handlePointerUp(e))
   }
   getDrawResult(): DrawTextResult {
@@ -437,21 +437,11 @@ export class Text extends Shape {
     return this.context.textSelecting && this.context.selectingText === this
   }
 
-  private clearSelection(silent = false): void {
-    this.selAnchor = 0
-    this.selFocus = 0
-    if (this.context.selectingText === this) {
-      this.context.textSelecting = false
-      this.context.selectingText = null
-      this.context.textSelectionStr = ''
-    }
-    if (!silent) this.emitSelectionChange()
-  }
-
   private clearOtherSelections(): void {
-    for (const shape of this.context.paint.getShapes()) {
-      if (shape instanceof Text && shape !== this) {
-        shape.clearSelection(true)
+    for (const widget of this.context.paint.getWidgets()) {
+      if (widget instanceof Text && widget !== this) {
+        widget.selAnchor = 0
+        widget.selFocus = 0
       }
     }
   }
@@ -488,6 +478,7 @@ export class Text extends Shape {
       flatLen ?? layout.flatText.length,
       this.getSelectableEnd(layout)
     )
+    if (this.context.selectingText !== this) return null
     let start = Math.max(0, Math.min(this.selAnchor, this.selFocus, len))
     let end = Math.max(0, Math.min(Math.max(this.selAnchor, this.selFocus), len))
     start = this.clampIndexBeforeEllipsis(start, layout.lines)

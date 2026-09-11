@@ -342,7 +342,7 @@ class Store {
     childrenColKey = 'children';
     hasTree = true;
     hasSelection = false;
-    debug = true;
+    debug = false;
     defaultRowHeight = 36;
     maxColLevel = 0;
     sumHeight = 0;

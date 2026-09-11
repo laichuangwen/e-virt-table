@@ -1,15 +1,16 @@
 import { Column, EVirtTableOptions } from "../../types";
-// import { EventBus } from "./EventBus";
 import { Paint } from "./Paint";
 import Config from './Config';
 import EvitListener from "./EvitListener";
 import Store from "./Store";
 import type { Text } from "./Text";
 import Scroller from "./Scroller";
+import Table from "./Table";
 export default class Context {
     private animationFrameId: number | undefined = undefined;
-    private listener: EvitListener;
-    private scroller: Scroller;
+    private tableWidget: Table;
+    listener: EvitListener;
+    scroller: Scroller;
     config: Config;
     store: Store;
     containerElement!: HTMLDivElement;
@@ -58,25 +59,17 @@ export default class Context {
     maxColIndex = 0;
     maxRowIndex = 0;
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
-        console.time('Context constructor');
         this.config = new Config();
-        console.time('Store constructor');
         this.store = new Store({
             columns: options.columns as unknown as any,
             data: options.data as unknown as any,
         });
-        console.timeEnd('Store constructor');
         this.createContainer(target, options);
         this.paint = new Paint(this.canvasElement);
         this.initWH();
         this.listener = new EvitListener(this);
         this.scroller = new Scroller(this);
-        // console.log(this.store);
-        console.timeEnd('Context constructor');
-        this.scroller.setScrollY(1000000000);
-        this.scroller.setScrollX(1000000000);
-        console.log('scrollY', this.scrollY);
-        console.log('scrollX', this.scrollX);
+        this.tableWidget = new Table(this);
     }
     private createContainer(containerElement: HTMLDivElement, options: EVirtTableOptions) {
         this.containerElement = containerElement;
@@ -107,18 +100,23 @@ export default class Context {
         const { top } = containerElement;
         const windowInnerHeight = window.innerHeight;
         const visibleHeight = windowInnerHeight - top;
+        const stageWidth = Math.floor(containerElement.width)
+        let stageHeight = 0;
         if (visibleHeight > 0) {
-            this.stageHeight = Math.floor(visibleHeight - 8);
-            console.log('stageHeight', this.stageHeight);
-            
+            stageHeight = Math.floor(visibleHeight - 16);
         }
-        this.stageWidth = Math.floor(containerElement.width);
+        if (stageHeight === this.stageHeight && stageWidth === this.stageWidth) {
+            return;
+        }
+        this.stageHeight = stageHeight;
+        this.stageWidth = stageWidth;
         // this.stageHeight = Math.floor(containerElement.height);
         this.stageElement.style.width = `${this.stageWidth}px`;
         this.stageElement.style.height = `${this.stageHeight}px`;
         const dpr = window.devicePixelRatio || 1; // 获取设备像素比
         this.canvasElement.width = Math.round(this.stageWidth * dpr);
         this.canvasElement.height = Math.round(this.stageHeight * dpr);
+        // console.log(this.canvasElement.width, this.canvasElement.height);
         this.canvasElement.style.width = `${this.stageWidth}px`;
         this.canvasElement.style.height = `${this.stageHeight}px`;
         this.paint.scale(dpr);
@@ -128,13 +126,9 @@ export default class Context {
             cancelAnimationFrame(this.animationFrameId);
         }
         this.animationFrameId = requestAnimationFrame(() => {
-            // console.time('draw');
-            this.initWH();
+            this.scroller.update();
             this.paint.draw();
-            // console.timeEnd('draw');
         });
-        // this.initWH();
-        // this.paint.draw();
     }
     destroy() {
         this.listener.destroy();

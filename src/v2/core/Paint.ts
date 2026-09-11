@@ -1,4 +1,4 @@
-import { Shape, ShapeEventMap } from "./Shape";
+import { Widget, WidgetEventMap } from "./Widget";
 
 export interface LineOptions {
     lineCap?: CanvasLineCap;
@@ -38,8 +38,8 @@ export interface RectOptions {
     lineDashOffset?: number;
 };
 export class Paint {
-    private shapes: Shape[] = [];
     private ctx: CanvasRenderingContext2D
+    private widgets: Widget[] = [];
     private target: HTMLCanvasElement | null = null
     constructor(target: HTMLCanvasElement | CanvasRenderingContext2D) {
         // 不能用 instanceof 判断；非 canvas 元素即视为已有 ctx。
@@ -56,41 +56,36 @@ export class Paint {
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.ctx.scale(dpr, dpr);
     }
-    addShape(shape: Shape) {
+    addWidget(widget: Widget) {
         // 按 zIndex 升序插入；同级保持后添加更靠上（数组更靠后）
-        const idx = this.shapes.findIndex((s) => s.zIndex > shape.zIndex)
-        if (idx === -1) this.shapes.push(shape)
-        else this.shapes.splice(idx, 0, shape)
+        const idx = this.widgets.findIndex((s) => s.zIndex > widget.zIndex)
+        if (idx === -1) this.widgets.push(widget)
+        else this.widgets.splice(idx, 0, widget)
     }
-    removeShape(shape: Shape) {
-        this.shapes = this.shapes.filter(s => s !== shape)
+    removeWidget(widget: Widget) {
+        this.widgets = this.widgets.filter((item) => item !== widget)
     }
-    /** 修改 zIndex 后重新按层级排序 */
-    setZIndex(shape: Shape, zIndex: number) {
-        shape.zIndex = zIndex
-        this.removeShape(shape)
-        this.addShape(shape)
+    getWidgets() {
+        return this.widgets;
     }
-    getShapes(): Shape[] {
-        return this.shapes
-    }
-    removeAllShapes() {
-        this.shapes = []
-    }
-    dispatchListener<K extends keyof ShapeEventMap>(eventName: K, e: ShapeEventMap[K]) {
+    dispatchListener<K extends keyof WidgetEventMap>(eventName: K, e: WidgetEventMap[K]) {
         // zIndex 高的在数组后面，倒序优先命中；stopPropagation 后不再传给下层
-        for (let i = this.shapes.length - 1; i >= 0; i--) {
-            if (this.shapes[i].dispatch(eventName, e)) break
+        for (let i = this.widgets.length - 1; i >= 0; i--) {
+            if (this.widgets[i].dispatch(eventName, e)) break
         }
     }
-    getRelativePosition(e: PointerEvent | MouseEvent) {
+    getRelativePosition(e: PointerEvent | MouseEvent | TouchEvent) {
         if (!(this.target instanceof HTMLCanvasElement)) {
             throw new Error('target is not a canvas element')
         }
+        const point = 'clientX' in e ? e : (e.touches[0] ?? e.changedTouches[0])
+        if (!point) {
+            return { x: 0, y: 0 }
+        }
         const rect = this.target.getBoundingClientRect()
         return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
+            x: point.clientX - rect.left,
+            y: point.clientY - rect.top,
         }
     }
     getCtx() {
@@ -249,8 +244,8 @@ export class Paint {
         this.ctx.restore();
     }
     draw() {
-        const { canvas } = this.ctx
+        const { canvas } = this.ctx;
         this.ctx.clearRect(0, 0, canvas.width, canvas.height)
-        this.shapes.forEach(shape => shape.draw())
+        this.widgets.forEach(widget => widget.draw())
     }
 }
