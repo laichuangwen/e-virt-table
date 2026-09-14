@@ -113,6 +113,8 @@ export default class Context {
         // this.stageHeight = Math.floor(containerElement.height);
         this.stageElement.style.width = `${this.stageWidth}px`;
         this.stageElement.style.height = `${this.stageHeight}px`;
+        this.stageElement.style.borderColor = this.config.BORDER_COLOR;
+        this.stageElement.style.borderRadius = `${this.config.BORDER_RADIUS}px`;
         const dpr = window.devicePixelRatio || 1; // 获取设备像素比
         this.canvasElement.width = Math.round(this.stageWidth * dpr);
         this.canvasElement.height = Math.round(this.stageHeight * dpr);
@@ -122,13 +124,17 @@ export default class Context {
         this.paint.scale(dpr);
     }
     draw() {
-        if (this.animationFrameId) {
-            cancelAnimationFrame(this.animationFrameId);
-        }
-        this.animationFrameId = requestAnimationFrame(() => {
-            this.scroller.update();
-            this.paint.draw();
-        });
+        this.scroller.update();
+        this.paint.draw();
+        // console.log(this.scrollY, this.scrollY + this.stageHeight - 100 - 14, this.store.sumHeight);
+        // if (this.animationFrameId) {
+        //     cancelAnimationFrame(this.animationFrameId);
+        // }
+        // this.animationFrameId = requestAnimationFrame(() => {
+        //     this.scroller.update();
+        //     this.paint.draw();
+        //     console.log(this.scrollY, this.scrollY + this.stageHeight - 100 - 14, this.store.sumHeight);
+        // });
     }
     destroy() {
         this.listener.destroy();

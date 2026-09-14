@@ -57,21 +57,18 @@ export class Paint {
         this.ctx.scale(dpr, dpr);
     }
     addWidget(widget: Widget) {
-        // 按 zIndex 升序插入；同级保持后添加更靠上（数组更靠后）
-        const idx = this.widgets.findIndex((s) => s.zIndex > widget.zIndex)
-        if (idx === -1) this.widgets.push(widget)
-        else this.widgets.splice(idx, 0, widget)
+        this.widgets.push(widget)
     }
     removeWidget(widget: Widget) {
         this.widgets = this.widgets.filter((item) => item !== widget)
     }
     getWidgets() {
-        return this.widgets;
+        return this.widgets.sort((a, b) => a.zIndex - b.zIndex);
     }
     dispatchListener<K extends keyof WidgetEventMap>(eventName: K, e: WidgetEventMap[K]) {
-        // zIndex 高的在数组后面，倒序优先命中；stopPropagation 后不再传给下层
-        for (let i = this.widgets.length - 1; i >= 0; i--) {
-            if (this.widgets[i].dispatch(eventName, e)) break
+        const widgets = this.getWidgets();
+        for (let i = widgets.length - 1; i >= 0; i--) {
+            if (widgets[i].dispatch(eventName, e)) break
         }
     }
     getRelativePosition(e: PointerEvent | MouseEvent | TouchEvent) {
@@ -246,6 +243,8 @@ export class Paint {
     draw() {
         const { canvas } = this.ctx;
         this.ctx.clearRect(0, 0, canvas.width, canvas.height)
-        this.widgets.forEach(widget => widget.draw())
+        const widgets = this.getWidgets();
+        widgets.forEach(widget => widget.update());
+        widgets.forEach(widget => widget.draw())
     }
 }

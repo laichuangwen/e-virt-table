@@ -31,7 +31,7 @@ export interface WidgetConfig {
     zIndex?: number
 }
 
-export abstract class Widget {
+export class Widget {
     private hovered = false
     private listeners = new Map<WidgetEventName, Set<ListenerEntry>>()
     context: Context
@@ -52,9 +52,6 @@ export abstract class Widget {
         this.zIndex = config?.zIndex ?? 0
         this.context.paint.addWidget(this)
     }
-
-    abstract render(paint: Paint): void
-
     inside(x: number, y: number): boolean {
         if (!this.visible) return false
         return x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height
@@ -132,7 +129,8 @@ export abstract class Widget {
     destroy() {
         this.context.paint.removeWidget(this)
     }
-
+    render(_paint: Paint) { }
+    update() { }
     draw() {
         if (!this.visible) return
         this.render(this.context.paint)

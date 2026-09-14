@@ -25,12 +25,6 @@ export class Icon extends Widget {
         this.on('click:self', () => {
             console.log('click', this.name);
         }, { stopPropagation: true })
-        // this.on('pointerdown', () => {
-        //     console.log('pointerdown', this.name);
-        // }, { stopPropagation: true })
-        // this.on('pointerup', () => {
-        //     console.log('pointerup', this.name);
-        // }, { stopPropagation: true })
     }
     private initSource(source: IconSource): void {
         if (source instanceof HTMLImageElement) {

@@ -4,6 +4,7 @@ import { Paint } from "./Paint";
 import { Widget } from "./Widget";
 
 const THUMB_MIN_SIZE = 30;
+const Z_INDEX = 10000;
 
 class ScrollbarThumb extends Widget {
     private scrollbar: Scrollbar;
@@ -53,9 +54,9 @@ class ScrollbarThumb extends Widget {
             if (!this.isDragging) return;
             const { x, y } = this.context.paint.getRelativePosition(e);
             if (this.isVertical()) {
-                this.setY(Math.max(0, Math.min(y - this.pointerdownOffset, this.maxY)));
+                this.setY(y - this.pointerdownOffset);
             } else {
-                this.setX(Math.max(0, Math.min(x - this.pointerdownOffset, this.maxX)));
+                this.setX(x - this.pointerdownOffset);
             }
         });
         this.on('wheel', (e) => {
@@ -71,6 +72,9 @@ class ScrollbarThumb extends Widget {
         this.on('touchmove', (e) => this.onTouchMove(e));
         this.update();
     }
+    get offset() {
+        return this.scrollbar.offset;
+    }
     get viewportSize() {
         return this.scrollbar.viewportSize;
     }
@@ -82,10 +86,10 @@ class ScrollbarThumb extends Widget {
         return Math.min(this.viewportSize, Math.max(THUMB_MIN_SIZE, size));
     }
     get maxY() {
-        return this.viewportSize - this.height;
+        return this.offset + this.viewportSize - this.height;
     }
     get maxX() {
-        return this.viewportSize - this.width;
+        return this.offset + this.viewportSize - this.width;
     }
     private isVertical() {
         return this.scrollbar.isVertical();
@@ -94,16 +98,16 @@ class ScrollbarThumb extends Widget {
         return this.scrollbar.isHorizontal();
     }
     private setY(y: number) {
-        if (this.y === y) return;
-        this.y = y;
-        this.context.scroller.setScrollY(y * this.ratio);
-        this.context.draw();
+        const next = Math.max(this.offset, Math.min(y, this.maxY));
+        if (this.y === next) return;
+        this.y = next;
+        this.context.scroller.setScrollY((next - this.offset) * this.ratio);
     }
     private setX(x: number) {
-        if (this.x === x) return;
-        this.x = x;
-        this.context.scroller.setScrollX(x * this.ratio);
-        this.context.draw();
+        const next = Math.max(this.offset, Math.min(x, this.maxX));
+        if (this.x === next) return;
+        this.x = next;
+        this.context.scroller.setScrollX((next - this.offset) * this.ratio);
     }
     private isOnScrollbar(e: TouchEvent) {
         return this.scrollbar.insideByEvent(e);
@@ -148,23 +152,32 @@ class ScrollbarThumb extends Widget {
     }
     update() {
         const { SCROLLER_TRACK_SIZE, SCROLLER_SIZE } = this.context.config;
-        const padding = (SCROLLER_TRACK_SIZE - SCROLLER_SIZE) / 2;
+        this.zIndex = Z_INDEX + 100;
+        const padding = (SCROLLER_TRACK_SIZE - SCROLLER_SIZE - 2) / 2;
         this.visible = this.scrollbar.visible;
         if (!this.visible) return;
         const thumbLength = this.getThumbSize;
         const track = this.viewportSize - thumbLength;
         this.ratio = track > 0 ? (this.contentSize - this.viewportSize) / track : 1;
-        if (this.isVertical()) {
+        const isVertical = this.isVertical();
+        const scroll = isVertical ? this.context.scrollY : this.context.scrollX;
+        const maxPos = isVertical ? this.maxY : this.maxX;
+        const thumbPos = Math.max(
+            this.offset,
+            Math.min(this.offset + scroll / this.ratio, maxPos),
+        );
+        if (isVertical) {
             this.width = SCROLLER_SIZE;
             this.height = thumbLength;
             this.x = this.scrollbar.x + padding;
-            this.y = Math.max(0, Math.min(this.context.scrollY / this.ratio, this.maxY));
+            this.y = thumbPos;
         } else {
             this.width = thumbLength;
             this.height = SCROLLER_SIZE;
-            this.x = Math.max(0, Math.min(this.context.scrollX / this.ratio, this.maxX));
+            this.x = thumbPos;
             this.y = this.scrollbar.y + padding;
         }
+   
     }
     render(paint: Paint) {
         paint.drawRect(this.x, this.y, this.width, this.height, {
@@ -179,6 +192,7 @@ class ScrollbarTrack extends Widget {
     constructor(scrollbar: Scrollbar) {
         const { context } = scrollbar;
         super(context);
+        this.zIndex = Z_INDEX + 1;
         this.scrollbar = scrollbar;
         this.on('pointerdown:self', (e) => {
             this.scrollbar.scrollbarThumb.setXYByPointerEvent(e);
@@ -192,15 +206,23 @@ class ScrollbarTrack extends Widget {
         this.update();
     }
     update() {
-        const { x, y, height, width } = this.scrollbar;
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        const { x, y, height, width, offset } = this.scrollbar;
         this.visible = this.scrollbar.visible;
+        if (this.scrollbar.isVertical()) {
+            this.x = x;
+            this.y = y + offset;
+            this.width = width;
+            this.height = height - offset;
+        } else {
+            this.x = x + offset;
+            this.y = y;
+            this.width = width - offset;
+            this.height = height;
+        }
     }
     render(paint: Paint) {
         paint.drawRect(this.x, this.y, this.width, this.height, {
+            borderColor: this.context.config.BORDER_COLOR,
             fillColor: this.context.config.SCROLLER_TRACK_COLOR,
         });
     }
@@ -213,17 +235,21 @@ class Scrollbar extends Widget {
 
     constructor(context: Context, type: ScrollbarType) {
         super(context);
+        this.zIndex = Z_INDEX;
         this.type = type;
         this.scrollbarTrack = new ScrollbarTrack(this);
         this.scrollbarThumb = new ScrollbarThumb(this);
     }
     get offset() {
-        return this.isVertical() ? 50 : 0;
+        return this.isVertical() ? 100 : 0;
     }
-    get viewportSize() {
+    get trackSize() {
         const { SCROLLER_TRACK_SIZE } = this.context.config;
         const { stageHeight, stageWidth } = this.context;
         return this.isVertical() ? stageHeight - SCROLLER_TRACK_SIZE : stageWidth - SCROLLER_TRACK_SIZE;
+    }
+    get viewportSize() {
+        return Math.max(0, this.trackSize - this.offset);
     }
     get contentSize() {
         const { sumHeight, sumWidth } = this.context.store;
@@ -242,11 +268,11 @@ class Scrollbar extends Widget {
     }
     private getWidth() {
         const { SCROLLER_TRACK_SIZE } = this.context.config;
-        return this.isVertical() ? SCROLLER_TRACK_SIZE : this.viewportSize;
+        return this.isVertical() ? SCROLLER_TRACK_SIZE : this.trackSize;
     }
     private getHeight() {
         const { SCROLLER_TRACK_SIZE } = this.context.config;
-        return this.isVertical() ? this.viewportSize : SCROLLER_TRACK_SIZE;
+        return this.isVertical() ? this.trackSize : SCROLLER_TRACK_SIZE;
     }
     isVertical() {
         return this.type === 'vertical';
@@ -255,10 +281,10 @@ class Scrollbar extends Widget {
         return !this.isVertical();
     }
     render(paint: Paint) {
-        // paint.drawRect(this.x, this.y, this.width, this.height, {
-        //     borderWidth: 1,
-        //     borderColor: this.context.config.BORDER_COLOR,
-        // });
+        const { BORDER_COLOR } = this.context.config;
+        paint.drawRect(this.x, this.y, this.width, this.height, {
+            borderColor: BORDER_COLOR,
+        });
     }
     update() {
         this.width = this.getWidth();
@@ -286,11 +312,15 @@ export default class Scroller {
         this.horizontalScrollbar.update();
     }
     setScrollY(scrollY: number) {
-        this.context.scrollY = Math.max(0, Math.min(Math.round(scrollY), this.verticalScrollbar.maxScroll));
+        const _scrollY = Math.max(0, Math.min(Math.round(scrollY), this.verticalScrollbar.maxScroll));
+        if (this.context.scrollY === _scrollY) return;
+        this.context.scrollY = _scrollY;
         this.context.draw();
     }
     setScrollX(scrollX: number) {
-        this.context.scrollX = Math.max(0, Math.min(Math.round(scrollX), this.horizontalScrollbar.maxScroll));
+        const _scrollX = Math.max(0, Math.min(Math.round(scrollX), this.horizontalScrollbar.maxScroll));
+        if (this.context.scrollX === _scrollX) return;
+        this.context.scrollX = _scrollX;
         this.context.draw();
     }
 }
