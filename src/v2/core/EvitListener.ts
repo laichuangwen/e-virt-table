@@ -24,6 +24,8 @@ type NativeListenertMap = {
 type SelfListenertMap = WithPrefix<NativeListenertMap, 'self'>;
 type CustomListenertMap = {
     containerResize: HTMLDivElement;
+    'pointerenter:table': PointerEvent;
+    'pointerleave:table': PointerEvent;
 }
 export type EvitListenerMap = NativeListenertMap & SelfListenertMap & CustomListenertMap;
 export type EvitListenerName = keyof EvitListenerMap

@@ -31,7 +31,7 @@ export interface WidgetConfig {
     zIndex?: number
 }
 
-export class Widget {
+export abstract class Widget {
     private hovered = false
     private listeners = new Map<WidgetEventName, Set<ListenerEntry>>()
     context: Context
@@ -85,28 +85,25 @@ export class Widget {
      */
     dispatch<K extends WidgetEventName>(eventName: K, event: WidgetEventMap[K]): boolean {
         if (!this.visible) return false
-
+        this.invoke(eventName, event)
         const pointerEvent = event as PointerEvent | MouseEvent | TouchEvent
         const hasPoint = 'clientX' in pointerEvent || Boolean(
             (pointerEvent as TouchEvent).touches?.[0] || (pointerEvent as TouchEvent).changedTouches?.[0],
         )
         const inside = hasPoint && this.insideByEvent(pointerEvent)
-
-        if (eventName === 'pointermove') {
+        // 因为时间代理重新派发pointerleave, pointerenter是失效的用pointermove事件来判断，return防止重复派发
+        if (['pointermove', 'pointerleave', 'pointerenter'].includes(eventName)) {
             const moveEvent = event as WidgetEventMap['pointermove']
             if (!inside && this.hovered) {
                 this.invoke('pointerleave:self', moveEvent)
                 this.hovered = false
+                return false
             } else if (inside && !this.hovered) {
                 this.invoke('pointerenter:self', moveEvent)
                 this.hovered = true
+                return false
             }
-        } else if ((eventName === 'pointerleave' || eventName === 'pointercancel') && this.hovered) {
-            this.invoke('pointerleave:self', event as WidgetEventMap['pointerleave:self'])
-            this.hovered = false
         }
-
-        this.invoke(eventName, event)
         if (!inside) return false
         const selfName = `${eventName}:self` as WidgetEventName
         return this.invoke(selfName, event as WidgetEventMap[typeof selfName])

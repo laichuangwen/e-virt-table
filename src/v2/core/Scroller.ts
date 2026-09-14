@@ -18,16 +18,16 @@ class ScrollbarThumb extends Widget {
     constructor(scrollbar: Scrollbar) {
         super(scrollbar.context);
         this.scrollbar = scrollbar;
-        const { SCROLLER_COLOR, SCROLLER_FOCUS_COLOR } = this.context.config;
-        this.bgColor = SCROLLER_COLOR;
+        const { scrollbarThumbColor, scrollbarThumbFocusColor } = this.context.config;
+        this.bgColor = scrollbarThumbColor;
         this.on('pointerenter:self', () => {
-            this.bgColor = SCROLLER_FOCUS_COLOR;
+            this.bgColor = scrollbarThumbFocusColor;
             this.context.scrollerFocus = true;
             this.draw();
         });
         this.on('pointerleave:self', () => {
             if (this.isDragging) return;
-            this.bgColor = SCROLLER_COLOR;
+            this.bgColor = scrollbarThumbColor;
             this.context.scrollerFocus = false;
             this.draw();
         });
@@ -46,7 +46,7 @@ class ScrollbarThumb extends Widget {
             this.context.scrollerFocus = false;
             this.pointerdownOffset = 0;
             if (!this.insideByEvent(e)) {
-                this.bgColor = SCROLLER_COLOR;
+                this.bgColor = scrollbarThumbColor;
             };
             this.draw();
         });
@@ -68,8 +68,36 @@ class ScrollbarThumb extends Widget {
                 this.context.scroller.setScrollX(this.context.scrollX + e.deltaY);
             }
         });
-        this.on('touchstart', (e) => this.onTouchStart(e));
-        this.on('touchmove', (e) => this.onTouchMove(e));
+        this.on('touchstart', (e) => {
+            const touch = e.touches[0];
+            if (!touch) return;
+            if (this.isDragging || this.context.scrollerMove || this.isOnScrollbar(e)) {
+                this.touchPanning = false;
+                return;
+            }
+            this.touchPanning = true;
+            this.touchClient = this.isVertical() ? touch.clientY : touch.clientX;
+            this.touchScroll = this.isVertical() ? this.context.scrollY : this.context.scrollX;
+        });
+        this.on('touchmove', (e) => {
+            if (!this.touchPanning) return;
+            const touch = e.touches[0];
+            if (!touch) return;
+            const client = this.isVertical() ? touch.clientY : touch.clientX;
+            const delta = client - this.touchClient;
+            const next = Math.max(0, Math.min(Math.round(this.touchScroll - delta), this.scrollbar.maxScroll));
+            const atEdge = (next === 0 && delta > 0) || (next === this.scrollbar.maxScroll && delta < 0);
+            if (this.scrollbar.maxScroll > 0 && !atEdge) {
+                e.preventDefault();
+            }
+            if (this.isVertical()) {
+                if (next === this.context.scrollY) return;
+                this.context.scroller.setScrollY(next);
+                return;
+            }
+            if (next === this.context.scrollX) return;
+            this.context.scroller.setScrollX(next);
+        });
         this.update();
     }
     get offset() {
@@ -112,36 +140,6 @@ class ScrollbarThumb extends Widget {
     private isOnScrollbar(e: TouchEvent) {
         return this.scrollbar.insideByEvent(e);
     }
-    private onTouchStart(e: TouchEvent) {
-        const touch = e.touches[0];
-        if (!touch) return;
-        if (this.isDragging || this.context.scrollerMove || this.isOnScrollbar(e)) {
-            this.touchPanning = false;
-            return;
-        }
-        this.touchPanning = true;
-        this.touchClient = this.isVertical() ? touch.clientY : touch.clientX;
-        this.touchScroll = this.isVertical() ? this.context.scrollY : this.context.scrollX;
-    }
-    private onTouchMove(e: TouchEvent) {
-        if (!this.touchPanning) return;
-        const touch = e.touches[0];
-        if (!touch) return;
-        const client = this.isVertical() ? touch.clientY : touch.clientX;
-        const delta = client - this.touchClient;
-        const next = Math.max(0, Math.min(Math.round(this.touchScroll - delta), this.scrollbar.maxScroll));
-        const atEdge = (next === 0 && delta > 0) || (next === this.scrollbar.maxScroll && delta < 0);
-        if (this.scrollbar.maxScroll > 0 && !atEdge) {
-            e.preventDefault();
-        }
-        if (this.isVertical()) {
-            if (next === this.context.scrollY) return;
-            this.context.scroller.setScrollY(next);
-            return;
-        }
-        if (next === this.context.scrollX) return;
-        this.context.scroller.setScrollX(next);
-    }
     setXYByPointerEvent(e: PointerEvent) {
         const { y, x } = this.context.paint.getRelativePosition(e);
         if (this.isVertical()) {
@@ -151,10 +149,14 @@ class ScrollbarThumb extends Widget {
         }
     }
     update() {
-        const { SCROLLER_TRACK_SIZE, SCROLLER_SIZE } = this.context.config;
-        this.zIndex = Z_INDEX + 100;
-        const padding = (SCROLLER_TRACK_SIZE - SCROLLER_SIZE - 2) / 2;
         this.visible = this.scrollbar.visible;
+        /** 如果inner模式下，表格不在hover状态，则隐藏滚动条滑块 */
+        if (!this.scrollbar.isOuterMode && !this.isDragging && !this.context.isTableHovering) {
+            this.visible = false;
+        }
+        const { scrollbarTrackSize, scrollbarThumbSize } = this.context.config;
+        this.zIndex = Z_INDEX + 100;
+        const padding = (scrollbarTrackSize - scrollbarThumbSize - 2) / 2;
         if (!this.visible) return;
         const thumbLength = this.getThumbSize;
         const track = this.viewportSize - thumbLength;
@@ -167,17 +169,17 @@ class ScrollbarThumb extends Widget {
             Math.min(this.offset + scroll / this.ratio, maxPos),
         );
         if (isVertical) {
-            this.width = SCROLLER_SIZE;
+            this.width = scrollbarThumbSize;
             this.height = thumbLength;
             this.x = this.scrollbar.x + padding;
             this.y = thumbPos;
         } else {
             this.width = thumbLength;
-            this.height = SCROLLER_SIZE;
+            this.height = scrollbarThumbSize;
             this.x = thumbPos;
             this.y = this.scrollbar.y + padding;
         }
-   
+
     }
     render(paint: Paint) {
         paint.drawRect(this.x, this.y, this.width, this.height, {
@@ -221,10 +223,13 @@ class ScrollbarTrack extends Widget {
         }
     }
     render(paint: Paint) {
-        paint.drawRect(this.x, this.y, this.width, this.height, {
-            borderColor: this.context.config.BORDER_COLOR,
-            fillColor: this.context.config.SCROLLER_TRACK_COLOR,
-        });
+        if (this.scrollbar.isOuterMode) {
+            paint.drawRect(this.x, this.y, this.width, this.height, {
+                borderColor: this.context.config.borderColor,
+                fillColor: this.context.config.scrollbarTrackColor,
+            });
+        }
+
     }
 }
 
@@ -232,7 +237,6 @@ class Scrollbar extends Widget {
     type: ScrollbarType;
     scrollbarTrack: ScrollbarTrack;
     scrollbarThumb: ScrollbarThumb;
-
     constructor(context: Context, type: ScrollbarType) {
         super(context);
         this.zIndex = Z_INDEX;
@@ -240,13 +244,16 @@ class Scrollbar extends Widget {
         this.scrollbarTrack = new ScrollbarTrack(this);
         this.scrollbarThumb = new ScrollbarThumb(this);
     }
+    get isOuterMode() {
+        return this.context.config.scrollbarMode === 'outer';
+    }
     get offset() {
         return this.isVertical() ? 100 : 0;
     }
     get trackSize() {
-        const { SCROLLER_TRACK_SIZE } = this.context.config;
+        const { scrollbarTrackSize } = this.context.config;
         const { stageHeight, stageWidth } = this.context;
-        return this.isVertical() ? stageHeight - SCROLLER_TRACK_SIZE : stageWidth - SCROLLER_TRACK_SIZE;
+        return this.isVertical() ? stageHeight - scrollbarTrackSize : stageWidth - scrollbarTrackSize;
     }
     get viewportSize() {
         return Math.max(0, this.trackSize - this.offset);
@@ -259,20 +266,20 @@ class Scrollbar extends Widget {
         return Math.max(0, this.contentSize - this.viewportSize);
     }
     private getX() {
-        const { SCROLLER_TRACK_SIZE } = this.context.config;
-        return this.isVertical() ? this.context.stageWidth - SCROLLER_TRACK_SIZE : 0;
+        const { scrollbarTrackSize } = this.context.config;
+        return this.isVertical() ? this.context.stageWidth - scrollbarTrackSize : 0;
     }
     private getY() {
-        const { SCROLLER_TRACK_SIZE } = this.context.config;
-        return this.isVertical() ? 0 : this.context.stageHeight - SCROLLER_TRACK_SIZE;
+        const { scrollbarTrackSize } = this.context.config;
+        return this.isVertical() ? 0 : this.context.stageHeight - scrollbarTrackSize;
     }
     private getWidth() {
-        const { SCROLLER_TRACK_SIZE } = this.context.config;
-        return this.isVertical() ? SCROLLER_TRACK_SIZE : this.trackSize;
+        const { scrollbarTrackSize } = this.context.config;
+        return this.isVertical() ? scrollbarTrackSize : this.trackSize;
     }
     private getHeight() {
-        const { SCROLLER_TRACK_SIZE } = this.context.config;
-        return this.isVertical() ? this.trackSize : SCROLLER_TRACK_SIZE;
+        const { scrollbarTrackSize } = this.context.config;
+        return this.isVertical() ? this.trackSize : scrollbarTrackSize;
     }
     isVertical() {
         return this.type === 'vertical';
@@ -281,10 +288,12 @@ class Scrollbar extends Widget {
         return !this.isVertical();
     }
     render(paint: Paint) {
-        const { BORDER_COLOR } = this.context.config;
-        paint.drawRect(this.x, this.y, this.width, this.height, {
-            borderColor: BORDER_COLOR,
-        });
+        if (this.isOuterMode) {
+            const { borderColor } = this.context.config;
+            paint.drawRect(this.x, this.y, this.width, this.height, {
+                borderColor,
+            });
+        }
     }
     update() {
         this.width = this.getWidth();

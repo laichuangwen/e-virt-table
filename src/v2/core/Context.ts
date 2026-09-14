@@ -30,6 +30,7 @@ export default class Context {
     textSelecting = false;
     selectingText: Text | null = null;
     isMouseoverTargetContainer = false;
+    isTableHovering = false;
     mousedown = false;
     isEmpty = false; // 是否空数据
     rowResizing = false; // 行调整大小中
@@ -113,8 +114,8 @@ export default class Context {
         // this.stageHeight = Math.floor(containerElement.height);
         this.stageElement.style.width = `${this.stageWidth}px`;
         this.stageElement.style.height = `${this.stageHeight}px`;
-        this.stageElement.style.borderColor = this.config.BORDER_COLOR;
-        this.stageElement.style.borderRadius = `${this.config.BORDER_RADIUS}px`;
+        this.stageElement.style.borderColor = this.config.borderColor;
+        this.stageElement.style.borderRadius = `${this.config.borderRadius}px`;
         const dpr = window.devicePixelRatio || 1; // 获取设备像素比
         this.canvasElement.width = Math.round(this.stageWidth * dpr);
         this.canvasElement.height = Math.round(this.stageHeight * dpr);

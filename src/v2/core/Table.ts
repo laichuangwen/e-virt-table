@@ -19,7 +19,23 @@ export default class Table extends Widget {
         this.context.listener.on('resizeObserver',
             () => context.draw()
         );
+        this.on('pointerenter:self', (e) => {
+            this.context.listener.emit('pointerenter:table', e);
+            this.context.isTableHovering = true;
+            this.context.draw();
+        });
+        this.on('pointerleave:self', (e) => {
+            this.context.listener.emit('pointerleave:table', e);
+            this.context.isTableHovering = false;
+            this.context.draw();
+        });
         // this.createDemoWidgets();
+    }
+    update() {
+        this.x = 0;
+        this.y = 0;
+        this.width = this.context.stageWidth;
+        this.height = this.context.stageHeight;
     }
     render(paint: Paint) {
         // const { BORDER_RADIUS, BORDER_COLOR } = this.context.config;

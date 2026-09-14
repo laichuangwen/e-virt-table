@@ -17,7 +17,7 @@ export default class Body extends Widget {
     }
     render(paint: Paint) {
         paint.drawRect(this.x, this.y, this.width, this.height, {
-            fillColor: 'pink',
+            fillColor: this.context.config.BODY_BG_COLOR,
         });
     }
 }
