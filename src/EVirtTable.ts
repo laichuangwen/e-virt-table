@@ -315,6 +315,13 @@ export default class EVirtTable {
                     if (Array.isArray(err) && err.length) {
                         const [_err] = err;
                         const { rowKey, key } = _err;
+                        const targetRow = this.ctx.database.getRowForRowKey(rowKey);
+                        if (targetRow) {
+                            const { parentRowKeys = [] } = targetRow;
+                            if (parentRowKeys && parentRowKeys.length) {
+                                this.setExpandRowKeys(parentRowKeys, true);
+                            }
+                        }
                         this.scrollToRowkey(rowKey);
                         this.scrollToColkey(key);
                     }
