@@ -10,6 +10,7 @@
     "scripts": {
         "dev": "vite",
         "dev:v2": "vite --config vite.config.v2.mts",
+        "build:v2": "vite build --config vite.config.v2.mts",
         "dev:install": "cd docs && npm install",
         "dev:docs": "npm run build && npm run copy-dist && cd docs && npm run dev",
         "install:docs": "cd docs && npm install",

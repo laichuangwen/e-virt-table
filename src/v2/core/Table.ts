@@ -1,9 +1,4 @@
 import Context from "./Context";
-import { Text } from "./Text";
-import { Icon } from "./Icon";
-import checkboxCheck from "../svg/checkbox-check.svg?raw";
-import { IconWithShadow } from "./IconWithShadow";
-import { throttle } from "../../util";
 import { Widget } from "./Widget";
 import { Paint } from "./Paint";
 import Header from "./Header";
@@ -17,7 +12,12 @@ export default class Table extends Widget {
         this.header = new Header(context);
         this.body = new Body(context);
         this.context.listener.on('resizeObserver',
-            () => context.draw()
+            () => {
+                // 重新设置滚动条位置,防止溢出了
+                context.scroller.setScrollX(context.scrollX);
+                context.scroller.setScrollY(context.scrollY);
+                context.draw()
+            }
         );
         this.on('pointerenter:self', (e) => {
             this.context.listener.emit('pointerenter:table', e);

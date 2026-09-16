@@ -248,7 +248,7 @@ class Scrollbar extends Widget {
         return this.context.config.scrollbarMode === 'outer';
     }
     get offset() {
-        return this.isVertical() ? 100 : 0;
+        return this.isVertical() ? 0 : 0;
     }
     get trackSize() {
         const { scrollbarTrackSize } = this.context.config;
@@ -293,6 +293,11 @@ class Scrollbar extends Widget {
             paint.drawRect(this.x, this.y, this.width, this.height, {
                 borderColor,
             });
+            if (this.isVertical()) {
+                paint.drawRect(this.x, this.y, this.width, this.offset, {
+                    fillColor: this.context.config.HEADER_BG_COLOR,
+                });
+            }
         }
     }
     update() {
@@ -300,6 +305,8 @@ class Scrollbar extends Widget {
         this.height = this.getHeight();
         this.x = this.getX();
         this.y = this.getY();
+        const { scrollbarTrackSize } = this.context.config;
+        this.context.scrollbarSize = this.isOuterMode ? scrollbarTrackSize : 0;
         this.visible = this.contentSize > this.viewportSize && this.viewportSize > 0;
         this.scrollbarTrack.update();
         this.scrollbarThumb.update();

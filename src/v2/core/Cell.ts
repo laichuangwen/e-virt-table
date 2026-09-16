@@ -15,6 +15,10 @@ export default class Cell extends Widget {
         this.x = this.getDrawX();
         this.y = this.getDrawY();
     }
+    update(): void {
+        this.x = this.getDrawX();
+        this.y = this.getDrawY();
+    }
     isHorizontalVisible() {
         if (this.fixed) {
             return true;
@@ -35,8 +39,8 @@ export default class Cell extends Widget {
         }
         if (this.fixed === 'right') {
             // 可见区域宽度 -到右边界的距离即(表头宽度 - x坐标)
-            const { stageWidth } = this.context;
-            const x = stageWidth - (this.context.store.sumWidth - this.x);
+            const { stageWidth, config } = this.context;
+            const x = stageWidth - config.scrollbarTrackSize - (this.context.store.sumWidth - this.x);
             return x;
         }
         return this.x - this.context.scrollX;

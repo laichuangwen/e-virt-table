@@ -106,7 +106,7 @@ let columns: Column[] = [
                 title: '姓名1',
                 key: 'emp_name1',
                 align: 'left',
-                fixed: 'left',
+                // fixed: 'left',
                 children: [
                     {
                         title: '姓名11',
@@ -299,7 +299,7 @@ let columns: Column[] = [
         key: 'birthday',
         editorType: 'date',
         hoverIconName: 'icon-date',
-        sort: 2,
+        // sort: 2,
     },
     {
         title: '工作地址',
@@ -415,7 +415,7 @@ let columns: Column[] = [
     {
         title: '采购价(元)',
         key: 'purchasePrice',
-        fixed: 'right',
+        // fixed: 'right',
         required: true,
         align: 'right',
         // verticalAlign: 'top',
@@ -435,7 +435,7 @@ let columns: Column[] = [
     },
     {
         title: '销售价(元)',
-        fixed: 'right',
+        // fixed: 'right',
         key: 'salePrice',
         type: 'number',
         align: 'left',
@@ -456,6 +456,7 @@ let columns: Column[] = [
     {
         title: '操作',
         key: 'hander',
+        width: 210,
         fixed: 'right',
     },
 ];
@@ -549,7 +550,7 @@ for (let i = 0; i < 240; i += 1) {
         ],
     });
 }
-for (let i = 0; i < 100000; i += 1) {
+for (let i = 0; i < 0; i += 1) {
     columns.push({
         title: `表头${i}`,
         key: `sc_name${i}`,

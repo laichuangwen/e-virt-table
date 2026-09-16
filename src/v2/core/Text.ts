@@ -353,7 +353,7 @@ function alignTextX(
   return boxX + (boxW - textW) / 2
 }
 
-export class Text extends Widget {
+export default class Text extends Widget {
   text: string
   private selAnchor = 0
   private selFocus = 0
@@ -365,7 +365,7 @@ export class Text extends Widget {
   private layoutCache: TextLayout | null = null
   private result: DrawTextResult = EMPTY_RESULT
   constructor(context: Context, config: TextConfig) {
-    super(context, { zIndex: 10, ...config })
+    super(context, { zIndex: 10, autoDraw: false, ...config })
     this.text = config.text
     this.options = { ...defaultTextOptions, ...config }
     this.pad = normalizePadding(this.options.padding)

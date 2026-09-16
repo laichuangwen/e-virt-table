@@ -67,8 +67,10 @@ export class Paint {
     }
     dispatchListener<K extends keyof WidgetEventMap>(eventName: K, e: WidgetEventMap[K]) {
         const widgets = this.getWidgets();
-        for (let i = widgets.length - 1; i >= 0; i--) {
-            if (widgets[i].dispatch(eventName, e)) break
+        const childWidgets = widgets.flatMap(widget => widget.getChildWidgets());
+        const allWidgets = [...widgets, ...childWidgets];
+        for (let i = allWidgets.length - 1; i >= 0; i--) {
+            if (allWidgets[i].dispatch(eventName, e)) break
         }
     }
     getRelativePosition(e: PointerEvent | MouseEvent | TouchEvent) {

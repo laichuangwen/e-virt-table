@@ -1,9 +1,9 @@
-import { Column, EVirtTableOptions } from "../../types";
+import { EVirtTableOptions } from "../../types";
 import { Paint } from "./Paint";
 import Config from './Config';
 import EvitListener from "./EvitListener";
 import Store from "./Store";
-import type { Text } from "./Text";
+import type Text from "./Text";
 import Scroller from "./Scroller";
 import Table from "./Table";
 export default class Context {
@@ -35,6 +35,7 @@ export default class Context {
     isEmpty = false; // 是否空数据
     rowResizing = false; // 行调整大小中
     columnResizing = false; // 列调整大小中
+    scrollbarSize = 0; // 根据模式变化的
     scrollerMove = false; // 滚动条移动中
     scrollerFocus = false; // 滚动条focus中
     autofillMove = false; // 自动填充移动中
@@ -127,7 +128,7 @@ export default class Context {
     }
     draw() {
         console.time('draw');
-        this.scroller.update();
+        // this.scroller.update();
         this.paint.draw();
         console.timeEnd('draw');
         // console.log(this.scrollY, this.scrollY + this.stageHeight - 100 - 14, this.store.sumHeight);
