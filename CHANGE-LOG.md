@@ -6,6 +6,9 @@ Vx.x.x(TPL)
 -   Style changes
 -   Dependencies Changes
 -  
+V1.4.16
+### Feature
+- fix: 修复validateFields校验时tree类型有错误没有展开
 
 V1.4.15
 ### Feature
