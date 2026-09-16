@@ -549,7 +549,7 @@ for (let i = 0; i < 240; i += 1) {
         ],
     });
 }
-for (let i = 0; i < 0; i += 1) {
+for (let i = 0; i < 100000; i += 1) {
     columns.push({
         title: `表头${i}`,
         key: `sc_name${i}`,

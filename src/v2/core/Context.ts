@@ -62,6 +62,7 @@ export default class Context {
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
         this.config = new Config();
         this.store = new Store({
+            context: this,
             columns: options.columns as unknown as any,
             data: options.data as unknown as any,
         });
@@ -125,8 +126,10 @@ export default class Context {
         this.paint.scale(dpr);
     }
     draw() {
+        console.time('draw');
         this.scroller.update();
         this.paint.draw();
+        console.timeEnd('draw');
         // console.log(this.scrollY, this.scrollY + this.stageHeight - 100 - 14, this.store.sumHeight);
         // if (this.animationFrameId) {
         //     cancelAnimationFrame(this.animationFrameId);

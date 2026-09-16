@@ -29,19 +29,20 @@ export interface WidgetConfig {
     height: number
     visible?: boolean
     zIndex?: number
+    autoDraw?: boolean
 }
 
 export abstract class Widget {
     private hovered = false
     private listeners = new Map<WidgetEventName, Set<ListenerEntry>>()
-    context: Context
-    x: number = 0
-    y: number = 0
-    width: number = 0
-    height: number = 0
-    visible: boolean = true
-    zIndex: number = 0
-
+    context!: Context
+    x = 0
+    y = 0
+    width = 0
+    height = 0
+    visible = true
+    zIndex = 0
+    autoDraw = true
     constructor(context: Context, config?: WidgetConfig) {
         this.context = context
         this.x = config?.x ?? 0
@@ -50,7 +51,10 @@ export abstract class Widget {
         this.height = config?.height ?? 0
         this.visible = config?.visible ?? true
         this.zIndex = config?.zIndex ?? 0
-        this.context.paint.addWidget(this)
+        this.autoDraw = config?.autoDraw ?? true
+        if (this.autoDraw) {
+            this.context.paint.addWidget(this)
+        }
     }
     inside(x: number, y: number): boolean {
         if (!this.visible) return false

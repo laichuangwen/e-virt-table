@@ -22,6 +22,11 @@ export default class Config {
     scrollbarThumbColor = '#dee0e3';
     /** 滚动条滑块聚焦时的颜色 */
     scrollbarThumbFocusColor = '#bbbec4';
+    /** 合计底部固定 */
+    footerFixed = true;
+    /** 表头高度 */
+    cellHeaderHeight = 36;
+    /** 表头背景色 */
     HEADER_BG_COLOR = '#F8FAFF';
     BODY_BG_COLOR = '#FFF';
 }

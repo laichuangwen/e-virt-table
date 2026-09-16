@@ -1,4 +1,5 @@
 import type { Fixed, Column } from "../types";
+import Context from "./Context";
 
 export type RowNodeProps = {
     data: Record<string, any>;
@@ -43,23 +44,6 @@ class ColStore {
     hide = false;
     fixed: Fixed = '';
     sort = 0;
-    constructor() {
-    }
-    setWidth(width: number) {
-        this.width = width;
-    }
-    setHeight(height: number) {
-        this.height = height;
-    }
-    setHide(hide: boolean) {
-        this.hide = hide;
-    }
-    setSort(sort: number) {
-        this.sort = sort;
-    }
-    setFixed(fixed: Fixed) {
-        this.fixed = fixed;
-    }
 }
 export type ColNodeProps = {
     column: Column;
@@ -68,6 +52,9 @@ export type ColNodeProps = {
 export class ColNode {
     private store: Store;
     private colStore: ColStore;
+    x = -1;
+    y = -1;
+    colIndex = -1;
     column: Column;
     parentNode: ColNode | null = null;
     childrenNodes: ColNode[] = [];
@@ -80,13 +67,14 @@ export class ColNode {
         } else {
             this.colStore = new ColStore();
             this.store.setColStore(this.key, this.colStore);
+            this.colStore.width = this.column.width ?? 100;
+            this.colStore.height = this.column.height ?? this.store.defaultColHeight;
+            this.colStore.hide = typeof this.column.hide === 'function' ? this.column.hide({}) : this.column.hide ?? false;
+            this.colStore.sort = this.column.sort ?? 0;
+            this.colStore.fixed = this.column.fixed ?? '';
         }
-        this.colStore.setWidth(this.column.width ?? 100);
-        this.colStore.setHeight(this.column.height ?? 16);
-        this.colStore.setHide(typeof this.column.hide === 'function' ? this.column.hide({}) : this.column.hide ?? false);
-        this.colStore.setSort(this.column.sort ?? 0);
-        this.colStore.setFixed(this.column.fixed ?? '');
         this.initChildrenNodes(props.column);
+
     }
     get rowspan(): number {
         if (this.isRoot || this.hasChildren || this.hide) return 1;
@@ -110,6 +98,10 @@ export class ColNode {
             return this.childrenNodes.reduce((acc, child) => acc + child.width, 0);
         }
         return this.colStore.width;
+    }
+    get height(): number {
+        if (this.isRoot || this.hide) return 0;
+        return this.colStore.height * this.rowspan;
     }
     get hide(): boolean {
         if (this.colStore.hide) return true;
@@ -141,15 +133,24 @@ export class ColNode {
         if (!this.parentNode) return false;
         return this.parentNode.childrenNodes.length === this.parentNode.childrenNodes.indexOf(this) + 1;
     }
+    setX(x: number) {
+        this.x = x;
+    }
+    setY(y: number) {
+        this.y = y;
+    }
+    setColIndex(colIndex: number) {
+        this.colIndex = colIndex;
+    }
     setHide(hide: boolean) {
-        this.colStore.setHide(hide);
+        this.colStore.hide = hide;
     }
     setSort(sort: number) {
-        this.colStore.setSort(sort);
+        this.colStore.sort = sort;
         this.parentNode?.sortChildren();
     }
     setFixed(fixed: Fixed) {
-        this.colStore.setFixed(fixed);
+        this.colStore.fixed = fixed;
     }
     sortChildren() {
         this.childrenNodes.sort((a, b) => a.sort - b.sort);
@@ -172,9 +173,15 @@ export class ColNode {
         this.childrenNodes.push(child);
         this.store!.addColNodeMap(child);
     }
+    getRenderNodes(): ColNode[] {
+        if (this.hide) return [];
+        if (!this.hasChildren) return [this];
+        return this.childrenNodes.flatMap(child => child.getRenderNodes());
+    }
     getSumWidth(): number {
         let sumWidth = 0;
         for (const child of this.childrenNodes) {
+            if (child.hide) continue;
             sumWidth += child.width;
         }
         return sumWidth;
@@ -331,10 +338,16 @@ export class RowNode {
     }
 }
 
+export type StoreProps = {
+    context: Context;
+    columns: Column[];
+    data: any[];
+}
 
 class Store {
     private rootRowNode!: RowNode;
     private rootColNode!: ColNode;
+    private context!: Context;
     rootKey = 'root_evt';
     uuidKey = 'id';
     childrenKey = 'children';
@@ -342,22 +355,31 @@ class Store {
     childrenColKey = 'children';
     hasTree = true;
     hasSelection = false;
-    debug = false;
+    debug = true;
     defaultRowHeight = 36;
+    defaultColHeight = 36;
     maxColLevel = 0;
+    headerHeight = 0;
     sumHeight = 0;
     sumWidth = 0;
+    fixedLeftWidth = 0;
+    fixedRightWidth = 0;
     columns: Column[] = [];
     data: any[] = [];
     // flatRows: FlatRow[] = [];
+    leftColNodes: ColNode[] = [];
+    rightColNodes: ColNode[] = [];
+    centerColNodes: ColNode[] = [];
     leafColNodes: ColNode[] = [];
+    renderColNodes: ColNode[] = [];
     rowStoreMaps: Map<RowNodeKey, RowStore> = new Map();
     colStoreMaps: Map<string, ColStore> = new Map();
     rowNodeMaps: Map<RowNodeKey, RowNode> = new Map();
     colNodeMaps: Map<string, ColNode> = new Map();
     rowSelectable: RowSelectable | undefined;
-    constructor(props: { columns: Column[]; data: any[]; defaultRowHeight?: number; uuidKey?: string; childrenKey?: string; hasTree?: boolean }) {
-        const { columns, data } = props;
+    constructor(props: { context: Context; columns: Column[]; data: any[]; defaultRowHeight?: number; uuidKey?: string; childrenKey?: string; hasTree?: boolean }) {
+        const { context, columns, data } = props;
+        this.context = context;
         this.columns = columns;
         this.data = data;
         if (props.defaultRowHeight != null) this.defaultRowHeight = props.defaultRowHeight;
@@ -477,6 +499,26 @@ class Store {
         };
         walk(this.rootRowNode);
     }
+    /** 一次遍历生成 colIndex 与 x/y：父级 colIndex 取第一个可见叶子 */
+    generateColLayout(nodes: ColNode[], originX: number, originY: number) {
+        let index = 0;
+        const walk = (list: ColNode[], x: number, y: number): void => {
+            let everyOffsetX = x;
+            for (const child of list) {
+                if (child.hide) continue;
+                child.setX(everyOffsetX);
+                child.setY(y);
+                if (child.hasChildren) {
+                    child.setColIndex(index);
+                    walk(child.childrenNodes, everyOffsetX, y + child.height);
+                } else {
+                    child.setColIndex(index++);
+                }
+                everyOffsetX += child.width;
+            }
+        };
+        walk(nodes, originX, originY);
+    }
     loadData(data: any[]) {
         this.data = data;
         this.rowNodeMaps.clear();
@@ -510,6 +552,26 @@ class Store {
         });
         this.update();
     }
+    buildLCRColNodes() {
+        const leftColNodes = [];
+        const rightColNodes = [];
+        const centerColNodes = [];
+        for (const colNode of this.colNodes) {
+            // if (colNode.hide) continue;
+            if (colNode.fixed === 'left') {
+                leftColNodes.push(colNode);
+            } else if (colNode.fixed === 'right') {
+                rightColNodes.push(colNode);
+            } else {
+                centerColNodes.push(colNode);
+            }
+        }
+        return {
+            leftColNodes,
+            rightColNodes,
+            centerColNodes,
+        };
+    }
     buildLeafColNodes(): ColNode[] {
         const leaves: ColNode[] = [];
         const walk = (node: ColNode): void => {
@@ -532,6 +594,14 @@ class Store {
         }
         return null;
     }
+    private getLeafWidth(colNodes: ColNode[]): number {
+        return colNodes.reduce((acc, colNode) => {
+            if (!colNode.hide && !colNode.hasChildren) {
+                return acc + colNode.width;
+            }
+            return acc;
+        }, 0);
+    }
     // 更新数据,比如总高度、宽度，最大层级，和对应的rowIndex、colIndex等
     update() {
         if (this.debug) console.time('store update');
@@ -540,12 +610,23 @@ class Store {
         this.sumWidth = this.rootColNode.getSumWidth();
         this.maxColLevel = this.rootColNode.getMaxColLevel();
         this.leafColNodes = this.buildLeafColNodes();
+        const { leftColNodes, rightColNodes, centerColNodes } = this.buildLCRColNodes();
+        this.leftColNodes = leftColNodes;
+        this.rightColNodes = rightColNodes;
+        this.centerColNodes = centerColNodes;
+        this.renderColNodes = [...leftColNodes, ...centerColNodes, ...rightColNodes];
+        this.fixedLeftWidth = this.getLeafWidth(leftColNodes);
+        this.fixedRightWidth = this.getLeafWidth(rightColNodes);
+        this.generateColLayout(this.renderColNodes, 0, 0);
+        console.log(this);
+
         if (this.debug) {
             console.log('rowNodes SIZE:', this.rowNodeMaps.size);
             console.log('sumHeight', this.sumHeight);
             console.log('sumWidth', this.sumWidth);
             console.log('maxColLevel', this.maxColLevel);
             console.log('maxColLevel', this.maxColLevel);
+            console.log('leafColNodes', this.renderColNodes);
             console.timeEnd('store update');
         }
     }
