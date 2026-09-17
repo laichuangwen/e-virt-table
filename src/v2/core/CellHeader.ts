@@ -1,4 +1,4 @@
-import { CellConfig, CellType } from "../types";
+import { CellType } from "../types";
 import Cell from "./Cell";
 import Context from "./Context";
 import { ColNode } from "./Store";
@@ -9,6 +9,7 @@ export interface CellHeaderConfig {
 }
 export default class CellHeader extends Cell {
     private colNode: ColNode;
+    private text: Text;
     constructor(context: Context, colNode: ColNode) {
         super(context, {
             x: colNode.x,
@@ -19,9 +20,21 @@ export default class CellHeader extends Cell {
             cellType: 'header',
         });
         this.colNode = colNode;
+        this.text = new Text(this.context, {
+            align: 'left',
+            verticalAlign: 'middle',
+            padding: 8,
+            selectionKey: `header:${this.colNode.key}`,
+            text: this.colNode.column.title,
+            x: this.x,
+            y: this.y,
+            width: this.width,
+            height: this.height,
+        });
+        this.children.push(this.text);
         this.on('click:self', () => {
-            console.log('click',this.colNode.column.title);
-        },{
+            console.log('click', this.colNode.column.title);
+        }, {
             stopPropagation: true,
         });
     }
@@ -29,18 +42,11 @@ export default class CellHeader extends Cell {
         super.update();
     }
     draw(): void {
+        const { headerBgColor, borderColor } = this.context.config;
         this.context.paint.drawRect(this.x, this.y, this.width, this.height, {
-            fillColor: 'pink',
-            borderColor: this.context.config.borderColor,
-            borderWidth: 1,
+            fillColor: headerBgColor,
+            borderColor,
         });
-        const text = new Text(this.context, {
-            text: this.colNode.column.title,
-            x: this.x,
-            y: this.y,
-            width: this.width,
-            height: this.height,
-        });
-        text.draw();
+        this.text.draw();
     }
 }

@@ -10,10 +10,12 @@ export default class Body extends Widget {
         });
     }
     update() {
+        const headerHeight = this.context.store.headerHeight;
+        const { scrollbarGutter, stageWidth, stageHeight } = this.context;
         this.x = 0;
-        this.y = 100;
-        this.width = this.context.stageWidth - 14;
-        this.height = this.context.stageHeight - 100;
+        this.y = headerHeight;
+        this.width = stageWidth - scrollbarGutter;
+        this.height = stageHeight - headerHeight - scrollbarGutter;
     }
     render(paint: Paint) {
         paint.drawRect(this.x, this.y, this.width, this.height, {

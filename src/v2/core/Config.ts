@@ -27,6 +27,6 @@ export default class Config {
     /** 表头高度 */
     cellHeaderHeight = 36;
     /** 表头背景色 */
-    HEADER_BG_COLOR = '#F8FAFF';
+    headerBgColor = '#F8FAFF';
     BODY_BG_COLOR = '#FFF';
 }

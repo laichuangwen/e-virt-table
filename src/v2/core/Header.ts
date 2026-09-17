@@ -30,16 +30,16 @@ export default class Header extends Widget {
     }
     update() {
         this.width = this.context.stageWidth;
-        this.height = 100;
+        this.height = this.context.store.headerHeight;
         this.x = 0;
         this.y = 0;
         console.time('cell header');
         const { leftColNodes, rightColNodes, centerColNodes } = this.context.store;
         let list: CellHeader[] = [];
-        const { scrollX, stageWidth, scrollbarSize } = this.context;
+        const { scrollX, stageWidth, scrollbarGutter } = this.context;
         const { fixedRightWidth, fixedLeftWidth } = this.context.store;
         let startIndex = this.binarySearch(centerColNodes, scrollX - fixedLeftWidth);
-        let endIndex = this.binarySearch(centerColNodes, scrollX + stageWidth - scrollbarSize - fixedRightWidth);
+        let endIndex = this.binarySearch(centerColNodes, scrollX + stageWidth - scrollbarGutter - fixedRightWidth);
         const visibleCenterColNodes = centerColNodes.slice(startIndex, endIndex + 1);
         const visibleColNodes = [...leftColNodes, ...visibleCenterColNodes, ...rightColNodes];
         const generateCells = (nodes: ColNode[]) => {
@@ -53,13 +53,13 @@ export default class Header extends Widget {
         }
         generateCells(visibleColNodes);
         this.cells = list;
-        this.setChildWidgets(list);
+        this.children = list;
         console.log('list', list.length);
         console.timeEnd('cell header');
     }
     render(paint: Paint) {
         paint.drawRect(0, 0, this.width, this.height, {
-            fillColor: this.context.config.HEADER_BG_COLOR,
+            fillColor: this.context.config.headerBgColor,
         });
         for (const cell of this.cells) {
             if (!cell.fixed) cell.draw();

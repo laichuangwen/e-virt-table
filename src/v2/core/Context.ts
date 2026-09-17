@@ -3,7 +3,6 @@ import { Paint } from "./Paint";
 import Config from './Config';
 import EvitListener from "./EvitListener";
 import Store from "./Store";
-import type Text from "./Text";
 import Scroller from "./Scroller";
 import Table from "./Table";
 export default class Context {
@@ -26,16 +25,20 @@ export default class Context {
     paint: Paint;
     domSelectionStr = '';
     textSelectionStr = '';
-    /** 文本划选进行中；全局同时只允许一个 Text 划选 */
+    /** 文本划选进行中；全局同时只允许一个 selectionKey */
     textSelecting = false;
-    selectingText: Text | null = null;
+    /** 当前划选文本的稳定标识（不依赖 Text 实例） */
+    textSelectionKey: string | null = null;
+    textSelAnchor = 0;
+    textSelFocus = 0;
     isMouseoverTargetContainer = false;
     isTableHovering = false;
     mousedown = false;
     isEmpty = false; // 是否空数据
     rowResizing = false; // 行调整大小中
     columnResizing = false; // 列调整大小中
-    scrollbarSize = 0; // 根据模式变化的
+    /** 内容区为滚动条让出的空隙：outer 为轨道宽，inner 为 0 */
+    scrollbarGutter = 0;
     scrollerMove = false; // 滚动条移动中
     scrollerFocus = false; // 滚动条focus中
     autofillMove = false; // 自动填充移动中
@@ -140,6 +143,20 @@ export default class Context {
         //     this.paint.draw();
         //     console.log(this.scrollY, this.scrollY + this.stageHeight - 100 - 14, this.store.sumHeight);
         // });
+    }
+    clearTextSelection(redraw = true) {
+        this.textSelecting = false;
+        this.textSelectionKey = null;
+        this.textSelAnchor = 0;
+        this.textSelFocus = 0;
+        this.textSelectionStr = '';
+        if (redraw) this.draw();
+    }
+    copyTextSelection(e?: KeyboardEvent) {
+        const text = this.textSelectionStr;
+        if (!text) return;
+        e?.preventDefault();
+        navigator.clipboard?.writeText(text).catch((error) => console.error('Copy Failure:', error));
     }
     destroy() {
         this.listener.destroy();

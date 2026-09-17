@@ -11,6 +11,7 @@ type NativeListenertMap = {
     wheel: WheelEvent
     click: MouseEvent
     dblclick: MouseEvent
+    keydown: KeyboardEvent
     touchmove: TouchEvent
     touchstart: TouchEvent
     pointermove: PointerEvent
@@ -73,6 +74,12 @@ export default class EvitListener {
         this.bind(this.context.stageElement, 'pointerleave');
         this.bind(this.context.stageElement, 'pointerenter');
         this.bind(this.context.stageElement, 'pointercancel');
+        this.bind(this.context.containerElement, 'keydown');
+        this.on('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.code === 'KeyC') {
+                this.context.copyTextSelection(e);
+            }
+        });
     }
     private bind(
         target: EventTarget,

@@ -24,6 +24,8 @@ export interface Padding {
 
 export interface TextConfig extends WidgetConfig {
   text: string
+  /** 划选稳定标识；Header/Body 重建 Text 后仍能续上选区 */
+  selectionKey?: string
   padding?: PaddingInput
   maxLineClamp?: number
   autoRowHeight?: boolean
@@ -355,8 +357,7 @@ function alignTextX(
 
 export default class Text extends Widget {
   text: string
-  private selAnchor = 0
-  private selFocus = 0
+  readonly selectionKey: string
   private readonly options: ResolvedTextOptions
   private readonly pad: Padding
   private readonly box: ContentBox
@@ -367,6 +368,7 @@ export default class Text extends Widget {
   constructor(context: Context, config: TextConfig) {
     super(context, { zIndex: 10, autoDraw: false, ...config })
     this.text = config.text
+    this.selectionKey = config.selectionKey ?? `text:${config.x},${config.y},${config.text}`
     this.options = { ...defaultTextOptions, ...config }
     this.pad = normalizePadding(this.options.padding)
     this.beforeIcons = (config.beforeIcons ?? []).filter((icon) => icon.visible)
@@ -434,16 +436,14 @@ export default class Text extends Widget {
   }
 
   private isSelecting(): boolean {
-    return this.context.textSelecting && this.context.selectingText === this
+    return (
+      this.context.textSelecting &&
+      this.context.textSelectionKey === this.selectionKey
+    )
   }
 
-  private clearOtherSelections(): void {
-    for (const widget of this.context.paint.getWidgets()) {
-      if (widget instanceof Text && widget !== this) {
-        widget.selAnchor = 0
-        widget.selFocus = 0
-      }
-    }
+  private isActiveSelection(): boolean {
+    return this.context.textSelectionKey === this.selectionKey
   }
 
   private emitSelectionChange(): void {
@@ -473,14 +473,15 @@ export default class Text extends Widget {
   }
 
   private normalizedSelection(flatLen?: number): TextSelectionRange | null {
+    if (!this.isActiveSelection()) return null
     const layout = this.ensureLayout(this.context.paint.getCtx())
     const len = Math.min(
       flatLen ?? layout.flatText.length,
       this.getSelectableEnd(layout)
     )
-    if (this.context.selectingText !== this) return null
-    let start = Math.max(0, Math.min(this.selAnchor, this.selFocus, len))
-    let end = Math.max(0, Math.min(Math.max(this.selAnchor, this.selFocus), len))
+    const { textSelAnchor, textSelFocus } = this.context
+    let start = Math.max(0, Math.min(textSelAnchor, textSelFocus, len))
+    let end = Math.max(0, Math.min(Math.max(textSelAnchor, textSelFocus), len))
     start = this.clampIndexBeforeEllipsis(start, layout.lines)
     end = this.clampIndexBeforeEllipsis(end, layout.lines)
     return start >= end ? null : { start, end }
@@ -519,13 +520,12 @@ export default class Text extends Widget {
   private handlePointerDown(e: PointerEvent): void {
     if (e.button !== 0) return
     e.preventDefault()
-    this.clearOtherSelections()
     const { x, y } = this.context.paint.getRelativePosition(e)
     const index = this.hitTest(x, y)
-    this.selAnchor = index
-    this.selFocus = index
+    this.context.textSelectionKey = this.selectionKey
+    this.context.textSelAnchor = index
+    this.context.textSelFocus = index
     this.context.textSelecting = true
-    this.context.selectingText = this
 
     if (e.currentTarget instanceof Element) {
       e.currentTarget.setPointerCapture(e.pointerId)
@@ -540,13 +540,14 @@ export default class Text extends Widget {
     }
     const { x, y } = this.context.paint.getRelativePosition(e)
     const next = this.hitTest(x, y)
-    if (next === this.selFocus) return
-    this.selFocus = next
+    if (next === this.context.textSelFocus) return
+    this.context.textSelFocus = next
     this.emitSelectionChange()
   }
   private handlePointerUp(e?: PointerEvent): void {
     if (!this.isSelecting()) return
     this.context.textSelecting = false
+    this.context.textSelectionStr = this.getSelectedText()
     const target = e?.currentTarget
     if (target instanceof Element && e && target.hasPointerCapture(e.pointerId)) {
       target.releasePointerCapture(e.pointerId)
@@ -882,7 +883,8 @@ export default class Text extends Widget {
     ctx.font = this.buildFontStyle()
     ctx.textBaseline = 'alphabetic'
     ctx.textAlign = 'left'
-    if (this.options.color) ctx.fillStyle = this.options.color
+    // 必须显式设置：paintSelection 会污染共享 ctx.fillStyle
+    ctx.fillStyle = this.options.color || '#000'
     for (const line of lines) {
       if (!line.text) continue
       ctx.fillText(line.text, line.x, this.getTextBaselineY(ctx, line))

@@ -12,12 +12,14 @@ export default class Cell extends Widget {
         });
         this.fixed = config.fixed;
         this.cellType = config.cellType;
+        this.initPosition();
+    }
+    private initPosition() {
         this.x = this.getDrawX();
         this.y = this.getDrawY();
     }
     update(): void {
-        this.x = this.getDrawX();
-        this.y = this.getDrawY();
+        this.initPosition();
     }
     isHorizontalVisible() {
         if (this.fixed) {
@@ -39,8 +41,8 @@ export default class Cell extends Widget {
         }
         if (this.fixed === 'right') {
             // 可见区域宽度 -到右边界的距离即(表头宽度 - x坐标)
-            const { stageWidth, config } = this.context;
-            const x = stageWidth - config.scrollbarTrackSize - (this.context.store.sumWidth - this.x);
+            const { stageWidth, scrollbarGutter } = this.context;
+            const x = stageWidth - scrollbarGutter - (this.context.store.sumWidth - this.x);
             return x;
         }
         return this.x - this.context.scrollX;

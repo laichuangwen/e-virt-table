@@ -65,10 +65,23 @@ export class Paint {
     getWidgets() {
         return this.widgets.sort((a, b) => a.zIndex - b.zIndex);
     }
-    dispatchListener<K extends keyof WidgetEventMap>(eventName: K, e: WidgetEventMap[K]) {
+    getAllWidgets() {
+        // 获取所有 widget 和 子 widget，可以插到的父级
         const widgets = this.getWidgets();
-        const childWidgets = widgets.flatMap(widget => widget.getChildWidgets());
-        const allWidgets = [...widgets, ...childWidgets];
+        const allWidgets: Widget[] = [];
+        const loop = (widgets: Widget[]) => {
+            widgets.forEach(widget => {
+                allWidgets.push(widget);
+                if(widget.children.length) {
+                    loop(widget.children);
+                }
+            });
+        };
+        loop(widgets);
+        return allWidgets;
+    }
+    dispatchListener<K extends keyof WidgetEventMap>(eventName: K, e: WidgetEventMap[K]) {
+        const allWidgets = this.getAllWidgets();
         for (let i = allWidgets.length - 1; i >= 0; i--) {
             if (allWidgets[i].dispatch(eventName, e)) break
         }

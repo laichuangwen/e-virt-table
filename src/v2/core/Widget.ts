@@ -35,7 +35,7 @@ export interface WidgetConfig {
 export abstract class Widget {
     private hovered = false
     private listeners = new Map<WidgetEventName, Set<ListenerEntry>>()
-    private chilWidgets: Widget[] = []
+    children: Widget[] = []
     context!: Context
     x = 0
     y = 0
@@ -56,12 +56,6 @@ export abstract class Widget {
         if (this.autoDraw) {
             this.context.paint.addWidget(this)
         }
-    }
-    getChildWidgets() {
-        return this.chilWidgets
-    }
-    setChildWidgets(widgets: Widget[]) {
-        this.chilWidgets = widgets
     }
     inside(x: number, y: number): boolean {
         if (!this.visible) return false

@@ -1,3 +1,4 @@
+import { offset } from '@floating-ui/dom';
 import { ScrollbarType } from "../types";
 import Context from "./Context";
 import { Paint } from "./Paint";
@@ -247,8 +248,13 @@ class Scrollbar extends Widget {
     get isOuterMode() {
         return this.context.config.scrollbarMode === 'outer';
     }
+    /** 内容区为滚动条让出的空隙：outer 占用，inner 覆盖不占位 */
+    get scrollbarGutter() {
+        const { scrollbarTrackSize } = this.context.config;
+        return this.isOuterMode ? scrollbarTrackSize : 0;
+    }
     get offset() {
-        return this.isVertical() ? 0 : 0;
+        return this.isVertical() ? this.context.store.headerHeight : 0;
     }
     get trackSize() {
         const { scrollbarTrackSize } = this.context.config;
@@ -260,7 +266,10 @@ class Scrollbar extends Widget {
     }
     get contentSize() {
         const { sumHeight, sumWidth } = this.context.store;
-        return this.isVertical() ? sumHeight : sumWidth;
+        const { scrollbarTrackSize } = this.context.config;
+        const scrollbarGutter = this.isOuterMode ? 0 : scrollbarTrackSize;
+        // inner 滚动条会占内容一些，所以得减，outer不占用内容
+        return this.isVertical() ? sumHeight - scrollbarGutter : sumWidth - scrollbarGutter;
     }
     get maxScroll() {
         return Math.max(0, this.contentSize - this.viewportSize);
@@ -295,7 +304,7 @@ class Scrollbar extends Widget {
             });
             if (this.isVertical()) {
                 paint.drawRect(this.x, this.y, this.width, this.offset, {
-                    fillColor: this.context.config.HEADER_BG_COLOR,
+                    fillColor: this.context.config.headerBgColor,
                 });
             }
         }
@@ -305,8 +314,7 @@ class Scrollbar extends Widget {
         this.height = this.getHeight();
         this.x = this.getX();
         this.y = this.getY();
-        const { scrollbarTrackSize } = this.context.config;
-        this.context.scrollbarSize = this.isOuterMode ? scrollbarTrackSize : 0;
+        this.context.scrollbarGutter = this.scrollbarGutter;
         this.visible = this.contentSize > this.viewportSize && this.viewportSize > 0;
         this.scrollbarTrack.update();
         this.scrollbarThumb.update();

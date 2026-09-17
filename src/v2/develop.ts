@@ -456,7 +456,7 @@ let columns: Column[] = [
     {
         title: '操作',
         key: 'hander',
-        width: 210,
+        width: 200,
         fixed: 'right',
     },
 ];

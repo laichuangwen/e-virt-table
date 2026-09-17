@@ -99,9 +99,17 @@ export class ColNode {
         }
         return this.colStore.width;
     }
+    /** 列自身高度（不含跨行撑满） */
+    get ownHeight(): number {
+        if (this.isRoot || this.hide) return 0;
+        return this.colStore.height;
+    }
     get height(): number {
         if (this.isRoot || this.hide) return 0;
-        return this.colStore.height * this.rowspan;
+        // 父级只占自身一层；叶子撑满到表头底部
+        if (this.hasChildren) return this.ownHeight;
+        if (this.store.headerHeight <= 0) return this.ownHeight;
+        return Math.max(this.ownHeight, this.store.headerHeight - this.y);
     }
     get hide(): boolean {
         if (this.colStore.hide) return true;
@@ -499,7 +507,7 @@ class Store {
         };
         walk(this.rootRowNode);
     }
-    /** 一次遍历生成 colIndex 与 x/y：父级 colIndex 取第一个可见叶子 */
+    /** 一次遍历生成 colIndex 与 x/y：父级 colIndex 取第一个可见叶子；y 用 ownHeight 下推 */
     generateColLayout(nodes: ColNode[], originX: number, originY: number) {
         let index = 0;
         const walk = (list: ColNode[], x: number, y: number): void => {
@@ -510,7 +518,7 @@ class Store {
                 child.setY(y);
                 if (child.hasChildren) {
                     child.setColIndex(index);
-                    walk(child.childrenNodes, everyOffsetX, y + child.height);
+                    walk(child.childrenNodes, everyOffsetX, y + child.ownHeight);
                 } else {
                     child.setColIndex(index++);
                 }
@@ -518,6 +526,14 @@ class Store {
             }
         };
         walk(nodes, originX, originY);
+    }
+    /** 按叶子路径 y + ownHeight 取最大，作为表头总高 */
+    computeHeaderHeight(): number {
+        let max = 0;
+        for (const leaf of this.leafColNodes) {
+            max = Math.max(max, leaf.y + leaf.ownHeight);
+        }
+        return max;
     }
     loadData(data: any[]) {
         this.data = data;
@@ -617,7 +633,10 @@ class Store {
         this.renderColNodes = [...leftColNodes, ...centerColNodes, ...rightColNodes];
         this.fixedLeftWidth = this.getLeafWidth(leftColNodes);
         this.fixedRightWidth = this.getLeafWidth(rightColNodes);
+        // 布局前清空，避免叶子 height 依赖旧的 headerHeight
+        this.headerHeight = 0;
         this.generateColLayout(this.renderColNodes, 0, 0);
+        this.headerHeight = this.computeHeaderHeight();
         console.log(this);
 
         if (this.debug) {
