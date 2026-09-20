@@ -9,11 +9,11 @@ export type VerticalAlign = 'top' | 'middle' | 'bottom'
 export type PaddingInput =
   | number
   | {
-      top?: number
-      right?: number
-      bottom?: number
-      left?: number
-    }
+    top?: number
+    right?: number
+    bottom?: number
+    left?: number
+  }
 
 export interface Padding {
   top: number
@@ -30,7 +30,6 @@ export interface TextConfig extends WidgetConfig {
   maxLineClamp?: number
   autoRowHeight?: boolean
   onAutoHeight?: (height: number) => void
-  debug?: boolean
   align?: TextAlign
   verticalAlign?: VerticalAlign
   fontSize?: number
@@ -103,7 +102,6 @@ interface TextLayout {
   lines: LayoutLine[]
   flatText: string
   charHeight: number
-  textAnchor: number
   startY: number
   neededHeight: number
   clamped: boolean
@@ -114,7 +112,6 @@ const ELLIPSIS = '...'
 const DEFAULT_SELECTION_COLOR = '#B4D7FF'
 
 const defaultTextOptions = {
-  debug: false,
   align: 'center' as TextAlign,
   verticalAlign: 'middle' as VerticalAlign,
   fontSize: 14,
@@ -139,7 +136,6 @@ const EMPTY_LAYOUT: TextLayout = {
   lines: [],
   flatText: '',
   charHeight: 0,
-  textAnchor: 0,
   startY: 0,
   neededHeight: 0,
   clamped: false,
@@ -366,7 +362,7 @@ export default class Text extends Widget {
   private layoutCache: TextLayout | null = null
   private result: DrawTextResult = EMPTY_RESULT
   constructor(context: Context, config: TextConfig) {
-    super(context, { zIndex: 10, autoDraw: false, ...config })
+    super(context, { autoDraw: false, ...config })
     this.text = config.text
     this.selectionKey = config.selectionKey ?? `text:${config.x},${config.y},${config.text}`
     this.options = { ...defaultTextOptions, ...config }
@@ -407,8 +403,7 @@ export default class Text extends Widget {
     }
     const ctx = paint.getCtx()
     const layout = this.ensureLayout(ctx)
-    const { lines, charHeight, textAnchor, flatText, neededHeight, clamped } =
-      layout
+    const { lines, charHeight, flatText, neededHeight, clamped } = layout
 
     if (this.options.autoRowHeight) {
       const neededBoxHeight = neededHeight + this.pad.top + this.pad.bottom
@@ -421,11 +416,7 @@ export default class Text extends Widget {
     this.layoutIcons(lines, layout.afterOnNextLine)
     this.paintSelection(ctx, layout)
     this.paintLines(ctx, lines)
-    this.paintIcons()
-    if (this.options.debug) {
-      const { debugY } = this.resolveVerticalAlign(drawnHeight)
-      this.drawDebug(textAnchor, debugY)
-    }
+    // this.paintIcons()
     this.result = {
       height: drawnHeight,
       neededHeight,
@@ -623,8 +614,7 @@ export default class Text extends Widget {
     const drawnHeight =
       linesHeight(prepared.lines.length, charHeight) +
       (afterOnNextLine ? charHeight : 0)
-    const textAnchor = this.applyHorizontalAlign(ctx)
-    const { txtY: startY } = this.resolveVerticalAlign(drawnHeight)
+    const startY = this.resolveVerticalAlign(drawnHeight)
     const { contentX, contentWidth, beforeIconsWidth, afterIconsWidth } = box
     const afterOnSameLine = !afterOnNextLine && this.afterIcons.length > 0
     const layoutLines: LayoutLine[] = []
@@ -664,7 +654,6 @@ export default class Text extends Widget {
       lines: layoutLines,
       flatText: layoutLines.map((l) => l.text).join('\n'),
       charHeight,
-      textAnchor,
       startY,
       neededHeight: prepared.neededHeight + (afterOnNextLine ? charHeight : 0),
       clamped: prepared.clamped,
@@ -733,37 +722,16 @@ export default class Text extends Widget {
     return { lines, clamped, neededHeight }
   }
 
-  private applyHorizontalAlign(ctx: CanvasRenderingContext2D): number {
-    const { align } = this.options
-    const { contentX, contentXEnd, contentWidth } = this.box
-    if (align === 'right') {
-      ctx.textAlign = 'right'
-      return contentXEnd
-    }
-    if (align === 'left') {
-      ctx.textAlign = 'left'
-      return contentX
-    }
-    ctx.textAlign = 'center'
-    return contentX + contentWidth / 2
-  }
-
-  private resolveVerticalAlign(drawnHeight: number): {
-    txtY: number
-    debugY: number
-  } {
+  private resolveVerticalAlign(drawnHeight: number): number {
     const { verticalAlign } = this.options
     const { contentY, contentYEnd, contentHeight } = this.box
     if (verticalAlign === 'bottom') {
-      return { txtY: contentYEnd - drawnHeight, debugY: contentYEnd }
+      return contentYEnd - drawnHeight
     }
     if (verticalAlign === 'middle') {
-      return {
-        txtY: contentY + (contentHeight - drawnHeight) / 2,
-        debugY: contentY + contentHeight / 2,
-      }
+      return contentY + (contentHeight - drawnHeight) / 2
     }
-    return { txtY: contentY, debugY: contentY }
+    return contentY
   }
 
   private canPlaceAfterOnSameLine(
@@ -904,45 +872,5 @@ export default class Text extends Widget {
       metrics.actualBoundingBoxAscent || this.options.fontSize * 0.8
     const descent = metrics.actualBoundingBoxDescent || 0
     return line.y + (line.height + ascent - descent) / 2
-  }
-
-  private drawDebug(textAnchor: number, debugY: number): void {
-    const paint = this.context.paint
-    const { pad, box } = this
-    const {
-      x,
-      y,
-      width,
-      height,
-      contentX,
-      contentY,
-      contentWidth,
-      contentHeight,
-      contentXEnd,
-      contentYEnd,
-    } = box
-    const color = '#0C8CE9'
-
-    paint.drawRect(x, y, width, height, {
-      borderWidth: 1,
-      borderColor: color,
-    })
-
-    if (pad.top || pad.right || pad.bottom || pad.left) {
-      paint.drawRect(contentX, contentY, contentWidth, contentHeight, {
-        borderWidth: 1,
-        borderColor: '#94a3b8',
-        lineDash: [4, 3],
-      })
-    }
-
-    paint.drawLine([textAnchor, contentY, textAnchor, contentYEnd], {
-      borderWidth: 1,
-      borderColor: color,
-    })
-    paint.drawLine([contentX, debugY, contentXEnd, debugY], {
-      borderWidth: 1,
-      borderColor: color,
-    })
   }
 }

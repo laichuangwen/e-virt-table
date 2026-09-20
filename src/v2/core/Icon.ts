@@ -12,24 +12,20 @@ export class Icon extends Widget {
     name: string;
     color: string = 'currentColor';
     constructor(context: Context, config: IconConfig) {
-        super(context, { zIndex: 100, ...config })
+        super(context, { zIndex: 100, autoDraw: false, ...config })
         this.name = config.name
         this.color = config.color || 'currentColor';
-        this.initSource(config.source)
+        this.source = config.source;
         this.on('pointerenter:self', () => {
             this.context.paint.setCursor('pointer')
         })
         this.on('pointerleave:self', () => {
             this.context.paint.setCursor('default')
         })
-        this.on('click:self', () => {
-            console.log('click', this.name);
-        }, { stopPropagation: true })
     }
-    private initSource(source: IconSource): void {
+    generateSource(source: IconSource) {
         if (source instanceof HTMLImageElement) {
-            this.source = source;
-            return;
+            return source;
         }
         const parser = new DOMParser();
         const svgDoc = parser.parseFromString(source, 'image/svg+xml');
@@ -46,13 +42,9 @@ export class Icon extends Widget {
         const img = new Image();
         const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(svg));
         img.src = url;
-        img.onload = () => {
-            this.source = img;
-            this.draw();
-        }
-        this.source = img;
+        return img;
     }
     render(paint: Paint): void {
-        paint.drawImage(this.source as HTMLImageElement, this.x, this.y, this.width, this.height)
+        paint.drawImage(this.generateSource(this.source), this.x, this.y, this.width, this.height)
     }
 }

@@ -44,7 +44,7 @@ export default class Header extends Widget {
         const visibleColNodes = [...leftColNodes, ...visibleCenterColNodes, ...rightColNodes];
         const generateCells = (nodes: ColNode[]) => {
             for (const colNode of nodes) {
-                const cell = new CellHeader(this.context, colNode);
+                const cell = new CellHeader(this.context, colNode, this.zIndex);
                 list.push(cell);
                 if (colNode.hasChildren) {
                     generateCells(colNode.childrenNodes);
@@ -53,8 +53,9 @@ export default class Header extends Widget {
         }
         generateCells(visibleColNodes);
         this.cells = list;
-        this.children = list;
-        console.log('list', list.length);
+        this.setChildren(list);
+
+        console.log('list', list.map(item => item.zIndex));
         console.timeEnd('cell header');
     }
     render(paint: Paint) {

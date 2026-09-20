@@ -72,13 +72,13 @@ export class Paint {
         const loop = (widgets: Widget[]) => {
             widgets.forEach(widget => {
                 allWidgets.push(widget);
-                if(widget.children.length) {
-                    loop(widget.children);
+                if(widget.getChildren().length) {
+                    loop(widget.getChildren());
                 }
             });
         };
         loop(widgets);
-        return allWidgets;
+        return allWidgets.sort((a, b) => a.zIndex - b.zIndex);
     }
     dispatchListener<K extends keyof WidgetEventMap>(eventName: K, e: WidgetEventMap[K]) {
         const allWidgets = this.getAllWidgets();

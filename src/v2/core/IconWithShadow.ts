@@ -33,7 +33,7 @@ export class IconWithShadow extends Icon {
             fillColor: this.fillColor,
         });
         paint.drawImage(
-            this.source as HTMLImageElement,
+            this.generateSource(this.source),
             this.x + this.padding,
             this.y + this.padding,
             this.width - this.padding * 2,

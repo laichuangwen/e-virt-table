@@ -25,10 +25,8 @@ export default class Context {
     paint: Paint;
     domSelectionStr = '';
     textSelectionStr = '';
-    /** 文本划选进行中；全局同时只允许一个 selectionKey */
     textSelecting = false;
-    /** 当前划选文本的稳定标识（不依赖 Text 实例） */
-    textSelectionKey: string | null = null;
+    textSelectionKey = '';
     textSelAnchor = 0;
     textSelFocus = 0;
     isMouseoverTargetContainer = false;
@@ -146,7 +144,7 @@ export default class Context {
     }
     clearTextSelection(redraw = true) {
         this.textSelecting = false;
-        this.textSelectionKey = null;
+        this.textSelectionKey = '';
         this.textSelAnchor = 0;
         this.textSelFocus = 0;
         this.textSelectionStr = '';

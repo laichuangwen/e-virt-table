@@ -14,6 +14,7 @@ export type WidgetEventCallback<K extends WidgetEventName = WidgetEventName> = (
 
 /** 注册监听时的选项 */
 export interface WidgetEventListenOptions {
+    /** 是否禁止向更下层 widget 冒泡，默认 true */
     stopPropagation?: boolean
 }
 
@@ -35,7 +36,7 @@ export interface WidgetConfig {
 export abstract class Widget {
     private hovered = false
     private listeners = new Map<WidgetEventName, Set<ListenerEntry>>()
-    children: Widget[] = []
+    private children: Widget[] = []
     context!: Context
     x = 0
     y = 0
@@ -56,6 +57,12 @@ export abstract class Widget {
         if (this.autoDraw) {
             this.context.paint.addWidget(this)
         }
+    }
+    setChildren(children: Widget[]) {
+        this.children = children
+    }
+    getChildren(): Widget[] {
+        return this.children;
     }
     inside(x: number, y: number): boolean {
         if (!this.visible) return false
@@ -79,13 +86,13 @@ export abstract class Widget {
         }
         set.add({
             callback: callback as WidgetEventCallback,
-            stopPropagation: options?.stopPropagation ?? false,
+            stopPropagation: options?.stopPropagation ?? true,
         })
     }
 
     /**
      * 无 `:self` 后缀的监听始终派发（划选拖出区域后仍需 pointermove / pointerup）。
-     * `:self` 仅在命中本 widget 时派发；stopPropagation 只对 `:self` 生效。
+     * `:self` 仅在命中本 widget 时派发；命中后默认 stopPropagation，避免被遮挡的下层仍触发 pointerenter:self。
      * @returns 是否应停止向更下层 widget 继续分发
      */
     dispatch<K extends WidgetEventName>(eventName: K, event: WidgetEventMap[K]): boolean {
@@ -96,37 +103,44 @@ export abstract class Widget {
             (pointerEvent as TouchEvent).touches?.[0] || (pointerEvent as TouchEvent).changedTouches?.[0],
         )
         const inside = hasPoint && this.insideByEvent(pointerEvent)
-        // 因为时间代理重新派发pointerleave, pointerenter是失效的用pointermove事件来判断，return防止重复派发
+        // 因为事件代理重新派发 pointerleave / pointerenter 是失效的，用 pointermove 判断；return 防止重复派发
         if (['pointermove', 'pointerleave', 'pointerenter'].includes(eventName)) {
             const moveEvent = event as WidgetEventMap['pointermove']
             if (!inside && this.hovered) {
-                this.invoke('pointerleave:self', moveEvent)
                 this.hovered = false
+                this.invoke('pointerleave:self', moveEvent)
                 return false
             } else if (inside && !this.hovered) {
-                this.invoke('pointerenter:self', moveEvent)
                 this.hovered = true
-                return false
+                this.invoke('pointerenter:self', moveEvent)
+                return this.shouldStopPropagation('pointerenter:self')
             }
         }
         if (!inside) return false
         const selfName = `${eventName}:self` as WidgetEventName
-        return this.invoke(selfName, event as WidgetEventMap[typeof selfName])
+        this.invoke(selfName, event as WidgetEventMap[typeof selfName])
+        return this.shouldStopPropagation(selfName)
     }
 
-    /** @returns 是否有带 stopPropagation 的监听被触发 */
+    /** 命中后默认拦截；仅当所有 :self 监听都显式 stopPropagation: false 时才继续向下分发 */
+    private shouldStopPropagation(eventName: WidgetEventName): boolean {
+        const entries = this.listeners.get(eventName)
+        if (!entries?.size) return true
+        for (const entry of entries) {
+            if (entry.stopPropagation) return true
+        }
+        return false
+    }
+
     protected invoke<K extends WidgetEventName>(
         eventName: K,
         event: WidgetEventMap[K],
-    ): boolean {
+    ): void {
         const entries = this.listeners.get(eventName)
-        if (!entries?.size) return false
-        let stopped = false
+        if (!entries?.size) return
         for (const entry of entries) {
             entry.callback(event)
-            if (entry.stopPropagation) stopped = true
         }
-        return stopped
     }
     destroy() {
         this.context.paint.removeWidget(this)

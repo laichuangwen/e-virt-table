@@ -461,7 +461,7 @@ let columns: Column[] = [
     },
 ];
 let data: any[] = [];
-for (let i = 0; i < 240; i += 1) {
+for (let i = 0; i < 100; i += 1) {
     data.push({
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
         id: `${i}`,

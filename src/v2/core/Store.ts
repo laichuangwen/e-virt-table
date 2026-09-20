@@ -463,6 +463,9 @@ class Store {
         const node = this.getRowNode(key);
         if (node) node.setChecked(state);
     }
+    setCheckAll(checked: boolean) {
+        this.rootRowNode.setChecked(checked ? 'checked' : 'unchecked');
+    }
     getStoreCheckState(): CheckState {
         return this.rootRowNode.getCheckState();
     }
@@ -646,6 +649,7 @@ class Store {
             console.log('maxColLevel', this.maxColLevel);
             console.log('maxColLevel', this.maxColLevel);
             console.log('leafColNodes', this.renderColNodes);
+            this.setChecked('1', 'checked')
             console.timeEnd('store update');
         }
     }
