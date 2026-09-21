@@ -24,7 +24,7 @@ export default class CellHeader extends Cell {
     private colNode: ColNode;
     private checkIcon: Icon | null = null;
     private text: Text | null = null;
-    constructor(context: Context, colNode: ColNode, zIndex: number) {
+    constructor(context: Context, colNode: ColNode) {
         super(context, {
             x: colNode.x,
             y: colNode.y,
@@ -34,9 +34,8 @@ export default class CellHeader extends Cell {
             cellType: 'header',
         });
         this.colNode = colNode;
-        this.zIndex = zIndex;
         if (['left', 'right'].includes(this.colNode.fixed)) {
-            this.zIndex += 100;
+            this.zIndex = 100;
         }
 
         const checkState = this.context.store.getStoreCheckState();
@@ -49,15 +48,16 @@ export default class CellHeader extends Cell {
             source: checkStateMap[checkState],
             color: 'red',
             zIndex: this.zIndex,
-            visible: colNode.column.type?.includes('selection') ?? false,
+            // visible: colNode.column.type?.includes('selection') ?? false,
         });
         this.checkIcon.on('click:self', () => {
             const checkState = this.context.store.getStoreCheckState();
             const isCheckAll = checkState !== 'checked';
             this.context.store.setCheckAll(isCheckAll);
-            console.log(this.context.store.getStoreCheckState());
-            
+            console.log('check state=>>', this.context.store.getStoreCheckState());
             this.context.draw();
+        },{
+            stopPropagation: true,
         });
         // this.checkIcon.source = checkboxUnchecked;
         this.text = new Text(this.context, {
@@ -75,10 +75,9 @@ export default class CellHeader extends Cell {
             height: this.height,
         });
         this.setChildren([this.text, this.checkIcon]);
-        this.text.on('click:self', () => {
-            console.log('click-text', this.colNode.column.title);
+        this.on('pointerdown:self', () => {
+            console.log('click-header=>>>>>>', this.colNode.column.title);
         });
-
     }
     update(): void {
         super.update();

@@ -362,7 +362,7 @@ export default class Text extends Widget {
   private layoutCache: TextLayout | null = null
   private result: DrawTextResult = EMPTY_RESULT
   constructor(context: Context, config: TextConfig) {
-    super(context, { autoDraw: false, ...config })
+    super(context, config)
     this.text = config.text
     this.selectionKey = config.selectionKey ?? `text:${config.x},${config.y},${config.text}`
     this.options = { ...defaultTextOptions, ...config }
@@ -370,7 +370,7 @@ export default class Text extends Widget {
     this.beforeIcons = (config.beforeIcons ?? []).filter((icon) => icon.visible)
     this.afterIcons = (config.afterIcons ?? []).filter((icon) => icon.visible)
     this.box = this.createContentBox()
-    this.on('pointerdown:self', (e) => this.handlePointerDown(e))
+    this.on('pointerdown', (e) => this.handlePointerDown(e))
     this.on('pointermove', (e) => this.handlePointerMove(e))
     this.on('pointerup', (e) => this.handlePointerUp(e))
   }
@@ -511,6 +511,9 @@ export default class Text extends Widget {
   private handlePointerDown(e: PointerEvent): void {
     if (e.button !== 0) return
     e.preventDefault()
+    if(!this.insideByEvent(e)) {
+      return;
+    }
     const { x, y } = this.context.paint.getRelativePosition(e)
     const index = this.hitTest(x, y)
     this.context.textSelectionKey = this.selectionKey

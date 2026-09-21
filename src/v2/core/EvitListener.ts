@@ -1,4 +1,5 @@
 import Context from "./Context";
+import { Widget } from "./Widget";
 
 type WithPrefix<
     T,

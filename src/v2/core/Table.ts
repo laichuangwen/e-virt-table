@@ -36,17 +36,13 @@ export default class Table extends Widget {
         });
     }
     getAllWidgets() {
-        const widgets = this.getChildren();
         const allWidgets: Widget[] = [];
-        const loop = (widgets: Widget[]) => {
-            widgets.forEach(widget => {
-                allWidgets.push(widget);
-                if (widget.getChildren().length) {
-                    loop(widget.getChildren());
-                }
-            });
+        const loop = (widget: Widget) => {
+            allWidgets.push(widget);
+            for (const child of widget.getChildren()) loop(child);
         };
-        loop(widgets);
+        loop(this);
+        // console.log('allWidgets=>>', allWidgets);
         return allWidgets;
     }
     setScrollY(scrollY: number) {

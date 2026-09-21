@@ -1,20 +1,16 @@
+import { Fixed } from "../types";
 import Context from "./Context";
 import { Paint } from "./Paint";
 import { Widget, WidgetConfig } from "./Widget";
 export interface FixedShadowConfig extends WidgetConfig {
-    side: 'left' | 'right';
+    fixed: Fixed;
 }
-
 export default class FixedShadow extends Widget {
-    private side: 'left' | 'right';
+    private fixed: Fixed;
     constructor(context: Context, config: FixedShadowConfig) {
         super(context, config);
-        this.side = config.side;
-        if (this.side === 'left') {
-            this.visible = this.context.scrollX > 0;
-        } else if (this.side === 'right') {
-            this.visible = this.context.scrollX < this.context.maxScrollX;
-        }
+        this.fixed = config.fixed;
+        this.visible = this.fixed === 'left' ? this.context.scrollX > 0 : this.context.scrollX < this.context.maxScrollX;
     }
     render(paint: Paint) {
         const {
@@ -23,13 +19,13 @@ export default class FixedShadow extends Widget {
             fixedShadowFadeColor,
         } = this.context.config;
         const ctx = paint.getCtx();
-        if (this.side === 'right') {
+        if (this.fixed === 'right') {
             const gradient = ctx.createLinearGradient(this.x - fixedShadowWidth, this.y, this.x, this.y);
             gradient.addColorStop(0, fixedShadowFadeColor);
             gradient.addColorStop(1, fixedShadowColor);
             ctx.fillStyle = gradient;
             ctx.fillRect(this.x - fixedShadowWidth, this.y, fixedShadowWidth, this.height);
-        } else if (this.side === 'left') {
+        } else if (this.fixed === 'left') {
             const gradient = ctx.createLinearGradient(this.x + this.width, this.y, this.x + this.width + fixedShadowWidth, this.y);
             gradient.addColorStop(0, fixedShadowColor);
             gradient.addColorStop(1, fixedShadowFadeColor);

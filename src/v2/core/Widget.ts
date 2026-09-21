@@ -104,7 +104,7 @@ export abstract class Widget {
             if (!inside && this.hovered) {
                 this.hovered = false
                 this.invoke('pointerleave:self', moveEvent)
-                return false
+                return this.shouldStopPropagation('pointerenter:self')
             } else if (inside && !this.hovered) {
                 this.hovered = true
                 this.invoke('pointerenter:self', moveEvent)

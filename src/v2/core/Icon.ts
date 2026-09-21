@@ -12,7 +12,7 @@ export class Icon extends Widget {
     name: string;
     color: string = 'currentColor';
     constructor(context: Context, config: IconConfig) {
-        super(context, { zIndex: 100, autoDraw: false, ...config })
+        super(context, config)
         this.name = config.name
         this.color = config.color || 'currentColor';
         this.source = config.source;

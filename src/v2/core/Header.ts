@@ -42,20 +42,20 @@ export default class Header extends Widget {
         const { scrollX, stageWidth, scrollbarGutter } = this.context;
         const { fixedRightWidth, fixedLeftWidth } = this.context.store;
         this.fixedLeftShadow = new FixedShadow(this.context, {
-            side: 'left',
+            fixed: 'left',
             x: 0,
             y: 0,
             width: fixedLeftWidth,
             height: this.height,
-            zIndex: 1050,
+            zIndex: 50,
         });
         this.fixedShadowRight = new FixedShadow(this.context, {
-            side: 'right',
+            fixed: 'right',
             x: stageWidth - fixedRightWidth - scrollbarGutter,
             y: 0,
             width: fixedRightWidth,
             height: this.height,
-            zIndex: 1050,
+            zIndex: 50,
         });
         let startIndex = this.binarySearch(centerColNodes, scrollX - fixedLeftWidth);
         let endIndex = this.binarySearch(centerColNodes, scrollX + stageWidth - scrollbarGutter - fixedRightWidth);
@@ -63,7 +63,7 @@ export default class Header extends Widget {
         const visibleColNodes = [...leftColNodes, ...visibleCenterColNodes, ...rightColNodes];
         const generateCells = (nodes: ColNode[]) => {
             for (const colNode of nodes) {
-                const cell = new CellHeader(this.context, colNode, this.zIndex);
+                const cell = new CellHeader(this.context, colNode);
                 list.push(cell);
                 if (colNode.hasChildren) {
                     generateCells(colNode.childrenNodes);
