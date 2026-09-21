@@ -59,7 +59,6 @@ export default class EvitListener {
         this.resizeObserver = new ResizeObserver((entries) => {
             this.context.initWH();
             this.emit('resizeObserver', entries);
-            this.context.paint.dispatchListener('resizeObserver', entries);
         });
         this.resizeObserver.observe(this.context.containerElement);
         this.bind(window, 'pointerdown');
@@ -88,7 +87,10 @@ export default class EvitListener {
     ): void {
         const fn = (e: NativeListenertMap[typeof name]) => {
             this.emit(name, e);
-            this.context.paint.dispatchListener(name, e);
+            const allWidgets = this.context.table.getAllWidgets();
+            for (let i = allWidgets.length - 1; i >= 0; i--) {
+                if (allWidgets[i].dispatch(name, e)) break
+            }
         }
         target.addEventListener(name, fn as EventListener, options);
         this.nativeListenerTasks.add({ target, name, fn: fn as EventListener, options });

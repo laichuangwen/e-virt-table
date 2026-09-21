@@ -6,10 +6,7 @@ export default class Cell extends Widget {
     fixed: Fixed
     cellType: CellType
     constructor(context: Context, config: CellConfig) {
-        super(context, {
-            ...config,
-            autoDraw: false, // 不自动绘制
-        });
+        super(context, config);
         this.fixed = config.fixed;
         this.cellType = config.cellType;
         this.initPosition();
@@ -20,6 +17,7 @@ export default class Cell extends Widget {
     }
     update(): void {
         this.initPosition();
+        super.update();
     }
     isHorizontalVisible() {
         if (this.fixed) {

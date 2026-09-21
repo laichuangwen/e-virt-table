@@ -7,7 +7,7 @@ export type RowNodeProps = {
 };
 type RowNodeKey = string | number;
 type ColNodeKey = string | number;
-export type CheckState = 'unchecked' | 'checked' | 'indeterminate';
+export type CheckState = 'unchecked' | 'checked' | 'indeterminate' | 'disabled';
 type RowData = Record<string, any>;
 type RowSelectableParams = {
     row: RowData;
@@ -308,19 +308,23 @@ export class RowNode {
         this.rowStore.expand = expand;
     }
     getCheckState(): CheckState {
+        if (!this.getSelectable()) {
+            return 'disabled';
+        }
         return this.rowStore.checkState;
     }
-    setChecked(state: CheckState, ignoreChild: boolean = false) {
+    setChecked(state: CheckState, ignoreChild: boolean = false, ignoreParent: boolean = false) {
         if (!this.getSelectable()) {
+            this.rowStore.checkState = 'disabled';
             return;
         }
         this.rowStore.checkState = state;
         if (!ignoreChild) {
             for (const child of this.childrenNodes) {
-                child.setChecked(state);
+                child.setChecked(state, false, ignoreParent);
             }
         }
-        if (this.parentNode) {
+        if (this.parentNode && !ignoreParent) {
             const siblings = this.parentNode.childrenNodes;
             const enabledSiblings = siblings.filter((s: RowNode) => s.getSelectable());
             const totalEnabled = enabledSiblings.length;
@@ -411,6 +415,9 @@ class Store {
             data: rootRowData,
             store: this,
         });
+        this.rowSelectable = (params: RowSelectableParams) => {
+            return false;
+        }
         this.update();
     }
     get rowNodes(): RowNode[] {
@@ -463,8 +470,20 @@ class Store {
         const node = this.getRowNode(key);
         if (node) node.setChecked(state);
     }
+    clearSelection() {
+        this.rootRowNode.setChecked('unchecked', false, true);
+    }
+    toggleRowSelection() {
+        const checkState = this.context.store.getStoreCheckState();
+        if (checkState === 'checked') {
+            this.rootRowNode.setChecked('unchecked', false, true);
+        } else {
+            this.rootRowNode.setChecked('checked', false, true);
+        }
+    }
     setCheckAll(checked: boolean) {
-        this.rootRowNode.setChecked(checked ? 'checked' : 'unchecked');
+        // 忽略向上查找父级
+        this.rootRowNode.setChecked(checked ? 'checked' : 'unchecked', false, true);
     }
     getStoreCheckState(): CheckState {
         return this.rootRowNode.getCheckState();
@@ -650,6 +669,7 @@ class Store {
             console.log('maxColLevel', this.maxColLevel);
             console.log('leafColNodes', this.renderColNodes);
             this.setChecked('1', 'checked')
+
             console.timeEnd('store update');
         }
     }

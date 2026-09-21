@@ -8,6 +8,7 @@ import Text from "./Text";
 import checkboxCheck from "../svg/checkbox-check.svg?raw";
 import checkboxUnchecked from "../svg/checkbox-uncheck.svg?raw";
 import checkboxIndeterminate from "../svg/checkbox-indeterminate.svg?raw";
+import checkboxDisabled from "../svg/checkbox-disabled.svg?raw";
 import { Paint } from "./Paint";
 export interface CellHeaderConfig {
     cellType: CellType,
@@ -17,6 +18,7 @@ const checkStateMap = {
     unchecked: checkboxUnchecked,
     checked: checkboxCheck,
     indeterminate: checkboxIndeterminate,
+    disabled: checkboxDisabled,
 }
 export default class CellHeader extends Cell {
     private colNode: ColNode;
@@ -38,7 +40,6 @@ export default class CellHeader extends Cell {
         }
 
         const checkState = this.context.store.getStoreCheckState();
-        
         this.checkIcon = new Icon(this.context, {
             name: 'check',
             x: this.x,
@@ -54,6 +55,8 @@ export default class CellHeader extends Cell {
             const checkState = this.context.store.getStoreCheckState();
             const isCheckAll = checkState !== 'checked';
             this.context.store.setCheckAll(isCheckAll);
+            console.log(this.context.store.getStoreCheckState());
+            
             this.context.draw();
         });
         // this.checkIcon.source = checkboxUnchecked;
@@ -73,7 +76,7 @@ export default class CellHeader extends Cell {
         });
         this.setChildren([this.text, this.checkIcon]);
         this.text.on('click:self', () => {
-            console.log('click-text');
+            console.log('click-text', this.colNode.column.title);
         });
 
     }
@@ -87,7 +90,5 @@ export default class CellHeader extends Cell {
             fillColor: headerBgColor,
             borderColor,
         });
-        this.text?.draw();
-        this.checkIcon?.draw();
     }
 }

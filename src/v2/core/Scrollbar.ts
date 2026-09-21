@@ -62,11 +62,11 @@ class ScrollbarThumb extends Widget {
         });
         this.on('wheel', (e) => {
             if (this.isVertical() && e.shiftKey === false) {
-                this.context.scroller.setScrollY(this.context.scrollY + e.deltaY);
+                this.context.setScrollY(this.context.scrollY + e.deltaY);
             } else if (this.isHorizontal() && e.shiftKey === false) {
-                this.context.scroller.setScrollX(this.context.scrollX + e.deltaX);
+                this.context.setScrollX(this.context.scrollX + e.deltaX);
             } else if (this.isVertical() && e.shiftKey === true) {
-                this.context.scroller.setScrollX(this.context.scrollX + e.deltaY);
+                this.context.setScrollX(this.context.scrollX + e.deltaY);
             }
         });
         this.on('touchstart', (e) => {
@@ -93,11 +93,11 @@ class ScrollbarThumb extends Widget {
             }
             if (this.isVertical()) {
                 if (next === this.context.scrollY) return;
-                this.context.scroller.setScrollY(next);
+                this.context.setScrollY(next);
                 return;
             }
             if (next === this.context.scrollX) return;
-            this.context.scroller.setScrollX(next);
+            this.context.setScrollX(next);
         });
         this.update();
     }
@@ -130,13 +130,13 @@ class ScrollbarThumb extends Widget {
         const next = Math.max(this.offset, Math.min(y, this.maxY));
         if (this.y === next) return;
         this.y = next;
-        this.context.scroller.setScrollY((next - this.offset) * this.ratio);
+        this.context.setScrollY((next - this.offset) * this.ratio);
     }
     private setX(x: number) {
         const next = Math.max(this.offset, Math.min(x, this.maxX));
         if (this.x === next) return;
         this.x = next;
-        this.context.scroller.setScrollX((next - this.offset) * this.ratio);
+        this.context.setScrollX((next - this.offset) * this.ratio);
     }
     private isOnScrollbar(e: TouchEvent) {
         return this.scrollbar.insideByEvent(e);
@@ -234,7 +234,7 @@ class ScrollbarTrack extends Widget {
     }
 }
 
-class Scrollbar extends Widget {
+export default class Scrollbar extends Widget {
     type: ScrollbarType;
     scrollbarTrack: ScrollbarTrack;
     scrollbarThumb: ScrollbarThumb;
@@ -244,6 +244,7 @@ class Scrollbar extends Widget {
         this.type = type;
         this.scrollbarTrack = new ScrollbarTrack(this);
         this.scrollbarThumb = new ScrollbarThumb(this);
+        this.setChildren([this.scrollbarTrack, this.scrollbarThumb]);
     }
     get isOuterMode() {
         return this.context.config.scrollbarMode === 'outer';
@@ -314,37 +315,8 @@ class Scrollbar extends Widget {
         this.height = this.getHeight();
         this.x = this.getX();
         this.y = this.getY();
-        this.context.scrollbarGutter = this.scrollbarGutter;
         this.visible = this.contentSize > this.viewportSize && this.viewportSize > 0;
         this.scrollbarTrack.update();
         this.scrollbarThumb.update();
-    }
-}
-
-export default class Scroller {
-    private context: Context;
-    private verticalScrollbar: Scrollbar;
-    private horizontalScrollbar: Scrollbar;
-
-    constructor(context: Context) {
-        this.context = context;
-        this.verticalScrollbar = new Scrollbar(context, 'vertical');
-        this.horizontalScrollbar = new Scrollbar(context, 'horizontal');
-    }
-    update() {
-        this.verticalScrollbar.update();
-        this.horizontalScrollbar.update();
-    }
-    setScrollY(scrollY: number) {
-        const _scrollY = Math.max(0, Math.min(Math.round(scrollY), this.verticalScrollbar.maxScroll));
-        if (this.context.scrollY === _scrollY) return;
-        this.context.scrollY = _scrollY;
-        this.context.draw();
-    }
-    setScrollX(scrollX: number) {
-        const _scrollX = Math.max(0, Math.min(Math.round(scrollX), this.horizontalScrollbar.maxScroll));
-        if (this.context.scrollX === _scrollX) return;
-        this.context.scrollX = _scrollX;
-        this.context.draw();
     }
 }

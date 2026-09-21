@@ -28,5 +28,11 @@ export default class Config {
     cellHeaderHeight = 36;
     /** 表头背景色 */
     headerBgColor = '#F8FAFF';
-    BODY_BG_COLOR = '#FFF';
+    /** 固定列阴影靠近边界的颜色 */
+    fixedShadowColor = 'rgba(0,0,0,0.1)';
+    /** 固定列阴影渐隐末端的颜色 */
+    fixedShadowFadeColor = 'rgba(0,0,0,0)';
+    /** 固定列阴影宽度 */
+    fixedShadowWidth = 4;
+    // BODY_BG_COLOR = '#FFF';
 }

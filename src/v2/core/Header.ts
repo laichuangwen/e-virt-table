@@ -1,10 +1,13 @@
 import CellHeader from "./CellHeader";
 import Context from "./Context";
+import FixedShadow from "./FixedShadow";
 import { Paint } from "./Paint";
 import { ColNode } from "./Store";
 import { Widget } from "./Widget";
 export default class Header extends Widget {
     cells: CellHeader[] = [];
+    private fixedLeftShadow!: FixedShadow;
+    private fixedShadowRight!: FixedShadow;
     constructor(context: Context) {
         super(context);
         this.zIndex = 1000;
@@ -38,6 +41,22 @@ export default class Header extends Widget {
         let list: CellHeader[] = [];
         const { scrollX, stageWidth, scrollbarGutter } = this.context;
         const { fixedRightWidth, fixedLeftWidth } = this.context.store;
+        this.fixedLeftShadow = new FixedShadow(this.context, {
+            side: 'left',
+            x: 0,
+            y: 0,
+            width: fixedLeftWidth,
+            height: this.height,
+            zIndex: 1050,
+        });
+        this.fixedShadowRight = new FixedShadow(this.context, {
+            side: 'right',
+            x: stageWidth - fixedRightWidth - scrollbarGutter,
+            y: 0,
+            width: fixedRightWidth,
+            height: this.height,
+            zIndex: 1050,
+        });
         let startIndex = this.binarySearch(centerColNodes, scrollX - fixedLeftWidth);
         let endIndex = this.binarySearch(centerColNodes, scrollX + stageWidth - scrollbarGutter - fixedRightWidth);
         const visibleCenterColNodes = centerColNodes.slice(startIndex, endIndex + 1);
@@ -53,20 +72,12 @@ export default class Header extends Widget {
         }
         generateCells(visibleColNodes);
         this.cells = list;
-        this.setChildren(list);
-
-        console.log('list', list.map(item => item.zIndex));
+        this.setChildren([this.fixedLeftShadow, this.fixedShadowRight, ...list]);
         console.timeEnd('cell header');
     }
     render(paint: Paint) {
         paint.drawRect(0, 0, this.width, this.height, {
             fillColor: this.context.config.headerBgColor,
         });
-        for (const cell of this.cells) {
-            if (!cell.fixed) cell.draw();
-        }
-        for (const cell of this.cells) {
-            if (cell.fixed) cell.draw();
-        }
     }
 }

@@ -1,21 +1,26 @@
 import Context from "./Context";
 import { Widget } from "./Widget";
-import { Paint } from "./Paint";
 import Header from "./Header";
 import Body from "./Body";
+import Scrollbar from "./Scrollbar";
 
 export default class Table extends Widget {
     private header: Header;
     private body: Body;
+    private verticalScrollbar: Scrollbar;
+    private horizontalScrollbar: Scrollbar;
     constructor(context: Context) {
         super(context);
         this.header = new Header(context);
         this.body = new Body(context);
+        this.verticalScrollbar = new Scrollbar(context, 'vertical');
+        this.horizontalScrollbar = new Scrollbar(context, 'horizontal');
+        this.setChildren([this.header, this.body, this.verticalScrollbar, this.horizontalScrollbar]);
         this.context.listener.on('resizeObserver',
             () => {
                 // 重新设置滚动条位置,防止溢出了
-                context.scroller.setScrollX(context.scrollX);
-                context.scroller.setScrollY(context.scrollY);
+                this.setScrollX(context.scrollX);
+                this.setScrollY(context.scrollY);
                 context.draw()
             }
         );
@@ -30,12 +35,43 @@ export default class Table extends Widget {
             this.context.draw();
         });
     }
+    getAllWidgets() {
+        const widgets = this.getChildren();
+        const allWidgets: Widget[] = [];
+        const loop = (widgets: Widget[]) => {
+            widgets.forEach(widget => {
+                allWidgets.push(widget);
+                if (widget.getChildren().length) {
+                    loop(widget.getChildren());
+                }
+            });
+        };
+        loop(widgets);
+        return allWidgets;
+    }
+    setScrollY(scrollY: number) {
+        const _scrollY = Math.max(0, Math.min(Math.round(scrollY), this.verticalScrollbar.maxScroll));
+        if (this.context.scrollY === _scrollY) return;
+        this.context.scrollY = _scrollY;
+        this.context.draw();
+    }
+    setScrollX(scrollX: number) {
+        const _scrollX = Math.max(0, Math.min(Math.round(scrollX), this.horizontalScrollbar.maxScroll));
+        if (this.context.scrollX === _scrollX) return;
+        this.context.scrollX = _scrollX;
+        this.context.draw();
+    }
     update() {
         this.x = 0;
         this.y = 0;
         this.width = this.context.stageWidth;
         this.height = this.context.stageHeight;
+        this.context.scrollbarGutter = this.verticalScrollbar.scrollbarGutter;
+        this.context.maxScrollY = this.verticalScrollbar.maxScroll;
+        this.context.maxScrollX = this.horizontalScrollbar.maxScroll;
+        super.update();
+        console.log('table update', this.getChildren());
     }
-    render(paint: Paint) {
+    destroy() {
     }
 }

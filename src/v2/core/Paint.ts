@@ -1,5 +1,3 @@
-import { Widget, WidgetEventMap } from "./Widget";
-
 export interface LineOptions {
     lineCap?: CanvasLineCap;
     lineDash?: number[];
@@ -39,7 +37,6 @@ export interface RectOptions {
 };
 export class Paint {
     private ctx: CanvasRenderingContext2D
-    private widgets: Widget[] = [];
     private target: HTMLCanvasElement | null = null
     constructor(target: HTMLCanvasElement | CanvasRenderingContext2D) {
         // 不能用 instanceof 判断；非 canvas 元素即视为已有 ctx。
@@ -55,36 +52,6 @@ export class Paint {
     scale(dpr: number) {
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.ctx.scale(dpr, dpr);
-    }
-    addWidget(widget: Widget) {
-        this.widgets.push(widget)
-    }
-    removeWidget(widget: Widget) {
-        this.widgets = this.widgets.filter((item) => item !== widget)
-    }
-    getWidgets() {
-        return this.widgets.sort((a, b) => a.zIndex - b.zIndex);
-    }
-    getAllWidgets() {
-        // 获取所有 widget 和 子 widget，可以插到的父级
-        const widgets = this.getWidgets();
-        const allWidgets: Widget[] = [];
-        const loop = (widgets: Widget[]) => {
-            widgets.forEach(widget => {
-                allWidgets.push(widget);
-                if(widget.getChildren().length) {
-                    loop(widget.getChildren());
-                }
-            });
-        };
-        loop(widgets);
-        return allWidgets.sort((a, b) => a.zIndex - b.zIndex);
-    }
-    dispatchListener<K extends keyof WidgetEventMap>(eventName: K, e: WidgetEventMap[K]) {
-        const allWidgets = this.getAllWidgets();
-        for (let i = allWidgets.length - 1; i >= 0; i--) {
-            if (allWidgets[i].dispatch(eventName, e)) break
-        }
     }
     getRelativePosition(e: PointerEvent | MouseEvent | TouchEvent) {
         if (!(this.target instanceof HTMLCanvasElement)) {
@@ -107,56 +74,6 @@ export class Paint {
         if (this.target instanceof HTMLCanvasElement) {
             this.target.style.cursor = cursor;
         }
-    }
-    /**
-     * 绘制单侧阴影
-     */
-    drawShadow(x: number, y: number, width: number, height: number, options: ShadowOptions): void {
-        const { fillColor, side, shadowWidth, colorStart, colorEnd } = options;
-        this.ctx.save();
-        if (fillColor) {
-            this.ctx.fillStyle = fillColor;
-            this.ctx.fillRect(x, y, width, height);
-        }
-        if (!Number.isFinite(shadowWidth) || shadowWidth <= 0) {
-            this.ctx.restore();
-            return;
-        }
-        let gradient: CanvasGradient;
-        switch (side) {
-            case 'left':
-                gradient = this.ctx.createLinearGradient(x - shadowWidth, y, x, y);
-                gradient.addColorStop(0, colorStart);
-                gradient.addColorStop(1, colorEnd);
-                this.ctx.fillStyle = gradient;
-                this.ctx.fillRect(x - shadowWidth, y, shadowWidth, height);
-                break;
-            case 'right':
-                gradient = this.ctx.createLinearGradient(x + width, y, x + width + shadowWidth, y);
-                gradient.addColorStop(0, colorStart);
-                gradient.addColorStop(1, colorEnd);
-                this.ctx.fillStyle = gradient;
-                this.ctx.fillRect(x + width, y, shadowWidth, height);
-                break;
-            case 'top':
-                gradient = this.ctx.createLinearGradient(x, y - shadowWidth, x, y);
-                gradient.addColorStop(0, colorStart);
-                gradient.addColorStop(1, colorEnd);
-                this.ctx.fillStyle = gradient;
-                this.ctx.fillRect(x, y - shadowWidth, width, shadowWidth);
-                break;
-            case 'bottom':
-                gradient = this.ctx.createLinearGradient(x, y + height, x, y + height + shadowWidth);
-                gradient.addColorStop(0, colorStart);
-                gradient.addColorStop(1, colorEnd);
-                this.ctx.fillStyle = gradient;
-                this.ctx.fillRect(x, y + height, width, shadowWidth);
-                break;
-            default:
-                console.error('Invalid side specified for shadow');
-                break;
-        }
-        this.ctx.restore();
     }
     /**
      * 绘制线条
@@ -255,11 +172,8 @@ export class Paint {
         }
         this.ctx.restore();
     }
-    draw() {
+    clear() {
         const { canvas } = this.ctx;
         this.ctx.clearRect(0, 0, canvas.width, canvas.height)
-        const widgets = this.getWidgets();
-        widgets.forEach(widget => widget.update());
-        widgets.forEach(widget => widget.draw())
     }
 }

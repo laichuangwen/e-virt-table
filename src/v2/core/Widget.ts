@@ -30,7 +30,6 @@ export interface WidgetConfig {
     height: number
     visible?: boolean
     zIndex?: number
-    autoDraw?: boolean
 }
 
 export abstract class Widget {
@@ -44,7 +43,6 @@ export abstract class Widget {
     height = 0
     visible = true
     zIndex = 0
-    autoDraw = true
     constructor(context: Context, config?: WidgetConfig) {
         this.context = context
         this.x = config?.x ?? 0
@@ -53,12 +51,9 @@ export abstract class Widget {
         this.height = config?.height ?? 0
         this.visible = config?.visible ?? true
         this.zIndex = config?.zIndex ?? 0
-        this.autoDraw = config?.autoDraw ?? true
-        if (this.autoDraw) {
-            this.context.paint.addWidget(this)
-        }
     }
     setChildren(children: Widget[]) {
+        children.sort((a, b) => a.zIndex - b.zIndex);
         this.children = children
     }
     getChildren(): Widget[] {
@@ -142,13 +137,13 @@ export abstract class Widget {
             entry.callback(event)
         }
     }
-    destroy() {
-        this.context.paint.removeWidget(this)
-    }
     render(_paint: Paint) { }
-    update() { }
+    update() {
+        this.children.forEach(child => child.update());
+     }
     draw() {
         if (!this.visible) return
         this.render(this.context.paint)
+        this.children.forEach(child => child.draw());
     }
 }

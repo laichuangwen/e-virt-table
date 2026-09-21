@@ -3,13 +3,11 @@ import { Paint } from "./Paint";
 import Config from './Config';
 import EvitListener from "./EvitListener";
 import Store from "./Store";
-import Scroller from "./Scroller";
 import Table from "./Table";
 export default class Context {
-    private animationFrameId: number | undefined = undefined;
-    private tableWidget: Table;
+    table: Table;
     listener: EvitListener;
-    scroller: Scroller;
+    // scroller: Scroller;
     config: Config;
     store: Store;
     containerElement!: HTMLDivElement;
@@ -56,8 +54,8 @@ export default class Context {
     hasTree = false; // 是否有树形结构
     scrollY = 0;
     scrollX = 0;
-    fixedLeftWidth = 0;
-    fixedRightWidth = 0;
+    maxScrollX = 0;
+    maxScrollY = 0;
     lastCenterColIndex = 0;
     maxColIndex = 0;
     maxRowIndex = 0;
@@ -72,8 +70,7 @@ export default class Context {
         this.paint = new Paint(this.canvasElement);
         this.initWH();
         this.listener = new EvitListener(this);
-        this.scroller = new Scroller(this);
-        this.tableWidget = new Table(this);
+        this.table = new Table(this);
     }
     private createContainer(containerElement: HTMLDivElement, options: EVirtTableOptions) {
         this.containerElement = containerElement;
@@ -127,20 +124,18 @@ export default class Context {
         this.canvasElement.style.height = `${this.stageHeight}px`;
         this.paint.scale(dpr);
     }
+    setScrollY(scrollY: number) {
+        this.table.setScrollY(scrollY);
+    }
+    setScrollX(scrollX: number) {
+        this.table.setScrollX(scrollX);
+    }
     draw() {
         console.time('draw');
-        // this.scroller.update();
-        this.paint.draw();
+        this.paint.clear();
+        this.table.update();
+        this.table.draw();
         console.timeEnd('draw');
-        // console.log(this.scrollY, this.scrollY + this.stageHeight - 100 - 14, this.store.sumHeight);
-        // if (this.animationFrameId) {
-        //     cancelAnimationFrame(this.animationFrameId);
-        // }
-        // this.animationFrameId = requestAnimationFrame(() => {
-        //     this.scroller.update();
-        //     this.paint.draw();
-        //     console.log(this.scrollY, this.scrollY + this.stageHeight - 100 - 14, this.store.sumHeight);
-        // });
     }
     clearTextSelection(redraw = true) {
         this.textSelecting = false;
