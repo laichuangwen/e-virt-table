@@ -415,9 +415,9 @@ class Store {
             data: rootRowData,
             store: this,
         });
-        this.rowSelectable = (params: RowSelectableParams) => {
-            return false;
-        }
+        // this.rowSelectable = (params: RowSelectableParams) => {
+        //     return false;
+        // }
         this.update();
     }
     get rowNodes(): RowNode[] {

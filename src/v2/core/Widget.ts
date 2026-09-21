@@ -1,5 +1,5 @@
 import type Context from "./Context"
-import { EvitListenerMap } from "./EvitListener"
+import type { EvitListenerMap } from "./EvitListener"
 import type { Paint } from "./Paint"
 
 /** 事件名 → 回调参数类型 */
@@ -12,9 +12,8 @@ export type WidgetEventCallback<K extends WidgetEventName = WidgetEventName> = (
     event: WidgetEventMap[K],
 ) => void
 
-/** 注册监听时的选项 */
 export interface WidgetEventListenOptions {
-    /** 是否禁止向更下层 widget 冒泡，默认 true */
+    /** 是否禁止向父级冒泡，默认 true */
     stopPropagation?: boolean
 }
 
@@ -36,6 +35,7 @@ export abstract class Widget {
     private hovered = false
     private listeners = new Map<WidgetEventName, Set<ListenerEntry>>()
     private children: Widget[] = []
+    parent: Widget | null = null
     context!: Context
     x = 0
     y = 0
@@ -53,27 +53,27 @@ export abstract class Widget {
         this.zIndex = config?.zIndex ?? 0
     }
     setChildren(children: Widget[]) {
-        children.sort((a, b) => a.zIndex - b.zIndex);
-        this.children = children
+        for (const child of this.children) {
+            if (child.parent === this) child.parent = null
+        }
+        this.children = children.sort((a, b) => a.zIndex - b.zIndex)
+        for (const child of this.children) child.parent = this
     }
-    getChildren(): Widget[] {
-        return this.children;
+    getChildren() {
+        return this.children
     }
-    inside(x: number, y: number): boolean {
-        if (!this.visible) return false
-        return x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height
+    inside(x: number, y: number) {
+        return this.visible && x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height
     }
-
-    insideByEvent(event: PointerEvent | MouseEvent | TouchEvent): boolean {
+    insideByEvent(event: PointerEvent | MouseEvent | TouchEvent) {
         const { x, y } = this.context.paint.getRelativePosition(event)
         return this.inside(x, y)
     }
-
     on<K extends WidgetEventName>(
         eventName: K,
         callback: WidgetEventCallback<K>,
         options?: WidgetEventListenOptions,
-    ): void {
+    ) {
         let set = this.listeners.get(eventName)
         if (!set) {
             set = new Set()
@@ -86,64 +86,81 @@ export abstract class Widget {
     }
 
     /**
-     * 无 `:self` 后缀的监听始终派发（划选拖出区域后仍需 pointermove / pointerup）。
-     * `:self` 仅在命中本 widget 时派发；命中后默认 stopPropagation，避免被遮挡的下层仍触发 pointerenter:self。
-     * @returns 是否应停止向更下层 widget 继续分发
+     * 无 `:self` 派发给整棵树；`:self` 命中后沿 parent 冒泡（无监听不拦截，有监听默认 stop）。
+     * pointerenter / leave 不冒泡，按命中目标及其祖先更新 hover。
      */
-    dispatch<K extends WidgetEventName>(eventName: K, event: WidgetEventMap[K]): boolean {
-        if (!this.visible) return false
-        this.invoke(eventName, event)
-        const pointerEvent = event as PointerEvent | MouseEvent | TouchEvent
-        const hasPoint = 'clientX' in pointerEvent || Boolean(
-            (pointerEvent as TouchEvent).touches?.[0] || (pointerEvent as TouchEvent).changedTouches?.[0],
-        )
-        const inside = hasPoint && this.insideByEvent(pointerEvent)
-        // 因为事件代理重新派发 pointerleave / pointerenter 是失效的，用 pointermove 判断；return 防止重复派发
-        if (['pointermove', 'pointerleave', 'pointerenter'].includes(eventName)) {
-            const moveEvent = event as WidgetEventMap['pointermove']
-            if (!inside && this.hovered) {
-                this.hovered = false
-                this.invoke('pointerleave:self', moveEvent)
-                return this.shouldStopPropagation('pointerenter:self')
-            } else if (inside && !this.hovered) {
-                this.hovered = true
-                this.invoke('pointerenter:self', moveEvent)
-                return this.shouldStopPropagation('pointerenter:self')
+    dispatch<K extends WidgetEventName>(eventName: K, event: WidgetEventMap[K]) {
+        const widgets = this.flatten()
+        let target: Widget | null = null
+        for (const widget of widgets) {
+            if (widget.visible) widget.invoke(eventName, event)
+        }
+        for (let i = widgets.length - 1; i >= 0; i--) {
+            if (widgets[i].hit(event)) {
+                target = widgets[i]
+                break
             }
         }
-        if (!inside) return false
-        const selfName = `${eventName}:self` as WidgetEventName
-        this.invoke(selfName, event as WidgetEventMap[typeof selfName])
-        return this.shouldStopPropagation(selfName)
-    }
-
-    /** 命中后默认拦截；仅当所有 :self 监听都显式 stopPropagation: false 时才继续向下分发 */
-    private shouldStopPropagation(eventName: WidgetEventName): boolean {
-        const entries = this.listeners.get(eventName)
-        if (!entries?.size) return true
-        for (const entry of entries) {
-            if (entry.stopPropagation) return true
+        if (eventName === 'pointermove' || eventName === 'pointerenter' || eventName === 'pointerleave') {
+            this.syncHover(widgets, target, event as WidgetEventMap['pointermove'])
+            if (eventName !== 'pointermove') return
         }
-        return false
+        const selfName = `${eventName}:self` as WidgetEventName
+        for (let node = target; node; node = node.parent) {
+            if (node.visible && node.invoke(selfName, event as WidgetEventMap[typeof selfName])) break
+        }
     }
 
-    protected invoke<K extends WidgetEventName>(
-        eventName: K,
-        event: WidgetEventMap[K],
-    ): void {
+    private flatten(list: Widget[] = []) {
+        list.push(this)
+        for (const child of this.children) child.flatten(list)
+        return list
+    }
+    private hit(event: unknown) {
+        if (!this.visible || !event || typeof event !== 'object') return false
+        const touch = event as TouchEvent
+        if (!('clientX' in event) && !touch.touches?.[0] && !touch.changedTouches?.[0]) return false
+        return this.insideByEvent(event as PointerEvent | MouseEvent | TouchEvent)
+    }
+    private ancestors(node: Widget | null) {
+        const list: Widget[] = []
+        while (node) {
+            list.push(node)
+            node = node.parent
+        }
+        return list
+    }
+    private syncHover(widgets: Widget[], target: Widget | null, event: WidgetEventMap['pointermove']) {
+        const chain = this.ancestors(target)
+        const path = new Set(chain)
+        for (let i = widgets.length - 1; i >= 0; i--) {
+            if (!path.has(widgets[i])) widgets[i].setHover(false, event)
+        }
+        for (let i = chain.length - 1; i >= 0; i--) chain[i].setHover(true, event)
+    }
+    private setHover(next: boolean, event: WidgetEventMap['pointermove']) {
+        if (this.hovered === next) return
+        this.hovered = next
+        this.invoke(next ? 'pointerenter:self' : 'pointerleave:self', event)
+    }
+    /** @returns 是否应停止向父级冒泡 */
+    protected invoke<K extends WidgetEventName>(eventName: K, event: WidgetEventMap[K]) {
         const entries = this.listeners.get(eventName)
-        if (!entries?.size) return
+        if (!entries?.size) return false
+        let stop = false
         for (const entry of entries) {
             entry.callback(event)
+            if (entry.stopPropagation) stop = true
         }
+        return stop
     }
     render(_paint: Paint) { }
     update() {
-        this.children.forEach(child => child.update());
-     }
+        this.children.forEach(child => child.update())
+    }
     draw() {
         if (!this.visible) return
         this.render(this.context.paint)
-        this.children.forEach(child => child.draw());
+        this.children.forEach(child => child.draw())
     }
 }

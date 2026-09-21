@@ -1,4 +1,3 @@
-import { Type } from './../../types';
 import { CellType } from "../types";
 import Cell from "./Cell";
 import Context from "./Context";
@@ -37,7 +36,6 @@ export default class CellHeader extends Cell {
         if (['left', 'right'].includes(this.colNode.fixed)) {
             this.zIndex = 100;
         }
-
         const checkState = this.context.store.getStoreCheckState();
         this.checkIcon = new Icon(this.context, {
             name: 'check',
@@ -48,18 +46,16 @@ export default class CellHeader extends Cell {
             source: checkStateMap[checkState],
             color: 'red',
             zIndex: this.zIndex,
-            // visible: colNode.column.type?.includes('selection') ?? false,
+            visible: colNode.column.type?.includes('selection') ?? false,
         });
         this.checkIcon.on('click:self', () => {
             const checkState = this.context.store.getStoreCheckState();
             const isCheckAll = checkState !== 'checked';
             this.context.store.setCheckAll(isCheckAll);
-            console.log('check state=>>', this.context.store.getStoreCheckState());
             this.context.draw();
         },{
             stopPropagation: true,
         });
-        // this.checkIcon.source = checkboxUnchecked;
         this.text = new Text(this.context, {
             zIndex: this.zIndex,
             beforeIcons: [this.checkIcon],
@@ -75,7 +71,7 @@ export default class CellHeader extends Cell {
             height: this.height,
         });
         this.setChildren([this.text, this.checkIcon]);
-        this.on('pointerdown:self', () => {
+        this.on('click:self', () => {
             console.log('click-header=>>>>>>', this.colNode.column.title);
         });
     }

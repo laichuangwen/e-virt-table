@@ -34,5 +34,27 @@ export default class Config {
     fixedShadowFadeColor = 'rgba(0,0,0,0)';
     /** 固定列阴影宽度 */
     fixedShadowWidth = 4;
-    // BODY_BG_COLOR = '#FFF';
+    /** 主体背景色 */
+    bodyBgColor = '#FFF';
+    constructor(config: Partial<Config> = {}) {
+        Object.assign(this, config);
+        this.initCssVar();
+    }
+    private getCssVar(name: string, el: HTMLElement = document.documentElement): string {
+        const key = name.startsWith('--') ? name : `--${name}`;
+        const styles = getComputedStyle(el);
+        return styles.getPropertyValue(key).trim();
+    }
+    private initCssVar() {
+        Object.keys(this).forEach((key) => {
+            if (key.endsWith('Color') || key.endsWith('Font')) {
+                // 把驼峰转换为短横线
+                const cssKey = `--evt-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`;
+                const val = this.getCssVar(cssKey);
+                if (val) {
+                    (this as any)[key] = val;
+                }
+            }
+        });
+    }
 }

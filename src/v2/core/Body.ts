@@ -5,9 +5,6 @@ import { Widget } from "./Widget";
 export default class Body extends Widget {
     constructor(context: Context) {
         super(context);
-        this.on('pointerdown:self', (e) => {
-            console.log('body pointerdown', e);
-        });
     }
     update() {
         const headerHeight = this.context.store.headerHeight;
@@ -19,7 +16,7 @@ export default class Body extends Widget {
     }
     render(paint: Paint) {
         paint.drawRect(this.x, this.y, this.width, this.height, {
-            fillColor: this.context.config.BODY_BG_COLOR,
+            fillColor: this.context.config.bodyBgColor,
         });
     }
 }

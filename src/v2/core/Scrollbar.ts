@@ -24,12 +24,14 @@ class ScrollbarThumb extends Widget {
         this.on('pointerenter:self', () => {
             this.bgColor = scrollbarThumbFocusColor;
             this.context.scrollerFocus = true;
+            this.context.paint.setCursor('pointer');
             this.draw();
         });
         this.on('pointerleave:self', () => {
             if (this.isDragging) return;
             this.bgColor = scrollbarThumbColor;
             this.context.scrollerFocus = false;
+            this.context.paint.setCursor('default');
             this.draw();
         });
         this.on('pointerdown:self', (e) => {

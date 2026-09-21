@@ -27,23 +27,11 @@ export default class Table extends Widget {
         this.on('pointerenter:self', (e) => {
             this.context.listener.emit('pointerenter:table', e);
             this.context.isTableHovering = true;
-            this.context.draw();
         });
         this.on('pointerleave:self', (e) => {
             this.context.listener.emit('pointerleave:table', e);
             this.context.isTableHovering = false;
-            this.context.draw();
         });
-    }
-    getAllWidgets() {
-        const allWidgets: Widget[] = [];
-        const loop = (widget: Widget) => {
-            allWidgets.push(widget);
-            for (const child of widget.getChildren()) loop(child);
-        };
-        loop(this);
-        // console.log('allWidgets=>>', allWidgets);
-        return allWidgets;
     }
     setScrollY(scrollY: number) {
         const _scrollY = Math.max(0, Math.min(Math.round(scrollY), this.verticalScrollbar.maxScroll));

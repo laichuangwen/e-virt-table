@@ -1,5 +1,4 @@
 import Context from "./Context";
-import { Widget } from "./Widget";
 
 type WithPrefix<
     T,
@@ -88,10 +87,7 @@ export default class EvitListener {
     ): void {
         const fn = (e: NativeListenertMap[typeof name]) => {
             this.emit(name, e);
-            const allWidgets = this.context.table.getAllWidgets();
-            for (let i = allWidgets.length - 1; i >= 0; i--) {
-                if (allWidgets[i].dispatch(name, e)) break
-            }
+            this.context.table?.dispatch(name, e);
         }
         target.addEventListener(name, fn as EventListener, options);
         this.nativeListenerTasks.add({ target, name, fn: fn as EventListener, options });
