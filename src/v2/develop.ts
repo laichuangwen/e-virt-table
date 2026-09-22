@@ -1,5 +1,6 @@
-import { Column, BeforeValueChangeItem } from '../types';
+import { BeforeValueChangeItem } from '../types';
 import { EVirtTable } from './core/EVirtTable';
+import { Column } from './types/ColumnType';
 const canvas = document.getElementById('e-virt-table') as HTMLDivElement;
 let columns: Column[] = [
     // {
@@ -109,12 +110,13 @@ let columns: Column[] = [
                 // fixed: 'left',
                 children: [
                     {
-                        title: '姓名11',
+                        title: '姓名111',
                         key: 'emp_name11',
                         // verticalAlign: 'middle',
                         readonly: false,
                         width: 200,
                         maxLineClamp: 2,
+                        // cellHeaderHeight: 100,
                         rules: {
                             required: true,
                             message: '该项必填哦！',
@@ -180,11 +182,12 @@ let columns: Column[] = [
     {
         title: '手机号111111111111111111111111111111',
         key: 'phone',
-        maxLineClamp: 'auto',
+        // maxLineClamp: 'auto',
         sortBy: 'string',
         sortIconType: 'up-down',
         align: 'center',
         verticalAlign: 'bottom',
+        // maxLineClampHeader: 3,
         // fixed: 'right',
         // readonly: false,
         // overflowTooltipHeaderShow: true,

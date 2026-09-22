@@ -11,6 +11,13 @@ export type LineClampType = number | 'auto';
 export type SelectorCellValueType = 'displayText' | 'value';
 export type OverflowTooltipPlacement = 'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'left' | 'left-start' | 'left-end' | 'bottom' | 'bottom-start' | 'bottom-end';
 export type Rules = Rule[];
+export type PaddingInput = number| Padding
+export type Padding = {
+  top: number
+  right: number
+  bottom: number
+  left: number
+}
 export type Rule = {
     required?: boolean;
     message?: string;
@@ -64,6 +71,7 @@ export interface Column {
     headerAlign?: Align;
     headerVerticalAlign?: VerticalAlign;
     hideHeaderSelection?: boolean;
+    cellHeaderHeight?: number;
     align?: Align;
     verticalAlign?: VerticalAlign;
     fixed?: Fixed;

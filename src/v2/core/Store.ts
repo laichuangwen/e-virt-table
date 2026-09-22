@@ -68,7 +68,7 @@ export class ColNode {
             this.colStore = new ColStore();
             this.store.setColStore(this.key, this.colStore);
             this.colStore.width = this.column.width ?? 100;
-            this.colStore.height = this.column.height ?? this.store.defaultColHeight;
+            this.colStore.height = this.column.cellHeaderHeight ?? this.store.defaultColHeight;
             this.colStore.hide = typeof this.column.hide === 'function' ? this.column.hide({}) : this.column.hide ?? false;
             this.colStore.sort = this.column.sort ?? 0;
             this.colStore.fixed = this.column.fixed ?? '';
@@ -398,6 +398,7 @@ class Store {
         if (props.uuidKey) this.uuidKey = props.uuidKey;
         if (props.childrenKey) this.childrenKey = props.childrenKey;
         if (props.hasTree != null) this.hasTree = props.hasTree;
+        this.defaultColHeight = this.context.config.cellHeaderHeight;
         const rootColData = {
             key: this.rootColKey,
             title: '',

@@ -4,20 +4,10 @@ import Context from "./Context";
 import { Icon } from "./Icon";
 import { ColNode } from "./Store";
 import Text from "./Text";
-import checkboxCheck from "../svg/checkbox-check.svg?raw";
-import checkboxUnchecked from "../svg/checkbox-uncheck.svg?raw";
-import checkboxIndeterminate from "../svg/checkbox-indeterminate.svg?raw";
-import checkboxDisabled from "../svg/checkbox-disabled.svg?raw";
 import { Paint } from "./Paint";
 export interface CellHeaderConfig {
     cellType: CellType,
     colNode: ColNode,
-}
-const checkStateMap = {
-    unchecked: checkboxUnchecked,
-    checked: checkboxCheck,
-    indeterminate: checkboxIndeterminate,
-    disabled: checkboxDisabled,
 }
 export default class CellHeader extends Cell {
     private colNode: ColNode;
@@ -37,15 +27,16 @@ export default class CellHeader extends Cell {
             this.zIndex = 100;
         }
         const checkState = this.context.store.getStoreCheckState();
+        const { checkboxSize } = this.context.config;
+        const icon = this.context.config.getIcon(`checkbox-${checkState}`);
         this.checkIcon = new Icon(this.context, {
             name: 'check',
             x: this.x,
             y: this.y,
-            width: 18,
-            height: 18,
-            source: checkStateMap[checkState],
+            width: checkboxSize,
+            height: checkboxSize,
+            source: icon?.source,
             color: 'red',
-            zIndex: this.zIndex,
             visible: colNode.column.type?.includes('selection') ?? false,
         });
         this.checkIcon.on('click:self', () => {
@@ -53,24 +44,26 @@ export default class CellHeader extends Cell {
             const isCheckAll = checkState !== 'checked';
             this.context.store.setCheckAll(isCheckAll);
             this.context.draw();
-        },{
+        }, {
             stopPropagation: true,
         });
+        const { cellAlign, cellVerticalAlign, cellPadding } = this.context.config;
+        const { maxLineClampHeader, headerAlign, headerVerticalAlign, title } = this.colNode.column;
         this.text = new Text(this.context, {
-            zIndex: this.zIndex,
             beforeIcons: [this.checkIcon],
             afterIcons: [],
-            align: 'left',
-            verticalAlign: 'middle',
-            padding: 8,
+            padding: cellPadding,
             selectionKey: `header:${this.colNode.key}`,
-            text: this.colNode.column.title,
             x: this.x,
             y: this.y,
             width: this.width,
             height: this.height,
+            text: title,
+            align: headerAlign || cellAlign,
+            verticalAlign: headerVerticalAlign || cellVerticalAlign,
+            maxLineClamp: maxLineClampHeader,
         });
-        this.setChildren([this.text, this.checkIcon]);
+        this.setChildren([this.text]);
         this.on('click:self', () => {
             console.log('click-header=>>>>>>', this.colNode.column.title);
         });

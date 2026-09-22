@@ -1,36 +1,18 @@
+import { Align, LineClampType, Padding, PaddingInput, VerticalAlign } from '../types'
 import type Context from './Context'
 import { Icon } from './Icon'
 import type { Paint } from './Paint'
 import { Widget, type WidgetConfig } from './Widget'
-
-export type TextAlign = 'left' | 'center' | 'right'
-export type VerticalAlign = 'top' | 'middle' | 'bottom'
-
-export type PaddingInput =
-  | number
-  | {
-    top?: number
-    right?: number
-    bottom?: number
-    left?: number
-  }
-
-export interface Padding {
-  top: number
-  right: number
-  bottom: number
-  left: number
-}
 
 export interface TextConfig extends WidgetConfig {
   text: string
   /** 划选稳定标识；Header/Body 重建 Text 后仍能续上选区 */
   selectionKey?: string
   padding?: PaddingInput
-  maxLineClamp?: number
+  maxLineClamp?: LineClampType
   autoRowHeight?: boolean
   onAutoHeight?: (height: number) => void
-  align?: TextAlign
+  align?: Align
   verticalAlign?: VerticalAlign
   fontSize?: number
   fontWeight?: string
@@ -112,7 +94,7 @@ const ELLIPSIS = '...'
 const DEFAULT_SELECTION_COLOR = '#B4D7FF'
 
 const defaultTextOptions = {
-  align: 'center' as TextAlign,
+  align: 'center' as Align,
   verticalAlign: 'middle' as VerticalAlign,
   fontSize: 14,
   fontWeight: '',
@@ -122,7 +104,7 @@ const defaultTextOptions = {
   lineHeight: undefined as number | undefined,
   color: undefined as string | undefined,
   padding: 0 as PaddingInput,
-  maxLineClamp: undefined as number | undefined,
+  maxLineClamp: 'auto' as LineClampType,
   autoRowHeight: false,
   onAutoHeight: undefined as ((height: number) => void) | undefined,
   selectionColor: DEFAULT_SELECTION_COLOR,
@@ -341,7 +323,7 @@ function measureEdges(ctx: CanvasRenderingContext2D, text: string): number[] {
 }
 
 function alignTextX(
-  align: TextAlign,
+  align: Align,
   boxX: number,
   boxW: number,
   textW: number
@@ -370,6 +352,7 @@ export default class Text extends Widget {
     this.beforeIcons = (config.beforeIcons ?? []).filter((icon) => icon.visible)
     this.afterIcons = (config.afterIcons ?? []).filter((icon) => icon.visible)
     this.box = this.createContentBox()
+    this.setChildren([...this.beforeIcons, ...this.afterIcons])
     this.on('pointerdown', (e) => this.handlePointerDown(e))
     this.on('pointermove', (e) => this.handlePointerMove(e))
     this.on('pointerup', (e) => this.handlePointerUp(e))
@@ -385,15 +368,6 @@ export default class Text extends Widget {
   }
   getIcons(): Icon[] {
     return [...this.beforeIcons, ...this.afterIcons]
-  }
-
-  draw(): DrawTextResult {
-    if (!this.visible) {
-      this.result = EMPTY_RESULT
-      return this.result
-    }
-    this.render(this.context.paint)
-    return this.result
   }
 
   render(paint: Paint): void {
@@ -674,9 +648,12 @@ export default class Text extends Widget {
       box
 
     const firstLineWidth = Math.max(0, contentWidth - beforeIconsWidth)
-    const maxLinesByHeight = options.autoRowHeight
+    // 高度连一行都放不下时仍保留 1 行，避免空白，改画省略号
+    const fitLines = options.autoRowHeight
       ? undefined
       : Math.floor(contentHeight / charHeight)
+    const maxLinesByHeight =
+      fitLines == null ? undefined : Math.max(1, fitLines)
 
     const lastLineMax = (lineCount: number) => {
       const lead = lineCount <= 1 ? beforeIconsWidth : 0
@@ -697,7 +674,9 @@ export default class Text extends Widget {
       if (result.clamped) clamped = true
     }
 
-    applyClamp(options.maxLineClamp)
+    const lineClamp =
+      typeof options.maxLineClamp === 'number' ? options.maxLineClamp : undefined
+    applyClamp(lineClamp)
 
     const neededHeight = linesHeight(lines.length, charHeight)
 
@@ -705,7 +684,16 @@ export default class Text extends Widget {
       maxLinesByHeight != null &&
       linesHeight(lines.length, charHeight) > contentHeight
     ) {
-      applyClamp(maxLinesByHeight)
+      if (
+        fitLines != null &&
+        fitLines <= 0 &&
+        lines.some((line) => line.trimEnd().length > 0)
+      ) {
+        lines = [ELLIPSIS]
+        clamped = true
+      } else {
+        applyClamp(maxLinesByHeight)
+      }
     }
 
     if (afterIconsWidth > 0 && lines.length > 0) {
@@ -713,7 +701,7 @@ export default class Text extends Widget {
       const lastMax = lastLineMax(lines.length)
       if (ctx.measureText(last).width > lastMax) {
         const hitLineClamp =
-          options.maxLineClamp != null && lines.length >= options.maxLineClamp
+          lineClamp != null && lines.length >= lineClamp
         const hitHeightClamp =
           maxLinesByHeight != null && lines.length >= maxLinesByHeight
         if (clamped || hitLineClamp || hitHeightClamp) {
@@ -860,10 +848,6 @@ export default class Text extends Widget {
       if (!line.text) continue
       ctx.fillText(line.text, line.x, this.getTextBaselineY(ctx, line))
     }
-  }
-  private paintIcons(): void {
-    for (const icon of this.beforeIcons) icon.draw()
-    for (const icon of this.afterIcons) icon.draw()
   }
 
   private getTextBaselineY(
