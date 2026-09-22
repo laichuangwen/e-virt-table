@@ -39,7 +39,7 @@ export default class Header extends Widget {
         console.time('cell header');
         const { leftColNodes, rightColNodes, centerColNodes } = this.context.store;
         let list: CellHeader[] = [];
-        const { scrollX, stageWidth, scrollbarGutter } = this.context;
+        const { stageWidth, scrollbarGutter } = this.context;
         const { fixedRightWidth, fixedLeftWidth } = this.context.store;
         this.fixedLeftShadow = new FixedShadow(this.context, {
             fixed: 'left',
@@ -57,9 +57,8 @@ export default class Header extends Widget {
             height: this.height,
             zIndex: 50,
         });
-        let startIndex = this.binarySearch(centerColNodes, scrollX - fixedLeftWidth);
-        let endIndex = this.binarySearch(centerColNodes, scrollX + stageWidth - scrollbarGutter - fixedRightWidth);
-        const visibleCenterColNodes = centerColNodes.slice(startIndex, endIndex + 1);
+        const { startCenterIndex, endCenterIndex } = this.context;
+        const visibleCenterColNodes = centerColNodes.slice(startCenterIndex, endCenterIndex + 1);
         const visibleColNodes = [...leftColNodes, ...visibleCenterColNodes, ...rightColNodes];
         const generateCells = (nodes: ColNode[]) => {
             for (const colNode of nodes) {

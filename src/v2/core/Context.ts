@@ -5,9 +5,9 @@ import EvitListener from "./EvitListener";
 import Store from "./Store";
 import Table from "./Table";
 export default class Context {
+    private animationFrameId = 0;
     table: Table;
     listener: EvitListener;
-    // scroller: Scroller;
     config: Config;
     store: Store;
     containerElement!: HTMLDivElement;
@@ -59,6 +59,10 @@ export default class Context {
     lastCenterColIndex = 0;
     maxColIndex = 0;
     maxRowIndex = 0;
+    startCenterIndex = 0;
+    endCenterIndex = 0;
+    startRowIndex = 0;
+    endRowIndex = 0;
     constructor(target: HTMLDivElement, options: EVirtTableOptions) {
         this.config = new Config();
         this.store = new Store({
@@ -131,11 +135,16 @@ export default class Context {
         this.table.setScrollX(scrollX);
     }
     draw() {
-        console.time('draw');
-        this.paint.clear();
-        this.table.update();
-        this.table.draw();
-        console.timeEnd('draw');
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+        }
+        this.animationFrameId = requestAnimationFrame(() => {
+            console.time('draw');
+            this.paint.clear();
+            this.table.update();
+            this.table.draw();
+            console.timeEnd('draw');
+        });
     }
     clearTextSelection(redraw = true) {
         this.textSelecting = false;

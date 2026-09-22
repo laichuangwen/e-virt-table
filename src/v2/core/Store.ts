@@ -207,6 +207,8 @@ export class ColNode {
 export class RowNode {
     private store: Store;
     private rowStore: RowStore;
+    y = -1;
+    rowIndex = -1;
     data: RowData = {};
     parentNode: RowNode | null = null;
     childrenNodes: RowNode[] = [];
@@ -222,9 +224,6 @@ export class RowNode {
             this.store.setRowStore(this.key, this.rowStore);
         }
         this.initChildrenNodes(props.data);
-    }
-    get rowIndex(): number {
-        return this.rowStore.rowIndex;
     }
     get height(): number {
         return this.rowStore.height;
@@ -268,6 +267,12 @@ export class RowNode {
     get expand(): boolean {
         return this.rowStore.expand;
     }
+    set visible(visible: boolean) {
+        this.rowStore.visible = visible;
+    }
+    get visible(): boolean {
+        return this.rowStore.visible;
+    }
     private initChildrenNodes(data: Record<string, any>) {
         if (!this.store.hasTree && !this.isRoot) return;
         const { childrenKey } = this.store;
@@ -287,13 +292,17 @@ export class RowNode {
         this.childrenNodes.push(child);
         this.store!.addRowNodeMap(child);
     }
+    setY(y: number) {
+        this.y = y;
+    }
     setRowIndex(index: number) {
+        this.rowIndex = index;
         this.rowStore.rowIndex = index;
     }
     getSumHeight(): number {
         let sumHeight = 0;
-        // 先计算子节点高度
         for (const child of this.childrenNodes) {
+            if (!child.visible) continue;
             sumHeight += child.height;
             if (child.expand) {
                 sumHeight += child.getSumHeight();
@@ -347,6 +356,14 @@ export class RowNode {
     }
     setValue(key: string, value: any) {
         this.data[key] = value;
+    }
+    getValue(key: string): any {
+        return this.data[key];
+    }
+    getTextValue(key: string): string {
+        const value = this.getValue(key);
+        if ([undefined, null, ''].includes(value)) return '';
+        return `${value}`;
     }
 }
 
@@ -517,18 +534,33 @@ class Store {
             this.update();
         }
     }
-    // 生成rowIndex
-    generateRowIndex() {
+    /** 一次遍历生成 rowIndex 与 y：按行高累加；隐藏行、未展开子树不参与 */
+    generateRowLayout(nodes: RowNode[], originY: number) {
         let index = 0;
-        const walk = (node: RowNode): void => {
-            if (!node.expand && !node.isRoot) return;
-            for (const child of node.childrenNodes) {
-                const rowIndex = (node.expand || node.isRoot) ? index++ : -1;
-                child.setRowIndex(rowIndex);
-                walk(child);
-            }
+        const reset = (node: RowNode) => {
+            node.setY(-1);
+            node.setRowIndex(-1);
+            for (const child of node.childrenNodes) reset(child);
         };
-        walk(this.rootRowNode);
+        const walk = (list: RowNode[], y: number): number => {
+            let offsetY = y;
+            for (const child of list) {
+                if (!child.visible) {
+                    reset(child);
+                    continue;
+                }
+                child.setY(offsetY);
+                child.setRowIndex(index++);
+                offsetY += child.height;
+                if (child.expand && child.hasChildren) {
+                    offsetY = walk(child.childrenNodes, offsetY);
+                } else {
+                    for (const nested of child.childrenNodes) reset(nested);
+                }
+            }
+            return offsetY;
+        };
+        walk(nodes, originY);
     }
     /** 一次遍历生成 colIndex 与 x/y：父级 colIndex 取第一个可见叶子；y 用 ownHeight 下推 */
     generateColLayout(nodes: ColNode[], originX: number, originY: number) {
@@ -644,7 +676,6 @@ class Store {
     // 更新数据,比如总高度、宽度，最大层级，和对应的rowIndex、colIndex等
     update() {
         if (this.debug) console.time('store update');
-        this.generateRowIndex();
         this.sumHeight = this.rootRowNode.getSumHeight();
         this.sumWidth = this.rootColNode.getSumWidth();
         this.maxColLevel = this.rootColNode.getMaxColLevel();
@@ -660,6 +691,7 @@ class Store {
         this.headerHeight = 0;
         this.generateColLayout(this.renderColNodes, 0, 0);
         this.headerHeight = this.computeHeaderHeight();
+        this.generateRowLayout(this.rowNodes, this.headerHeight);
         console.log(this);
 
         if (this.debug) {
@@ -669,6 +701,7 @@ class Store {
             console.log('maxColLevel', this.maxColLevel);
             console.log('maxColLevel', this.maxColLevel);
             console.log('leafColNodes', this.renderColNodes);
+            // console.log('rowNodes', this.rowNodes);
             this.setChecked('1', 'checked')
 
             console.timeEnd('store update');

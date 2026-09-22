@@ -53,8 +53,12 @@ export default class Config {
     cellPadding: PaddingInput = 8;
     /** 表头背景色 */
     headerBgColor = '#F8FAFF';
+    /** 表头文本颜色 */
+    headerTextColor = '#1D2129';
     /** 主体背景色 */
     bodyBgColor = '#fff';
+    /** 主体文本颜色 */
+    bodyTextColor = '#4E5969';
     /** 选择框大小 */
     checkboxSize = 18;
     /** 选择框颜色 */

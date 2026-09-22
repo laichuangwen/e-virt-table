@@ -1,4 +1,3 @@
-import { offset } from '@floating-ui/dom';
 import { ScrollbarType } from "../types";
 import Context from "./Context";
 import { Paint } from "./Paint";

@@ -3,6 +3,7 @@ import { Widget } from "./Widget";
 import Header from "./Header";
 import Body from "./Body";
 import Scrollbar from "./Scrollbar";
+import { ColNode, RowNode } from "./Store";
 
 export default class Table extends Widget {
     private header: Header;
@@ -33,6 +34,33 @@ export default class Table extends Widget {
             this.context.isTableHovering = false;
         });
     }
+    private binarySearch(nodes: ColNode[] | RowNode[], value: number) {
+        let start = 0;
+        let end = nodes.length - 1;
+        let tempIndex = -1;
+        while (start <= end) {
+            const midIndex = Math.floor((start + end) / 2);
+            const node = nodes[midIndex];
+            let midValue = 0;
+            let inside = false;
+            if (node instanceof ColNode) {
+                midValue = node.x;
+                inside = node.x <= value && node.x + node.width >= value;
+            } else if (node instanceof RowNode) {
+                midValue = node.y;
+                inside = node.y <= value && node.y + node.height >= value;
+            }
+            if (inside) {
+                return midIndex;
+            } else if (midValue < value) {
+                start = midIndex + 1;
+            } else {
+                tempIndex = midIndex;
+                end = midIndex - 1;
+            }
+        }
+        return tempIndex;
+    }
     setScrollY(scrollY: number) {
         const _scrollY = Math.max(0, Math.min(Math.round(scrollY), this.verticalScrollbar.maxScroll));
         if (this.context.scrollY === _scrollY) return;
@@ -46,16 +74,19 @@ export default class Table extends Widget {
         this.context.draw();
     }
     update() {
-        this.x = 0;
-        this.y = 0;
-        this.width = this.context.stageWidth;
-        this.height = this.context.stageHeight;
         this.context.scrollbarGutter = this.verticalScrollbar.scrollbarGutter;
         this.context.maxScrollY = this.verticalScrollbar.maxScroll;
         this.context.maxScrollX = this.horizontalScrollbar.maxScroll;
+        const { centerColNodes, rowNodes } = this.context.store;
+        const { scrollX, stageWidth, scrollbarGutter, stageHeight, scrollY } = this.context;
+        const { fixedRightWidth, fixedLeftWidth, headerHeight } = this.context.store;
+        this.height = stageHeight;
+        this.width = stageWidth;
+        this.context.startCenterIndex = this.binarySearch(centerColNodes, scrollX - fixedLeftWidth);
+        this.context.endCenterIndex = this.binarySearch(centerColNodes, scrollX + stageWidth - scrollbarGutter - fixedRightWidth);
+        this.context.startRowIndex = this.binarySearch(rowNodes, scrollY + headerHeight);
+        this.context.endRowIndex = this.binarySearch(rowNodes, scrollY + stageHeight - scrollbarGutter);
         super.update();
         console.log('table update', this.getChildren());
-    }
-    destroy() {
     }
 }

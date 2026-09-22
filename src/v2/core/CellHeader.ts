@@ -1,14 +1,9 @@
-import { CellType } from "../types";
 import Cell from "./Cell";
 import Context from "./Context";
 import { Icon } from "./Icon";
 import { ColNode } from "./Store";
 import Text from "./Text";
 import { Paint } from "./Paint";
-export interface CellHeaderConfig {
-    cellType: CellType,
-    colNode: ColNode,
-}
 export default class CellHeader extends Cell {
     private colNode: ColNode;
     private checkIcon: Icon | null = null;
@@ -47,21 +42,22 @@ export default class CellHeader extends Cell {
         }, {
             stopPropagation: true,
         });
-        const { cellAlign, cellVerticalAlign, cellPadding } = this.context.config;
+        const { cellAlign, cellVerticalAlign, cellPadding, headerTextColor } = this.context.config;
         const { maxLineClampHeader, headerAlign, headerVerticalAlign, title } = this.colNode.column;
         this.text = new Text(this.context, {
-            beforeIcons: [this.checkIcon],
-            afterIcons: [],
-            padding: cellPadding,
-            selectionKey: `header:${this.colNode.key}`,
             x: this.x,
             y: this.y,
             width: this.width,
             height: this.height,
+            beforeIcons: [this.checkIcon],
+            afterIcons: [],
+            padding: cellPadding,
+            selectionKey: `header:${this.colNode.key}`,
             text: title,
             align: headerAlign || cellAlign,
             verticalAlign: headerVerticalAlign || cellVerticalAlign,
             maxLineClamp: maxLineClampHeader,
+            color: headerTextColor,
         });
         this.setChildren([this.text]);
         this.on('click:self', () => {

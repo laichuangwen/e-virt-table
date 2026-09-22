@@ -1,88 +1,60 @@
 import { CellType } from "../types";
 import Cell from "./Cell";
 import Context from "./Context";
-import { Icon } from "./Icon";
-import { ColNode } from "./Store";
+import { ColNode, RowNode } from "./Store";
 import Text from "./Text";
-import checkboxCheck from "../svg/checkbox-check.svg?raw";
-import checkboxUnchecked from "../svg/checkbox-uncheck.svg?raw";
-import checkboxIndeterminate from "../svg/checkbox-indeterminate.svg?raw";
-import checkboxDisabled from "../svg/checkbox-disabled.svg?raw";
 import { Paint } from "./Paint";
 export interface CellHeaderConfig {
     cellType: CellType,
     colNode: ColNode,
 }
-const checkStateMap = {
-    unchecked: checkboxUnchecked,
-    checked: checkboxCheck,
-    indeterminate: checkboxIndeterminate,
-    disabled: checkboxDisabled,
-}
 export default class CellBody extends Cell {
     private colNode: ColNode;
-    private checkIcon: Icon | null = null;
+    private rowNode: RowNode;
     private text: Text | null = null;
-    constructor(context: Context, colNode: ColNode) {
+    constructor(context: Context, colNode: ColNode, rowNode: RowNode) {
         super(context, {
             x: colNode.x,
-            y: colNode.y,
+            y: rowNode.y,
             width: colNode.width,
-            height: colNode.height,
+            height: rowNode.height,
             fixed: colNode.fixed,
             cellType: 'body',
         });
         this.colNode = colNode;
+        this.rowNode = rowNode;
         if (['left', 'right'].includes(this.colNode.fixed)) {
             this.zIndex = 100;
         }
-        const checkState = this.context.store.getStoreCheckState();
-        this.checkIcon = new Icon(this.context, {
-            name: 'check',
-            x: this.x,
-            y: this.y,
-            width: 18,
-            height: 18,
-            source: checkStateMap[checkState],
-            color: 'red',
-            zIndex: this.zIndex,
-            visible: colNode.column.type?.includes('selection') ?? false,
-        });
-        this.checkIcon.on('click:self', () => {
-            const checkState = this.context.store.getStoreCheckState();
-            const isCheckAll = checkState !== 'checked';
-            this.context.store.setCheckAll(isCheckAll);
-            this.context.draw();
-        },{
-            stopPropagation: true,
-        });
+        const { cellAlign, cellVerticalAlign, cellPadding, bodyTextColor } = this.context.config;
+        const { maxLineClamp } = this.colNode.column;
         this.text = new Text(this.context, {
-            zIndex: this.zIndex,
-            beforeIcons: [this.checkIcon],
+            beforeIcons: [],
             afterIcons: [],
-            align: 'left',
-            verticalAlign: 'middle',
-            padding: 8,
-            selectionKey: `header:${this.colNode.key}`,
-            text: this.colNode.column.title,
+            maxLineClamp,
+            align: cellAlign,
+            verticalAlign: cellVerticalAlign,
+            padding: cellPadding,
+            selectionKey: `body:${this.colNode.key}:${this.rowNode.key}`,
+            text: this.getText(),
             x: this.x,
             y: this.y,
             width: this.width,
             height: this.height,
+            color: bodyTextColor,
         });
-        this.setChildren([this.text, this.checkIcon]);
-        this.on('click:self', () => {
-            console.log('click-header=>>>>>>', this.colNode.column.title);
-        });
+        this.setChildren([this.text]);
+    }
+    getText(): string {
+        return this.rowNode.getTextValue(this.colNode.column.key);
     }
     update(): void {
         super.update();
-        console.log('cell header', this.zIndex);
     }
     render(paint: Paint): void {
-        const { headerBgColor, borderColor } = this.context.config;
+        const { bodyBgColor, borderColor } = this.context.config;
         paint.drawRect(this.x, this.y, this.width, this.height, {
-            fillColor: headerBgColor,
+            fillColor: bodyBgColor,
             borderColor,
         });
     }
