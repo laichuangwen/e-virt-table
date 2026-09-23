@@ -3,7 +3,7 @@ export type SortStateMapItem = { direction: SortDirection; timestamp: number };
 export type SortStateMap = Map<string, SortStateMapItem>;
 export type SortByType = 'number' | 'string' | 'date' | 'api' | ((a: any, b: any) => number);
 export type RenderType = 'default' | 'both';
-export type Type = 'index' | 'selection' | 'index-selection' | 'tree' | 'selection-tree' | 'tree-selection' | 'number';
+export type Type = 'index' | 'selection' | 'index-selection' | 'selection-text' | 'tree' | 'selection-tree' | 'tree-selection' | 'number';
 export type Align = 'left' | 'center' | 'right';
 export type VerticalAlign = 'top' | 'middle' | 'bottom';
 export type Fixed = 'left' | 'right' | '';

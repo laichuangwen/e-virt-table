@@ -29,18 +29,16 @@ export default class Body extends Widget {
     update() {
         const headerHeight = this.context.store.headerHeight;
         const { scrollbarGutter, stageWidth, stageHeight } = this.context;
-        this.x = 0;
-        this.y = headerHeight;
-        this.width = stageWidth - scrollbarGutter;
-        this.height = stageHeight - headerHeight - scrollbarGutter;
         const { centerColNodes, leftColNodes, rightColNodes, rowNodes, fixedLeftWidth, fixedRightWidth } = this.context.store;
         const { startRowIndex, endRowIndex, startCenterIndex, endCenterIndex } = this.context;
         const visibleCenterColNodes = centerColNodes.slice(startCenterIndex, endCenterIndex + 1);
         const visibleColNodes = [...leftColNodes, ...visibleCenterColNodes, ...rightColNodes];
         const leafColNodes = this.getLeafColNodes(visibleColNodes);
         const visibleRowNodes = rowNodes.slice(startRowIndex, endRowIndex + 1);
-        console.log('visibleColNodes', visibleColNodes);
-        console.log('visibleRowNodes', visibleRowNodes);
+        this.x = 0;
+        this.y = headerHeight;
+        this.width = stageWidth - scrollbarGutter;
+        this.height = stageHeight - headerHeight - scrollbarGutter;
         this.fixedLeftShadow = new FixedShadow(this.context, {
             fixed: 'left',
             x: 0,

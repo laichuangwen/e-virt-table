@@ -2,7 +2,7 @@ import { EVirtTableOptions } from "../../types";
 import { Paint } from "./Paint";
 import Config from './Config';
 import EvitListener from "./EvitListener";
-import Store from "./Store";
+import Store, { RowNode } from "./Store";
 import Table from "./Table";
 export default class Context {
     private animationFrameId = 0;
@@ -27,7 +27,6 @@ export default class Context {
     textSelectionKey = '';
     textSelAnchor = 0;
     textSelFocus = 0;
-    isMouseoverTargetContainer = false;
     isTableHovering = false;
     mousedown = false;
     isEmpty = false; // 是否空数据

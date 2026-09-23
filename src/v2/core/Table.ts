@@ -87,6 +87,5 @@ export default class Table extends Widget {
         this.context.startRowIndex = this.binarySearch(rowNodes, scrollY + headerHeight);
         this.context.endRowIndex = this.binarySearch(rowNodes, scrollY + stageHeight - scrollbarGutter);
         super.update();
-        console.log('table update', this.getChildren());
     }
 }

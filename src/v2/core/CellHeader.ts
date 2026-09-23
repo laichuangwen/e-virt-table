@@ -32,18 +32,18 @@ export default class CellHeader extends Cell {
             height: checkboxSize,
             source: icon?.source,
             color: 'red',
-            visible: colNode.column.type?.includes('selection') ?? false,
-        });
-        this.checkIcon.on('click:self', () => {
-            const checkState = this.context.store.getStoreCheckState();
-            const isCheckAll = checkState !== 'checked';
-            this.context.store.setCheckAll(isCheckAll);
-            this.context.draw();
-        }, {
-            stopPropagation: true,
+            visible: this.hasSelection,
+            on: {
+                'click:self': () => {
+                    const checkState = this.context.store.getStoreCheckState();
+                    const isCheckAll = checkState !== 'checked';
+                    this.context.store.setCheckAll(isCheckAll);
+                    this.context.draw();
+                },
+            },
         });
         const { cellAlign, cellVerticalAlign, cellPadding, headerTextColor } = this.context.config;
-        const { maxLineClampHeader, headerAlign, headerVerticalAlign, title } = this.colNode.column;
+        const { maxLineClampHeader, headerAlign, headerVerticalAlign, title, align, verticalAlign } = this.colNode.column;
         this.text = new Text(this.context, {
             x: this.x,
             y: this.y,
@@ -54,8 +54,8 @@ export default class CellHeader extends Cell {
             padding: cellPadding,
             selectionKey: `header:${this.colNode.key}`,
             text: title,
-            align: headerAlign || cellAlign,
-            verticalAlign: headerVerticalAlign || cellVerticalAlign,
+            align: headerAlign || align || cellAlign,
+            verticalAlign: headerVerticalAlign || verticalAlign || cellVerticalAlign,
             maxLineClamp: maxLineClampHeader,
             color: headerTextColor,
         });
@@ -63,6 +63,9 @@ export default class CellHeader extends Cell {
         this.on('click:self', () => {
             console.log('click-header=>>>>>>', this.colNode.column.title);
         });
+    }
+    get hasSelection(): boolean {
+        return this.colNode.column.type?.includes('selection') ?? false;
     }
     update(): void {
         super.update();

@@ -41,6 +41,7 @@ export class IconWithShadow extends Icon {
             this.y + this.padding,
             this.width - this.padding * 2,
             this.height - this.padding * 2,
+            this.rotate,
         );
     }
 }

@@ -111,9 +111,17 @@ export class Paint {
     /**
      * 绘制图片
      */
-    drawImage(img: CanvasImageSource, x: number, y: number, width: number, height: number) {
+    drawImage(img: CanvasImageSource, x: number, y: number, width: number, height: number, rotate = 0) {
         this.ctx.save();
-        this.ctx.drawImage(img, x, y, width, height);
+        if (rotate) {
+            const centerX = x + width / 2;
+            const centerY = y + height / 2;
+            this.ctx.translate(centerX, centerY);
+            this.ctx.rotate((rotate * Math.PI) / 180);
+            this.ctx.drawImage(img, -width / 2, -height / 2, width, height);
+        } else {
+            this.ctx.drawImage(img, x, y, width, height);
+        }
         this.ctx.restore();
     }
 

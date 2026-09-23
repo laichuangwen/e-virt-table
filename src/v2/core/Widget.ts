@@ -29,6 +29,9 @@ export interface WidgetConfig {
     height: number
     visible?: boolean
     zIndex?: number
+    on?: {
+        [K in WidgetEventName]?: WidgetEventCallback<K>
+    }
 }
 
 export abstract class Widget {
@@ -51,6 +54,11 @@ export abstract class Widget {
         this.height = config?.height ?? 0
         this.visible = config?.visible ?? true
         this.zIndex = config?.zIndex ?? 0
+        if (config?.on) {
+            for (const [eventName, callback] of Object.entries(config.on)) {
+                this.on(eventName as WidgetEventName, callback as WidgetEventCallback)
+            }
+        }
     }
     setChildren(children: Widget[]) {
         for (const child of this.children) {

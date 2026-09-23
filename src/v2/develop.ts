@@ -14,7 +14,7 @@ let columns: Column[] = [
         title: '工号',
         key: 'emp_no',
         align: 'left',
-        // type: 'tree',
+        type: 'tree',
         // operation: true,
         readonly: false,
         width: 120,
@@ -40,8 +40,11 @@ let columns: Column[] = [
     {
         key: 'id',
         width: 100,
-        title: 'ID',
-        fixed: 'left',
+        title: '',
+        // fixed: 'left',
+        type: 'index-selection',
+        align: 'center',
+        verticalAlign: 'middle',
         // dragRow: true,
         minWidth: 80,
         maxWidth: 200,
@@ -58,6 +61,7 @@ let columns: Column[] = [
         width: 100,
         fixed: 'left',
         align: 'left',
+        type: 'selection-text',
         // dragRow: true,
         // type: 'selection',
         // type: 'index-selection',
@@ -464,7 +468,7 @@ let columns: Column[] = [
     },
 ];
 let data: any[] = [];
-for (let i = 0; i < 240; i += 1) {
+for (let i = 0; i < 24000; i += 1) {
     data.push({
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
         id: `${i}`,

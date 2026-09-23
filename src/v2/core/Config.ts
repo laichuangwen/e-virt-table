@@ -3,6 +3,8 @@ import checkboxCheck from "../svg/checkbox-check.svg?raw";
 import checkboxUnchecked from "../svg/checkbox-uncheck.svg?raw";
 import checkboxIndeterminate from "../svg/checkbox-indeterminate.svg?raw";
 import checkboxDisabled from "../svg/checkbox-disabled.svg?raw";
+import expandIcon from "../svg/expand.svg?raw";
+import shrinkIcon from "../svg/select.svg?raw";
 
 export type RenderIcon = {
     name: string;
@@ -79,6 +81,12 @@ export default class Config {
     checkboxIndeterminateSvg = checkboxIndeterminate;
     /** 选择框禁用图标 */
     checkboxDisabledSvg = checkboxDisabled;
+    /** 展开图标颜色 */
+    expandIconColor = '#4E5969';
+    /** 展开图标 */
+    expandIconSvg = expandIcon;
+    /** 展开图标大小 */
+    expandIconSize = 18;
     /** 合计行底部固定 */
     footerFixed = true;
     constructor(config: Partial<Config> = {}) {
@@ -146,6 +154,11 @@ export default class Config {
                 name: 'checkbox-disabled',
                 color: this.checkboxDisabledColor,
                 svg: checkboxDisabled,
+            },
+            {
+                name: 'expand',
+                color: this.expandIconColor,
+                svg: this.expandIconSvg,
             },
         ].map((item) => {
             return {

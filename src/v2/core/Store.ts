@@ -377,6 +377,7 @@ class Store {
     private rootRowNode!: RowNode;
     private rootColNode!: ColNode;
     private context!: Context;
+    private hoverRowNode: RowNode | null = null;
     rootKey = 'root_evt';
     uuidKey = 'id';
     childrenKey = 'children';
@@ -395,7 +396,6 @@ class Store {
     fixedRightWidth = 0;
     columns: Column[] = [];
     data: any[] = [];
-    // flatRows: FlatRow[] = [];
     leftColNodes: ColNode[] = [];
     rightColNodes: ColNode[] = [];
     centerColNodes: ColNode[] = [];
@@ -720,6 +720,14 @@ class Store {
             children: node.childrenNodes.map(toData),
         });
         return this.rowNodes.map(toData);
+    }
+    setHoverRowNode(node: RowNode) {
+        if (this.hoverRowNode === node) return;
+        this.hoverRowNode = node;
+        this.context.draw();
+    }
+    getHoverRowNode() {
+        return this.hoverRowNode;
     }
 }
 
