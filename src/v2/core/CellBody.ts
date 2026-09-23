@@ -65,7 +65,7 @@ export default class CellBody extends Cell {
             rotate: this.isExpanded ? 90 : 0,
             on: {
                 'click:self': () => {
-                    this.rowNode.setExpand(!this.isExpanded);
+                    this.context.store.setExpand(this.rowNode.key,!this.isExpanded);
                     this.context.draw();
                 },
             },
@@ -101,6 +101,7 @@ export default class CellBody extends Cell {
     }
     get expandVisible(): boolean {
         const { type } = this.colNode.column;
+        if (!this.rowNode.hasChildren) return false;
         if (type === 'tree') return true;
         return false;
     }

@@ -692,8 +692,6 @@ class Store {
         this.generateColLayout(this.renderColNodes, 0, 0);
         this.headerHeight = this.computeHeaderHeight();
         this.generateRowLayout(this.rowNodes, this.headerHeight);
-        console.log(this);
-
         if (this.debug) {
             console.log('rowNodes SIZE:', this.rowNodeMaps.size);
             console.log('sumHeight', this.sumHeight);
@@ -701,7 +699,7 @@ class Store {
             console.log('maxColLevel', this.maxColLevel);
             console.log('maxColLevel', this.maxColLevel);
             console.log('leafColNodes', this.renderColNodes);
-            // console.log('rowNodes', this.rowNodes);
+            console.log('rowNodes', this.rowNodes);
             this.setChecked('1', 'checked')
 
             console.timeEnd('store update');

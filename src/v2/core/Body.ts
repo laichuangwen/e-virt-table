@@ -62,6 +62,9 @@ export default class Body extends Widget {
                     const cell = new CellBody(this.context, colNode, rowNode);
                     list.push(cell);
                 }
+                if (rowNode.hasChildren) {
+                    generateCells(rowNode.childrenNodes);
+                }
             }
         }
         generateCells(visibleRowNodes);
