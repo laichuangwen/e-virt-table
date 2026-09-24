@@ -1,4 +1,4 @@
-import { CellType } from "../types";
+import { CellType, Padding, PaddingInput } from "../types";
 import Cell from "./Cell";
 import Context from "./Context";
 import { ColNode, RowNode } from "./Store";
@@ -29,7 +29,7 @@ export default class CellBody extends Cell {
         if (['left', 'right'].includes(this.colNode.fixed)) {
             this.zIndex = 100;
         }
-        const { cellAlign, cellVerticalAlign, cellPadding, bodyTextColor } = this.context.config;
+        const { cellAlign, cellVerticalAlign, cellPadding, bodyTextColor, cellTextWidgetGap } = this.context.config;
         const { maxLineClamp, align, verticalAlign } = this.colNode.column;
         const checkState = this.rowNode.getCheckState();
         const { checkboxSize, expandIconSize } = this.context.config;
@@ -65,14 +65,14 @@ export default class CellBody extends Cell {
             rotate: this.isExpanded ? 90 : 0,
             on: {
                 'click:self': () => {
-                    this.context.store.setExpand(this.rowNode.key,!this.isExpanded);
+                    this.context.store.setExpand(this.rowNode.key, !this.isExpanded);
                     this.context.draw();
                 },
             },
         });
         this.text = new Text(this.context, {
-            beforeIcons: [this.checkIcon, this.expandIcon],
-            afterIcons: [],
+            beforeWidgets: [this.checkIcon, this.expandIcon],
+            afterWidgets: [],
             maxLineClamp,
             align: align || cellAlign,
             verticalAlign: verticalAlign || cellVerticalAlign,
@@ -84,6 +84,8 @@ export default class CellBody extends Cell {
             width: this.width,
             height: this.height,
             color: bodyTextColor,
+            offsetLeft: this.expandOffsetLeft,
+            widgetGap: cellTextWidgetGap,
         });
         this.setChildren([this.text]);
         this.on('click:self', () => {
@@ -99,11 +101,22 @@ export default class CellBody extends Cell {
     get isChecked(): boolean {
         return this.rowNode.getCheckState() === 'checked';
     }
-    get expandVisible(): boolean {
+    get hasExpand() {
         const { type } = this.colNode.column;
-        if (!this.rowNode.hasChildren) return false;
         if (type === 'tree') return true;
+    }
+    get expandVisible(): boolean {
+        if (!this.rowNode.hasChildren) return false;
+        if (this.hasExpand) return true;
         return false;
+    }
+    get expandOffsetLeft(): number {
+        const { expandIconSize, cellTextWidgetGap } = this.context.config;
+        if (!this.hasExpand) return 0;
+        if (!this.expandVisible && this.rowNode.level > 0) {
+            return expandIconSize + cellTextWidgetGap + expandIconSize * this.rowNode.level;
+        }
+        return expandIconSize * this.rowNode.level;
     }
     get checkboxVisible(): boolean {
         const { type } = this.colNode.column;

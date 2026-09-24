@@ -42,15 +42,15 @@ export default class CellHeader extends Cell {
                 },
             },
         });
-        const { cellAlign, cellVerticalAlign, cellPadding, headerTextColor } = this.context.config;
+        const { cellAlign, cellVerticalAlign, cellPadding, headerTextColor,cellTextWidgetGap } = this.context.config;
         const { maxLineClampHeader, headerAlign, headerVerticalAlign, title, align, verticalAlign } = this.colNode.column;
         this.text = new Text(this.context, {
             x: this.x,
             y: this.y,
             width: this.width,
             height: this.height,
-            beforeIcons: [this.checkIcon],
-            afterIcons: [],
+            beforeWidgets: [this.checkIcon],
+            afterWidgets: [],
             padding: cellPadding,
             selectionKey: `header:${this.colNode.key}`,
             text: title,
@@ -58,6 +58,7 @@ export default class CellHeader extends Cell {
             verticalAlign: headerVerticalAlign || verticalAlign || cellVerticalAlign,
             maxLineClamp: maxLineClampHeader,
             color: headerTextColor,
+            widgetGap: cellTextWidgetGap,
         });
         this.setChildren([this.text]);
         this.on('click:self', () => {

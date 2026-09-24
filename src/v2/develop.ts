@@ -61,7 +61,6 @@ let columns: Column[] = [
         width: 100,
         fixed: 'left',
         align: 'left',
-        type: 'selection-text',
         // dragRow: true,
         // type: 'selection',
         // type: 'index-selection',

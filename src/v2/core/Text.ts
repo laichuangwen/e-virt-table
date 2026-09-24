@@ -1,9 +1,7 @@
 import { Align, LineClampType, Padding, PaddingInput, VerticalAlign } from '../types'
 import type Context from './Context'
-import { Icon } from './Icon'
 import type { Paint } from './Paint'
 import { Widget, type WidgetConfig } from './Widget'
-
 export interface TextConfig extends WidgetConfig {
   text: string
   /** 划选稳定标识；Header/Body 重建 Text 后仍能续上选区 */
@@ -22,9 +20,17 @@ export interface TextConfig extends WidgetConfig {
   lineHeight?: number
   color?: string
   selectionColor?: string
-  beforeIcons?: Icon[]
-  afterIcons?: Icon[]
-  iconGap?: number
+  beforeWidgets?: Widget[]
+  afterWidgets?: Widget[]
+  widgetGap?: number
+  /** 内容区左侧额外占位 */
+  offsetLeft?: number
+  /** 内容区右侧额外占位 */
+  offsetRight?: number
+  /** 内容区顶部额外占位 */
+  offsetTop?: number
+  /** 内容区底部额外占位 */
+  offsetBottom?: number
 }
 
 export interface TextSelectionRange {
@@ -65,8 +71,8 @@ interface ContentBox {
   contentHeight: number
   contentXEnd: number
   contentYEnd: number
-  beforeIconsWidth: number
-  afterIconsWidth: number
+  beforeWidgetsWidth: number
+  afterWidgetsWidth: number
 }
 
 interface LayoutLine {
@@ -108,8 +114,12 @@ const defaultTextOptions = {
   autoRowHeight: false,
   onAutoHeight: undefined as ((height: number) => void) | undefined,
   selectionColor: DEFAULT_SELECTION_COLOR,
-  iconGap: 4,
+  widgetGap: 4,
   type: 'text' as 'text' | 'link',
+  offsetLeft: 0,
+  offsetRight: 0,
+  offsetTop: 0,
+  offsetBottom: 0,
 }
 
 type ResolvedTextOptions = typeof defaultTextOptions
@@ -303,15 +313,15 @@ function clampLines(
   return { lines: clamped, clamped: true }
 }
 
-function iconsSpanWidth(icons: Icon[], gap: number): number {
-  if (icons.length === 0) return 0
-  return icons.reduce((sum, icon, i) => {
-    return sum + icon.width + (i < icons.length - 1 ? gap : 0)
+function widgetsSpanWidth(widgets: Widget[], gap: number): number {
+  if (widgets.length === 0) return 0
+  return widgets.reduce((sum, widget, i) => {
+    return sum + widget.width + (i < widgets.length - 1 ? gap : 0)
   }, 0)
 }
 
-function measureIconsWidth(icons: Icon[], gap: number): number {
-  return icons.length === 0 ? 0 : iconsSpanWidth(icons, gap) + gap
+function measureWidgetsWidth(widgets: Widget[], gap: number): number {
+  return widgets.length === 0 ? 0 : widgetsSpanWidth(widgets, gap) + gap
 }
 
 function measureEdges(ctx: CanvasRenderingContext2D, text: string): number[] {
@@ -339,8 +349,8 @@ export default class Text extends Widget {
   private readonly options: ResolvedTextOptions
   private readonly pad: Padding
   private readonly box: ContentBox
-  private readonly beforeIcons: Icon[]
-  private readonly afterIcons: Icon[]
+  private readonly beforeWidgets: Widget[]
+  private readonly afterWidgets: Widget[]
   private layoutCache: TextLayout | null = null
   private result: DrawTextResult = EMPTY_RESULT
   constructor(context: Context, config: TextConfig) {
@@ -349,10 +359,10 @@ export default class Text extends Widget {
     this.selectionKey = config.selectionKey ?? `text:${config.x},${config.y},${config.text}`
     this.options = { ...defaultTextOptions, ...config }
     this.pad = normalizePadding(this.options.padding)
-    this.beforeIcons = (config.beforeIcons ?? []).filter((icon) => icon.visible)
-    this.afterIcons = (config.afterIcons ?? []).filter((icon) => icon.visible)
+    this.beforeWidgets = (config.beforeWidgets ?? []).filter((widget) => widget.visible)
+    this.afterWidgets = (config.afterWidgets ?? []).filter((widget) => widget.visible)
     this.box = this.createContentBox()
-    this.setChildren([...this.beforeIcons, ...this.afterIcons])
+    this.setChildren([...this.beforeWidgets, ...this.afterWidgets])
     this.on('pointerdown', (e) => this.handlePointerDown(e))
     this.on('pointermove', (e) => this.handlePointerMove(e))
     this.on('pointerup', (e) => this.handlePointerUp(e))
@@ -360,14 +370,14 @@ export default class Text extends Widget {
   getDrawResult(): DrawTextResult {
     return this.result
   }
-  getBeforeIcons(): Icon[] {
-    return this.beforeIcons
+  getBeforeWidgets(): Widget[] {
+    return this.beforeWidgets
   }
-  getAfterIcons(): Icon[] {
-    return this.afterIcons
+  getAfterWidgets(): Widget[] {
+    return this.afterWidgets
   }
-  getIcons(): Icon[] {
-    return [...this.beforeIcons, ...this.afterIcons]
+  getWidgets(): Widget[] {
+    return [...this.beforeWidgets, ...this.afterWidgets]
   }
 
   render(paint: Paint): void {
@@ -380,17 +390,22 @@ export default class Text extends Widget {
     const { lines, charHeight, flatText, neededHeight, clamped } = layout
 
     if (this.options.autoRowHeight) {
-      const neededBoxHeight = neededHeight + this.pad.top + this.pad.bottom
+      const neededBoxHeight =
+        neededHeight +
+        this.pad.top +
+        this.pad.bottom +
+        this.options.offsetTop +
+        this.options.offsetBottom
       this.options.onAutoHeight?.(Math.ceil(neededBoxHeight))
     }
     const drawnHeight =
       linesHeight(lines.length, charHeight) +
       (layout.afterOnNextLine ? charHeight : 0)
 
-    this.layoutIcons(lines, layout.afterOnNextLine)
+    this.layoutWidgets(lines, layout.afterOnNextLine)
     this.paintSelection(ctx, layout)
     this.paintLines(ctx, lines)
-    // this.paintIcons()
+    // this.paintWidgets()
     this.result = {
       height: drawnHeight,
       neededHeight,
@@ -485,7 +500,7 @@ export default class Text extends Widget {
   private handlePointerDown(e: PointerEvent): void {
     if (e.button !== 0) return
     e.preventDefault()
-    if(!this.insideByEvent(e)) {
+    if (!this.insideByEvent(e)) {
       return;
     }
     const { x, y } = this.context.paint.getRelativePosition(e)
@@ -525,11 +540,12 @@ export default class Text extends Widget {
   private createContentBox(): ContentBox {
     const { x, y, width, height } = this
     const { left, top, right, bottom } = this.pad
-    const contentX = x + left
-    const contentY = y + top
-    const contentWidth = width - left - right
-    const contentHeight = height - top - bottom
-    const gap = this.options.iconGap
+    const { offsetLeft, offsetRight, offsetTop, offsetBottom } = this.options
+    const contentX = x + left + offsetLeft
+    const contentY = y + top + offsetTop
+    const contentWidth = width - left - right - offsetLeft - offsetRight
+    const contentHeight = height - top - bottom - offsetTop - offsetBottom
+    const gap = this.options.widgetGap
     return {
       x,
       y,
@@ -541,22 +557,22 @@ export default class Text extends Widget {
       contentHeight,
       contentXEnd: contentX + contentWidth,
       contentYEnd: contentY + contentHeight,
-      beforeIconsWidth: measureIconsWidth(this.beforeIcons, gap),
-      afterIconsWidth: measureIconsWidth(this.afterIcons, gap),
+      beforeWidgetsWidth: measureWidgetsWidth(this.beforeWidgets, gap),
+      afterWidgetsWidth: measureWidgetsWidth(this.afterWidgets, gap),
     }
   }
 
   private isValid(): boolean {
     const { width, height } = this
     const { fontSize } = this.options
-    const { contentWidth, contentHeight, beforeIconsWidth } = this.box
+    const { contentWidth, contentHeight, beforeWidgetsWidth } = this.box
     return (
       width > 0 &&
       height > 0 &&
       fontSize > 0 &&
       contentWidth > 0 &&
       contentHeight > 0 &&
-      contentWidth - beforeIconsWidth > 0
+      contentWidth - beforeWidgetsWidth > 0
     )
   }
   private buildFontStyle(): string {
@@ -592,8 +608,8 @@ export default class Text extends Widget {
       linesHeight(prepared.lines.length, charHeight) +
       (afterOnNextLine ? charHeight : 0)
     const startY = this.resolveVerticalAlign(drawnHeight)
-    const { contentX, contentWidth, beforeIconsWidth, afterIconsWidth } = box
-    const afterOnSameLine = !afterOnNextLine && this.afterIcons.length > 0
+    const { contentX, contentWidth, beforeWidgetsWidth, afterWidgetsWidth } = box
+    const afterOnSameLine = !afterOnNextLine && this.afterWidgets.length > 0
     const layoutLines: LayoutLine[] = []
     let flatStart = 0
     let txtY = startY
@@ -601,9 +617,9 @@ export default class Text extends Widget {
     for (let i = 0; i < lineCount; i++) {
       const text = prepared.lines[i].trimEnd()
       const width = text ? ctx.measureText(text).width : 0
-      const lead = i === 0 ? beforeIconsWidth : 0
+      const lead = i === 0 ? beforeWidgetsWidth : 0
       const trail =
-        i === lineCount - 1 && afterOnSameLine ? afterIconsWidth : 0
+        i === lineCount - 1 && afterOnSameLine ? afterWidgetsWidth : 0
       const lineBoxX = contentX + lead
       const lineBoxW = Math.max(0, contentWidth - lead - trail)
       layoutLines.push({
@@ -644,10 +660,10 @@ export default class Text extends Widget {
     charHeight: number
   ): { lines: string[]; clamped: boolean; neededHeight: number } {
     const { text, options, box } = this
-    const { contentWidth, contentHeight, beforeIconsWidth, afterIconsWidth } =
+    const { contentWidth, contentHeight, beforeWidgetsWidth, afterWidgetsWidth } =
       box
 
-    const firstLineWidth = Math.max(0, contentWidth - beforeIconsWidth)
+    const firstLineWidth = Math.max(0, contentWidth - beforeWidgetsWidth)
     // 高度连一行都放不下时仍保留 1 行，避免空白，改画省略号
     const fitLines = options.autoRowHeight
       ? undefined
@@ -656,8 +672,8 @@ export default class Text extends Widget {
       fitLines == null ? undefined : Math.max(1, fitLines)
 
     const lastLineMax = (lineCount: number) => {
-      const lead = lineCount <= 1 ? beforeIconsWidth : 0
-      return Math.max(0, contentWidth - lead - afterIconsWidth)
+      const lead = lineCount <= 1 ? beforeWidgetsWidth : 0
+      return Math.max(0, contentWidth - lead - afterWidgetsWidth)
     }
     let lines = splitText({
       ctx,
@@ -696,7 +712,7 @@ export default class Text extends Widget {
       }
     }
 
-    if (afterIconsWidth > 0 && lines.length > 0) {
+    if (afterWidgetsWidth > 0 && lines.length > 0) {
       const last = lines[lines.length - 1]
       const lastMax = lastLineMax(lines.length)
       if (ctx.measureText(last).width > lastMax) {
@@ -729,40 +745,40 @@ export default class Text extends Widget {
     ctx: CanvasRenderingContext2D,
     lines: string[]
   ): boolean {
-    if (this.afterIcons.length === 0 || lines.length === 0) return false
-    const { contentWidth, beforeIconsWidth, afterIconsWidth } = this.box
+    if (this.afterWidgets.length === 0 || lines.length === 0) return false
+    const { contentWidth, beforeWidgetsWidth, afterWidgetsWidth } = this.box
     const last = lines[lines.length - 1].trimEnd()
     const lastWidth = last ? ctx.measureText(last).width : 0
-    const lead = lines.length === 1 ? beforeIconsWidth : 0
-    return lastWidth + afterIconsWidth <= contentWidth - lead + 0.5
+    const lead = lines.length === 1 ? beforeWidgetsWidth : 0
+    return lastWidth + afterWidgetsWidth <= contentWidth - lead + 0.5
   }
 
   private willPlaceAfterOnNextLine(
     ctx: CanvasRenderingContext2D,
     lines: string[]
   ): boolean {
-    if (this.afterIcons.length === 0) return false
+    if (this.afterWidgets.length === 0) return false
     if (!lines.some((line) => line.trimEnd().length > 0)) return false
     return !this.canPlaceAfterOnSameLine(ctx, lines)
   }
 
-  private layoutIcons(lines: LayoutLine[], afterOnNextLine: boolean): void {
+  private layoutWidgets(lines: LayoutLine[], afterOnNextLine: boolean): void {
     const { contentX, contentXEnd, contentWidth, contentY, contentHeight } =
       this.box
-    const gap = this.options.iconGap
+    const gap = this.options.widgetGap
     const align = this.options.align
 
     const placeRow = (
-      icons: Icon[],
+      widgets: Widget[],
       startX: number,
       lineY: number,
       lineH: number
     ) => {
       let x = startX
-      for (const icon of icons) {
-        icon.x = x
-        icon.y = lineY + (lineH - icon.height) / 2
-        x += icon.width + gap
+      for (const widget of widgets) {
+        widget.x = x
+        widget.y = lineY + (lineH - widget.height) / 2
+        x += widget.width + gap
       }
     }
 
@@ -774,14 +790,14 @@ export default class Text extends Widget {
     }
 
     const placeBothInOneRow = (lineY: number, lineH: number) => {
-      const beforeSpan = iconsSpanWidth(this.beforeIcons, gap)
-      const afterSpan = iconsSpanWidth(this.afterIcons, gap)
+      const beforeSpan = widgetsSpanWidth(this.beforeWidgets, gap)
+      const afterSpan = widgetsSpanWidth(this.afterWidgets, gap)
       const midGap =
-        this.beforeIcons.length && this.afterIcons.length ? gap : 0
+        this.beforeWidgets.length && this.afterWidgets.length ? gap : 0
       let x = alignedX(beforeSpan + afterSpan + midGap)
-      placeRow(this.beforeIcons, x, lineY, lineH)
-      if (this.beforeIcons.length) x += beforeSpan + gap
-      placeRow(this.afterIcons, x, lineY, lineH)
+      placeRow(this.beforeWidgets, x, lineY, lineH)
+      if (this.beforeWidgets.length) x += beforeSpan + gap
+      placeRow(this.afterWidgets, x, lineY, lineH)
     }
     const hasVisibleText = lines.some((line) => line.text.length > 0)
     if (lines.length === 0 || !hasVisibleText) {
@@ -793,21 +809,21 @@ export default class Text extends Widget {
     }
     const first = lines[0]
     const last = lines[lines.length - 1]
-    if (this.beforeIcons.length > 0) {
-      const beforeSpan = iconsSpanWidth(this.beforeIcons, gap)
-      placeRow(this.beforeIcons, first.x - gap - beforeSpan, first.y, first.height)
+    if (this.beforeWidgets.length > 0) {
+      const beforeSpan = widgetsSpanWidth(this.beforeWidgets, gap)
+      placeRow(this.beforeWidgets, first.x - gap - beforeSpan, first.y, first.height)
     }
-    if (this.afterIcons.length === 0) return
+    if (this.afterWidgets.length === 0) return
     if (afterOnNextLine) {
       placeRow(
-        this.afterIcons,
-        alignedX(iconsSpanWidth(this.afterIcons, gap)),
+        this.afterWidgets,
+        alignedX(widgetsSpanWidth(this.afterWidgets, gap)),
         last.y + last.height,
         last.height
       )
       return
     }
-    placeRow(this.afterIcons, last.x + last.width + gap, last.y, last.height)
+    placeRow(this.afterWidgets, last.x + last.width + gap, last.y, last.height)
   }
 
   private paintSelection(ctx: CanvasRenderingContext2D, layout: TextLayout): void {

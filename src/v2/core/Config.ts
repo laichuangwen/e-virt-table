@@ -53,6 +53,8 @@ export default class Config {
     cellHeaderHeight = 32;
     /** 单元格内边距 */
     cellPadding: PaddingInput = 8;
+    /** 单元格文本与小部件之间的间距 */
+    cellTextWidgetGap: number = 4;
     /** 表头背景色 */
     headerBgColor = '#F8FAFF';
     /** 表头文本颜色 */
