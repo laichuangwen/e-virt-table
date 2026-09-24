@@ -405,6 +405,8 @@ class Store {
     colStoreMaps: Map<string, ColStore> = new Map();
     rowNodeMaps: Map<RowNodeKey, RowNode> = new Map();
     colNodeMaps: Map<string, ColNode> = new Map();
+    colIndexMaps: Map<number, ColNode> = new Map();
+    rowIndexMaps: Map<number, RowNode> = new Map();
     rowSelectable: RowSelectable | undefined;
     constructor(props: { context: Context; columns: Column[]; data: any[]; defaultRowHeight?: number; uuidKey?: string; childrenKey?: string; hasTree?: boolean }) {
         const { context, columns, data } = props;
@@ -443,6 +445,25 @@ class Store {
     }
     get colNodes(): ColNode[] {
         return this.rootColNode.childrenNodes;
+    }
+    getRenderRowNodes(): RowNode[] {
+       return Array.from(this.rowIndexMaps.values());
+    }
+    getRowNodesRange(startIndex: number, endIndex: number) {
+        const rowNodes: RowNode[] = [];
+        for (let i = startIndex; i <= endIndex; i++) {
+            const rowNode = this.getRowNodeByIndex(i);
+            if (rowNode) {
+                rowNodes.push(rowNode);
+            }
+        }
+        return rowNodes;
+    }
+    getRowNodeByIndex(index: number) {
+        return this.rowIndexMaps.get(index);
+    }
+    getColNodeByIndex(index: number) {
+        return this.colIndexMaps.get(index);
     }
     getMaxColLevel(): number {
         return this.rootColNode.getMaxColLevel();
@@ -537,6 +558,7 @@ class Store {
     /** 一次遍历生成 rowIndex 与 y：按行高累加；隐藏行、未展开子树不参与 */
     generateRowLayout(nodes: RowNode[], originY: number) {
         let index = 0;
+        this.rowIndexMaps.clear();
         const reset = (node: RowNode) => {
             node.setY(-1);
             node.setRowIndex(-1);
@@ -550,7 +572,9 @@ class Store {
                     continue;
                 }
                 child.setY(offsetY);
-                child.setRowIndex(index++);
+                child.setRowIndex(index);
+                this.rowIndexMaps.set(index, child);
+                index += 1;
                 offsetY += child.height;
                 if (child.expand && child.hasChildren) {
                     offsetY = walk(child.childrenNodes, offsetY);
@@ -565,6 +589,7 @@ class Store {
     /** 一次遍历生成 colIndex 与 x/y：父级 colIndex 取第一个可见叶子；y 用 ownHeight 下推 */
     generateColLayout(nodes: ColNode[], originX: number, originY: number) {
         let index = 0;
+        this.colIndexMaps.clear();
         const walk = (list: ColNode[], x: number, y: number): void => {
             let everyOffsetX = x;
             for (const child of list) {
@@ -575,7 +600,9 @@ class Store {
                     child.setColIndex(index);
                     walk(child.childrenNodes, everyOffsetX, y + child.ownHeight);
                 } else {
-                    child.setColIndex(index++);
+                    child.setColIndex(index);
+                    this.colIndexMaps.set(index, child);
+                    index += 1;
                 }
                 everyOffsetX += child.width;
             }

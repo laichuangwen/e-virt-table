@@ -15,7 +15,7 @@ export default class Body extends Widget {
         // 递归遍历取最末级数
         const leaves: ColNode[] = [];
         const walk = (nodes: ColNode[]): void => {
-            for (const child of nodes){
+            for (const child of nodes) {
                 if (child.hasChildren) {
                     walk(child.childrenNodes);
                 } else {
@@ -29,12 +29,12 @@ export default class Body extends Widget {
     update() {
         const headerHeight = this.context.store.headerHeight;
         const { scrollbarGutter, stageWidth, stageHeight } = this.context;
-        const { centerColNodes, leftColNodes, rightColNodes, rowNodes, fixedLeftWidth, fixedRightWidth } = this.context.store;
+        const { centerColNodes, leftColNodes, rightColNodes, fixedLeftWidth, fixedRightWidth } = this.context.store;
         const { startRowIndex, endRowIndex, startCenterIndex, endCenterIndex } = this.context;
         const visibleCenterColNodes = centerColNodes.slice(startCenterIndex, endCenterIndex + 1);
         const visibleColNodes = [...leftColNodes, ...visibleCenterColNodes, ...rightColNodes];
         const leafColNodes = this.getLeafColNodes(visibleColNodes);
-        const visibleRowNodes = rowNodes.slice(startRowIndex, endRowIndex + 1);
+        const visibleRowNodes = this.context.store.getRowNodesRange(startRowIndex, endRowIndex);
         this.x = 0;
         this.y = headerHeight;
         this.width = stageWidth - scrollbarGutter;

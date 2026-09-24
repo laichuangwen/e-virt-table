@@ -77,15 +77,16 @@ export default class Table extends Widget {
         this.context.scrollbarGutter = this.verticalScrollbar.scrollbarGutter;
         this.context.maxScrollY = this.verticalScrollbar.maxScroll;
         this.context.maxScrollX = this.horizontalScrollbar.maxScroll;
-        const { centerColNodes, rowNodes } = this.context.store;
+        const { centerColNodes } = this.context.store;
         const { scrollX, stageWidth, scrollbarGutter, stageHeight, scrollY } = this.context;
         const { fixedRightWidth, fixedLeftWidth, headerHeight } = this.context.store;
         this.height = stageHeight;
         this.width = stageWidth;
         this.context.startCenterIndex = this.binarySearch(centerColNodes, scrollX - fixedLeftWidth);
         this.context.endCenterIndex = this.binarySearch(centerColNodes, scrollX + stageWidth - scrollbarGutter - fixedRightWidth);
-        this.context.startRowIndex = this.binarySearch(rowNodes, scrollY + headerHeight);
-        this.context.endRowIndex = this.binarySearch(rowNodes, scrollY + stageHeight - scrollbarGutter);
+        const renderRowNodes = this.context.store.getRenderRowNodes();
+        this.context.startRowIndex = this.binarySearch(renderRowNodes, scrollY + headerHeight);
+        this.context.endRowIndex = this.binarySearch(renderRowNodes, scrollY + stageHeight - scrollbarGutter);
         super.update();
     }
 }

@@ -29,6 +29,7 @@ export interface WidgetConfig {
     height: number
     visible?: boolean
     zIndex?: number
+    reserveSpace?: boolean
     on?: {
         [K in WidgetEventName]?: WidgetEventCallback<K>
     }
@@ -45,6 +46,8 @@ export abstract class Widget {
     width = 0
     height = 0
     visible = true
+    /** 不可见时仍参与前置排版，用于叶子节点占住树图标位置 */
+    reserveSpace = false
     zIndex = 0
     constructor(context: Context, config?: WidgetConfig) {
         this.context = context
@@ -54,6 +57,7 @@ export abstract class Widget {
         this.height = config?.height ?? 0
         this.visible = config?.visible ?? true
         this.zIndex = config?.zIndex ?? 0
+        this.reserveSpace = config?.reserveSpace ?? false
         if (config?.on) {
             for (const [eventName, callback] of Object.entries(config.on)) {
                 this.on(eventName as WidgetEventName, callback as WidgetEventCallback)

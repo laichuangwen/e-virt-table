@@ -348,7 +348,7 @@ export default class Text extends Widget {
   readonly selectionKey: string
   private readonly options: ResolvedTextOptions
   private readonly pad: Padding
-  private readonly box: ContentBox
+  private box: ContentBox
   private readonly beforeWidgets: Widget[]
   private readonly afterWidgets: Widget[]
   private layoutCache: TextLayout | null = null
@@ -359,13 +359,18 @@ export default class Text extends Widget {
     this.selectionKey = config.selectionKey ?? `text:${config.x},${config.y},${config.text}`
     this.options = { ...defaultTextOptions, ...config }
     this.pad = normalizePadding(this.options.padding)
-    this.beforeWidgets = (config.beforeWidgets ?? []).filter((widget) => widget.visible)
-    this.afterWidgets = (config.afterWidgets ?? []).filter((widget) => widget.visible)
+    this.beforeWidgets = (config.beforeWidgets ?? []).filter(
+      (widget) => widget.visible || widget.reserveSpace
+    )
+    this.afterWidgets = (config.afterWidgets ?? []).filter(
+      (widget) => widget.visible || widget.reserveSpace
+    )
     this.box = this.createContentBox()
     this.setChildren([...this.beforeWidgets, ...this.afterWidgets])
     this.on('pointerdown', (e) => this.handlePointerDown(e))
     this.on('pointermove', (e) => this.handlePointerMove(e))
     this.on('pointerup', (e) => this.handlePointerUp(e))
+    this.update()
   }
   getDrawResult(): DrawTextResult {
     return this.result
@@ -380,15 +385,17 @@ export default class Text extends Widget {
     return [...this.beforeWidgets, ...this.afterWidgets]
   }
 
-  render(paint: Paint): void {
+  update(): void {
+    this.box = this.createContentBox()
+    this.layoutCache = null
     if (!this.isValid()) {
       this.result = EMPTY_RESULT
+      super.update()
       return
     }
-    const ctx = paint.getCtx()
+    const ctx = this.context.paint.getCtx()
     const layout = this.ensureLayout(ctx)
     const { lines, charHeight, flatText, neededHeight, clamped } = layout
-
     if (this.options.autoRowHeight) {
       const neededBoxHeight =
         neededHeight +
@@ -398,21 +405,25 @@ export default class Text extends Widget {
         this.options.offsetBottom
       this.options.onAutoHeight?.(Math.ceil(neededBoxHeight))
     }
-    const drawnHeight =
-      linesHeight(lines.length, charHeight) +
-      (layout.afterOnNextLine ? charHeight : 0)
-
     this.layoutWidgets(lines, layout.afterOnNextLine)
-    this.paintSelection(ctx, layout)
-    this.paintLines(ctx, lines)
-    // this.paintWidgets()
     this.result = {
-      height: drawnHeight,
+      height:
+        linesHeight(lines.length, charHeight) +
+        (layout.afterOnNextLine ? charHeight : 0),
       neededHeight,
       lines: lines.length,
       clamped,
       flatText,
     }
+    super.update()
+  }
+
+  render(paint: Paint): void {
+    const layout = this.layoutCache
+    if (!layout || !this.isValid()) return
+    const ctx = paint.getCtx()
+    this.paintSelection(ctx, layout)
+    this.paintLines(ctx, layout.lines)
   }
 
   private isSelecting(): boolean {

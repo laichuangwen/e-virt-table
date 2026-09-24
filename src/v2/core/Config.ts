@@ -89,6 +89,10 @@ export default class Config {
     expandIconSvg = expandIcon;
     /** 展开图标大小 */
     expandIconSize = 18;
+    /** 是否绘制树形连线 */
+    treeLine = true;
+    /** 树形连线颜色 */
+    treeLineColor = '#e1e6eb';
     /** 合计行底部固定 */
     footerFixed = true;
     constructor(config: Partial<Config> = {}) {

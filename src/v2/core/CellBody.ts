@@ -63,6 +63,7 @@ export default class CellBody extends Cell {
             color: expandIcon?.color || '',
             visible: this.expandVisible,
             rotate: this.isExpanded ? 90 : 0,
+            reserveSpace: this.hasExpand && !this.expandVisible,
             on: {
                 'click:self': () => {
                     this.context.store.setExpand(this.rowNode.key, !this.isExpanded);
@@ -103,7 +104,7 @@ export default class CellBody extends Cell {
     }
     get hasExpand() {
         const { type } = this.colNode.column;
-        if (type === 'tree') return true;
+        return type === 'tree' || type === 'selection-tree' || type === 'tree-selection';
     }
     get expandVisible(): boolean {
         if (!this.rowNode.hasChildren) return false;
@@ -111,11 +112,8 @@ export default class CellBody extends Cell {
         return false;
     }
     get expandOffsetLeft(): number {
-        const { expandIconSize, cellTextWidgetGap } = this.context.config;
+        const { expandIconSize } = this.context.config;
         if (!this.hasExpand) return 0;
-        if (!this.expandVisible && this.rowNode.level > 0) {
-            return expandIconSize + cellTextWidgetGap + expandIconSize * this.rowNode.level;
-        }
         return expandIconSize * this.rowNode.level;
     }
     get checkboxVisible(): boolean {
@@ -142,6 +140,52 @@ export default class CellBody extends Cell {
     }
     update(): void {
         super.update();
+    }
+    draw(): void {
+        if (!this.visible) return;
+        const paint = this.context.paint;
+        this.render(paint);
+        this.drawTreeLine(paint);
+        for (const child of this.getChildren()) child.draw();
+    }
+    private drawTreeLine(paint: Paint): void {
+        const { treeLine, treeLineColor } = this.context.config;
+        if (!treeLine || !this.hasExpand) return;
+        const icon = this.expandIcon;
+        if (!icon) return;
+        const row = this.rowNode;
+        const level = row.level;
+        const treeIndent = icon.width;
+        const iconCenterX = icon.x + icon.width / 2;
+        const iconCenterY = icon.y + icon.height / 2;
+        const baseX = icon.x - level * treeIndent;
+        const line = {
+            borderColor: treeLineColor,
+            borderWidth: 1,
+            lineDash: [4, 4],
+            lineDashOffset: 0,
+        };
+        const parentRowKeys = row.parentRowKeys;
+        if (level > 0) {
+            for (let i = 0; i < level - 1; i += 1) {
+                const nextKey = parentRowKeys[i + 2];
+                const nextRow = nextKey ? this.context.store.getRowNode(nextKey) : undefined;
+                if (nextRow?.isLastChild) continue;
+                const vx = Math.round(icon.x - (level - i) * treeIndent + icon.width / 2);
+                paint.drawLine([vx, this.y, vx, this.y + this.height], line);
+            }
+            const vxParent = Math.round(icon.x - treeIndent + icon.width / 2);
+            const y2 = row.isLastChild ? iconCenterY : this.y + this.height;
+            paint.drawLine([vxParent, this.y, vxParent, y2], line);
+            const currVX = Math.round(baseX + (level - 1) * treeIndent + icon.width / 2);
+            paint.drawLine([currVX, iconCenterY, iconCenterX, iconCenterY], line);
+        }
+        if (row.hasChildren && row.expand) {
+            paint.drawLine(
+                [iconCenterX, icon.y + icon.height, iconCenterX, this.y + this.height],
+                line,
+            );
+        }
     }
     render(paint: Paint): void {
         const { bodyBgColor, borderColor } = this.context.config;
