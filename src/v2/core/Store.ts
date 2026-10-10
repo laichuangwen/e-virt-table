@@ -386,7 +386,7 @@ class Store {
     hasTree = true;
     hasSelection = false;
     debug = true;
-    defaultRowHeight = 36;
+    defaultRowHeight = 68;
     defaultColHeight = 36;
     maxColLevel = 0;
     headerHeight = 0;

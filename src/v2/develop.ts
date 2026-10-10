@@ -6,7 +6,7 @@ let columns: Column[] = [
     // {
     //   title: "序号",
     //   key: "index",
-    //   type: "index",
+    //   type: "tree",
     //   fixed: "left",
     //   width: 50,
     // },
@@ -42,7 +42,7 @@ let columns: Column[] = [
         width: 100,
         title: '',
         // fixed: 'left',
-        type: 'index-selection',
+        type: 'selection',
         align: 'center',
         verticalAlign: 'middle',
         // dragRow: true,
@@ -58,7 +58,8 @@ let columns: Column[] = [
     {
         title: '姓名',
         key: 'emp_name',
-        width: 100,
+        type: 'selection-tree',
+        width: 150,
         fixed: 'left',
         align: 'left',
         // dragRow: true,
@@ -86,18 +87,12 @@ let columns: Column[] = [
     // {
     //   title: '部门',
     //   key: 'dep_name',
-    //   size: 'large',
+    //   type: 'tree',
     //   align: 'left',
     //   readonly: true,
     //   // fixed: 'right',
     //   overflowTooltipShow: true,
-    //   overflowTooltipWidth: 300,
     //   overflowTooltipPlacement: 'left-end',
-    //   renderFooter(cell: any) {
-    //     return h('span', {
-    //       class: 'text',
-    //     }, 'heji部门');
-    //   },
     // },
     {
         title: '岗位',
@@ -467,7 +462,7 @@ let columns: Column[] = [
     },
 ];
 let data: any[] = [];
-for (let i = 0; i < 240; i += 1) {
+for (let i = 0; i < 24000; i += 1) {
     data.push({
         _height: [3, 5, 6, 7].includes(i) ? 60 : 0,
         id: `${i}`,
@@ -556,7 +551,7 @@ for (let i = 0; i < 240; i += 1) {
         ],
     });
 }
-for (let i = 0; i < 0; i += 1) {
+for (let i = 0; i < 10000; i += 1) {
     columns.push({
         title: `表头${i}`,
         key: `sc_name${i}`,

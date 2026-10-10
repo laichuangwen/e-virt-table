@@ -23,14 +23,8 @@ export interface TextConfig extends WidgetConfig {
   beforeWidgets?: Widget[]
   afterWidgets?: Widget[]
   widgetGap?: number
-  /** 内容区左侧额外占位 */
-  offsetLeft?: number
-  /** 内容区右侧额外占位 */
-  offsetRight?: number
-  /** 内容区顶部额外占位 */
-  offsetTop?: number
-  /** 内容区底部额外占位 */
-  offsetBottom?: number
+  /** true：左右组件固定，中间文字调整；false：左右组件跟随文字 */
+  fixedWidgets?: boolean
 }
 
 export interface TextSelectionRange {
@@ -115,11 +109,8 @@ const defaultTextOptions = {
   onAutoHeight: undefined as ((height: number) => void) | undefined,
   selectionColor: DEFAULT_SELECTION_COLOR,
   widgetGap: 4,
+  fixedWidgets: false,
   type: 'text' as 'text' | 'link',
-  offsetLeft: 0,
-  offsetRight: 0,
-  offsetTop: 0,
-  offsetBottom: 0,
 }
 
 type ResolvedTextOptions = typeof defaultTextOptions
@@ -397,12 +388,7 @@ export default class Text extends Widget {
     const layout = this.ensureLayout(ctx)
     const { lines, charHeight, flatText, neededHeight, clamped } = layout
     if (this.options.autoRowHeight) {
-      const neededBoxHeight =
-        neededHeight +
-        this.pad.top +
-        this.pad.bottom +
-        this.options.offsetTop +
-        this.options.offsetBottom
+      const neededBoxHeight = neededHeight + this.pad.top + this.pad.bottom
       this.options.onAutoHeight?.(Math.ceil(neededBoxHeight))
     }
     this.layoutWidgets(lines, layout.afterOnNextLine)
@@ -551,11 +537,10 @@ export default class Text extends Widget {
   private createContentBox(): ContentBox {
     const { x, y, width, height } = this
     const { left, top, right, bottom } = this.pad
-    const { offsetLeft, offsetRight, offsetTop, offsetBottom } = this.options
-    const contentX = x + left + offsetLeft
-    const contentY = y + top + offsetTop
-    const contentWidth = width - left - right - offsetLeft - offsetRight
-    const contentHeight = height - top - bottom - offsetTop - offsetBottom
+    const contentX = x + left
+    const contentY = y + top
+    const contentWidth = width - left - right
+    const contentHeight = height - top - bottom
     const gap = this.options.widgetGap
     return {
       x,
@@ -620,7 +605,9 @@ export default class Text extends Widget {
       (afterOnNextLine ? charHeight : 0)
     const startY = this.resolveVerticalAlign(drawnHeight)
     const { contentX, contentWidth, beforeWidgetsWidth, afterWidgetsWidth } = box
-    const afterOnSameLine = !afterOnNextLine && this.afterWidgets.length > 0
+    const fixed = options.fixedWidgets
+    const afterOnSameLine =
+      !fixed && !afterOnNextLine && this.afterWidgets.length > 0
     const layoutLines: LayoutLine[] = []
     let flatStart = 0
     let txtY = startY
@@ -628,9 +615,12 @@ export default class Text extends Widget {
     for (let i = 0; i < lineCount; i++) {
       const text = prepared.lines[i].trimEnd()
       const width = text ? ctx.measureText(text).width : 0
-      const lead = i === 0 ? beforeWidgetsWidth : 0
-      const trail =
-        i === lineCount - 1 && afterOnSameLine ? afterWidgetsWidth : 0
+      const lead = fixed || i === 0 ? beforeWidgetsWidth : 0
+      const trail = fixed
+        ? afterWidgetsWidth
+        : i === lineCount - 1 && afterOnSameLine
+          ? afterWidgetsWidth
+          : 0
       const lineBoxX = contentX + lead
       const lineBoxW = Math.max(0, contentWidth - lead - trail)
       layoutLines.push({
@@ -674,7 +664,14 @@ export default class Text extends Widget {
     const { contentWidth, contentHeight, beforeWidgetsWidth, afterWidgetsWidth } =
       box
 
-    const firstLineWidth = Math.max(0, contentWidth - beforeWidgetsWidth)
+    const fixed = options.fixedWidgets
+    const middleWidth = Math.max(
+      0,
+      contentWidth - beforeWidgetsWidth - (fixed ? afterWidgetsWidth : 0)
+    )
+    const firstLineWidth = fixed
+      ? middleWidth
+      : Math.max(0, contentWidth - beforeWidgetsWidth)
     // 高度连一行都放不下时仍保留 1 行，避免空白，改画省略号
     const fitLines = options.autoRowHeight
       ? undefined
@@ -683,13 +680,14 @@ export default class Text extends Widget {
       fitLines == null ? undefined : Math.max(1, fitLines)
 
     const lastLineMax = (lineCount: number) => {
+      if (fixed) return middleWidth
       const lead = lineCount <= 1 ? beforeWidgetsWidth : 0
       return Math.max(0, contentWidth - lead - afterWidgetsWidth)
     }
     let lines = splitText({
       ctx,
       text,
-      width: contentWidth,
+      width: fixed ? middleWidth : contentWidth,
       firstLineWidth,
     })
     let clamped = false
@@ -768,6 +766,7 @@ export default class Text extends Widget {
     ctx: CanvasRenderingContext2D,
     lines: string[]
   ): boolean {
+    if (this.options.fixedWidgets) return false
     if (this.afterWidgets.length === 0) return false
     if (!lines.some((line) => line.trimEnd().length > 0)) return false
     return !this.canPlaceAfterOnSameLine(ctx, lines)
@@ -798,6 +797,18 @@ export default class Text extends Widget {
       if (align === 'right') return contentXEnd - span
       if (align === 'center') return contentX + (contentWidth - span) / 2
       return contentX
+    }
+
+    if (this.options.fixedWidgets) {
+      placeRow(this.beforeWidgets, contentX, contentY, contentHeight)
+      const afterSpan = widgetsSpanWidth(this.afterWidgets, gap)
+      placeRow(
+        this.afterWidgets,
+        afterSpan > 0 ? contentXEnd - afterSpan : contentXEnd,
+        contentY,
+        contentHeight
+      )
+      return
     }
 
     const placeBothInOneRow = (lineY: number, lineH: number) => {

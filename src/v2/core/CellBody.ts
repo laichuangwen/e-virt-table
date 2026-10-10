@@ -1,10 +1,12 @@
-import { CellType, Padding, PaddingInput } from "../types";
+import { CellType } from "../types";
 import Cell from "./Cell";
 import Context from "./Context";
 import { ColNode, RowNode } from "./Store";
 import Text from "./Text";
 import { Paint } from "./Paint";
 import { Icon } from "./Icon";
+import { TreeLine } from "./TreeLine";
+import { Widget } from "./Widget";
 export interface CellHeaderConfig {
     cellType: CellType,
     colNode: ColNode,
@@ -14,6 +16,7 @@ export default class CellBody extends Cell {
     private rowNode: RowNode;
     private checkIcon: Icon | null = null;
     private expandIcon: Icon | null = null;
+    private spacerIcon: Icon | null = null;
     private text: Text | null = null;
     constructor(context: Context, colNode: ColNode, rowNode: RowNode) {
         super(context, {
@@ -33,15 +36,15 @@ export default class CellBody extends Cell {
         const { maxLineClamp, align, verticalAlign } = this.colNode.column;
         const checkState = this.rowNode.getCheckState();
         const { checkboxSize, expandIconSize } = this.context.config;
-        const icon = this.context.config.getIcon(`checkbox-${checkState}`);
+        const checkboxIcon = this.context.config.getIcon(`checkbox-${checkState}`);
         this.checkIcon = new Icon(this.context, {
             name: 'check',
             x: this.x,
             y: this.y,
             width: checkboxSize,
             height: checkboxSize,
-            source: icon?.source,
-            color: icon?.color || '',
+            source: checkboxIcon?.source,
+            color: checkboxIcon?.color || '',
             visible: this.checkboxVisible,
             on: {
                 'click:self': () => {
@@ -71,8 +74,19 @@ export default class CellBody extends Cell {
                 },
             },
         });
+        this.spacerIcon = new Icon(this.context, {
+            name: 'spacer',
+            x: this.x,
+            y: this.y,
+            width: this.expandOffsetLeft - cellTextWidgetGap,
+            height: 0,
+            source: undefined,
+            color: '',
+            visible: false,
+            reserveSpace: this.rowNode.level > 0,
+        });
         this.text = new Text(this.context, {
-            beforeWidgets: [this.checkIcon, this.expandIcon],
+            beforeWidgets: [...this.defaultBeforeWidgets],
             afterWidgets: [],
             maxLineClamp,
             align: align || cellAlign,
@@ -85,10 +99,11 @@ export default class CellBody extends Cell {
             width: this.width,
             height: this.height,
             color: bodyTextColor,
-            offsetLeft: this.expandOffsetLeft,
             widgetGap: cellTextWidgetGap,
+            fixedWidgets: true,
         });
-        this.setChildren([this.text]);
+        const treeLine = new TreeLine(this.context, this.text, this.rowNode, this.hasExpand);
+        this.setChildren([treeLine, this.text]);
         this.on('click:self', () => {
             console.log('click:self', this.colNode.key, this.rowNode.key);
         });
@@ -119,10 +134,20 @@ export default class CellBody extends Cell {
     get checkboxVisible(): boolean {
         const { type } = this.colNode.column;
         if (type === 'selection') return true;
+        if (type === 'tree-selection') return true;
+        if (type === 'selection-tree') return true;
         if (type === 'selection-text') return true;
         if (type === 'index-selection' && this.isChecked) return true;
         if (type === 'index-selection' && this.isCurrentRowHovered) return true;
         return false;
+    }
+    get defaultBeforeWidgets(): Widget[] {
+        const { type } = this.colNode.column;
+        if (!this.spacerIcon || !this.expandIcon || !this.checkIcon) return [];
+        if (type === 'tree') return [this.spacerIcon, this.expandIcon];
+        if (type === 'selection-tree') return [this.checkIcon, this.spacerIcon, this.expandIcon];
+        if (type === 'tree-selection') return [this.spacerIcon, this.expandIcon, this.checkIcon];
+        return [];
     }
     get isExpanded(): boolean {
         return this.rowNode.getExpand();
@@ -140,52 +165,6 @@ export default class CellBody extends Cell {
     }
     update(): void {
         super.update();
-    }
-    draw(): void {
-        if (!this.visible) return;
-        const paint = this.context.paint;
-        this.render(paint);
-        this.drawTreeLine(paint);
-        for (const child of this.getChildren()) child.draw();
-    }
-    private drawTreeLine(paint: Paint): void {
-        const { treeLine, treeLineColor } = this.context.config;
-        if (!treeLine || !this.hasExpand) return;
-        const icon = this.expandIcon;
-        if (!icon) return;
-        const row = this.rowNode;
-        const level = row.level;
-        const treeIndent = icon.width;
-        const iconCenterX = icon.x + icon.width / 2;
-        const iconCenterY = icon.y + icon.height / 2;
-        const baseX = icon.x - level * treeIndent;
-        const line = {
-            borderColor: treeLineColor,
-            borderWidth: 1,
-            lineDash: [4, 4],
-            lineDashOffset: 0,
-        };
-        const parentRowKeys = row.parentRowKeys;
-        if (level > 0) {
-            for (let i = 0; i < level - 1; i += 1) {
-                const nextKey = parentRowKeys[i + 2];
-                const nextRow = nextKey ? this.context.store.getRowNode(nextKey) : undefined;
-                if (nextRow?.isLastChild) continue;
-                const vx = Math.round(icon.x - (level - i) * treeIndent + icon.width / 2);
-                paint.drawLine([vx, this.y, vx, this.y + this.height], line);
-            }
-            const vxParent = Math.round(icon.x - treeIndent + icon.width / 2);
-            const y2 = row.isLastChild ? iconCenterY : this.y + this.height;
-            paint.drawLine([vxParent, this.y, vxParent, y2], line);
-            const currVX = Math.round(baseX + (level - 1) * treeIndent + icon.width / 2);
-            paint.drawLine([currVX, iconCenterY, iconCenterX, iconCenterY], line);
-        }
-        if (row.hasChildren && row.expand) {
-            paint.drawLine(
-                [iconCenterX, icon.y + icon.height, iconCenterX, this.y + this.height],
-                line,
-            );
-        }
     }
     render(paint: Paint): void {
         const { bodyBgColor, borderColor } = this.context.config;
