@@ -1,6 +1,7 @@
 import type { Align } from './types';
 import type Context from './Context';
 import type CellHeader from './CellHeader';
+import { copyText } from './util';
 
 export type TextSelectionRange = {
     start: number;
@@ -194,7 +195,7 @@ export default class TextSelector {
             return;
         }
         e.preventDefault();
-        navigator.clipboard?.writeText(text).catch((error) => console.error('Copy Failure:', error));
+        copyText(text).catch((error) => console.error('Copy Failure:', error));
     }
 
     /**

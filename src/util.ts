@@ -263,6 +263,111 @@ function encodeToSpreadsheetStr(arr: string[][]) {
 
     return str;
 }
+/**
+ * 写入剪贴板。优先 Clipboard API，不可用时才降级为 execCommand。
+ */
+function copyText(text: string): Promise<void> {
+    const clipboard = navigator.clipboard;
+    if (clipboard?.writeText && window.isSecureContext) {
+        return clipboard.writeText(text);
+    }
+    return copyTextByExecCommand(text);
+}
+function copyTextByExecCommand(text: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.top = '0';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        let ok = false;
+        try {
+            ok = document.execCommand('copy');
+        } catch (error) {
+            document.body.removeChild(textarea);
+            reject(error);
+            return;
+        }
+        document.body.removeChild(textarea);
+        if (ok) {
+            resolve();
+        } else {
+            reject(new Error('Copy Failure'));
+        }
+    });
+}
+/**
+ * 读取剪贴板文本。优先 Clipboard API，不可用时才降级为 paste 事件的 clipboardData。
+ */
+function readClipboardText(): Promise<string> {
+    const clipboard = navigator.clipboard;
+    if (clipboard?.readText && window.isSecureContext) {
+        return clipboard.readText();
+    }
+    return readClipboardByPasteEvent().promise;
+}
+function readClipboardByPasteEvent(): { promise: Promise<string>; cancel: () => void } {
+    let settled = false;
+    let timer = 0;
+    let execTimer = 0;
+    let cancel = () => {};
+    const promise = new Promise<string>((resolve, reject) => {
+        const finish = (error: Error | null, text = '') => {
+            if (settled) {
+                return;
+            }
+            settled = true;
+            window.clearTimeout(timer);
+            window.clearTimeout(execTimer);
+            window.removeEventListener('paste', onPaste, true);
+            if (error) {
+                reject(error);
+            } else {
+                resolve(text);
+            }
+        };
+        const onPaste = (event: ClipboardEvent) => {
+            const data = event.clipboardData;
+            const text = data?.getData('text/plain') || data?.getData('text') || '';
+            event.preventDefault();
+            finish(null, text);
+        };
+        window.addEventListener('paste', onPaste, true);
+        // 键盘粘贴会在 keydown 之后同步派发 paste。右键菜单没有该事件，再尝试 execCommand。
+        execTimer = window.setTimeout(() => {
+            if (settled) {
+                return;
+            }
+            const textarea = document.createElement('textarea');
+            textarea.style.position = 'fixed';
+            textarea.style.top = '0';
+            textarea.style.left = '-9999px';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            const active = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+            textarea.focus();
+            try {
+                document.execCommand('paste');
+            } catch {
+                // 继续等待 paste 事件或超时
+            }
+            document.body.removeChild(textarea);
+            active?.focus();
+        }, 0);
+        timer = window.setTimeout(() => {
+            finish(new Error('Failed to get the clipboard content'));
+        }, 100);
+        cancel = () => finish(null, '');
+    });
+    return {
+        promise,
+        cancel: () => cancel(),
+    };
+}
 // 获取合并单元格的spanArr,针对行数据相同key合并
 function getSpanArrByRow(list: any, key: string, relationRowKeys: string[] = []) {
     let contactDot = 0;
@@ -489,6 +594,8 @@ export {
     getMaxRow,
     decodeSpreadsheetStr,
     encodeToSpreadsheetStr,
+    copyText,
+    readClipboardText,
     mergeRowCell,
     mergeColCell,
     getSpanArrByRow,

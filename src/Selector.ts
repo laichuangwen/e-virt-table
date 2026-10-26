@@ -2,7 +2,7 @@ import type Context from './Context';
 import type Cell from './Cell';
 import type CellHeader from './CellHeader';
 import { BeforePasteDataMethod, BeforeSetSelectorMethod, ChangeItem, ErrorResult, BeforeCopyMethod } from './types';
-import { throttle, decodeSpreadsheetStr, encodeToSpreadsheetStr } from './util';
+import { throttle, decodeSpreadsheetStr, encodeToSpreadsheetStr, copyText, readClipboardText } from './util';
 import { getLayoutScrollerTrackSize } from './ScrollbarMode';
 export default class Selector {
     private isCut = false;
@@ -592,24 +592,19 @@ export default class Selector {
             value = res.data;
         }
         const text = encodeToSpreadsheetStr(value);
-        if (navigator.clipboard) {
-            navigator.clipboard
-                .writeText(text)
-                .then(() => {
-                    // 处理复制线
-                    this.ctx.selector.xArrCopy = this.ctx.selector.xArr.slice();
-                    this.ctx.selector.yArrCopy = this.ctx.selector.yArr.slice();
-                    this.ctx.emit('copyChange', {
-                        xArr: this.ctx.selector.xArrCopy,
-                        yArr: this.ctx.selector.yArrCopy,
-                        data: value,
-                    });
-                    this.ctx.emit('draw');
-                })
-                .catch((error) => console.error('Copy Failure:', error));
-        } else {
-            console.error('current browser does not support the Clipboard API');
-        }
+        copyText(text)
+            .then(() => {
+                // 处理复制线
+                this.ctx.selector.xArrCopy = this.ctx.selector.xArr.slice();
+                this.ctx.selector.yArrCopy = this.ctx.selector.yArr.slice();
+                this.ctx.emit('copyChange', {
+                    xArr: this.ctx.selector.xArrCopy,
+                    yArr: this.ctx.selector.yArrCopy,
+                    data: value,
+                });
+                this.ctx.emit('draw');
+            })
+            .catch((error) => console.error('Copy Failure:', error));
     }
     clearSelectedData(xArr: number[], yArr: number[], ignoreSet = false, value = null) {
         let changeList: ChangeItem[] = [];
@@ -652,17 +647,12 @@ export default class Selector {
         return changeList;
     }
     private paste() {
-        if (!navigator.clipboard) {
-            console.error('current browser does not support the Clipboard API');
-            return;
-        }
         const { ENABLE_PASTER } = this.ctx.config;
         if (this.ctx.selector.enable && ENABLE_PASTER) {
             const rowIndex = this.ctx.selector.yArr[0];
             const colIndex = this.ctx.selector.xArr[0];
             const rowKeyList: Set<string> = new Set();
-            navigator.clipboard
-                .readText()
+            readClipboardText()
                 .then(async (val) => {
                     let textArr = decodeSpreadsheetStr(val);
                     const _xArr = [colIndex, colIndex + textArr[0].length - 1];
