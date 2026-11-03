@@ -917,8 +917,12 @@ export default class Selector {
         } else if (diffBottom > 0) {
             _scrollY = Math.floor(scrollY + diffBottom);
         }
-        // >1是因为上面为了可移动加1，所以这里要大于2(保险一点)
-        if (Math.abs(scrollX - _scrollX) > 2.5 || Math.abs(scrollY - _scrollY) > 2.5) {
+        // 水平方向包含选中框的 1px 补偿，保留容差以避免边缘抖动。
+        if (Math.abs(scrollX - _scrollX) <= 2.5) {
+            _scrollX = scrollX;
+        }
+        // 垂直方向不能忽略 1–2px：上一行可能仍在虚拟渲染区外，导致方向键无法继续向上。
+        if (scrollX !== _scrollX || scrollY !== _scrollY) {
             this.ctx.setScroll(_scrollX, _scrollY);
         }
     }
