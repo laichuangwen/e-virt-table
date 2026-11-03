@@ -6,6 +6,11 @@ Vx.x.x(TPL)
 -   Style changes
 -   Dependencies Changes
 -  
+
+V1.4.18
+### Feature
+- fix: 修复虚拟行边界处方向键向上移动卡住
+
 V1.4.17
 ### Feature
 - fix:复制功能发布到服务器上如果不是https 浏览器无法复制

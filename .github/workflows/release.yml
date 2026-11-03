@@ -8,9 +8,17 @@ on:
 permissions:
     contents: write
 
+# 避免同一时间多次发布
+concurrency:
+    group: release
+    cancel-in-progress: false
+
 jobs:
     release:
         runs-on: ubuntu-latest
+        outputs:
+            version: ${{ steps.ver.outputs.version }}
+            is_new: ${{ steps.check.outputs.is_new }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -29,15 +37,15 @@ jobs:
               id: check
               run: |
                   if git rev-parse "refs/tags/${{ steps.ver.outputs.tag }}" >/dev/null 2>&1; then
-                      echo "exists=true" >> "$GITHUB_OUTPUT"
+                      echo "is_new=false" >> "$GITHUB_OUTPUT"
                       echo "Tag ${{ steps.ver.outputs.tag }} already exists, skip release."
                   else
-                      echo "exists=false" >> "$GITHUB_OUTPUT"
+                      echo "is_new=true" >> "$GITHUB_OUTPUT"
                       echo "Tag ${{ steps.ver.outputs.tag }} not found, will create release."
                   fi
 
             - name: Extract changelog
-              if: steps.check.outputs.exists == 'false'
+              if: steps.check.outputs.is_new == 'true'
               run: |
                   VERSION="${{ steps.ver.outputs.version }}"
                   awk -v ver="$VERSION" '
@@ -54,10 +62,56 @@ jobs:
                   cat /tmp/notes.md
 
             - name: Create GitHub Release
-              if: steps.check.outputs.exists == 'false'
+              if: steps.check.outputs.is_new == 'true'
               uses: softprops/action-gh-release@v2
               with:
                   tag_name: ${{ steps.ver.outputs.tag }}
                   name: v${{ steps.ver.outputs.version }}
                   body_path: /tmp/notes.md
                   generate_release_notes: false
+
+    publish:
+        needs: release
+        if: needs.release.result == 'success'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            id-token: write # npm provenance 需要
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '22'
+                  registry-url: 'https://registry.npmjs.org'
+
+            - name: Check if version already published
+              id: npm-check
+              run: |
+                  NAME=$(node -p "require('./package.json').name")
+                  VERSION=$(node -p "require('./package.json').version")
+                  echo "name=$NAME" >> "$GITHUB_OUTPUT"
+                  echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+                  if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
+                      echo "published=true" >> "$GITHUB_OUTPUT"
+                      echo "$NAME@$VERSION 已存在于 npm，跳过发布。"
+                  else
+                      echo "published=false" >> "$GITHUB_OUTPUT"
+                      echo "$NAME@$VERSION 尚未发布，准备发布。"
+                  fi
+
+            - name: Install dependencies
+              if: steps.npm-check.outputs.published == 'false'
+              run: npm install --no-audit --no-fund
+
+            - name: Build
+              if: steps.npm-check.outputs.published == 'false'
+              run: npm run build
+
+            - name: Publish to npm
+              if: steps.npm-check.outputs.published == 'false'
+              run: npm publish --access public --provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
