@@ -828,7 +828,7 @@ export default class Selector {
         }
         this.ctx.setFocusCell(cell);
         this.setSelector(xArr, yArr);
-        this.adjustBoundaryPosition();
+        this.adjustBoundaryPosition(dir === 'TOP' || dir === 'BOTTOM');
         this.ctx.emit('moveFocus', cell);
         this.ctx.emit('draw');
     }
@@ -863,7 +863,7 @@ export default class Selector {
     /**
      * 调整滚动条位置，让焦点单元格始终出现在可视区域内
      */
-    private adjustBoundaryPosition() {
+    private adjustBoundaryPosition(allowSmallVerticalScroll = false) {
         const {
             stageHeight,
             stageWidth,
@@ -917,12 +917,14 @@ export default class Selector {
         } else if (diffBottom > 0) {
             _scrollY = Math.floor(scrollY + diffBottom);
         }
-        // 水平方向包含选中框的 1px 补偿，保留容差以避免边缘抖动。
-        if (Math.abs(scrollX - _scrollX) <= 2.5) {
+        const shouldScrollX = Math.abs(scrollX - _scrollX) > 2.5;
+        // 仅键盘导航允许 1–2px 的纵向校正，避免上一行留在虚拟渲染区外。
+        const shouldScrollY = Math.abs(scrollY - _scrollY) > (allowSmallVerticalScroll ? 0 : 2.5);
+        // 保留横向边框补偿的容差；点击和程序选中仍沿用原来的滚动行为。
+        if (allowSmallVerticalScroll && !shouldScrollX) {
             _scrollX = scrollX;
         }
-        // 垂直方向不能忽略 1–2px：上一行可能仍在虚拟渲染区外，导致方向键无法继续向上。
-        if (scrollX !== _scrollX || scrollY !== _scrollY) {
+        if (shouldScrollX || shouldScrollY) {
             this.ctx.setScroll(_scrollX, _scrollY);
         }
     }

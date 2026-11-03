@@ -114,7 +114,7 @@ switch (process.env.SELECTOR_SCENARIO) {
         for (const pixels of [1, 2]) {
             const { ctx, selector, calls } = overflowContext();
             ctx.focusCell.drawY = ctx.header.height - pixels;
-            selector.adjustBoundaryPosition();
+            selector.adjustBoundaryPosition(true);
             assert.deepEqual(calls, [[50, 100 - pixels]]);
         }
         break;
@@ -122,7 +122,7 @@ switch (process.env.SELECTOR_SCENARIO) {
         for (const pixels of [1, 2]) {
             const { ctx, selector, calls } = overflowContext();
             ctx.focusCell.drawY = ctx.stageHeight - 14 - ctx.focusCell.height + pixels;
-            selector.adjustBoundaryPosition();
+            selector.adjustBoundaryPosition(true);
             assert.deepEqual(calls, [[50, 100 + pixels]]);
         }
         break;
@@ -130,7 +130,7 @@ switch (process.env.SELECTOR_SCENARIO) {
         for (const pixels of [1, 2, 3]) {
             const { ctx, selector, calls } = overflowContext();
             ctx.focusCell.drawX = 1 - pixels;
-            selector.adjustBoundaryPosition();
+            selector.adjustBoundaryPosition(true);
             assert.deepEqual(calls, pixels > 2 ? [[50 - pixels, 100]] : []);
         }
         break;
@@ -138,7 +138,7 @@ switch (process.env.SELECTOR_SCENARIO) {
         const { ctx, selector, calls } = overflowContext();
         ctx.focusCell.drawX = 0;
         ctx.focusCell.drawY = ctx.header.height - 1;
-        selector.adjustBoundaryPosition();
+        selector.adjustBoundaryPosition(true);
         assert.deepEqual(calls, [[50, 99]]);
         break;
     }
@@ -147,7 +147,7 @@ switch (process.env.SELECTOR_SCENARIO) {
         ctx.focusCell.fixed = 'left';
         ctx.focusCell.drawX = -20;
         ctx.focusCell.drawY = ctx.header.height - 1;
-        selector.adjustBoundaryPosition();
+        selector.adjustBoundaryPosition(true);
         assert.deepEqual(calls, [[50, 99]]);
         break;
     }
@@ -161,10 +161,29 @@ switch (process.env.SELECTOR_SCENARIO) {
                 position === 'top'
                     ? ctx.header.height + ctx.footer.height - 1
                     : ctx.stageHeight - ctx.footer.height - 14 - ctx.focusCell.height + 1;
-            selector.adjustBoundaryPosition();
+            selector.adjustBoundaryPosition(true);
             assert.deepEqual(calls, [[50, position === 'top' ? 99 : 101]]);
         }
         break;
+    case 'legacy':
+        for (const pixels of [1, 2, 3]) {
+            const { ctx, selector, calls } = overflowContext();
+            ctx.focusCell.drawX = 0;
+            ctx.focusCell.drawY = ctx.header.height - pixels;
+            selector.adjustBoundaryPosition();
+            // The existing non-keyboard path also applies the horizontal correction
+            // when a large vertical correction triggers scrolling.
+            assert.deepEqual(calls, pixels > 2 ? [[49, 100 - pixels]] : []);
+        }
+        break;
+    case 'oversized': {
+        const { ctx, selector, calls } = overflowContext();
+        ctx.focusCell.drawY = ctx.header.height;
+        ctx.focusCell.height = ctx.body.visibleHeight * 2;
+        selector.adjustBoundaryPosition(true);
+        assert.deepEqual(calls, []);
+        break;
+    }
     default:
         throw new Error(`Unknown scenario: ${process.env.SELECTOR_SCENARIO}`);
 }

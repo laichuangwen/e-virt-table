@@ -14,6 +14,8 @@ for (const [scenario, description] of [
     ['independent-axes', 'does not introduce a horizontal nudge while correcting vertical overflow'],
     ['fixed', 'corrects vertical overflow for fixed columns without moving them horizontally'],
     ['footer', 'respects fixed footer boundaries at the top and bottom'],
+    ['legacy', 'keeps the original scroll tolerance for mouse and programmatic selection'],
+    ['oversized', 'does not scroll an already aligned cell taller than the viewport'],
 ]) {
     test(description, () => {
         const result = spawnSync(
